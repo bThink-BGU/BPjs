@@ -1,4 +1,4 @@
 language: java
 jdk: oraclejdk8
 after_success:
-  - mvn clean test jacoco:report coveralls:report
+  - mvn -DTRAVIS_JOB_ID=$TRAVIS_JOB_ID clean test jacoco:report coveralls:report
