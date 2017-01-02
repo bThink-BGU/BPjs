@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: il.ac.bgu.cs.bp.bpjs.examples.addingbthreads_auto.AddingBthreadsAutomaticTest
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.011 sec
