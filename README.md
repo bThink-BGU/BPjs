@@ -3,6 +3,7 @@
 This repository contains a javascript-based [BP](http://www.b-prog.org) library.
 
 [![Build Status](https://travis-ci.org/bThink-BGU/BPjs.svg?branch=develop)](https://travis-ci.org/bThink-BGU/BPjs)
+[![Documentation Status](http://readthedocs.org/projects/bpjs/badge/?version=develop)](http://bpjs.readthedocs.io/)
 
 ## Change log for the BPjs library.
 
