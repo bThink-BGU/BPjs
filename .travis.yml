@@ -1,3 +1,5 @@
 language: java
 jdk: oraclejdk8
 before_script: cd code
+after_success:
+  - mvn clean test jacoco:report coveralls:report

@@ -2,9 +2,12 @@
 
 This repository contains a javascript-based [BP](http://www.b-prog.org) library.
 
+[![Build Status](https://travis-ci.org/bThink-BGU/BPjs.svg?branch=develop)](https://travis-ci.org/bThink-BGU/BPjs)
+
 ## Change log for the BPjs library.
 
 ### 2017-01-02
+* :sparkles: Added continuous testing with [Travis-CI](https://travis-ci.org) (Thanks guys!).
 * :tada: Moved from native NetBeans to *maven* project :tada: :tada: :sparkles:
 * :bug: Various small issues fixed thanks to static analysis (and NetBeans' Code Inspection tool).
 * :arrows_counterclockwise: Moved to canonical package structure (`il.ac.bgu.cs.bp.*`).
