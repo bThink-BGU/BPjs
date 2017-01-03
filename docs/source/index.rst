@@ -14,16 +14,16 @@ University of the Negev, Israel. The code is `available on GitHub`_.
 
 .. _available on GitHub: https://github.com/bThink-BGU/BPjs
 
-Here you can learn about :doc:`writing <write-bpjs>` and :doc:`executing <execute-bpjs>` BPjs programs, embedding BPjs
-programs in larger Java systems (or any JVM-based systems, really), and extending
-and modifying BPjs' behavior. If you are new to Behavioral Programming (that's alright,
-it's a fairly new concept), you're invited to read our quick intro.
+Here you can learn about :doc:`writing <write-bpjs>` and :doc:`executing <execute-bpjs>` BPjs programs,
+:doc:`embedding <embed-bpjs>` BPjs programs in larger Java systems (or any JVM-based systems, really),
+and extending and modifying BPjs' behavior.
+
+.. tip:: If you are new to Behavioral Programming (that's alright, it's a fairly new concept), you're invited to read our quick intro.
 
 .. note:: Model checking for behavioral programs is coming soon!
 
 .. todo:: short theory page about BP.
 
-.. todo:: guide for writing BPjs code.
 
 .. todo:: guide for embedding BPjs in an application.
 
@@ -34,6 +34,7 @@ it's a fairly new concept), you're invited to read our quick intro.
 
    write-bpjs
    execute-bpjs
+   embed-bpjs
 
 
 
