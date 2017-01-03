@@ -3,9 +3,14 @@
 This repository contains a javascript-based [BP](http://www.b-prog.org) library.
 
 [![Build Status](https://travis-ci.org/bThink-BGU/BPjs.svg?branch=develop)](https://travis-ci.org/bThink-BGU/BPjs)
+[![Coverage Status](https://coveralls.io/repos/github/bThink-BGU/BPjs/badge.svg?branch=develop)](https://coveralls.io/github/bThink-BGU/BPjs?branch=develop)
 [![Documentation Status](http://readthedocs.org/projects/bpjs/badge/?version=develop)](http://bpjs.readthedocs.io/en/develop/)
 
 ## Change log for the BPjs library.
+
+### 2017-01-03
+* :sparkles: Added continuous code coverage with [Coveralls.io](https://coveralls.io/github/bThink-BGU/BPjs?branch=develop) (Thanks guys!).
+* :sparkles: Improved test coverage.
 
 ### 2017-01-02
 * :sparkles: Added continuous testing with [Travis-CI](https://travis-ci.org) (Thanks guys!).
