@@ -83,17 +83,6 @@ public class BThreadSyncSnapshot implements Serializable {
         entryPoint.setParentScope(scope);
     }
 
-    /**
-     * Called from the Javascript code (via the proxy) when the client code wants to bsync.
-     * @param aStatement 
-     */
-    public void bsync( BSyncStatement aStatement ) {
-        bSyncStatement = aStatement.setBthread(this);
-        ContinuationPending capturedContinuation = Context.getCurrentContext().captureContinuation();
-        capturedContinuation.setApplicationState(aStatement);
-        throw capturedContinuation;
-    }
-    
     public BSyncStatement getBSyncStatement() {
         return bSyncStatement;
     }

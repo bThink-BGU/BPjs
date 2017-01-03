@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 import static java.util.stream.Collectors.toSet;
 import java.util.stream.Stream;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
@@ -54,10 +55,10 @@ public class BThreadJsProxy implements java.io.Serializable {
                      .block( convertToEventSet(jRWB.get("block")) )
                  .interrupt( convertToEventSet(jRWB.get("interrupt")) );
         
-        bthread.bsync( stmt );
+        captureBThreadState(stmt);
         
     }
-    
+
     private EventSet convertToEventSet( Object jsObject ) {
         if ( jsObject == null ) return Events.emptySet;
         
@@ -98,7 +99,7 @@ public class BThreadJsProxy implements java.io.Serializable {
                       EventSet waitedEvents,
                       EventSet blockedEvents) {
         System.err.println("warning: positional bsync (bsync(r,w,b)) is deprecated. Use named arguemnt bsync (bsync({request:...})) instead.");
-        bthread.bsync(BSyncStatement.make().request(requestedEvents)
+        captureBThreadState(BSyncStatement.make().request(requestedEvents)
                                   .waitFor(waitedEvents)
                                   .block(blockedEvents) );
     }
@@ -113,7 +114,7 @@ public class BThreadJsProxy implements java.io.Serializable {
                       EventSet waitedEvents,
                       EventSet blockedEvents) {
         System.err.println("warning: positional bsync (bsync(r,w,b)) is deprecated. Use named arguemnt bsync (bsync({request:...})) instead.");
-        bthread.bsync(BSyncStatement.make().request(aRequestedEvent)
+        captureBThreadState(BSyncStatement.make().request(aRequestedEvent)
                                   .waitFor(waitedEvents)
                                   .block(blockedEvents) );
     }
@@ -123,4 +124,13 @@ public class BThreadJsProxy implements java.io.Serializable {
         bthread.setInterruptHandler(
                 (aPossibleHandler instanceof Function) ? (Function) aPossibleHandler: null );
     }
+    
+    private void captureBThreadState(BSyncStatement stmt) throws ContinuationPending {
+        bthread.setBSyncStatement(stmt);
+        stmt.setBthread(bthread);
+        ContinuationPending capturedContinuation = Context.getCurrentContext().captureContinuation();
+        capturedContinuation.setApplicationState(stmt);
+        throw capturedContinuation;
+    }
+
 }

@@ -30,13 +30,15 @@ public class ContinuationGames {
         @Override
         protected void setupProgramScope(Scriptable scope) {
             evaluateBpCode(scope,
+                    " j=1; "+
                     "bp.registerBThread( \"bt\", function(){\n"
                     + "   bp.log.info(\"started\");"
 //                    + "   bsync({});\n"
-                    + "   bsync({request: bp.Event(\"e\")});\n"
                     + "   var i=1;"
+                    + "   bsync({request: bp.Event(\"e\")});\n"
+                    + "   bp.log.info('i:' + i + ' j:'+j);"
                     + "   i = i+1;"
-                    + "   bp.log.info(i);"
+                    + "   j = j+1;"
                     + "});", "");
         }
 
@@ -48,23 +50,26 @@ public class ContinuationGames {
                 Context.enter();
                 try (ByteArrayOutputStream bytes = new ByteArrayOutputStream(); 
                      ScriptableOutputStream outs = new ScriptableOutputStream(bytes, bt.getScope())) {
-                    outs.writeObject(cnt);
+//                    outs.writeObject(cnt);
                 }
                 Context.exit();
 
-                Context globalContext = ContextFactory.getGlobal().enterContext();
-                globalContext.setOptimizationLevel(-1); // must use interpreter mode
+                Context cx = ContextFactory.getGlobal().enterContext();
+                cx.setOptimizationLevel(-1); // must use interpreter mode
                 for (int i = 0; i < 10; i++) {
-                    globalContext.resumeContinuation(cnt, globalScope, "");
+                    ImporterTopLevel importer = new ImporterTopLevel(cx);
+                    Scriptable ns = cx.initStandardObjects(importer);
+//                    ns.setParentScope(globalScope);
+                    cx.resumeContinuation(cnt, ns, "");
                 }
                 Context.exit();
-
             } catch (Exception ex) {
                 Logger.getLogger(ContinuationGames.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
+        
     }
-
+    
     public static void main(String[] args) throws Exception {
         Context ctxt = Context.enter();
         ctxt.setOptimizationLevel(-1);

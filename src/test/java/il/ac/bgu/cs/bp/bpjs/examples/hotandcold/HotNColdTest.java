@@ -38,7 +38,8 @@ public class HotNColdTest {
         
         eventLogger.getEvents().forEach(e->System.out.println(e) );
         
-        EventPattern expected = new EventPattern().append(coldEvent).append(hotEvent)
+        EventPattern expected = new EventPattern()
+                .append(coldEvent).append(hotEvent)
                 .append(coldEvent).append(hotEvent)
                 .append(coldEvent).append(hotEvent)
                 .append(allDoneEvent);
