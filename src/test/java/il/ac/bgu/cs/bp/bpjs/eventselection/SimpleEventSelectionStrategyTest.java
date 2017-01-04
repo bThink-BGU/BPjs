@@ -2,14 +2,18 @@ package il.ac.bgu.cs.bp.bpjs.eventselection;
 
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BSyncStatement;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import static java.util.stream.Collectors.toSet;
+import java.util.stream.IntStream;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -35,6 +39,14 @@ public class SimpleEventSelectionStrategyTest {
     public void testEmptySet() {
         assertEquals(Optional.empty(),
                 sut.select(Collections.emptySet(), Collections.emptyList(), Collections.emptySet()) );
+    }
+    
+    @Test
+    public void testNoStatementsWithExternalEvents() {
+        List<BEvent> externals = Arrays.asList(BEvent.named("a"), BEvent.named("b"));
+        EventSelectionStrategy ess = new SimpleEventSelectionStrategy(700);
+        assertEquals(Collections.singleton(externals.get(0)),
+                ess.selectableEvents(Collections.emptySet(), externals) );
     }
     
     @Test
@@ -113,5 +125,26 @@ public class SimpleEventSelectionStrategyTest {
         assertEquals( singleton(eventOne), sut.selectableEvents(sets, externals));
         assertEquals(Optional.of( new EventSelectionResult(eventOne, singleton(0))),
                       sut.select(sets, externals, singleton(eventOne)));
+    }
+    
+    @Test
+    public void testSeed() {
+        Set<BEvent> events = IntStream.range(0, 1000).mapToObj( i -> BEvent.named("evt"+i) ).collect( toSet() );
+        Set<BSyncStatement> stmts = events.stream().map( e -> BSyncStatement.make().request(e)).collect(toSet());
+        
+        // See what sut does
+        List<BEvent> selectedBySut = new ArrayList<>(1000);
+        for ( int i=0; i<1000; i++ ) {
+            selectedBySut.add( sut.select(stmts, emptyList(), events).get().getEvent() );
+        }
+        
+        // replicate with a strategy with the same seed
+        EventSelectionStrategy sameSeedEss = new SimpleEventSelectionStrategy(sut.getSeed());
+        List<BEvent> selectedBySameSeed = new ArrayList<>(1000);
+        for ( int i=0; i<1000; i++ ) {
+            selectedBySameSeed.add( sameSeedEss.select(stmts, emptyList(), events).get().getEvent() );
+        }
+        
+        assertEquals( selectedBySut, selectedBySameSeed );
     }
 }

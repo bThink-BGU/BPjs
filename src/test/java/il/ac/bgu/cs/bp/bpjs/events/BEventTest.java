@@ -42,8 +42,10 @@ public class BEventTest {
         final BEvent bEvent = new BEvent("a");
         final BEvent bEvent2 = new BEvent("a", "sampleData");
         final BEvent bEvent2Too = new BEvent("a", "sampleData");
+        final BEvent bEvent3 = new BEvent("a", 3);
         assertNotEquals(bEvent, bEvent2 );
         assertNotEquals(bEvent2, bEvent );
+        assertNotEquals(bEvent2, bEvent3 );
         assertEquals( bEvent2, bEvent2Too );
         assertEquals( bEvent2Too, bEvent2 );
     }
