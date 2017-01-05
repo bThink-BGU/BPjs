@@ -1,0 +1,17 @@
+BPjs Execution Runtime
+----------------------
+
+This program takes a series of BPjs files, and executes them 
+as a single BProgram.
+
+Use "-" to also read from stdin.
+
+Program log and event sequence are written to stdout.
+
+Program output has the following format:
+* Lines that start with "#":
+     -  program load messages.
+* Lines that start with hyphens and ":" (e.g. "  --: TEXT"):
+     -  Program listener messages
+* Other lines are output from the BProgram itself.
+

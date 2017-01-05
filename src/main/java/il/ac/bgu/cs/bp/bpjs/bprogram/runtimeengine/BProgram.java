@@ -61,7 +61,7 @@ public abstract class BProgram {
         String line;
         try {
             while ((line = br.readLine()) != null) {
-                sb.append(line);
+                sb.append(line).append("\n");
             }
         } catch (IOException e) {
             throw new RuntimeException("error while reading javascript from stream", e);

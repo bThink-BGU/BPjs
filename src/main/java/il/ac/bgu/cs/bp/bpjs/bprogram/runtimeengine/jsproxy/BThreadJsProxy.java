@@ -48,7 +48,7 @@ public class BThreadJsProxy implements java.io.Serializable {
                         Arrays.asList( arr.getIndexIds() ).stream()
                               .map( i -> (BEvent)arr.get(i) )
                               .collect( toSet() ));
-            }
+            } 
         }
         
         stmt = stmt.waitFor( convertToEventSet(jRWB.get("waitFor")) )

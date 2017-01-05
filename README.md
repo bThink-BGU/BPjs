@@ -8,6 +8,10 @@ This repository contains a javascript-based [BP](http://www.b-prog.org) library.
 
 ## Change log for the BPjs library.
 
+### 2017-01-05
+* :sparkles: `RunFile` can now accept multiple BPjs files for input, and runs them as a single BProgram. It also has improved help text.
+
+
 ### 2017-01-03
 * :sparkles: Added continuous code coverage with [Coveralls.io](https://coveralls.io/github/bThink-BGU/BPjs?branch=develop) (Thanks guys!).
 * :sparkles: Improved test coverage.
