@@ -2,3 +2,5 @@
 .DS_Store
 /docs/build/
 /nbproject/
+settings.xml
+

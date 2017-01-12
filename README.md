@@ -6,7 +6,20 @@ This repository contains a javascript-based [BP](http://www.b-prog.org) library.
 [![Coverage Status](https://coveralls.io/repos/github/bThink-BGU/BPjs/badge.svg?branch=develop)](https://coveralls.io/github/bThink-BGU/BPjs?branch=develop)
 [![Documentation Status](http://readthedocs.org/projects/bpjs/badge/?version=develop)](http://bpjs.readthedocs.io/en/develop/)
 
+#### License
+* BPjs is open sourced under the [MIT license](http://www.opensource.org/licenses/mit-license.php). If you use it in a system, please provide
+a link to this page somewhere in the documentation/system about section.
+* BPjs is uses the Mozilla Rhino Javascript engine. See [here](https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino) for project page and source code.
+
+---
+
 ## Change log for the BPjs library.
+
+### 2017-01-12
+* :sparkles: License (MIT)
+* :sparkles: Preparations for Maven Central
+* :arrows_counterclockwise: More javadocs and code cleanup.
+
 
 ### 2017-01-05
 * :sparkles: `RunFile` can now accept multiple BPjs files for input, and runs them as a single BProgram. It also has improved help text.
@@ -105,7 +118,6 @@ This repository contains a javascript-based [BP](http://www.b-prog.org) library.
 * :arrows_counterclockwise: BProgram's `setupProgramScope` gets a scope as parameter. So no need to call `getGlobalScope`, and it's clearer what to do.
 * :sparkles: `RWBStatement` now knows which BThread instantiated it
 * :sparkles: When a program deadlock, `StreamLoggerListener` would print the `RWBStatement`s of all `BThreads`.
-
 
 
 Legend:
