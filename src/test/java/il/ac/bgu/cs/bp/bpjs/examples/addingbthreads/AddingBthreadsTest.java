@@ -22,7 +22,7 @@ public class AddingBthreadsTest {
         return new BProgram("AddingBthreadsTest") {
             @Override
             protected void setupProgramScope( Scriptable aScope ) {
-                loadJavascriptResource("AddingBthreads.js");
+                evaluateResource("AddingBthreads.js");
             }
         };
     }

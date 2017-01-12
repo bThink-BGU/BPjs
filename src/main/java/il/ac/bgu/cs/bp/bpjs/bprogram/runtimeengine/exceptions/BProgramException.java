@@ -1,6 +1,3 @@
-/*
- *  Author: Michael Bar-Sinai
- */
 package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.exceptions;
 
 /**

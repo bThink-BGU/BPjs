@@ -47,7 +47,6 @@ public class ExplicitEventSetTest {
         assertTrue( ExplicitEventSet.of(evtOne, evtTwo).contains(evtOne) );
         assertTrue( ExplicitEventSet.of(evtOne, evtTwo).contains(evtTwo) );
         assertFalse( ExplicitEventSet.of(evtOne, evtTwo).contains(evtTre) );
-        assertFalse( ExplicitEventSet.of(evtOne, evtTwo).contains("a string") );
     }
     
 }

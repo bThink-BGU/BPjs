@@ -19,7 +19,7 @@ public class NamedArgsHotNColdTest {
         return new BProgram("NamedArgsHotNCold") {
             @Override
             protected void setupProgramScope( Scriptable aScope ) {
-                loadJavascriptResource("NamedArgsHotNCold.js");
+                evaluateResource("NamedArgsHotNCold.js");
             }
         };
     }

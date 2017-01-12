@@ -6,7 +6,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContinuationPending;
 
 /**
- * A task to start a BThread.
+ * A task to start a BThread, taking it from its entry point to its first {@code bsync}.
  */
 public class StartBThread extends BPEngineTask {
     private final BThreadSyncSnapshot bthreadBss;

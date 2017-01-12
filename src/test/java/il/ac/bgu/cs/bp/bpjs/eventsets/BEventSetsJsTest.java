@@ -32,8 +32,7 @@ public class BEventSetsJsTest {
                 aScope.put("events", aScope, Context.javaToJS(events, aScope));
                 aScope.put("eventSets", aScope, Context.javaToJS(eventSets, aScope));
                 aScope.put("test", aScope, Context.javaToJS(BEventSetsJsTest.this, aScope));
-                evaluateBpCode(aScope,
-                        "eventSets.put(\"esName\", bp.EventSet( 'x', function(e){ "
+                evaluate("eventSets.put(\"esName\", bp.EventSet( 'x', function(e){ "
                                 + "bp.log.info('esName');\n"
                                 + "bp.log.info(e);\n"
                                 + "bp.log.info(e.name);\n"

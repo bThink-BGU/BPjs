@@ -19,7 +19,7 @@ public class PushingExternalEventTest {
         return new BProgram("PushingExternalEvent") {
             @Override
             protected void setupProgramScope( Scriptable aScope ) {
-                loadJavascriptResource("PushingExternalEvent.js");
+                evaluateResource("PushingExternalEvent.js");
             }
         };
     }

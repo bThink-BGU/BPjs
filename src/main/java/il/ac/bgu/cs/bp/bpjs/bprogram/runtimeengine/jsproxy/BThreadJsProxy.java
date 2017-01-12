@@ -23,7 +23,16 @@ import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
 
 /**
- * The Javascript interface of a {@link BThreadSyncSnapshot}.
+ * Serves as {@code this} (of sorts) for Javascript BThread code. Public methods
+ * in this class are directly callable form BThread code, no qualification needed.
+ * 
+ * For example, the following code invokes {@link #bsync(org.mozilla.javascript.NativeObject) }:
+ * 
+ * <pre><code>
+ * bp.registerBThread( function(){
+ *   bsync(...);
+ * });
+ * </code></pre>
  * @author michael
  */
 public class BThreadJsProxy implements java.io.Serializable {

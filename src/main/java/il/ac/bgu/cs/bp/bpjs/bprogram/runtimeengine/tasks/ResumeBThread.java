@@ -7,7 +7,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContinuationPending;
 
 /**
- * A task to resume a BThread from a BSync operation.
+ * A task that resumes a BThread from a BSync operation.
  */
 public class ResumeBThread extends BPEngineTask {
     private final BThreadSyncSnapshot bss;

@@ -3,6 +3,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.eventsets;
 
+import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.EvaluatorException;
@@ -24,10 +25,10 @@ public class JsEventSet implements EventSet, java.io.Serializable {
     }
 
     @Override
-    public boolean contains(Object o) {
+    public boolean contains(BEvent event) {
         try {
             Object result = predicate.call(Context.getCurrentContext(), predicate, predicate.getParentScope(),
-                    new Object[]{Context.javaToJS(o, predicate.getParentScope())});
+                    new Object[]{Context.javaToJS(event, predicate.getParentScope())});
 
             Boolean res = (Boolean) Context.jsToJava(result, Boolean.class);
             if (res == null) {

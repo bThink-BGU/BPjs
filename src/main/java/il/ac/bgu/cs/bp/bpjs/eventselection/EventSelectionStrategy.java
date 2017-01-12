@@ -7,13 +7,12 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Strategy for selecting events from a set of {@link BSyncStatement}s.
- * The selection result might be an event, a deadlock detection, or no event
- * (i.e. nobody requested anything).
+ * Strategy for selecting events from a set of {@link BSyncStatement}s and an
+ * external event queue.
  * 
- * This class has two methods, one for creating the set of selectable events, and 
- * the other for selecting the actual event. The former is useful in both execution 
- * and model checking. The latter, in execution only.
+ * This class has two methods, one for detecting the set of selectable events, 
+ * and the other for selecting the actual event. The former is useful in both
+ * execution and model checking. The latter - in execution only.
  * 
  * @author michael
  */

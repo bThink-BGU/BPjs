@@ -16,6 +16,15 @@ public interface BProgramListener {
     void started( BProgram bp );
     
     /**
+     * Called when a BProgram cannot advance, and is waiting for external events 
+     * to continue. For this to happen, the BProgram has to be in daemon mode.
+     * @param bp 
+     * 
+     * @see BProgram#setDaemonMode(boolean) 
+     */
+    void superstepDone( BProgram bp );
+    
+    /**
      * Called when the {@link BProgram} {@code bp} ends.
      * @param bp 
      */
@@ -41,12 +50,5 @@ public interface BProgramListener {
      * @param theEvent the new event selected.
      */
     void eventSelected( BProgram bp, BEvent theEvent );
-    
-    /**
-     * Called when a BProgram cannot advance, and is waiting for external events 
-     * to continue.
-     * @param bp 
-     */
-    void superstepDone( BProgram bp );
     
 }

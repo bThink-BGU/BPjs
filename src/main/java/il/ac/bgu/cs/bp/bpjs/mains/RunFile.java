@@ -37,7 +37,7 @@ public class RunFile {
                         if ( arg.equals("-") ) {
                             println(" [READ] stdin");
                             try {
-                                evaluateInGlobalScope(System.in, "stdin");
+                                evaluate(System.in, "stdin");
                             } catch ( EvaluatorException ee ) {
                                 logScriptExceptionAndQuit(ee, arg);
                             }
@@ -49,7 +49,7 @@ public class RunFile {
                                 System.exit(-2);
                             }
                             try ( InputStream in = Files.newInputStream(inFile) ) {
-                                evaluateInGlobalScope(in, arg);
+                                evaluate(in, arg);
                             } catch ( EvaluatorException ee ) {
                                 logScriptExceptionAndQuit(ee, arg);
                             } catch (IOException ex) {

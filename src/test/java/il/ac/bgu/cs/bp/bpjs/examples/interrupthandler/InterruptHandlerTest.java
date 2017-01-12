@@ -20,7 +20,7 @@ public class InterruptHandlerTest {
         return new BProgram(jsFilename) {
             @Override
             protected void setupProgramScope( Scriptable aScope ) {
-                loadJavascriptResource(jsFilename + ".js");
+                evaluateResource(jsFilename + ".js");
             }
         };
     }

@@ -108,7 +108,7 @@ public class BThreadSyncSnapshot implements Serializable {
 
     @Override
     public String toString() {
-        return "[BThread: " + name + "]";
+        return "[BThreadSyncSnapshot: " + name + "]";
     }
 
     public Optional<Function> getInterrupt() {

@@ -1,5 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.eventsets;
 
+import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import java.util.Arrays;
 import java.util.Collection;
 
@@ -30,8 +31,8 @@ public abstract class ComposableEventSet implements EventSet {
 		} else {
 			return new ComposableEventSet() {
 				@Override
-				public boolean contains(Object o) {
-					return ifce.contains(o);
+				public boolean contains(BEvent event) {
+					return ifce.contains(event);
 				}
 
 				@Override
@@ -45,8 +46,8 @@ public abstract class ComposableEventSet implements EventSet {
         if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
 		return new ComposableEventSet() {
 			@Override
-			public boolean contains(Object o) {
-				return ! ifce.contains(o);
+			public boolean contains(BEvent event) {
+				return ! ifce.contains(event);
 			}
 			@Override
 			public String toString() {
@@ -58,8 +59,8 @@ public abstract class ComposableEventSet implements EventSet {
         if ( ifces==null ) throw new IllegalArgumentException("eventset collection cannot be null");
 		return new ComposableEventSet() {
 			@Override
-			public boolean contains(Object o) {
-                return ifces.stream().anyMatch( ifce->ifce.contains(o) );
+			public boolean contains(BEvent event) {
+                return ifces.stream().anyMatch(ifce->ifce.contains(event) );
 			}
 			@Override
 			public String toString() {
@@ -71,9 +72,9 @@ public abstract class ComposableEventSet implements EventSet {
         if ( ifces==null ) throw new IllegalArgumentException("eventset collection cannot be null");
 		return new ComposableEventSet() {
 			@Override
-			public boolean contains(Object o) {
+			public boolean contains(BEvent event) {
 				for ( EventSet ifce : ifces ) {
-					if ( ifce.contains(o) ) return true;
+					if ( ifce.contains(event) ) return true;
 				}
 				return false;
 			}
@@ -87,9 +88,9 @@ public abstract class ComposableEventSet implements EventSet {
         if ( ifces==null ) throw new IllegalArgumentException("eventset collection cannot be null");
 		return new ComposableEventSet() {
 			@Override
-			public boolean contains(Object o) {
+			public boolean contains(BEvent event) {
 				for ( EventSet ifce : ifces ) {
-					if ( ! ifce.contains(o) ) return false;
+					if ( ! ifce.contains(event) ) return false;
 				}
 				return true;
 			}
@@ -103,8 +104,8 @@ public abstract class ComposableEventSet implements EventSet {
         if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
 		return new ComposableEventSet() {
 			@Override
-			public boolean contains(Object o) {
-				return ifce.contains(o) && ComposableEventSet.this.contains(o);
+			public boolean contains(BEvent event) {
+				return ifce.contains(event) && ComposableEventSet.this.contains(event);
 			}
 			
 			@Override
@@ -119,8 +120,8 @@ public abstract class ComposableEventSet implements EventSet {
         if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
 		return new ComposableEventSet() {
 			@Override
-			public boolean contains(Object o) {
-				return ifce.contains(o) || ComposableEventSet.this.contains(o);
+			public boolean contains(BEvent event) {
+				return ifce.contains(event) || ComposableEventSet.this.contains(event);
 			}
 			
 			@Override
@@ -133,8 +134,8 @@ public abstract class ComposableEventSet implements EventSet {
         if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
 		return new ComposableEventSet() {
 			@Override
-			public boolean contains(Object o) {
-				return ifce.contains(o) ^ ComposableEventSet.this.contains(o);
+			public boolean contains(BEvent event) {
+				return ifce.contains(event) ^ ComposableEventSet.this.contains(event);
 			}
 			
 			@Override
@@ -147,8 +148,8 @@ public abstract class ComposableEventSet implements EventSet {
         if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
 		return new ComposableEventSet() {
 			@Override
-			public boolean contains(Object o) {
-				return !(ifce.contains(o) || ComposableEventSet.this.contains(o));
+			public boolean contains(BEvent event) {
+				return !(ifce.contains(event) || ComposableEventSet.this.contains(event));
 			}
 			
 			@Override
@@ -161,8 +162,8 @@ public abstract class ComposableEventSet implements EventSet {
         if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
 		return new ComposableEventSet() {
 			@Override
-			public boolean contains(Object o) {
-				return !(ifce.contains(o) && ComposableEventSet.this.contains(o));
+			public boolean contains(BEvent event) {
+				return !(ifce.contains(event) && ComposableEventSet.this.contains(event));
 			}
 			
 			@Override

@@ -1,4 +1,3 @@
-
 package il.ac.bgu.cs.bp.bpjs.events;
 
 import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
@@ -49,7 +48,7 @@ public class BEvent implements Comparable<BEvent>, EventSet, java.io.Serializabl
     }
 
     public BEvent() {
-        this(BEvent.class.getSimpleName() + "#" + INSTANCE_ID_GEN.incrementAndGet());
+        this("BEvent-" + INSTANCE_ID_GEN.incrementAndGet());
     }
 
     @Override
@@ -133,8 +132,8 @@ public class BEvent implements Comparable<BEvent>, EventSet, java.io.Serializabl
     }
 
     @Override
-    public boolean contains(Object o) {
-        return equals(o);
+    public boolean contains(BEvent event) {
+        return equals(event);
     }
 
     /**

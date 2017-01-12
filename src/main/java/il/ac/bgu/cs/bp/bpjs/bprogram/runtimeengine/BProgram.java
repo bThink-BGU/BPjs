@@ -35,12 +35,18 @@ import org.mozilla.javascript.Scriptable;
 import static java.util.stream.Collectors.toSet;
 import static java.nio.file.Paths.get;
 import static java.util.Collections.reverseOrder;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.WrappedException;
 
 /**
  * Base class for BPrograms. Contains the logic for managing {@link BThreadSyncSnapshot}s
- * and the main event loop.
+ * and the main event loop. Concrete BProgram extend this class by implementing 
+ * the {@link #setupProgramScope(org.mozilla.javascript.Scriptable)} method.
+ * 
+ * <p>
+ * For creating a BProgram that uses a single Javascript file available in the
+ * classpath, see {@link SingleResourceBProgram}.
  *
  * @author michael
  */
@@ -53,51 +59,14 @@ public abstract class BProgram {
      * daemon mode off.
      */
     private static final BEvent NO_MORE_DAEMON = new BEvent("NO_MORE_DAEMON");
-
-    public static Object readAndEvaluateBpCode(Scriptable scope, InputStream ios, String scriptName) {
-        InputStreamReader streamReader = new InputStreamReader(ios, StandardCharsets.UTF_8);
-        BufferedReader br = new BufferedReader(streamReader);
-        StringBuilder sb = new StringBuilder();
-        String line;
-        try {
-            while ((line = br.readLine()) != null) {
-                sb.append(line).append("\n");
-            }
-        } catch (IOException e) {
-            throw new RuntimeException("error while reading javascript from stream", e);
-        }
-        String script = sb.toString();
-        return evaluateBpCode(scope, script, scriptName);
-    }
-
-    public static Object getAndEvaluateBpCode(Scriptable scope, URI path) {
-        Path pathObject = get(path);
-        try {
-            String script = new String(readAllBytes(pathObject), StandardCharsets.UTF_8);
-            return evaluateBpCode(scope, script, pathObject.toString());
-        } catch (IOException e) {
-            throw new RuntimeException("Error while evaluating in global context: " + e.getMessage(), e);
-        }
-    }
-
-    /**
-     * Runs the passed code in the passed scope.
-     * @param scope The scope to evaluate the script in. Has to contain BP-related values.
-     * @param script Code to evaluate
-     * @param scriptName For error reporting purposes.
-     * @return Result of code evaluation.
-     */
-    public static Object evaluateBpCode(Scriptable scope, String script, String scriptName) {
-        return Context.getCurrentContext().evaluateString(scope, script, scriptName, 1, null);
-    }
+    
+    /** Counter for giving anonymous instances some semantic name. */
+    private static final AtomicInteger INSTANCE_COUNTER = new AtomicInteger();
 
     // ------------- Instance Members ---------------
     
     /**
-     * A collection containing all the BThreads in the system. A BThread adds
-     * itself to the list either - in its constructor and removes itself when
-     * its run() function finishes - or a Java thread adds itself and removes
-     * itself explicitly
+     * Snapshots of participating BThreads, when in bsync point.
      */
     protected Set<BThreadSyncSnapshot> bthreads;
     private Set<BThreadSyncSnapshot> nextRoundBthreads;
@@ -105,7 +74,7 @@ public abstract class BProgram {
     private String name;
 
     /**
-     * When {@code true}, the bprogram waits for an external event when no
+     * When {@code true}, the BProgram waits for an external event when no
      * internal ones are available.
      */
     private boolean daemonMode;
@@ -132,10 +101,10 @@ public abstract class BProgram {
 
     private volatile boolean started = false;
 
-    protected Scriptable globalScope;
+    protected Scriptable programScope;
 
     public BProgram() {
-        this(BProgram.class.getSimpleName());
+        this("BProgram-" + INSTANCE_COUNTER.incrementAndGet());
     }
 
     public BProgram(String aName) {
@@ -305,38 +274,71 @@ public abstract class BProgram {
         return result;
     }
 
-    
-    protected Object evaluateInGlobalScope(InputStream ios, String scriptname) {
-        return readAndEvaluateBpCode(globalScope, ios, scriptname);
-    }
-
-    protected Object evaluateInGlobalScope(URI path) {
-        return getAndEvaluateBpCode(globalScope, path);
-    }
-
-    protected Object evaluateInGlobalScope(String path, String scriptname) {
-        try (final InputStream ios = getClass().getResourceAsStream(path)) {
-            return evaluateInGlobalScope(ios, scriptname);
-        } catch (IOException iox) {
-            throw new RuntimeException("Error reading javascript file '" + path + "'", iox);
-        }
-    }
-
     /**
      * Loads a Javascript resource (a file that's included in the .jar).
      *
      * @param pathInJar path of the resource, relative to the class.
      */
-    public void loadJavascriptResource(String pathInJar) {
+    public void evaluateResource(String pathInJar) {
         try {
             final URL resource = Thread.currentThread().getContextClassLoader().getResource(pathInJar);
             if (resource == null) {
                 throw new RuntimeException("Resource '" + pathInJar + "' not found.");
             }
-            evaluateInGlobalScope(resource.toURI());
+            evaluateCodeAt(resource.toURI());
         } catch (URISyntaxException ex) {
             Logger.getLogger(BProgram.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    /**
+     * Reads and evaluates the code pointed by the URI. The resource has to be
+     * local (either in the file system or in the classpath.
+     * @param path path to the code to evaluate
+     * @return Result of code evaluation.
+     */
+    protected Object evaluateCodeAt(URI path) {
+        Path pathObject = get(path);
+        try {
+            String script = new String(readAllBytes(pathObject), StandardCharsets.UTF_8);
+            return evaluate(script, pathObject.toString());
+        } catch (IOException e) {
+            throw new RuntimeException("Error while reading code at '" + path + "': " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Reads and evaluates the code at the passed input stream. The stream is 
+     * read to its end, but is not closed.
+     * 
+     * @param inStrm 
+     * @param scriptName for error reporting purposes.
+     * @return Result of evaluating the code at {@code inStrm}.
+     */
+    protected Object evaluate(InputStream inStrm, String scriptName) {
+        InputStreamReader streamReader = new InputStreamReader(inStrm, StandardCharsets.UTF_8);
+        BufferedReader br = new BufferedReader(streamReader);
+        StringBuilder sb = new StringBuilder();
+        String line;
+        try {
+            while ((line = br.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+        } catch (IOException e) {
+            throw new RuntimeException("error while reading javascript from stream", e);
+        }
+        String script = sb.toString();
+        return evaluate(script, scriptName);
+    }
+
+    /**
+     * Runs the passed code in the passed scope.
+     * @param script Code to evaluate
+     * @param scriptName For error reporting purposes.
+     * @return Result of code evaluation.
+     */
+    protected Object evaluate(String script, String scriptName) {
+        return Context.getCurrentContext().evaluateString(programScope, script, scriptName, 1, null);
     }
     
     /**
@@ -404,34 +406,29 @@ public abstract class BProgram {
     }
 
     protected void setupAddedBThread(BThreadSyncSnapshot bt) {
-        bt.setupScope(globalScope);
+        bt.setupScope(programScope);
     }
 
     protected void setupBThreadScopes() {
-        bthreads.forEach(bt -> bt.setupScope(globalScope));
+        bthreads.forEach(bt -> bt.setupScope(programScope));
     }
 
     private void setupGlobalScope(Context cx) {
         // load and execute globalScopeInit.js
-        try (InputStream script = Thread.currentThread().getContextClassLoader().getResourceAsStream("globalScopeInit.js")) {
-            ImporterTopLevel importer = new ImporterTopLevel(cx);
-            globalScope = cx.initStandardObjects(importer);
-            
-            BProgramJsProxy proxy = new BProgramJsProxy(this);
-            globalScope.put("bp", globalScope,
-                    Context.javaToJS(proxy, globalScope));
-            globalScope.put("emptySet", globalScope,
-                    Context.javaToJS(emptySet, globalScope));
-            globalScope.put("all", globalScope,
-                    Context.javaToJS(all, globalScope));
+        ImporterTopLevel importer = new ImporterTopLevel(cx);
+        programScope = cx.initStandardObjects(importer);
 
-            evaluateInGlobalScope(script, "globalScopeInit.js");
+        BProgramJsProxy proxy = new BProgramJsProxy(this);
+        programScope.put("bp", programScope,
+                Context.javaToJS(proxy, programScope));
+        programScope.put("emptySet", programScope,
+                Context.javaToJS(emptySet, programScope));
+        programScope.put("all", programScope,
+                Context.javaToJS(all, programScope));
 
-            setupProgramScope(globalScope);
+        evaluateResource("globalScopeInit.js");
 
-        } catch (IOException ex) {
-            throw new RuntimeException("Error while setting up global scope", ex);
-        }
+        setupProgramScope(programScope);
     }
 
     /**
@@ -529,6 +526,16 @@ public abstract class BProgram {
         }
     }
 
+    /**
+     * Returns {@code true} iff the program is in daemon mode. When in this mode,
+     * the program will not terminate when it has no event available for selection.
+     * Rather, it will wait for an external event to be enqueued into its external
+     * event queue.
+     * 
+     * @return {@code true} if this BProgram is in daemon mode,
+     *         {@code false} otherwise.
+     * @see #enqueueExternalEvent(il.ac.bgu.cs.bp.bpjs.events.BEvent) 
+     */
     public boolean isDaemonMode() {
         return daemonMode;
     }
@@ -538,7 +545,7 @@ public abstract class BProgram {
      * @return the global scope of the program.
      */
     public Scriptable getGlobalScope() {
-        return globalScope;
+        return programScope;
     }
 
     /**
@@ -567,7 +574,7 @@ public abstract class BProgram {
 
     @Override
     public String toString() {
-        return "[BProgram name]";
+        return "[BProgram " + getName() + "]";
     }
     
 }

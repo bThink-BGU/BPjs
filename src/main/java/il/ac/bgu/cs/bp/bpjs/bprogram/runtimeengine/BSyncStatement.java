@@ -13,7 +13,7 @@ import static il.ac.bgu.cs.bp.bpjs.eventsets.Events.emptySet;
 /**
  * A statement a BThread makes at a {@code bsync} point. Contains data about 
  * what events it requests, waits for, and blocks, and possible additional data,
- * such as labels and break-upon event set.
+ * such as labels, or a break-upon event set.
  * 
  * @author michael
  */

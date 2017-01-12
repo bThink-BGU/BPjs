@@ -11,8 +11,19 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.mozilla.javascript.Function;
 
 /**
- * An object representing a {@link BProgram} at the Javascript code. Used in order to
- * prevent JS code from touching parts of the BProgram it shouldn't.
+ * An object representing the {@link BProgram} context for Javascript code.
+ * Methods in this object allow Javascript code to register new BThreads, 
+ * create events,write messages to the log etc.
+ * 
+ * Methods in the class are available to Javascript code via the {@code bp}
+ * object, like so:
+ * 
+ * <pre><code>
+ * bp.log.info("I'm a log message!");
+ * var myEvent = bp.Event("My Event");
+ * bp.registerBThread(...);
+ * </code></pre>
+ * 
  * @author michael
  */
 public class BProgramJsProxy implements java.io.Serializable {
@@ -124,7 +135,7 @@ public class BProgramJsProxy implements java.io.Serializable {
      * @param path absolute path of the resource in the .jar file.
      */
     public void loadJavascriptResource(String path) {
-        program.loadJavascriptResource(path);
+        program.evaluateResource(path);
     }
     
 }

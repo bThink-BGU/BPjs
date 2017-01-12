@@ -28,8 +28,7 @@ public class BEventsJsTest {
             @Override
             protected void setupProgramScope(Scriptable aScope) {
                 aScope.put("events", aScope, Context.javaToJS(events, aScope));                
-                evaluateBpCode(aScope,
-                          "events.put('nameOnly1',     bp.Event('nameOnly'));\n"
+                evaluate( "events.put('nameOnly1',     bp.Event('nameOnly'));\n"
                         + "events.put('nameOnly2',     bp.Event('nameOnly'));\n"
                         + "events.put('nameOnly-diff', bp.Event('nameOnly-diff'));\n"
                         + "events.put('withData1',           bp.Event('withData',{a:'a',b:'b',c:700}));\n"

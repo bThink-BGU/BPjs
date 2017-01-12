@@ -1,8 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.eventsets;
 
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import java.util.Collections;
-import java.util.Set;
 
 /**
  * Utility class for commonly used event sets.
@@ -15,8 +13,8 @@ public class Events {
     public final static EventSet all = new EventSet() {
 
         @Override
-        public boolean contains(Object o) {
-            return (o instanceof EventSet) || (o instanceof BEvent);
+        public boolean contains(BEvent event) {
+            return (event instanceof EventSet) || (event instanceof BEvent);
         }
 
         @Override
@@ -31,7 +29,7 @@ public class Events {
     public final static EventSet emptySet = new EventSet() {
         
         @Override
-        public boolean contains(Object o) {
+        public boolean contains(BEvent event) {
             return false;
         }
 
@@ -40,11 +38,5 @@ public class Events {
             return "{empty}";
         }
     };
-    
-    public final static Set<BEvent> noEvents = Collections.emptySet();
-    
-    public static <T extends BEvent> EventSet ofClass( Class<T> cls ) {
-        return new EventsOfClass(cls);
-    }
     
 }

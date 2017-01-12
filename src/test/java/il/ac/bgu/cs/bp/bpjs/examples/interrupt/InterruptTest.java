@@ -19,7 +19,7 @@ public class InterruptTest {
         return new BProgram("Interrupt") {
             @Override
             protected void setupProgramScope( Scriptable aScope ) {
-                loadJavascriptResource("Interrupt.js");
+                evaluateResource("Interrupt.js");
             }
         };
     }
