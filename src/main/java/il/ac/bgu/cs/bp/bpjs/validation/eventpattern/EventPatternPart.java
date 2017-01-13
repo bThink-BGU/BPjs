@@ -3,6 +3,11 @@ package il.ac.bgu.cs.bp.bpjs.validation.eventpattern;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
 
+/**
+ * Part of an {@link EventPattern}.
+ * 
+ * @author michael
+ */
 public class EventPatternPart  {
 	
 	private final EventSet eventSet;

@@ -29,7 +29,7 @@ public class ContinuationGames {
 
         @Override
         protected void setupProgramScope(Scriptable scope) {
-            evaluate(" j=1; "+
+            evaluate(" j=1;" +
                     "bp.registerBThread( \"bt\", function(){\n"
                     + "   bp.log.info(\"started\");"
 //                    + "   bsync({});\n"

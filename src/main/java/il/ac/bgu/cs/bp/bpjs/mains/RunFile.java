@@ -18,7 +18,10 @@ import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.Scriptable;
 
 /**
- * Run a single program file. Outputs event log to (@code stdout}.
+ * This is a console application for running BPjs files. Source files are passed
+ * as arguments at the command line. Program events and log are printed to 
+ * {@link java.lang.System.out}.
+ * 
  * 
  * @author michael
  */

@@ -15,6 +15,7 @@ import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.eventselection.SimpleEventSelectionStrategy;
 import static il.ac.bgu.cs.bp.bpjs.eventsets.Events.all;
 import static il.ac.bgu.cs.bp.bpjs.eventsets.Events.emptySet;
+import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsCodeEvaluationException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -37,6 +38,8 @@ import static java.nio.file.Paths.get;
 import static java.util.Collections.reverseOrder;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.mozilla.javascript.ContinuationPending;
+import org.mozilla.javascript.EcmaError;
+import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.WrappedException;
 
 /**
@@ -256,20 +259,22 @@ public abstract class BProgram {
     private List<Future<BThreadSyncSnapshot>> startRecentlyRegisteredBThreads() throws InterruptedException {
         
         // Setup the new BThread's scopes.
+        Set<BThreadSyncSnapshot> newThreads = new HashSet<>(recentlyRegisteredBthreads);
+        recentlyRegisteredBthreads.clear();
+        
         try {
             Context cx = ContextFactory.getGlobal().enterContext();
             cx.setOptimizationLevel(-1); // must use interpreter mode
-            recentlyRegisteredBthreads.forEach(bt -> setupAddedBThread(bt));
+            newThreads.forEach(this::setupAddedBThread);
         } finally {
             Context.exit();
         }
 
         // run the new BThreads.
-        final List<Future<BThreadSyncSnapshot>> result = executor.invokeAll(recentlyRegisteredBthreads.stream()
+        final List<Future<BThreadSyncSnapshot>> result = executor.invokeAll(newThreads.stream()
                 .map(bt -> new StartBThread(bt))
-                .filter( Objects::nonNull )
+                .filter(Objects::nonNull)
                 .collect(toList()));
-        recentlyRegisteredBthreads.clear();
         
         return result;
     }
@@ -338,7 +343,16 @@ public abstract class BProgram {
      * @return Result of code evaluation.
      */
     protected Object evaluate(String script, String scriptName) {
-        return Context.getCurrentContext().evaluateString(programScope, script, scriptName, 1, null);
+        try {
+            return Context.getCurrentContext().evaluateString(programScope, script, scriptName, 1, null);
+        } catch (EcmaError rerr) {
+            if ( rerr.getErrorMessage().trim().equals("\"bsync\" is not defined.") ) {
+                throw new BPjsCodeEvaluationException("'bsync' is only defined in BThreads. Did you forget to call 'bp.registerBThread()'?", rerr);
+            }
+            throw new BPjsCodeEvaluationException(rerr);
+        } catch (EvaluatorException evalExp) {
+            throw new BPjsCodeEvaluationException(evalExp);
+        }
     }
     
     /**
