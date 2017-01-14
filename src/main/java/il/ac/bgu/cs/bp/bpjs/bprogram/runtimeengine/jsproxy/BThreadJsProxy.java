@@ -91,44 +91,6 @@ public class BThreadJsProxy implements java.io.Serializable {
         }
     }
     
-    /**
-     * BSync call, used by the JS programs. Works as follows:
-     * <ol>
-     * <li>Creates an {@link BSyncStatement} using the parameters</li>
-     * <li>Captures a continuation</li>
-     * <li>Cleans up current Javascript context</li>
-     * <li>Throws the continuation</li>
-     * </ol>
-     * @param requestedEvents 
-     * @param waitedEvents
-     * @param blockedEvents
-     * @deprecated use the named arguments version
-     */
-    public void bsync(Set<? extends BEvent> requestedEvents,
-                      EventSet waitedEvents,
-                      EventSet blockedEvents) {
-        System.err.println("warning: positional bsync (bsync(r,w,b)) is deprecated. Use named arguemnt bsync (bsync({request:...})) instead.");
-        captureBThreadState(BSyncStatement.make().request(requestedEvents)
-                                  .waitFor(waitedEvents)
-                                  .block(blockedEvents) );
-    }
-    
-    /**
-     * @param aRequestedEvent The requested event
-     * @param waitedEvents the waited for events set
-     * @param blockedEvents the blocked events set
-     * @deprecated use the named arguments version
-     */
-    public void bsync(BEvent aRequestedEvent,
-                      EventSet waitedEvents,
-                      EventSet blockedEvents) {
-        System.err.println("warning: positional bsync (bsync(r,w,b)) is deprecated. Use named arguemnt bsync (bsync({request:...})) instead.");
-        captureBThreadState(BSyncStatement.make().request(aRequestedEvent)
-                                  .waitFor(waitedEvents)
-                                  .block(blockedEvents) );
-    }
-    
-    
     public void setInterruptHandler( Object aPossibleHandler ) {
         bthread.setInterruptHandler(
                 (aPossibleHandler instanceof Function) ? (Function) aPossibleHandler: null );

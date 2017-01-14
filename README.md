@@ -16,6 +16,10 @@ a link to this page somewhere in the documentation/system about section.
 ## Change log for the BPjs library.
 
 ### 2017-01-13
+* :bug: Fixing Javadoc references.
+* :put_litter_in_its_place: Positional `bsync` removed.
+
+### 2017-01-13
 * :sparkles: Adding a BThread is idempotent. Previously, if a BThread was added twice, it would run twice with unexpected results.
 * :sparkles: Basic engine exceptions, plus a friendlier error message when calling `bsync` outside of a BThread.
 * :arrows_counterclockwise: More Javadocs and code cleanup (mostly dead code removal).

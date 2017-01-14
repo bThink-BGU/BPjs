@@ -11,14 +11,16 @@ import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 public interface BProgramListener {
     /**
      * Called when the {@link BProgram} {@code bp} was started.
-     * @param bp 
+     * 
+     * @param bp The BProgram started.
      */
     void started( BProgram bp );
     
     /**
      * Called when a BProgram cannot advance, and is waiting for external events 
      * to continue. For this to happen, the BProgram has to be in daemon mode.
-     * @param bp 
+     * 
+     * @param bp The BProgram informing the change.
      * 
      * @see BProgram#setDaemonMode(boolean) 
      */
@@ -26,7 +28,8 @@ public interface BProgramListener {
     
     /**
      * Called when the {@link BProgram} {@code bp} ends.
-     * @param bp 
+     * 
+     * @param bp The BProgram ended.
      */
     void ended( BProgram bp );
     
@@ -46,7 +49,7 @@ public interface BProgramListener {
     
     /**
      * Called when a BProgram selects an event.
-     * @param bp The BProgram
+     * @param bp The BProgram the event was selected in.
      * @param theEvent the new event selected.
      */
     void eventSelected( BProgram bp, BEvent theEvent );

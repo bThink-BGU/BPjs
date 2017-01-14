@@ -8,11 +8,8 @@ import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.eventsets.ExplicitEventSet;
 
 /**
- * Matches a list of events against a glob-like pattern.
- * @see {@linkplain http://en.wikipedia.org/wiki/Glob_(programming)}
- * *
- * ?
- * literals
+ * Matches a list of events against a
+ * <a href="http://en.wikipedia.org/wiki/Glob_(programming)">glob-like</a> pattern.
  * 
  * @author michaelbar-sinai
  */
@@ -64,9 +61,9 @@ public class EventPattern {
 	 * Appends a single occurrence of {@code esi} to the pattern.
 	 * 
 	 * Convenience call to {@code append(esi,1,1)}.
-	 * @param esi the EventSetInterface that should occur.
+	 * @param esi the EventSet that should occur.
 	 * @return {@code this}, to allow call chaining.
-	 * @see #append(EventSetInterface, int, Integer)
+	 * @see #append(EventSet, int, Integer)
 	 */
 	public EventPattern append( EventSet esi ) {
 		return append( esi, 1, 1);
@@ -80,9 +77,9 @@ public class EventPattern {
 	 * (Kleene's star).
 	 * 
 	 * Convenience call to {@code append(esi,0,null)}.
-	 * @param esi the EventSetInterface that should occur.
+	 * @param esi the EventSet that should occur.
 	 * @return {@code this}, to allow call chaining.
-	 * @see #append(EventSetInterface, int, Integer)
+	 * @see #append(EventSet, int, Integer)
 	 */
 	public EventPattern appendStar( EventSet esi ) {
 		return append( esi, 0, null );

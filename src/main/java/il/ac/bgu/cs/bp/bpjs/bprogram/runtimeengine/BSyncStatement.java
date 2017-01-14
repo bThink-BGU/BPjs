@@ -42,10 +42,10 @@ public class BSyncStatement implements java.io.Serializable {
     private BThreadSyncSnapshot bthread;
     
     /**
-     * Creates a new request where all fields are set to {@link none}. To be
+     * Creates a new request where all fields are set to {@code empty}. To be
      * used as a DSL like manner:
      * <code>
-     * RWBStatement myStatement = make().request( XX ).waitFor( YY ).block( ZZZ );
+     * BSyncStatement myStatement = make().request( XX ).waitFor( YY ).block( ZZZ );
      * </code>
      * @param creator the {@link BThreadSyncSnapshot} that created this statement.
      * @return an empty statement

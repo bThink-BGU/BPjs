@@ -20,7 +20,7 @@ import org.mozilla.javascript.Scriptable;
 /**
  * This is a console application for running BPjs files. Source files are passed
  * as arguments at the command line. Program events and log are printed to 
- * {@link java.lang.System.out}.
+ * {@link java.lang.System#out}.
  * 
  * 
  * @author michael

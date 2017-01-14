@@ -14,10 +14,9 @@ bp.registerBThread("HotBt", function () {
 });
 
 bp.registerBThread("ColdBt", function () {
-  //old-school, position-based bsyncs have to play along.
-  bsync(coldEvent, emptySet, emptySet);
-  bsync(coldEvent, emptySet, emptySet);
-  bsync(coldEvent, emptySet, emptySet);
+  bsync({request:coldEvent});
+  bsync({request:[coldEvent]});
+  bsync({request:coldEvent});
 });
 
 bp.registerBThread("AlternatorBt", function () {

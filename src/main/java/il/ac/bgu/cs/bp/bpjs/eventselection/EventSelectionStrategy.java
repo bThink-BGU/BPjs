@@ -28,9 +28,8 @@ public interface EventSelectionStrategy {
     Set<BEvent> selectableEvents(Set<BSyncStatement> statements, List<BEvent> externalEvents);
     
     /**
-     * Selects an event for execution from the parameter {@code selectableEvents}, or
-     * returns an {@link EventSelectionResult.EmptyResult} in case no suitable event
-     * is found.
+     * Selects an event for execution from the parameter {@code selectableEvents},
+     * or returns {@link Optional#empty()} in case no suitable event is found.
      * 
      * @param statements statements of all participating BThreads.
      * @param externalEvents events queued by external processes.

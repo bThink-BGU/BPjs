@@ -84,8 +84,8 @@ public class BProgramJsProxy implements java.io.Serializable {
     /**
      * Called from JS to add BThreads running func as their runnable code.
      *
-     * @param name
-     * @param func
+     * @param name Name of the registered BThread (useful for debugging).
+     * @param func Script entry point of the BThread.
      *
      * @see #registerBThread(org.mozilla.javascript.Function)
      */
@@ -119,7 +119,8 @@ public class BProgramJsProxy implements java.io.Serializable {
      * Sets whether the BProgram will wait for external events when there's
      * no internal event to choose.
      * 
-     * @param newDaemonMode 
+     * @param newDaemonMode {@code true} for making {@code this} a daemon; 
+     *                      {@code false} otherwise.
      */
     public void setDaemonMode( boolean newDaemonMode ) {
         program.setDaemonMode( newDaemonMode );

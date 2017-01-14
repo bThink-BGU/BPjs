@@ -150,7 +150,7 @@ public abstract class BProgram {
      * Advances the BProgram a single super-step, that is until there are no
      * more internal events that can be selected.
      *
-     * @throws InterruptedException
+     * @throws InterruptedException If this thread is interrupted during the BProgram's execution.
      */
     protected void mainEventLoop() throws InterruptedException {
         boolean go = true;
@@ -193,7 +193,7 @@ public abstract class BProgram {
      * bsync, and waits for them to terminate.
      *
      * @param selectedEvent The event to trigger. Cannot be {@code null}.
-     * @throws java.lang.InterruptedException
+     * @throws InterruptedException If this thread is interrupted during the BProgram's execution
      */
     protected void triggerEvent( BEvent selectedEvent) throws InterruptedException {
         if (selectedEvent == null) {
@@ -316,7 +316,7 @@ public abstract class BProgram {
      * Reads and evaluates the code at the passed input stream. The stream is 
      * read to its end, but is not closed.
      * 
-     * @param inStrm 
+     * @param inStrm Input stream for reading the script to be evaluated.
      * @param scriptName for error reporting purposes.
      * @return Result of evaluating the code at {@code inStrm}.
      */
@@ -373,7 +373,7 @@ public abstract class BProgram {
      * Registers a BThread into the program. If the program started, the BThread
      * will take part in the current bstep.
      *
-     * @param bt
+     * @param bt the BThread to be registered.
      */
     public void registerBThread(BThreadSyncSnapshot bt) {
         listeners.forEach(l -> l.bthreadAdded(this, bt));
@@ -385,10 +385,10 @@ public abstract class BProgram {
     }
     
     /**
-     * Creates a list of the current {@link RWBStatements} of the current
-     * BThreads. Note that the order in the list is arbitrary.
+     * Creates a set with the current {@link BSyncStatement}s of the current
+     * BThreads.
      *
-     * @return list of statements in arbitrary order.
+     * @return Set of current BSyncStatements.
      */
     public Set<BSyncStatement> currentStatements() {
         return bthreads.stream()
@@ -397,9 +397,9 @@ public abstract class BProgram {
     }
 
     /**
-     * a method that sends events as input for the application
+     * Adds an event to {@code this}' external event queue.
      *
-     * @param e
+     * @param e The event to add.
      */
     public void enqueueExternalEvent(BEvent e) {
         recentlyEnqueuedExternalEvents.add(e);
@@ -446,8 +446,8 @@ public abstract class BProgram {
     }
 
     /**
-     * The BProgram should set up its scope here (e.g. load the script for
-     * BThreads). This method is called after {@link #setupGlobalScope()}.
+     * The BProgram should set up its scope here. Normally, this amount to 
+     * loading the script with the BThreads.
      *
      * @param scope the scope to set up.
      */

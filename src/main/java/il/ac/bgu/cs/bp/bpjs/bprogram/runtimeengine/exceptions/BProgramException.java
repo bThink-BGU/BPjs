@@ -1,5 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.exceptions;
 
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+
 /**
  * Base class for exceptions thrown from a {@link BProgram}.
  * @author michael

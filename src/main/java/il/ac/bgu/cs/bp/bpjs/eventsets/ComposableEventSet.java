@@ -6,10 +6,10 @@ import java.util.Collection;
 
 
 /**
- * A wrapper class for {@link EventSetInterfaces} that allows natural style logical
+ * A wrapper class for {@link EventSet} that allows natural style logical
  * compositions of event set interfaces. Unary operators are static methods to be statically 
  * imported, and binary operators are methods of the class. <br>
- * So, assuming that A,B,C and D are {@code EventSetInterface}s, one could write:
+ * So, assuming that A,B,C and D are {@code EventSet}s, one could write:
  * <pre><code>
  * 
  * import static bp.contrib.eventsetbooleanops.EventSetBooleanOp.*;
