@@ -14,6 +14,7 @@ import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import java.net.URISyntaxException;
 import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.mozilla.javascript.Context;
@@ -60,15 +61,19 @@ public class JsEventSetTest {
     public void testJsSetData() throws InterruptedException, URISyntaxException {
         try {
             Context.enter();
-            BProgram bpr = new StringBProgram(
-                      "var es=bp.EventSet('all',function(e){return true;});\n"
+            BProgram bpr = new StringBProgram( "Eventset",
+                      "var es=bp.EventSet('a',function(e){return e.name=='a';});\n"
             );
             bpr.start();
             NativeJavaObject sut = (NativeJavaObject) bpr.getGlobalScope().get("es", bpr.getGlobalScope());
             JsEventSet jsSut = (JsEventSet) Context.jsToJava(sut, JsEventSet.class);
-            assertEquals("all", jsSut.getName());
-            assertTrue( jsSut.toString().contains("all"));
+            assertEquals("a", jsSut.getName());
+            assertTrue( jsSut.toString().contains("a"));
             assertTrue( jsSut.toString().contains("JsEventSet"));
+            
+            assertTrue( jsSut.contains(BEvent.named("a")) );
+            assertFalse( jsSut.contains(BEvent.named("b")) );
+            
         } finally {
             Context.exit();
         }

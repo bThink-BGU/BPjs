@@ -15,7 +15,7 @@ public class StringBProgram extends BProgram {
         this.sourceCode = sourceCode;
     }
 
-    public StringBProgram(String sourceCode, String aName) {
+    public StringBProgram( String aName, String sourceCode) {
         super(aName);
         this.sourceCode = sourceCode;
     }

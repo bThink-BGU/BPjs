@@ -3,8 +3,10 @@ package il.ac.bgu.cs.bp.bpjs.eventsets;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import java.util.Arrays;
 import java.util.HashSet;
+import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
@@ -48,6 +50,18 @@ public class ExplicitEventSetTest {
         assertEquals( sutManual, sutOf );
         
         assertEquals(1, new HashSet<>(Arrays.asList(sutOf, sutManual, sutFrom)).size());
+    }
+    
+    @Test
+    public void testEqualit() {
+        ExplicitEventSet sutA = ExplicitEventSet.of(evtOne, evtTwo);
+        ExplicitEventSet sutB = ExplicitEventSet.of(evtOne, evtTre);
+        
+        assertEquals(sutA, sutA);
+        assertNotEquals(sutA, sutB);
+        assertNotEquals(sutA, null);
+        assertNotEquals(sutA, "XYZ");
+        
     }
     
     @Test
