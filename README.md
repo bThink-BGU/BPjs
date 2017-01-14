@@ -15,9 +15,14 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
-### 2017-01-13
+### 2017-01-14
+This release in focused on better BPjs-programmer experience and getting the code into
+a maven-central quality grade.
 * :bug: Fixing Javadoc references.
 * :put_litter_in_its_place: Positional `bsync` removed.
+* :sparkles: Better error reporting on event sets defined in JavaScript.
+* :sparkles: Better error reports for generic JS errors.
+* :sparkles: Added `StringBProgram`: a new class for running BPjs code from a String (rather than a resource or a file).
 
 ### 2017-01-13
 * :sparkles: Adding a BThread is idempotent. Previously, if a BThread was added twice, it would run twice with unexpected results.

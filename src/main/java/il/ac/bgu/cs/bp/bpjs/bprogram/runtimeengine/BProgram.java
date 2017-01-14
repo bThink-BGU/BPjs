@@ -16,6 +16,8 @@ import il.ac.bgu.cs.bp.bpjs.eventselection.SimpleEventSelectionStrategy;
 import static il.ac.bgu.cs.bp.bpjs.eventsets.Events.all;
 import static il.ac.bgu.cs.bp.bpjs.eventsets.Events.emptySet;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsCodeEvaluationException;
+import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
+import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -142,7 +144,7 @@ public abstract class BProgram {
                 listeners.forEach(l -> l.ended(this));
             }
         } catch ( WrappedException we ) {
-            throw new BProgramException(we.getCause());
+            throw new BProgramException("Failed to start program.", we.getCause());
         }
     }
 
@@ -350,6 +352,14 @@ public abstract class BProgram {
                 throw new BPjsCodeEvaluationException("'bsync' is only defined in BThreads. Did you forget to call 'bp.registerBThread()'?", rerr);
             }
             throw new BPjsCodeEvaluationException(rerr);
+            
+        } catch (WrappedException wrapped) {
+            if ( wrapped.getCause() instanceof BPjsException ) {
+                throw (BPjsException)wrapped.getCause();
+            } else {
+                throw wrapped;
+            }
+            
         } catch (EvaluatorException evalExp) {
             throw new BPjsCodeEvaluationException(evalExp);
         }

@@ -7,6 +7,8 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.eventsets.JsEventSet;
+import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
+import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.mozilla.javascript.Function;
 
@@ -77,8 +79,12 @@ public class BProgramJsProxy implements java.io.Serializable {
         return new BEvent(name, jsData );
     }
     
-    public JsEventSet EventSet(String name, Function predicate) {
-        return new JsEventSet(name, predicate);
+    public JsEventSet EventSet(String name, Object predicateObj) {
+        if ( predicateObj instanceof Function ) {
+            return new JsEventSet(name, (Function) predicateObj);
+        } else {
+            throw new BPjsRuntimeException("An event set predicate has to be a function.");
+        }
     }
     
     /**

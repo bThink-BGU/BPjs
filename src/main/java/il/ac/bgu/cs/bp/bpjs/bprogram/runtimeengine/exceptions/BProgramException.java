@@ -8,9 +8,6 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
  */
 public class BProgramException extends RuntimeException {
 
-    public BProgramException() {
-    }
-
     public BProgramException(String message) {
         super(message);
     }
@@ -19,8 +16,4 @@ public class BProgramException extends RuntimeException {
         super(message, cause);
     }
 
-    public BProgramException(Throwable cause) {
-        super(cause);
-    }
-    
 }

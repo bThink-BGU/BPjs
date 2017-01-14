@@ -4,6 +4,7 @@
 package il.ac.bgu.cs.bp.bpjs.eventsets;
 
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.EvaluatorException;
@@ -36,9 +37,9 @@ public class JsEventSet implements EventSet, java.io.Serializable {
             }
             return res;
         } catch (EvaluatorException ee) {
-            throw new RuntimeException("JS Predicate did not return a boolean value.", ee);
+            throw new BPjsRuntimeException("JS Predicate did not return a boolean value.", ee);
         } catch (EcmaError ee) {
-            throw new RuntimeException("Error evaluating JS Predicate:" + ee.getMessage(), ee);
+            throw new BPjsRuntimeException("Error evaluating JS Predicate:" + ee.getMessage(), ee);
         }
     }
 
@@ -52,6 +53,6 @@ public class JsEventSet implements EventSet, java.io.Serializable {
 
     @Override
     public String toString() {
-        return "EventSet:" + getName();
+        return "[JsEventSet: " + getName() +"]";
     }
 }
