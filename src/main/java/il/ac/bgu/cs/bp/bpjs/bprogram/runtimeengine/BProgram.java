@@ -26,6 +26,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Path;
 import static java.nio.file.Files.readAllBytes;
 import java.util.logging.Level;
@@ -287,30 +289,13 @@ public abstract class BProgram {
      * @param pathInJar path of the resource, relative to the class.
      */
     public void evaluateResource(String pathInJar) {
-        try {
-            final URL resource = Thread.currentThread().getContextClassLoader().getResource(pathInJar);
+        try ( InputStream resource = Thread.currentThread().getContextClassLoader().getResourceAsStream(pathInJar) ) {
             if (resource == null) {
                 throw new RuntimeException("Resource '" + pathInJar + "' not found.");
             }
-            evaluateCodeAt(resource.toURI());
-        } catch (URISyntaxException ex) {
-            Logger.getLogger(BProgram.class.getName()).log(Level.SEVERE, null, ex);
-        }
-    }
-    
-    /**
-     * Reads and evaluates the code pointed by the URI. The resource has to be
-     * local (either in the file system or in the classpath.
-     * @param path path to the code to evaluate
-     * @return Result of code evaluation.
-     */
-    protected Object evaluateCodeAt(URI path) {
-        Path pathObject = get(path);
-        try {
-            String script = new String(readAllBytes(pathObject), StandardCharsets.UTF_8);
-            return evaluate(script, pathObject.toString());
-        } catch (IOException e) {
-            throw new RuntimeException("Error while reading code at '" + path + "': " + e.getMessage(), e);
+            evaluate(resource, pathInJar);
+        } catch (IOException ex) {
+            throw new RuntimeException("Error reading resource: '" + pathInJar +"': " + ex.getMessage(), ex);
         }
     }
     

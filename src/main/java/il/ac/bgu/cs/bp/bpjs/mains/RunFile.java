@@ -9,6 +9,10 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,41 +23,41 @@ import org.mozilla.javascript.Scriptable;
 
 /**
  * This is a console application for running BPjs files. Source files are passed
- * as arguments at the command line. Program events and log are printed to 
+ * as arguments at the command line. Program events and log are printed to
  * {@link java.lang.System#out}.
- * 
- * 
+ *
+ *
  * @author michael
  */
 public class RunFile {
-    
+
     public static void main(String[] args) {
-        if ( args.length == 0 ) {
+        if (args.length == 0) {
             printUsageAndExit();
         }
-        
+
         try {
-            BProgram bpp = new BProgram("BPjs"){
+            BProgram bpp = new BProgram("BPjs") {
                 @Override
                 protected void setupProgramScope(Scriptable scope) {
-                    for ( String arg : args ) {
-                        if ( arg.equals("-") ) {
+                    for (String arg : args) {
+                        if (arg.equals("-")) {
                             println(" [READ] stdin");
                             try {
                                 evaluate(System.in, "stdin");
-                            } catch ( EvaluatorException ee ) {
+                            } catch (EvaluatorException ee) {
                                 logScriptExceptionAndQuit(ee, arg);
                             }
                         } else {
                             Path inFile = Paths.get(arg);
-                            println( " [READ] %s", inFile.toAbsolutePath().toString());
-                            if ( ! Files.exists(inFile) ) {
-                                println("File %s does not exit", inFile.toAbsolutePath().toString() );
+                            println(" [READ] %s", inFile.toAbsolutePath().toString());
+                            if (!Files.exists(inFile)) {
+                                println("File %s does not exit", inFile.toAbsolutePath().toString());
                                 System.exit(-2);
                             }
-                            try ( InputStream in = Files.newInputStream(inFile) ) {
+                            try (InputStream in = Files.newInputStream(inFile)) {
                                 evaluate(in, arg);
-                            } catch ( EvaluatorException ee ) {
+                            } catch (EvaluatorException ee) {
                                 logScriptExceptionAndQuit(ee, arg);
                             } catch (IOException ex) {
                                 println("Exception while processing " + arg + ": " + ex.getMessage());
@@ -65,42 +69,42 @@ public class RunFile {
                 }
 
                 private void logScriptExceptionAndQuit(EvaluatorException ee, String arg) {
-                    println( "Error in source %s:", arg);
-                    println( ee.details() );
-                    println( "line: " + ee.lineNumber() + ":" + ee.columnNumber() );
-                    println( "source: " + ee.lineSource() );
+                    println("Error in source %s:", arg);
+                    println(ee.details());
+                    println("line: " + ee.lineNumber() + ":" + ee.columnNumber());
+                    println("source: " + ee.lineSource());
                     System.exit(-3);
                 }
             };
-            
-           bpp.addListener( new StreamLoggerListener() );
-           bpp.start();
-            
+
+            bpp.addListener(new StreamLoggerListener());
+            bpp.start();
+
         } catch (InterruptedException ex) {
             Logger.getLogger(RunFile.class.getName()).log(Level.SEVERE, null, ex);
-        } 
-        
+        }
+
     }
-    
+
     private static void println(String template, String... params) {
-        print( template + "\n", params );
+        print(template + "\n", params);
     }
-    
+
     private static void print(String template, String... params) {
-        if (params.length == 0 ) {
+        if (params.length == 0) {
             System.out.print("# " + template);
         } else {
-            System.out.printf("# " + template, (Object[])params);
+            System.out.printf("# " + template, (Object[]) params);
         }
     }
-    
+
     private static void printUsageAndExit() {
-        try (BufferedReader rdr = new BufferedReader( new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream("RunFile-usage.txt")))) {
+        try (BufferedReader rdr = new BufferedReader(new InputStreamReader(Thread.currentThread().getContextClassLoader().getResourceAsStream("RunFile-usage.txt")))) {
             rdr.lines().forEach(System.out::println);
         } catch (IOException ex) {
             throw new RuntimeException("Cannot find 'RunFile-usage.txt'");
         }
         System.exit(-1);
     }
-    
+
 }

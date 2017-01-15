@@ -4,8 +4,6 @@
 package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
 
 import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionStrategy;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URL;
 import org.mozilla.javascript.Scriptable;
 
@@ -15,40 +13,31 @@ import org.mozilla.javascript.Scriptable;
  */
 public class SingleResourceBProgram extends BProgram {
     
-    private final URI resourceUri;
+    private final String resourceName;
 
-    public SingleResourceBProgram(URI resourceUri) {
-        super(resourceUri.getPath());
-        this.resourceUri = resourceUri;
-    }
-
-    public SingleResourceBProgram(String resourceName) {
-        super( resourceName );
-        try {
-            final URL resourceUrl = Thread.currentThread().getContextClassLoader().getResource(resourceName);
-            if ( resourceUrl == null ) {
-                throw new IllegalArgumentException("Specified resource '" + resourceName + "' not available in classpath.");
-            }
-            resourceUri = resourceUrl.toURI();
+    public SingleResourceBProgram(String aResourceName) {
+        super( aResourceName );
+        resourceName = aResourceName;
+        URL resUrl = Thread.currentThread().getContextClassLoader().getResource(aResourceName);
             
-        } catch ( URISyntaxException use ) {
-            throw new RuntimeException( use );
+        if ( resUrl == null ) {
+            throw new RuntimeException( "Cannot find resource '" + aResourceName + "'");    
         }
     }
     
-    public SingleResourceBProgram(URI resourceUri, String aName) {
+    public SingleResourceBProgram(String aResourceName, String aName) {
         super(aName);
-        this.resourceUri = resourceUri;
+        resourceName = aResourceName;
     }
 
-    public SingleResourceBProgram(URI resourceUri, String aName, EventSelectionStrategy anEventSelectionStrategy) {
+    public SingleResourceBProgram(String aResourceName, String aName, EventSelectionStrategy anEventSelectionStrategy) {
         super(aName, anEventSelectionStrategy);
-        this.resourceUri = resourceUri;
+        resourceName = aResourceName;
     }
 
     @Override
     protected void setupProgramScope(Scriptable scope) {
-        evaluateCodeAt( resourceUri );
+        evaluateResource( resourceName );
     }
     
 }
