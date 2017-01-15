@@ -5,15 +5,39 @@ This repository contains a javascript-based [BP](http://www.b-prog.org) library.
 [![Build Status](https://travis-ci.org/bThink-BGU/BPjs.svg?branch=develop)](https://travis-ci.org/bThink-BGU/BPjs)
 [![Coverage Status](https://coveralls.io/repos/github/bThink-BGU/BPjs/badge.svg?branch=develop)](https://coveralls.io/github/bThink-BGU/BPjs?branch=develop)
 [![Documentation Status](http://readthedocs.org/projects/bpjs/badge/?version=develop)](http://bpjs.readthedocs.io/en/develop/)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.bthink-bgu/BPjs/badge.png?style-plastic)](https://maven-badges.herokuapp.com/maven-central/com.github.bthink-bgu/BPjs/badge.png?style-plastic)
+
+[Browse JavaDocs](http://www.javadoc.io/doc/com.github.bthink-bgu/BPjs/)
 
 #### License
 * BPjs is open sourced under the [MIT license](http://www.opensource.org/licenses/mit-license.php). If you use it in a system, please provide
 a link to this page somewhere in the documentation/system about section.
-* BPjs is uses the Mozilla Rhino Javascript engine. See [here](https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino) for project page and source code.
-
+* BPjs uses the Mozilla Rhino Javascript engine. See [here](https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino) for project page and source code.
+  
 ---
 
+## Getting BPjs
+* From Maven: Add as dependency to a Maven project:
+
+    <dependencies>
+        ...
+        <dependency>
+            <groupId>com.github.bthink-bgu</groupId>
+            <artifactId>BPjs</artifactId>
+            <version>0.8.0</version>
+        </dependency>
+        ...
+    </dependencies>
+
+* Clone, fork, or download the [starting project](https://github.com/bThink-BGU/SampleBPjsProject).
+* Download the `.jar` files directly from [Maven Central](https://repo.maven.apache.org/maven2/com/github/bthink-bgu/BPjs/).
+
 ## Change log for the BPjs library.
+
+### 2017-01-16
+* :sparkles: Updated documentation to refer to Maven Central
+* :bug: `RunFile` re-reads files from file system again.
+* :arrows_counterclockwise: More dead code removal.
 
 ### 2017-01-14
 This release in focused on better BPjs-programmer experience and getting the code into
