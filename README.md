@@ -2,10 +2,10 @@
 
 This repository contains a javascript-based [BP](http://www.b-prog.org) library.
 
-[![Build Status](https://travis-ci.org/bThink-BGU/BPjs.svg?branch=master)](https://travis-ci.org/bThink-BGU/BPjs)
-[![Coverage Status](https://coveralls.io/repos/github/bThink-BGU/BPjs/badge.svg?branch=master)](https://coveralls.io/github/bThink-BGU/BPjs?branch=master)
+[![Build Status](https://travis-ci.org/bThink-BGU/BPjs.svg?branch=develop)](https://travis-ci.org/bThink-BGU/BPjs)
+[![Coverage Status](https://coveralls.io/repos/github/bThink-BGU/BPjs/badge.svg?branch=develop)](https://coveralls.io/github/bThink-BGU/BPjs?branch=develop)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.bthink-bgu/BPjs/badge.png?style-plastic)](https://maven-badges.herokuapp.com/maven-central/com.github.bthink-bgu/BPjs/badge.png?style-plastic)
-[![Documentation Status](http://readthedocs.org/projects/bpjs/badge/?version=master)](http://bpjs.readthedocs.io/en/master/)
+[![Documentation Status](http://readthedocs.org/projects/bpjs/badge/?version=develop)](http://bpjs.readthedocs.io/en/develop/)
 
 [Browse JavaDocs](http://www.javadoc.io/doc/com.github.bthink-bgu/BPjs/)
 
