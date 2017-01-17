@@ -4,7 +4,7 @@ This repository contains a javascript-based [BP](http://www.b-prog.org) library.
 
 [![Build Status](https://travis-ci.org/bThink-BGU/BPjs.svg?branch=master)](https://travis-ci.org/bThink-BGU/BPjs)
 [![Coverage Status](https://coveralls.io/repos/github/bThink-BGU/BPjs/badge.svg?branch=master)](https://coveralls.io/github/bThink-BGU/BPjs?branch=master)
-[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.bthink-bgu/BPjs/badge.svg?style=flat)](https://repo.maven.apache.org/maven2/com/github/bthink-bgu/BPjs/)
+[![Maven Central](https://img.shields.io/maven-central/v/com.github.bthink-bgu/BPjs.svg)](http://mvnrepository.com/artifact/com.github.bthink-bgu/BPjs)
 [![Documentation Status](http://readthedocs.org/projects/bpjs/badge/?version=master)](http://bpjs.readthedocs.io/en/master/)
 
 [Browse JavaDocs](http://www.javadoc.io/doc/com.github.bthink-bgu/BPjs/)
