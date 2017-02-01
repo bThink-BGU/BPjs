@@ -30,7 +30,12 @@ pre {
   border: 1px solid white;
 }
 
-.bash .highlight pre{
+.bash .highlight pre,
+.code.bash.literal-block {
   background-color: #232;
   color: #0B0;
+}
+
+.code.bash.literal-block span.ln {
+  color: #090;
 }
