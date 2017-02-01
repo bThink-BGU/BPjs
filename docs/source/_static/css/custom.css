@@ -17,3 +17,20 @@ h2 {
   border-right: 10px solid yellow;
   background-color: white;
 }
+
+.linenodiv pre {
+  color: black;
+}
+
+.highlighttable tbody tr td.code {
+  width:100%
+}
+
+pre {
+  border: 1px solid white;
+}
+
+.bash .highlight pre{
+  background-color: #232;
+  color: #0B0;
+}

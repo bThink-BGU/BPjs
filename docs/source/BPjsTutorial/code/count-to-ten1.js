@@ -1,0 +1,1 @@
+bp.registerBThread("ad")

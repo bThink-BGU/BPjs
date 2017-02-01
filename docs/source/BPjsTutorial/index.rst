@@ -18,11 +18,10 @@ Behavioral Programming was introduced by Harel, Marron and Weiss in 2012 in a `p
 .. _paper: http://cacm.acm.org/magazines/2012/7/151241-behavioral-programming/fulltext
 .. _ACM Transactions on Computer Science: http://todo/fill/this
 
-* dynamic add BThreads
-
-* External Events
-
-* add logging
-
 .. toctree::
   hello-world
+  eventsets
+  events-with-data
+  logging
+  dynamic-bthread-addition
+  interrupts
