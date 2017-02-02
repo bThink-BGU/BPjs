@@ -38,7 +38,7 @@ The "event generator" creates four events, one for each logging level. The "even
 
 
 
-.. note :: Later versions might integrate BPjs with a full-blown logging system, such as `logback`_ or `log4j2`_.
+.. caution :: Later versions might integrate BPjs with a full-blown logging system, such as `logback`_ or `log4j2`_. Programs relying on the exact logging format may need to change once the logging is updated.
 
 .. _logback: https://logback.qos.ch
 .. _log4j2: http://logging.apache.org/log4j/2.x/index.html

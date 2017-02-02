@@ -18,6 +18,11 @@ bp.registerBThread("Oven", function(){
 
 // Make me a cake as fast as you can
 bp.registerBThread("Baker", function() {
+  setInterruptHandler( function(evt) {
+    bp.log.warn("Error making cake: " + evt);
+    bp.enqueueExternalEvent(bp.Event("No cake for you!"));
+    bp.enqueueExternalEvent(bp.Event("Come back - 1 month!"));
+  });
   bsync({waitFor:CAKE_REQUEST});
   bsync({request:bp.Event("Buy Ingredients")});
   bsync({request:bp.Event("Mix Ingredients")});
