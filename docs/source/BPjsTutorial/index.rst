@@ -23,5 +23,4 @@ Behavioral Programming was introduced by Harel, Marron and Weiss in 2012 in a `p
   eventsets
   logging
   events-with-data
-  dynamic-bthread-addition
   interrupts
