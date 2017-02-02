@@ -13,8 +13,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramListener;
 import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionResult;
 import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.eventselection.SimpleEventSelectionStrategy;
-import static il.ac.bgu.cs.bp.bpjs.eventsets.Events.all;
-import static il.ac.bgu.cs.bp.bpjs.eventsets.Events.emptySet;
+import static il.ac.bgu.cs.bp.bpjs.eventsets.EventSets.all;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsCodeEvaluationException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
@@ -45,6 +44,7 @@ import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.WrappedException;
+import static il.ac.bgu.cs.bp.bpjs.eventsets.EventSets.none;
 
 /**
  * Base class for BPrograms. Contains the logic for managing {@link BThreadSyncSnapshot}s
@@ -431,7 +431,7 @@ public abstract class BProgram {
         programScope.put("bp", programScope,
                 Context.javaToJS(proxy, programScope));
         programScope.put("emptySet", programScope,
-                Context.javaToJS(emptySet, programScope));
+                Context.javaToJS(none, programScope));
         programScope.put("all", programScope,
                 Context.javaToJS(all, programScope));
 

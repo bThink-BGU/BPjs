@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
-import static il.ac.bgu.cs.bp.bpjs.eventsets.Events.emptySet;
+import static il.ac.bgu.cs.bp.bpjs.eventsets.EventSets.none;
 
 /**
  * A statement a BThread makes at a {@code bsync} point. Contains data about 
@@ -51,10 +51,10 @@ public class BSyncStatement implements java.io.Serializable {
      * @return an empty statement
      */
     public static BSyncStatement make(BThreadSyncSnapshot creator) {
-        return new BSyncStatement(Collections.emptySet(), emptySet, emptySet, emptySet).setBthread(creator);
+        return new BSyncStatement(Collections.emptySet(), none, none, none).setBthread(creator);
     }
     public static BSyncStatement make() {
-        return new BSyncStatement(Collections.emptySet(), emptySet, emptySet, emptySet);
+        return new BSyncStatement(Collections.emptySet(), none, none, none);
     }
     
     public BSyncStatement(Collection<? extends BEvent> request, EventSet waitFor, EventSet block, EventSet except) {
@@ -65,7 +65,7 @@ public class BSyncStatement implements java.io.Serializable {
     }
 
     public BSyncStatement(Collection<? extends BEvent> request, EventSet waitFor, EventSet block) {
-        this(request, waitFor, block, emptySet);
+        this(request, waitFor, block, none);
     }
     
     public boolean shouldWakeFor( BEvent anEvent ) {

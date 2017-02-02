@@ -1,0 +1,58 @@
+h1 {
+  text-shadow: 0 4px 6px rgba(0,0,0,.5);
+  font-weight: bold;
+}
+
+h2 {
+  text-shadow: 0 2px 4px rgba(0,0,0,.5);
+  font-weight: bold;
+}
+
+h3 {
+  text-shadow: 0 1px 2px rgba(0,0,0,.5);
+  font-weight: bold;
+}
+
+.admonition {
+  box-shadow: 0 2px 2px rgba(255,255,255,.5) inset, 0 2px 4px rgba(0,0,0,.5);
+}
+
+.note {
+  background-color: rgba(128,128,128,.5);
+}
+
+.tip {
+  background-color: rgba(128,128,255,.4);
+}
+
+.caution {
+  background-color: rgba(255,128,128,.4);
+}
+
+.admonition-todo {
+  border: 1px solid black;
+  border-right: 10px solid yellow;
+  background-color: white;
+}
+
+.linenodiv pre {
+  color: black;
+}
+
+.highlighttable tbody tr td.code {
+  width:100%
+}
+
+pre {
+  border: 1px solid white;
+}
+
+.bash .highlight pre,
+.code.bash.literal-block {
+  background-color: #232;
+  color: #0B0;
+}
+
+.code.bash.literal-block span.ln {
+  color: #090;
+}
