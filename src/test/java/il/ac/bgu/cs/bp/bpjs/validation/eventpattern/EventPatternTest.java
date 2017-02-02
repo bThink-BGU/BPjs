@@ -8,7 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import static il.ac.bgu.cs.bp.bpjs.eventsets.Events.all;
+import static il.ac.bgu.cs.bp.bpjs.eventsets.EventSets.all;
 import static org.junit.Assert.*;
 
 public class EventPatternTest {

@@ -20,6 +20,8 @@ When a b-thread requests an event, it has to be specific. That is, the b-thread 
       return /* computation about evt goes here */;
     });
 
+* By using one of the built-in event sets, ``bp.all``, which contains all events, or ``bp.none``, which is an empty set.
+
 Example: Keep Serving Coffee
 ----------------------------
 

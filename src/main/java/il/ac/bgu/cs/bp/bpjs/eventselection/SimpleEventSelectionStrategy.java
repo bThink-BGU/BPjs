@@ -4,7 +4,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BSyncStatement;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.eventsets.ComposableEventSet;
 import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
-import il.ac.bgu.cs.bp.bpjs.eventsets.Events;
+import il.ac.bgu.cs.bp.bpjs.eventsets.EventSets;
 import java.util.ArrayList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
@@ -56,7 +56,7 @@ public class SimpleEventSelectionStrategy implements EventSelectionStrategy {
         EventSet blocked = ComposableEventSet.anyOf(statements.stream()
                 .filter( stmt -> stmt!=null )
                 .map(BSyncStatement::getBlock )
-                .filter(r -> r != Events.emptySet )
+                .filter(r -> r != EventSets.none )
                 .collect( Collectors.toSet() ) );
         
         Set<BEvent> requested = statements.stream()

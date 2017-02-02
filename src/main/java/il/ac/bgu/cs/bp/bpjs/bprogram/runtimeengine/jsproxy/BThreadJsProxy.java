@@ -8,7 +8,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BSyncStatement;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.eventsets.ComposableEventSet;
 import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
-import il.ac.bgu.cs.bp.bpjs.eventsets.Events;
+import il.ac.bgu.cs.bp.bpjs.eventsets.EventSets;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.Set;
@@ -69,7 +69,7 @@ public class BThreadJsProxy implements java.io.Serializable {
     }
 
     private EventSet convertToEventSet( Object jsObject ) {
-        if ( jsObject == null ) return Events.emptySet;
+        if ( jsObject == null ) return EventSets.none;
         
         // This covers event sets AND events.
         if ( jsObject instanceof EventSet ) {

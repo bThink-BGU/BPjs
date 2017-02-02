@@ -17,7 +17,7 @@ a link to this page somewhere in the documentation/system about section.
 ---
 
 ## Getting BPjs
-* From Maven: Add as dependency to a Maven project:
+* From Maven: Add as dependency to a Maven project. Note that the version number changes.
 
 ````
 <dependencies>
@@ -25,7 +25,7 @@ a link to this page somewhere in the documentation/system about section.
     <dependency>
         <groupId>com.github.bthink-bgu</groupId>
         <artifactId>BPjs</artifactId>
-        <version>0.8.0</version>
+        <version>0.8.2</version>
     </dependency>
     ...
 </dependencies>
@@ -35,6 +35,14 @@ a link to this page somewhere in the documentation/system about section.
 * Download the `.jar` files directly from [Maven Central](https://repo.maven.apache.org/maven2/com/github/bthink-bgu/BPjs/).
 
 ## Change log for the BPjs library.
+
+### 2017-02-02
+
+* :arrows_counterclockwise: `Events` class renamed to `EventSets`. Some cleanup.
+* :arrows_counterclockwise: `emptySet` is now `none`.
+* :arrows_counterclockwise: `all` and `emptySet` are now available to BPjs code via `bp.all` and `bp.none`. This is to prevent name collisions with client code.
+* :bug: Fixed an issue with the logger, where logging levels were ignored.
+* :sparkles: Log level can be set by BPjs code, using `bp.log.setLevel(l)`. `l` is one of `Warn`, `Info`, `Fine`.
 
 ### 2017-01-16
 * :sparkles: Updated documentation to refer to Maven Central

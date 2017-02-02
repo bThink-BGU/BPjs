@@ -21,7 +21,7 @@ Behavioral Programming was introduced by Harel, Marron and Weiss in 2012 in a `p
 .. toctree::
   hello-world
   eventsets
-  events-with-data
   logging
+  events-with-data
   dynamic-bthread-addition
   interrupts

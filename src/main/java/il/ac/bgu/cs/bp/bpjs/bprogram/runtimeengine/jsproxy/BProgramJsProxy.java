@@ -6,8 +6,9 @@ package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.jsproxy;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
+import il.ac.bgu.cs.bp.bpjs.eventsets.EventSets;
 import il.ac.bgu.cs.bp.bpjs.eventsets.JsEventSet;
-import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.mozilla.javascript.Function;
@@ -40,10 +41,21 @@ public class BProgramJsProxy implements java.io.Serializable {
         public void fine( String msg ) { log( LogLevel.Fine, msg ); }
         
         public void log( LogLevel lvl, String msg ) {
-            if ( level.compareTo(lvl) <= 0) {
+            if ( level.compareTo(lvl) >= 0) {
                 System.out.println("[JS][" + lvl.name() + "] " + msg );
             }
         }
+        
+        public void setLevel( String levelName ) {
+            synchronized(this){
+                level = LogLevel.valueOf(levelName);
+            }
+        }
+        
+        public String getLevel() {
+            return level.name();
+        }
+        
     }
     
     private final BProgram program;
@@ -51,6 +63,10 @@ public class BProgramJsProxy implements java.io.Serializable {
     private final AtomicInteger autoAddCounter = new AtomicInteger(0);
     
     public final BpLog log = new BpLog();
+    
+    public final EventSet all = EventSets.all;
+    
+    public final EventSet none = EventSets.none;
     
     public BProgramJsProxy(BProgram program) {
         this.program = program;

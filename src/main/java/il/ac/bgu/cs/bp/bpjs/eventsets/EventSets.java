@@ -5,7 +5,12 @@ import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 /**
  * Utility class for commonly used event sets.
  */
-public class Events {
+public final class EventSets {
+    
+    private EventSets(){
+        // prevent instantiation.
+    }
+    
     /**
      * An event set that contains all events and event sets.
      * @author Bertrand Russel
@@ -26,7 +31,7 @@ public class Events {
     /**
      * An event set containing no events.
      */
-    public final static EventSet emptySet = new EventSet() {
+    public final static EventSet none = new EventSet() {
         
         @Override
         public boolean contains(BEvent event) {
@@ -35,7 +40,7 @@ public class Events {
 
         @Override
         public String toString() {
-            return "{empty}";
+            return "{none}";
         }
     };
     
