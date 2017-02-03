@@ -4,7 +4,7 @@
   <groupId>com.github.bthink-bgu</groupId>
   <artifactId>BPjs</artifactId>
   <name>BPjs</name>
-  <version>0.8.2-SNAPSHOT</version>
+  <version>0.8.3-SNAPSHOT</version>
   <description>Provides a runtime for behavioral programs written in Javascript. It can 
         run stand-alone (from the commmandline) or be embedded in larger 
         JVM-based systems.</description>
@@ -67,26 +67,34 @@
           </archive>
         </configuration>
       </plugin>
-      <plugin>
-        <artifactId>maven-shade-plugin</artifactId>
-        <version>2.4.1</version>
-        <executions>
-          <execution>
-            <phase>package</phase>
-            <goals>
-              <goal>shade</goal>
-            </goals>
-            <configuration>
-              <transformers>
-                <transformer />
-              </transformers>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
     </plugins>
   </build>
   <profiles>
+    <profile>
+      <id>fat-jar</id>
+      <build>
+        <finalName>BPjs-${version}.fat</finalName>
+        <plugins>
+          <plugin>
+            <artifactId>maven-shade-plugin</artifactId>
+            <version>2.4.1</version>
+            <executions>
+              <execution>
+                <phase>package</phase>
+                <goals>
+                  <goal>shade</goal>
+                </goals>
+                <configuration>
+                  <transformers>
+                    <transformer />
+                  </transformers>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
     <profile>
       <id>release</id>
       <build>

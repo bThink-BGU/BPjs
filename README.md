@@ -4,10 +4,9 @@ This repository contains a javascript-based [BP](http://www.b-prog.org) library.
 
 [![Build Status](https://travis-ci.org/bThink-BGU/BPjs.svg?branch=master)](https://travis-ci.org/bThink-BGU/BPjs)
 [![Coverage Status](https://coveralls.io/repos/github/bThink-BGU/BPjs/badge.svg?branch=master)](https://coveralls.io/github/bThink-BGU/BPjs?branch=master)
-[![Maven Central](https://img.shields.io/maven-central/v/com.github.bthink-bgu/BPjs.svg)](http://mvnrepository.com/artifact/com.github.bthink-bgu/BPjs)
+[![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.bthink-bgu/BPjs/badge.png?style-plastic)](https://repo.maven.apache.org/maven2/com/github/bthink-bgu/BPjs/)
 [![Documentation Status](http://readthedocs.org/projects/bpjs/badge/?version=master)](http://bpjs.readthedocs.io/en/master/)
-
-[Browse JavaDocs](http://www.javadoc.io/doc/com.github.bthink-bgu/BPjs/)
+[![JavaDocs](https://img.shields.io/badge/javadocs-browse-green.svg)](http://www.javadoc.io/doc/com.github.bthink-bgu/BPjs/)
 
 #### License
 * BPjs is open sourced under the [MIT license](http://www.opensource.org/licenses/mit-license.php). If you use it in a system, please provide
@@ -19,13 +18,13 @@ a link to this page somewhere in the documentation/system about section.
 ## Getting BPjs
 * From Maven: Add as dependency to a Maven project. Note that the version number changes.
 
-````
+````xml
 <dependencies>
     ...
     <dependency>
         <groupId>com.github.bthink-bgu</groupId>
         <artifactId>BPjs</artifactId>
-        <version>0.8.2</version>
+        <version>0.8.3</version>
     </dependency>
     ...
 </dependencies>
@@ -35,6 +34,11 @@ a link to this page somewhere in the documentation/system about section.
 * Download the `.jar` files directly from [Maven Central](https://repo.maven.apache.org/maven2/com/github/bthink-bgu/BPjs/).
 
 ## Change log for the BPjs library.
+
+### 2017-02-03
+
+* :sparkles: the standard `.jar` file now contains only BPjs, and no dependencies. Fat jar (the jar that includes dependencies) is available via the releases tab.
+
 
 ### 2017-02-02
 
