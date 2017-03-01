@@ -17,7 +17,7 @@ We assume you have downloaded and installed BPjs. This process is explained in :
 The Sequential Version
 ----------------------
 
-The "Hello, World" version below (:download:`source <code/hello-world-seq.js>`) below contains a single b-thread, requesting the two events in sequence. Since it is the only b-thread in the program, these events are not blocked by anyone, and are the only available events. Thus, the arbiter select each one of them as they are requested.
+The "Hello, World" version below (:download:`source <code/hello-world-seq.js>`) contains a single b-thread, requesting the two events in sequence. Since it is the only b-thread in the program, these events are not blocked by anyone, and are the only available events. Thus, the arbiter select each one of them as they are requested.
 
 .. literalinclude:: code/hello-world-seq.js
   :linenos:
@@ -71,7 +71,7 @@ Here is what we'd ideally like to have (:download:`source <code/hello-world-deco
     :linenos:
     :language: javascript
 
-Each b-thread is responsible for requesting its event only, so the code is very cohesive. But alas, the program may generate the events in the wrong order. This is because the event arbiter can choose which event to select first. In the blow example, we have two runs generating different traces.
+Each b-thread is responsible for requesting its event only, so the code is very cohesive. But alas, the program may generate the events in the wrong order. This is because the event arbiter can choose which event to select first. In the example below, we have two runs generating different traces.
 
 .. code:: bash
   :number-lines:
