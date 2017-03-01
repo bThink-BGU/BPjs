@@ -10,6 +10,7 @@ import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.eventsets.EventSets;
 import il.ac.bgu.cs.bp.bpjs.eventsets.JsEventSet;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
+import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.mozilla.javascript.Function;
 
@@ -55,7 +56,6 @@ public class BProgramJsProxy implements java.io.Serializable {
         public String getLevel() {
             return level.name();
         }
-        
     }
     
     private final BProgram program;
@@ -67,6 +67,12 @@ public class BProgramJsProxy implements java.io.Serializable {
     public final EventSet all = EventSets.all;
     
     public final EventSet none = EventSets.none;
+    
+    /**
+     * Facility for creating random numbers. BPjs code should not use Javascript's
+     * random facility, as it won't play well with model checking.
+     */
+    public RandomProxy random = new RandomProxy();
     
     public BProgramJsProxy(BProgram program) {
         this.program = program;
@@ -160,5 +166,6 @@ public class BProgramJsProxy implements java.io.Serializable {
     public void loadJavascriptResource(String path) {
         program.evaluateResource(path);
     }
+    
     
 }
