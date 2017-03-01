@@ -18,9 +18,15 @@ Behavioral Programming was introduced by Harel, Marron and Weiss in 2012 in a `p
 .. _paper: http://cacm.acm.org/magazines/2012/7/151241-behavioral-programming/fulltext
 .. _ACM Transactions on Computer Science: http://todo/fill/this
 
+Tutorial
+~~~~~~~~
+This tutorial will introduce you to BP principles and to the BPjs api. After completing it, you will be able to write BPjs programs. That's the technical part, though. Properly thinking in BP and in general scenario-based programming - well, that would probably take longer, as with any new programming paradigm.
+
 .. toctree::
   hello-world
   eventsets
   logging
   events-with-data
   interrupts
+  bp-object
+  dynamic-bthread-addition

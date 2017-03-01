@@ -30,7 +30,7 @@ BPjs is released using two .jar files, available at our `release page`_:
 
 * ``BPjs-{version}.jar`` Contains only BPjs' classes. Use this if you want to manage the BPjs' dependencies yourself.
 
-* ``BPjs-{version}.fat.jar`` Contains BPjs and its dependencies. Use this if you are certain BPjs' dependencies are different from the dependencies of the rest of your project. Otherwise, classpath clashes might occur.
+* ``BPjs-{version}.uber.jar`` Contains BPjs and its dependencies. Use this to execute BPjs programs, or if you are certain BPjs' dependencies are different from the dependencies of the rest of your project. Otherwise, classpath clashes might occur.
 
 
 Compile from Source
