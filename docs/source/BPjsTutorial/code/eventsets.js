@@ -13,13 +13,11 @@ bp.registerBThread("coffee supply", function() {
   var coffeeOrderES = bp.EventSet( "coffee orders", function(evt){
     return evt.name.endsWith("coffee");
   });
-  var orderCount = 0;
   while ( true ) {
-    bsync({waitFor:coffeeOrderES});
-    orderCount = orderCount+1;
-    if ( (orderCount%10) == 0 ) {
-      bsync({request:bp.Event("Grind More Coffee"),
-             block:coffeeOrderES});
+    for ( var i=0; i<10; i++ ) {
+      bsync({waitFor:coffeeOrderES});
     }
+    bsync({request:bp.Event("Grind more coffee!"),
+           block:coffeeOrderES});
   }
 });

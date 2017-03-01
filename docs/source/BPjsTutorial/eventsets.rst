@@ -44,6 +44,8 @@ The "orders" b-thread generates one hundred random orders. We now need to detect
 
 After defining the event set for coffee orders, the "coffee supply" b-thread loops forever, waiting for coffee order events (line 7). After ten orders, when it's time to grind more coffee, it blocks coffee orders from happening, and requests a coffee grinding event (the ``bsync`` at lines 10-11). Until the coffee grinding event is selected, no coffee order can be selected.
 
+.. note:: Rather than counting how many coffees were made using some variable, the "coffee supply" b-thread loops for 10 times, waiting for coffee to be ordered. This is an example for the classic scenario style: X has to happen Y times, and then we do Z.
+
 Here's a sample output of this b-program:
 
 .. code:: bash
@@ -73,7 +75,7 @@ Here's a sample output of this b-program:
    --:BPjs Event [BEvent name:latte coffee]
    --:BPjs Event [BEvent name:black tea]
    --:BPjs Event [BEvent name:espresso coffee]
-   --:BPjs Event [BEvent name:Grind More Coffee]
+   --:BPjs Event [BEvent name:Grind more coffee!]
    --:BPjs Event [BEvent name:flatwhite coffee]
    --:BPjs Event [BEvent name:sparkling water]
    --:BPjs Event [BEvent name:black tea]

@@ -18,7 +18,7 @@ h3 {
 }
 
 .note {
-  background-color: rgba(128,128,128,.5);
+  background-color: rgba(128,255,128,.4);
 }
 
 .tip {
@@ -31,8 +31,49 @@ h3 {
 
 .admonition-todo {
   border: 1px solid black;
-  border-right: 10px solid yellow;
   background-color: white;
+  position: relative;
+}
+
+.admonition-todo {
+  border: 1px solid black;
+  background-color: #FFA;
+  position: relative;
+  padding-left: 37px !important;
+}
+
+.admonition-todo::after {
+  content:"";
+  position: absolute;
+  display:block;
+  top:0;
+  right:0;
+  height:100%;
+  width:20px;
+  background: repeating-linear-gradient(
+    -45deg,
+    #FF0,
+    #FF0 7px,
+    #000 7px,
+    #000 14px
+  );
+}
+
+.admonition-todo::before {
+  content:"     ";
+  position: absolute;
+  display:block;
+  top:0;
+  left:0;
+  height:100%;
+  width:20px;
+  background: repeating-linear-gradient(
+    -45deg,
+    #FF0,
+    #FF0 7px,
+    #000 7px,
+    #000 14px
+  );
 }
 
 .linenodiv pre {
