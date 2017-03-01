@@ -6,8 +6,9 @@ All events in BPjs have a name. A name alone can get you quite far, but sometime
 
   var anEvent = bp.Event("answer", {value:42, scope:"everything"});
   bp.log.info(anEvent.name); // logs "answer"
-  bp.log.info(anEvent.value); // logs 42
-
+  bp.log.info(anEvent.data.value); // logs 42
+  bp.log.info(anEvent.data.scope); // logs "everything"
+  
 Adding data to events allows for a more complex interaction between b-threads. The b-threads in the example (:download:`source <code/count-to-ten1.js>`) below collaborate in order run to count to 10.
 
 The first b-thread requests three events: two with no data, and one with a ``counter`` type and a ``0`` value. Note that the use of ``type`` here is convention only; there's no static type system in place to enforce type correctness.
