@@ -21,33 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.jsproxy;
+package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
-import org.junit.Test;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import org.junit.Test;
 
 /**
  *
  * @author michael
  */
-public class BProgramJsProxyTest {
-    
+public class BProgramTest {
+
     @Test
-    public void randomProxyText() throws InterruptedException {
-        
+    public void testGlobalScopeAccessors() throws InterruptedException {
         BProgram sut = new SingleResourceBProgram("RandomProxy.js");
         
         sut.start();
-        Double boolCount = sut.getFromGlobalScope("boolCount", Double.class).get();
-        assertEquals(500.0, boolCount, 100);
         
-        Double intCount = sut.getFromGlobalScope("intCount", Double.class).get();
-        assertEquals(500.0, intCount, 100);
-        
-        Double floatCount = sut.getFromGlobalScope("floatCount", Double.class).get();
-        assertEquals(500.0, floatCount, 100);
-
+        assertEquals( 1000.0, sut.getFromGlobalScope("TOTAL_COUNT", Double.class).get(), 3 );
+        assertFalse( sut.getFromGlobalScope("does-not-exist", Double.class).isPresent() );
     }
+    
 }

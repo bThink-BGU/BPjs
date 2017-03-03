@@ -35,6 +35,13 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+### 2017-03-02
+
+* :sparkles: `bp.random` added.
+* :arrows_counterclockwise: Documentation updates
+* :sparkles: Added java accessors for putting and getting variables in the JS program
+* :arrows_counterclockwise: `fat.jar` is now `uber.jar`.
+
 ### 2017-02-03
 
 * :sparkles: the standard `.jar` file now contains only BPjs, and no dependencies. Fat jar (the jar that includes dependencies) is available via the releases tab.
