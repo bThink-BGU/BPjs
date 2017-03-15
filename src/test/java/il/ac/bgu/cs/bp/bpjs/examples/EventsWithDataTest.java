@@ -1,7 +1,7 @@
 /*
  *  Author: Michael Bar-Sinai
  */
-package il.ac.bgu.cs.bp.bpjs.examples.eventarrays;
+package il.ac.bgu.cs.bp.bpjs.examples;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
@@ -17,18 +17,18 @@ import org.junit.Test;
  *
  * @author michael
  */
-public class EventsArraysTest {
+public class EventsWithDataTest {
 
     @Test
     public void testEventsWithData() throws Exception {
-        BProgram bpr = new SingleResourceBProgram( "EventArrays.js" );
+        BProgram bpr = new SingleResourceBProgram( "EventsWithData.js" );
         bpr.addListener( new StreamLoggerListener() );
         InMemoryEventLoggingListener events = bpr.addListener( new InMemoryEventLoggingListener() );
         
         bpr.start();
         
-        assertEquals( Arrays.asList("e11", "e21"),
-                      events.getEvents().stream().map( BEvent::getName).collect(toList()));
+        assertEquals( Arrays.asList("e1", "e2", "e1e2"),
+                events.getEvents().stream().map( BEvent::getName).collect(toList()));
         
     }
     

@@ -35,6 +35,10 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+### 2017-03-15
+
+* :put_litter_in_its_place: Simplified the `examples` test package.
+
 ### 2017-03-14
 
 * :arrows_counterclockwise: Internal method name clean-ups.

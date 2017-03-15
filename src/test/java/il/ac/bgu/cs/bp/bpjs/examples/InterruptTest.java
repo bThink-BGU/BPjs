@@ -1,4 +1,4 @@
-package il.ac.bgu.cs.bp.bpjs.examples.interrupt;
+package il.ac.bgu.cs.bp.bpjs.examples;
 
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;

@@ -1,52 +1,46 @@
-package il.ac.bgu.cs.bp.bpjs.examples.addingbthreads;
+package il.ac.bgu.cs.bp.bpjs.examples;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
-import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.validation.eventpattern.EventPattern;
 import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 import org.mozilla.javascript.Scriptable;
 
 /**
- * Tests for a bhtread that adds bthreads as it works.
- * 
+ * @author orelmosheweinstock
  * @author @michbarsinai
  */
-public class AddingBthreadsTest {
-    
+public class NamedArgsHotNColdTest {
 
     BProgram buildProgram() {
-        return new BProgram("AddingBthreadsTest") {
+        return new BProgram("NamedArgsHotNCold") {
             @Override
             protected void setupProgramScope( Scriptable aScope ) {
-                evaluateResource("AddingBthreads.js");
+                evaluateResource("NamedArgsHotNCold.js");
             }
         };
     }
     
     @Test
     public void superStepTest() throws InterruptedException {
-        
-        final BEvent parentDone = new BEvent("parentDone");
-        final BEvent kidADone = new BEvent("kidADone");
-        final BEvent kidBDone = new BEvent("kidBDone");
-        
         BProgram sut = buildProgram();
         sut.addListener( new StreamLoggerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
         sut.start();
-        EventSet kiddies = il.ac.bgu.cs.bp.bpjs.eventsets.ComposableEventSet.anyOf(kidADone, kidBDone);
-        EventPattern expected = new EventPattern()
-                .append(kiddies)
-                .append(kiddies)
-                .append(parentDone)
-                .append(kiddies)
-                .append(kiddies)
-                .append(parentDone);
+        
+        eventLogger.getEvents().forEach(e->System.out.println(e) );
+        final BEvent hotEvent = new BEvent("hotEvent");
+        final BEvent coldEvent = new BEvent("coldEvent");
+        final BEvent allDoneEvent = new BEvent("allDone");
+        EventPattern expected = new EventPattern().append(coldEvent).append(hotEvent)
+                .append(coldEvent).append(hotEvent)
+                .append(coldEvent).append(hotEvent)
+                .append(allDoneEvent);
+        
         assertTrue( expected.matches(eventLogger.getEvents()) );
     }
 

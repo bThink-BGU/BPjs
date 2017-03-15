@@ -1,55 +1,50 @@
-package il.ac.bgu.cs.bp.bpjs.examples.interrupthandler;
+package il.ac.bgu.cs.bp.bpjs.examples;
 
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.exceptions.BProgramException;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
 import il.ac.bgu.cs.bp.bpjs.validation.eventpattern.EventPattern;
 import org.junit.Test;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import org.mozilla.javascript.Scriptable;
 
 /**
+ * @author orelmosheweinstock
  * @author @michbarsinai
  */
-public class InterruptHandlerTest {
+public class HotNColdTest {
+    
+    final BEvent hotEvent = new BEvent("hotEvent");
+    final BEvent coldEvent = new BEvent("coldEvent");
+    final BEvent allDoneEvent = new BEvent("allDone");
 
-    BProgram buildProgram(String jsFilename) {
-        return new BProgram(jsFilename) {
+    BProgram buildProgram() {
+        return new BProgram("HotAndCold") {
             @Override
             protected void setupProgramScope( Scriptable aScope ) {
-                evaluateResource(jsFilename + ".js");
+                evaluateResource("HotNCold.js");
             }
         };
     }
     
     @Test
-    public void echoEventTest() throws InterruptedException {
-        BProgram sut = buildProgram("InterruptHandler");
+    public void superStepTest() throws InterruptedException {
+        BProgram sut = buildProgram();
         sut.addListener( new StreamLoggerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
         sut.start();
         
         eventLogger.getEvents().forEach(e->System.out.println(e) );
+        
         EventPattern expected = new EventPattern()
-                .append(new BEvent("boom"))
-                .append(new BEvent("boom"))
-                .append(new BEvent("internalValue"));
+                .append(coldEvent).append(hotEvent)
+                .append(coldEvent).append(hotEvent)
+                .append(coldEvent).append(hotEvent)
+                .append(allDoneEvent);
         
         assertTrue( expected.matches(eventLogger.getEvents()) );
-    }
-    
-    @Test(expected=BProgramException.class)
-    public void illegalBsyncTest() throws InterruptedException {
-        BProgram sut = buildProgram("InterruptHandler_illegal");
-        sut.addListener( new StreamLoggerListener() );
-        
-        sut.start();
-        
-        fail("Program should have terminated in error.");
     }
 
 }
