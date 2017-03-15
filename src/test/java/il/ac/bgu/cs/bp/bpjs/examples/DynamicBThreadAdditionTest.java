@@ -37,7 +37,7 @@ public class DynamicBThreadAdditionTest {
     
     @Test
     public void test() throws InterruptedException {
-        BProgram sut = new SingleResourceBProgram("dynamicBThreadAddition.js");
+        BProgram sut = new SingleResourceBProgram("dynamicBthreadAddition.js");
         sut.addListener( new StreamLoggerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
