@@ -35,6 +35,14 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+### 2017-03-14
+
+* :arrows_counterclockwise: Internal method name clean-ups.
+* :put_litter_in_its_place: Removed unneeded initializations.
+* :bug: Program and bthread scopes are treated as scopes rather than prototypes.
+* :sparkles: B-Thread scope games eliminated :tada:. Dynamic b-thread addition is now possible from within loops etc. Tutorial updated.
+* :sparkles: More tests.
+
 ### 2017-03-02
 
 * :sparkles: `bp.random` added.

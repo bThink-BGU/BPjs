@@ -9,7 +9,7 @@ bp.registerBThread("Customer", function(){
 // Burn the cake half of the times.
 bp.registerBThread("Oven", function(){
   bsync({waitFor:bp.Event("Bake Start")});
-  if ( Math.random() > 0.5 ) {
+  if ( bp.random.nextBoolean() ) {
     bsync({request:bp.Event("Cake Burnt"), block:bp.Event("Bake End")});
   } else {
     bsync({request:bp.Event("Cake Ready"), block:bp.Event("Bake End")});

@@ -73,14 +73,28 @@ public class BThreadSyncSnapshot implements Serializable {
     
     void setupScope(Scriptable programScope) {
         scope = (Scriptable) Context.javaToJS(proxy, programScope);
-        scope.setPrototype(programScope);
+        scope.setParentScope(programScope);
 
         // This is a break from JS's semantics, but we have to do it.
         // In JS, inner functions know about variables in their syntactical parents.
         // For BThread functions we break this, and make them a top-level scope. This
         // works for us since the only communication between BThreads is via events,
-        // so in particular they can't share variables.
-        entryPoint.setParentScope(scope);
+        // so in particular they shouldn't share variables.
+    
+//        entryPoint.setParentScope(scope);
+        Scriptable curScope = entryPoint.getParentScope();
+        if ( curScope.getParentScope() == null ) {
+            entryPoint.setParentScope(scope);
+            scope.setParentScope(curScope);
+        } else {
+            while ( curScope.getParentScope().getParentScope() != null) {
+                curScope = curScope.getParentScope();
+            }
+            scope.setParentScope(curScope.getParentScope());
+            curScope.setParentScope(scope);
+            
+        }
+        entryPoint.getPrototype().setPrototype(scope);
     }
 
     public BSyncStatement getBSyncStatement() {

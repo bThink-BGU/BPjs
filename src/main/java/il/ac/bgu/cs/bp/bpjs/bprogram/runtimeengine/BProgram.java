@@ -396,7 +396,7 @@ public abstract class BProgram {
         try {
             Context cx = ContextFactory.getGlobal().enterContext();
             cx.setOptimizationLevel(-1); // must use interpreter mode
-            setupGlobalScope(cx);
+            initProgramScope(cx);
             setupBThreadScopes();
         } finally {
             Context.exit();
@@ -411,7 +411,7 @@ public abstract class BProgram {
         bthreads.forEach(bt -> bt.setupScope(programScope));
     }
 
-    private void setupGlobalScope(Context cx) {
+    private void initProgramScope(Context cx) {
         // load and execute globalScopeInit.js
         ImporterTopLevel importer = new ImporterTopLevel(cx);
         programScope = cx.initStandardObjects(importer);
@@ -424,7 +424,7 @@ public abstract class BProgram {
         programScope.put("all", programScope,
                 Context.javaToJS(all, programScope));
 
-        evaluateResource("globalScopeInit.js");
+//        evaluateResource("globalScopeInit.js"); <-- Currently not needed. Leaving in as we might need it soon.
 
         setupProgramScope(programScope);
     }

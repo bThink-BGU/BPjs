@@ -23,7 +23,7 @@ public class ResumeBThread extends BPEngineTask {
         try {
             Object toResume = bss.getContinuation();
             Object eventInJS = Context.javaToJS(event, bss.getScope());
-            jsContext.resumeContinuation(toResume, bss.getScope(), eventInJS); // may throw CapturedBSync
+            jsContext.resumeContinuation(toResume, bss.getScope(), eventInJS); 
             return null;
             
         } catch (ContinuationPending cbs) {  

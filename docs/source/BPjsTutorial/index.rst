@@ -28,5 +28,5 @@ This tutorial will introduce you to BP principles and to the BPjs api. After com
   logging
   events-with-data
   interrupts
-  bp-object
   dynamic-bthread-addition
+  bp-object

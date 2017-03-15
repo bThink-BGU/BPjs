@@ -7,8 +7,6 @@ package il.ac.bgu.cs.bp.bpjs.exceptions;
  */
 public abstract class BPjsException extends RuntimeException {
     
-    public BPjsException(){}
-    
     public BPjsException( String message ) {
         super(message);
     }
