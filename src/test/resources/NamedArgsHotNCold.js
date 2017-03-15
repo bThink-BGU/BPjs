@@ -6,10 +6,10 @@ var hotEvent = bp.Event("hotEvent");
 bp.registerBThread("HotBt", function () {
   // request hotEvent three times, in different verbosities.
     bsync({ request:hotEvent,
-            waitFor: [emptySet],
-            block: emptySet} );
+            waitFor: [bp.none],
+            block: bp.none} );
     bsync({ request: [hotEvent],
-            waitFor: emptySet });
+            waitFor: bp.none });
     bsync({ request: hotEvent });
 });
 

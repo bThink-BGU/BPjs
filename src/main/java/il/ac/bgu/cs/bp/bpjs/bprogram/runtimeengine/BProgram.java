@@ -13,7 +13,6 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramListener;
 import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionResult;
 import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.eventselection.SimpleEventSelectionStrategy;
-import static il.ac.bgu.cs.bp.bpjs.eventsets.EventSets.all;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsCodeEvaluationException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
 import java.io.BufferedReader;
@@ -33,7 +32,6 @@ import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.WrappedException;
-import static il.ac.bgu.cs.bp.bpjs.eventsets.EventSets.none;
 
 /**
  * Base class for BPrograms. Contains the logic for managing {@link BThreadSyncSnapshot}s
@@ -411,7 +409,7 @@ public abstract class BProgram {
         bthreads.forEach(bt -> bt.setupScope(programScope));
     }
 
-    private void initProgramScope(Context cx) {
+    protected void initProgramScope(Context cx) {
         // load and execute globalScopeInit.js
         ImporterTopLevel importer = new ImporterTopLevel(cx);
         programScope = cx.initStandardObjects(importer);
@@ -419,10 +417,6 @@ public abstract class BProgram {
         BProgramJsProxy proxy = new BProgramJsProxy(this);
         programScope.put("bp", programScope,
                 Context.javaToJS(proxy, programScope));
-        programScope.put("emptySet", programScope,
-                Context.javaToJS(none, programScope));
-        programScope.put("all", programScope,
-                Context.javaToJS(all, programScope));
 
 //        evaluateResource("globalScopeInit.js"); <-- Currently not needed. Leaving in as we might need it soon.
 
@@ -430,7 +424,7 @@ public abstract class BProgram {
     }
 
     /**
-     * The BProgram should set up its scope here. Normally, this amount to 
+     * The BProgram should set up its scope here. Normally, this amounts to 
      * loading the script with the BThreads.
      *
      * @param scope the scope to set up.

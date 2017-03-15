@@ -38,6 +38,8 @@ a link to this page somewhere in the documentation/system about section.
 ### 2017-03-15
 
 * :put_litter_in_its_place: Simplified the `examples` test package.
+* :put_litter_in_its_place: `all` and `none` are now only available via `bp`.
+* :arrows_counterclockwise: cleaner scope structure..
 
 ### 2017-03-14
 

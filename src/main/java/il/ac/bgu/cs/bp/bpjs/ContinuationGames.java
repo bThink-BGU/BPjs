@@ -6,9 +6,12 @@ package il.ac.bgu.cs.bp.bpjs;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BSyncStatement;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.eventsets.JsEventSet;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.mozilla.javascript.Context;
@@ -16,6 +19,7 @@ import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.serialize.ScriptableInputStream;
 import org.mozilla.javascript.serialize.ScriptableOutputStream;
 
 /**
@@ -45,21 +49,50 @@ public class ContinuationGames {
         public void mainEventLoop() throws InterruptedException {
             try {
                 BThreadSyncSnapshot bt = bthreads.iterator().next();
+                Context ctxt = Context.enter();
                 Object cnt = bt.getContinuation();
-                Context.enter();
+                final Scriptable scope = bt.getScope();
+                final Scriptable topLevelScope = ctxt.initSafeStandardObjects();
+                
+                Object bp = null;
+                for ( Scriptable sc=scope; sc!=null; sc = sc.getParentScope() ) {
+                    System.out.println("SCOPE START");
+                    if ( sc.has("bp", sc) ) {
+                        bp = sc.get("bp", sc);
+                        sc.delete("bp");
+                        System.out.println("bp deleted.");
+                    }
+                    System.out.println("SCOPE END\n\n");
+                }
+                
+                
+                byte[] serializedContinuationAndScope;
                 try (ByteArrayOutputStream bytes = new ByteArrayOutputStream(); 
-                     ScriptableOutputStream outs = new ScriptableOutputStream(bytes, bt.getScope())) {
-//                    outs.writeObject(cnt);
+                     ScriptableOutputStream outs = new ScriptableOutputStream(bytes, topLevelScope)) {
+                    outs.writeObject(cnt);
+                    outs.writeObject(scope);
+                    outs.flush();
+                    serializedContinuationAndScope = bytes.toByteArray();
                 }
                 Context.exit();
 
+                System.out.println("Seriazlied to " + serializedContinuationAndScope.length + " bytes.");
                 Context cx = ContextFactory.getGlobal().enterContext();
                 cx.setOptimizationLevel(-1); // must use interpreter mode
+                
                 for (int i = 0; i < 10; i++) {
-                    ImporterTopLevel importer = new ImporterTopLevel(cx);
-                    Scriptable ns = cx.initStandardObjects(importer);
-//                    ns.setParentScope(globalScope);
-                    cx.resumeContinuation(cnt, ns, "");
+                    try ( ScriptableInputStream sis = new ScriptableInputStream( new ByteArrayInputStream(serializedContinuationAndScope), topLevelScope)) {
+                        // read cnt and scope
+                        Scriptable cnt2 = (Scriptable) sis.readObject();
+                        Scriptable scope2 = (Scriptable) sis.readObject();
+                        
+                        // re-add bp to the scope
+                        initProgramScope(cx);
+                        scope2.setParentScope(getGlobalScope());
+                        
+                        // go!!
+                        cx.resumeContinuation(cnt2, scope2, new Object[0]);
+                    }
                 }
                 Context.exit();
             } catch (Exception ex) {
@@ -69,27 +102,7 @@ public class ContinuationGames {
         
     }
     
-    public static void main(String[] args) throws Exception {
-        Context ctxt = Context.enter();
-        ctxt.setOptimizationLevel(-1);
-        ImporterTopLevel importer = new ImporterTopLevel(ctxt);
-        Scriptable globalScope = ctxt.initStandardObjects(importer);
-            
-        Function f = (Function) ctxt.evaluateString(globalScope, "function(){ var i=1; i++;}", "", 0, null);
-    
-        BThreadSyncSnapshot bss = new BThreadSyncSnapshot("aName", f);
-        bss.setBSyncStatement( BSyncStatement.make()
-                .request( new BEvent("hello") )
-                .waitFor( new JsEventSet("S", f) )
-        );
-        bss.setInterruptHandler(f);
-        
-        try ( ByteArrayOutputStream bytes = new ByteArrayOutputStream(); 
-              ScriptableOutputStream outs = new ScriptableOutputStream(bytes, globalScope) ) {
-            outs.writeObject(bss);
-        }
-        Context.exit();
-        
+    public static void main(String[] args) throws Exception {   
         BProgram bpp = new BPP();
         bpp.start();
     }
