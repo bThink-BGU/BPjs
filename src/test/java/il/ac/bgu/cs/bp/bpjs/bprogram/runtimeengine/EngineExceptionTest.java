@@ -26,6 +26,7 @@ public class EngineExceptionTest {
             fail("System should have thrown an error due to bsync called outside of a BThread.");
         } catch (BPjsCodeEvaluationException exp) {
             assertEquals( 3, exp.getLineNumber() );
+            assertEquals( "hardcoded", exp.getSourceName() );
             assertTrue( exp.getMessage().contains("bsync"));
             assertTrue( exp.getMessage().contains("Did you forget")); // make sure this is the friendly message
             assertEquals(1, exp.getScriptStackTrace().size());
@@ -38,7 +39,7 @@ public class EngineExceptionTest {
             @Override
             protected void setupProgramScope(Scriptable scope) {
                 evaluate("var j=9\n"
-                        + "I'm not a Javascript code at all.\n"
+                        + "#This isn't a javascript line.\n"
                         + "var o=0;",
                         "hardcoded");
             }
@@ -49,6 +50,9 @@ public class EngineExceptionTest {
             fail("System should have thrown an error due to uncompilable Javascript code.");
         } catch (BPjsCodeEvaluationException exp) {
             assertEquals( 2, exp.getLineNumber() );
+            assertEquals( 1, exp.getColumnNumber() );
+            assertEquals("#This isn't a javascript line.", exp.getLineSource());
+            
         }
     }
 }

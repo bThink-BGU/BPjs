@@ -23,22 +23,23 @@
  */
 package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
 
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *
  * @author michael
  */
-public class NoBSyncTest {
+public class SingleResourceBProgramTest {
     
     @Test
-    public void test() throws InterruptedException {
-        BProgram sut = new SingleResourceBProgram("noBSyncs.js", "noBSyncs");
-        
-        sut.start();
-        final Long actualValue = sut.getFromGlobalScope("shouldBe7", Long.class).get();
-        assertEquals(new Long(7), actualValue);
-                
+    public void testMissingResource() {
+        final String missingResourceName = "I'm not there";
+        try {
+            new SingleResourceBProgram(missingResourceName);
+        } catch ( IllegalArgumentException iae ) {
+            assertTrue(iae.getMessage().contains(missingResourceName));
+        }
     }
+    
 }
