@@ -4,6 +4,9 @@ Terms Used in this documentation
 
 .. glossary::
 
+  Scenario-Based Programming
+    .. todo:: explain
+
   Behavioral Programming
     .. todo:: explain
 

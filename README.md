@@ -24,7 +24,7 @@ a link to this page somewhere in the documentation/system about section.
     <dependency>
         <groupId>com.github.bthink-bgu</groupId>
         <artifactId>BPjs</artifactId>
-        <version>0.8.3</version>
+        <version>0.8.4</version>
     </dependency>
     ...
 </dependencies>
@@ -34,6 +34,32 @@ a link to this page somewhere in the documentation/system about section.
 * Download the `.jar` files directly from [Maven Central](https://repo.maven.apache.org/maven2/com/github/bthink-bgu/BPjs/).
 
 ## Change log for the BPjs library.
+
+### 2017-03-21
+
+* :sparkles: `bp.getTime()` added.
+* :sparkles: Updated tutorial now includes the `bp` object.
+
+### 2017-03-15
+
+* :put_litter_in_its_place: Simplified the `examples` test package.
+* :put_litter_in_its_place: `all` and `none` are now only available via `bp`.
+* :arrows_counterclockwise: cleaner scope structure..
+
+### 2017-03-14
+
+* :arrows_counterclockwise: Internal method name clean-ups.
+* :put_litter_in_its_place: Removed unneeded initializations.
+* :bug: Program and bthread scopes are treated as scopes rather than prototypes.
+* :sparkles: B-Thread scope games eliminated :tada:. Dynamic b-thread addition is now possible from within loops etc. Tutorial updated.
+* :sparkles: More tests.
+
+### 2017-03-02
+
+* :sparkles: `bp.random` added.
+* :arrows_counterclockwise: Documentation updates
+* :sparkles: Added java accessors for putting and getting variables in the JS program
+* :arrows_counterclockwise: `fat.jar` is now `uber.jar`.
 
 ### 2017-02-03
 

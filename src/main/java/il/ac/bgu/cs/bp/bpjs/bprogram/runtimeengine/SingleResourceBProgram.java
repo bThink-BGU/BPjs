@@ -21,7 +21,7 @@ public class SingleResourceBProgram extends BProgram {
         URL resUrl = Thread.currentThread().getContextClassLoader().getResource(aResourceName);
             
         if ( resUrl == null ) {
-            throw new RuntimeException( "Cannot find resource '" + aResourceName + "'");    
+            throw new IllegalArgumentException( "Cannot find resource '" + aResourceName + "'");    
         }
     }
     

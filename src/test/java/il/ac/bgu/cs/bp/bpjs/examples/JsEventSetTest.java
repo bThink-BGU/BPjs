@@ -1,7 +1,7 @@
 /*
  *  Author: Michael Bar-Sinai
  */
-package il.ac.bgu.cs.bp.bpjs.examples.jseventset;
+package il.ac.bgu.cs.bp.bpjs.examples;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;

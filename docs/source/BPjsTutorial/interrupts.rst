@@ -34,6 +34,8 @@ The first b-thread requests a cake. Nothing much to note here, except the usage 
 
 The "Oven" b-thread waits for a ``"Bake Start"`` event. When this event is selected, it starts baking the cake - but has a 50% chance of burning it. This is something the the "baker" b-thread has to protect itself against.
 
+.. note:: The "Oven" b-thread code uses ``bp.random.nextBoolean()`` rather than Javascript's standard ``Math.random()``. This is done in order to allow model checking: we can execute the code once and enforce ``nextBoolean`` to return ``true``, and then run it again and make it return ``false``.
+
 .. literalinclude:: code/interrupts.js
   :linenos:
   :language: javascript
@@ -64,6 +66,8 @@ Here's the output of an unsuccessful baking attempt:
   ---:BPjs Ended
 
 
+.. _external_events:
+
 Final Acts of an Interrupted B-Thread
 --------------------------------------
 
@@ -78,6 +82,27 @@ The function can be used for clean up and logging, but as it is *not executed as
 
 Lines 2-6 of the baker b-thread set a handler for handling the unfortunate event of the burnt cake. The handler first logs why the b-thread was interrupted (line 3), and then enqueues two events to declare that no cake will be served (lines 4-5).
 
-.. note:: External events are polled only when there are live b-threads in the b-program. If all b-threads terminate while the external event queue contains events, there events will never be selected.
+.. code:: bash
+
+  $ java -jar BPjs.jar interrupt-handler.js
+  #  [READ] /.../interrupts-handler.js
+  -:BPjs Added Customer
+  -:BPjs Added Oven
+  -:BPjs Added Baker
+  #  [ OK ] docs/source/BPjsTutorial/code/interrupts-handler.js
+  ---:BPjs Started
+  --:BPjs Event [BEvent name:Cake Please]
+  --:BPjs Event [BEvent name:Buy Ingredients]
+  --:BPjs Event [BEvent name:Mix Ingredients]
+  --:BPjs Event [BEvent name:Bake Start]
+  --:BPjs Event [BEvent name:Cake Burnt]
+  -:BPjs Removed Baker
+  [JS][Warn] Error making cake: [BEvent name:Cake Burnt]
+  --:BPjs Event [BEvent name:No cake for you!]
+  --:BPjs Event [BEvent name:Come back - 1 month!]
+  ---:BPjs No Event Selected
+  ---:BPjs Ended
+
+.. note:: External events are polled only when there are live b-threads in the b-program. If all b-threads terminate while the external event queue contains events, these events will never be selected.
 
 .. tip:: Enqueueing external events can also be done from regular b-threads. This can serve as a sort of asynchronous event request. Note that events requested this way may never be selected, even if they were not blocked (see previous note).

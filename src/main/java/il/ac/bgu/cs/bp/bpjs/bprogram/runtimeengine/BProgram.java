@@ -13,38 +13,25 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramListener;
 import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionResult;
 import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.eventselection.SimpleEventSelectionStrategy;
-import static il.ac.bgu.cs.bp.bpjs.eventsets.EventSets.all;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsCodeEvaluationException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
-import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.FileSystem;
-import java.nio.file.FileSystems;
-import java.nio.file.Path;
-import static java.nio.file.Files.readAllBytes;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static java.util.stream.Collectors.toList;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Scriptable;
 import static java.util.stream.Collectors.toSet;
-import static java.nio.file.Paths.get;
 import static java.util.Collections.reverseOrder;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.WrappedException;
-import static il.ac.bgu.cs.bp.bpjs.eventsets.EventSets.none;
 
 /**
  * Base class for BPrograms. Contains the logic for managing {@link BThreadSyncSnapshot}s
@@ -407,7 +394,7 @@ public abstract class BProgram {
         try {
             Context cx = ContextFactory.getGlobal().enterContext();
             cx.setOptimizationLevel(-1); // must use interpreter mode
-            setupGlobalScope(cx);
+            initProgramScope(cx);
             setupBThreadScopes();
         } finally {
             Context.exit();
@@ -422,7 +409,7 @@ public abstract class BProgram {
         bthreads.forEach(bt -> bt.setupScope(programScope));
     }
 
-    private void setupGlobalScope(Context cx) {
+    protected void initProgramScope(Context cx) {
         // load and execute globalScopeInit.js
         ImporterTopLevel importer = new ImporterTopLevel(cx);
         programScope = cx.initStandardObjects(importer);
@@ -430,18 +417,14 @@ public abstract class BProgram {
         BProgramJsProxy proxy = new BProgramJsProxy(this);
         programScope.put("bp", programScope,
                 Context.javaToJS(proxy, programScope));
-        programScope.put("emptySet", programScope,
-                Context.javaToJS(none, programScope));
-        programScope.put("all", programScope,
-                Context.javaToJS(all, programScope));
 
-        evaluateResource("globalScopeInit.js");
+//        evaluateResource("globalScopeInit.js"); <-- Currently not needed. Leaving in as we might need it soon.
 
         setupProgramScope(programScope);
     }
 
     /**
-     * The BProgram should set up its scope here. Normally, this amount to 
+     * The BProgram should set up its scope here. Normally, this amounts to 
      * loading the script with the BThreads.
      *
      * @param scope the scope to set up.
@@ -556,7 +539,33 @@ public abstract class BProgram {
     public Scriptable getGlobalScope() {
         return programScope;
     }
-
+    
+    /**
+     * Adds an object to the program's global scope. JS code can reference the 
+     * added object by {@code name}.
+     * @param name The name under which {@code object} will be available to the JS code.
+     * @param obj The object to be added to the program's scope.
+     */
+    public void putInGlobalScope( String name, Object obj ) {
+        getGlobalScope().put(name, programScope, Context.javaToJS(obj, programScope));
+    }
+    
+    /**
+     * Gets the object pointer by the passed name in the global scope.
+     * @param <T> Class of the returned object.
+     * @param name Name of the object in the JS heap.
+     * @param clazz Class of the returned object
+     * @return The object pointer by the passed name in the JS heap, converted to
+     *         the passed class.
+     */
+    public <T> Optional<T> getFromGlobalScope( String name, Class<T> clazz ) {
+        if ( getGlobalScope().has(name, programScope) ) {
+            return Optional.of( (T)Context.jsToJava(getGlobalScope().get(name, getGlobalScope()), clazz) );
+        } else {
+            return Optional.empty();
+        }
+    }
+    
     /**
      * Returns the snapshots of all current BThreads. This method will only yield 
      * meaningful results when the program is at BSync state.
