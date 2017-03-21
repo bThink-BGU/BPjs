@@ -5,6 +5,7 @@ import org.mozilla.javascript.*;
 import java.io.Serializable;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.jsproxy.BThreadJsProxy;
+import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import java.util.Optional;
 
 /**
@@ -69,6 +70,49 @@ public class BThreadSyncSnapshot implements Serializable {
         aStatement.setBthread(retVal);
         
         return retVal;
+    }
+    
+    /**
+     * Runs the b-thread from the start to the first {@code bsync}. If there are
+     * no calls to {@code bsync}, runs to completion.
+     * 
+     * @return a snapshot of the b-thread after the first {@code bsync} call, or
+     *         {@code null} in case no such call exists.
+     */
+    public BThreadSyncSnapshot startBThread() {
+        try {
+            Context jsContext = Context.enter();
+            jsContext.callFunctionWithContinuations(getEntryPoint(), getScope(), new Object[0]);
+            return null;
+
+        } catch (ContinuationPending cbs) {
+            return copyWith(cbs.getContinuation(), (BSyncStatement) cbs.getApplicationState());
+        } finally {
+            Context.exit();
+        }
+    }
+    
+    /**
+     * Makes the call to {@code bsync} on which the b-thread snapshot was made
+     * return the passed event. Then returns the snapshot at the next 
+     * {@code bsync}, if any.
+     * @param anEvent The event to trigger
+     * @return snapshot of the bthread at the next call to {@code bsync}, or
+     *         {@code null}, if the b-thread ran to completion.
+     */
+    public BThreadSyncSnapshot triggerEvent(BEvent anEvent) {
+        try {
+            Context jsContext = Context.enter();
+            Object toResume = getContinuation();
+            Object eventInJS = Context.javaToJS(anEvent, getScope());
+            jsContext.resumeContinuation(toResume, getScope(), eventInJS); 
+            return null;
+            
+        } catch (ContinuationPending cbs) {  
+            return copyWith(cbs.getContinuation(), (BSyncStatement) cbs.getApplicationState());
+        } finally {
+            Context.exit();
+        }
     }
     
     void setupScope(Scriptable programScope) {
