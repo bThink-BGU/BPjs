@@ -66,6 +66,8 @@ Here's the output of an unsuccessful baking attempt:
   ---:BPjs Ended
 
 
+.. _external_events:
+
 Final Acts of an Interrupted B-Thread
 --------------------------------------
 

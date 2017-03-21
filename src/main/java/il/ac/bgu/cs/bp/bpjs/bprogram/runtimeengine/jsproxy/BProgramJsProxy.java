@@ -10,8 +10,6 @@ import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.eventsets.EventSets;
 import il.ac.bgu.cs.bp.bpjs.eventsets.JsEventSet;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
-import java.util.Arrays;
-import java.util.Random;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.mozilla.javascript.Function;
 
@@ -166,6 +164,13 @@ public class BProgramJsProxy implements java.io.Serializable {
      */
     public void loadJavascriptResource(String path) {
         program.evaluateResource(path);
+    }
+    
+    /**
+     * @return Returns the current time in milliseconds since 1/1/1970.
+     */
+    public long getTime() {
+        return System.currentTimeMillis();
     }
     
     

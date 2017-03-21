@@ -11,7 +11,6 @@ import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.eventsets.EventSets;
 import java.util.Arrays;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import static java.util.stream.Collectors.toSet;

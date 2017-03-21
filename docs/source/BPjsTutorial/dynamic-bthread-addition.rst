@@ -31,13 +31,13 @@ The reason for this is that Javascript is a late-binding language, so ``i``'s  v
 
 Alas, the b-thread is started after the javascript file is evaluated. At this point, ``i`` is equal to 4. So in effect, we had four b-threads, named ``requestor-0`` to ``requestor-3``, all asking for event ``e4``.
 
-To get four different events, we need to create a scope for each iteration. This is easy, since Javascript supports functions as first-class-citizens (:download:`source <code/dynamic-bthread-ok.js>`)..
+To get four different events, we need to create a scope for each iteration. This is easy, since Javascript supports functions as first-class-citizens (:download:`source <code/dynamic-bthread-ok.js>`).
 
 .. literalinclude:: code/dynamic-bthread-ok.js
   :linenos:
   :language: javascript
 
-Lines 4-6 are the same as before, but now they are wrapped in an anonymous function (line 3) that's immediately called, with ``i`` as the parameter (line 7). This results in the b-thread function having its own scope (or, to be technically exact, activation object). That scope keeps the value of ``i`` at the iteration the scope was created - that value is put in the parameter ``j``.
+Lines 4-6 are the same as before, but now they are wrapped in an anonymous function (line 3) that's immediately called, with ``i`` as the parameter (line 7). This results in the b-thread function having its own scope (or, to be technically exact, activation object). That scope keeps the value of ``i`` at the iteration the scope was created in - that value is put in the parameter ``j``.
 
 Thus, each b-thread gets its own scope and correct value of ``i`` (except that it's calling it ``j`` at this point).
 

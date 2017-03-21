@@ -24,7 +24,7 @@ a link to this page somewhere in the documentation/system about section.
     <dependency>
         <groupId>com.github.bthink-bgu</groupId>
         <artifactId>BPjs</artifactId>
-        <version>0.8.3</version>
+        <version>0.8.4</version>
     </dependency>
     ...
 </dependencies>
@@ -34,6 +34,11 @@ a link to this page somewhere in the documentation/system about section.
 * Download the `.jar` files directly from [Maven Central](https://repo.maven.apache.org/maven2/com/github/bthink-bgu/BPjs/).
 
 ## Change log for the BPjs library.
+
+### 2017-03-21
+
+* :sparkles: `bp.getTime()` added.
+* :sparkles: Updated tutorial now includes the `bp` object.
 
 ### 2017-03-15
 
