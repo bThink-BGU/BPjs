@@ -1,13 +1,13 @@
 package il.ac.bgu.cs.bp.bpjs.examples;
 
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
 import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
-import org.mozilla.javascript.Scriptable;
 
 /**
  * @author orelmosheweinstock
@@ -15,18 +15,9 @@ import org.mozilla.javascript.Scriptable;
  */
 public class InterruptTest {
 
-    BProgram buildProgram() {
-        return new BProgram("Interrupt") {
-            @Override
-            protected void setupProgramScope( Scriptable aScope ) {
-                evaluateResource("Interrupt.js");
-            }
-        };
-    }
-    
     @Test
     public void superStepTest() throws InterruptedException {
-        BProgram sut = buildProgram();
+        BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("Interrupt.js"));
         sut.addListener( new StreamLoggerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         

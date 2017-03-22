@@ -37,7 +37,7 @@ public class BProgramTest {
     public void testGlobalScopeAccessors() throws InterruptedException {
         BProgram sut = new SingleResourceBProgram("RandomProxy.js");
         
-        sut.start();
+        new BProgramRunner(sut).start();
         
         assertEquals( 1000.0, sut.getFromGlobalScope("TOTAL_COUNT", Double.class).get(), 3 );
         assertFalse( sut.getFromGlobalScope("does-not-exist", Double.class).isPresent() );

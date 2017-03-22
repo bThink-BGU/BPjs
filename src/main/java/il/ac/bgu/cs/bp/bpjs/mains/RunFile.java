@@ -4,6 +4,7 @@
 package il.ac.bgu.cs.bp.bpjs.mains;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -76,9 +77,10 @@ public class RunFile {
                     System.exit(-3);
                 }
             };
-
-            bpp.addListener(new StreamLoggerListener());
-            bpp.start();
+            
+            BProgramRunner bpr = new BProgramRunner(bpp);
+            bpr.addListener(new StreamLoggerListener());
+            bpr.start();
 
         } catch (InterruptedException ex) {
             Logger.getLogger(RunFile.class.getName()).log(Level.SEVERE, null, ex);

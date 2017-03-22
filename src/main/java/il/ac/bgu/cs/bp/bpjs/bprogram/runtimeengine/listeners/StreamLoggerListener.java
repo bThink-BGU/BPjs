@@ -23,6 +23,11 @@ public class StreamLoggerListener implements BProgramListener {
     }
 
     @Override
+    public void starting(BProgram bp) {
+        out.println("---:" + bp.getName() + " Starting");
+    }
+
+    @Override
     public void started(BProgram bp) {
         out.println("---:" + bp.getName() + " Started");
     }
@@ -50,6 +55,11 @@ public class StreamLoggerListener implements BProgramListener {
     @Override
     public void bthreadRemoved(BProgram bp, BThreadSyncSnapshot theBThread) {
         out.println("  -:" + bp.getName() + " Removed " + theBThread.getName());
+    }
+    
+    @Override
+    public void bthreadDone(BProgram bp, BThreadSyncSnapshot theBThread) {
+        out.println("  -:" + bp.getName() + " Done " + theBThread.getName());
     }
     
 }

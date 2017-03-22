@@ -21,34 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.examples;
+package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
-import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-import static java.util.stream.Collectors.toSet;
-import static org.junit.Assert.assertEquals;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *
  * @author michael
  */
-public class DynamicBThreadAdditionTest {
+public class BProgramRunnerTest {
     
+    public BProgramRunnerTest() {
+    }
+
+    /**
+     * Test of start method, of class BProgramRunner.
+     * @throws java.lang.Exception
+     */
     @Test
-    public void test() throws InterruptedException {
-        BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("dynamicBthreadAddition.js"));
+    public void testRun() throws Exception {
+        
+        BProgram bprog = new SingleResourceBProgram("HotNCold.js");
+        BProgramRunner sut = new BProgramRunner(bprog);
+        
         sut.addListener( new StreamLoggerListener() );
-        InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
         sut.start();
-        Set<String> expected = new HashSet<>(Arrays.asList("e0","e1","e2","e3"));
-        assertEquals( expected, eventLogger.getEvents().stream().map(BEvent::getName).collect(toSet()));
+        
     }
+
 }

@@ -4,6 +4,7 @@
 package il.ac.bgu.cs.bp.bpjs.examples;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
@@ -28,7 +29,7 @@ public class JsEventSetTest {
     
     @Test
     public void testRun() throws InterruptedException, URISyntaxException {
-        BProgram bpr = new SingleResourceBProgram("JsEventSet.js");
+        BProgramRunner bpr = new BProgramRunner(new SingleResourceBProgram("JsEventSet.js"));
         bpr.addListener( new StreamLoggerListener() );
         InMemoryEventLoggingListener eventLogger = bpr.addListener( new InMemoryEventLoggingListener() );
         bpr.start();
@@ -38,14 +39,13 @@ public class JsEventSetTest {
     
     @Test(expected=BPjsRuntimeException.class)
     public void testNullPredicate() throws InterruptedException, URISyntaxException {
-        BProgram bpr = new StringBProgram("var es=bp.EventSet('bad',null);");
-        bpr.start();
+        new BProgramRunner(new StringBProgram("var es=bp.EventSet('bad',null);")).start();
     }
     
     
     @Test(expected=BPjsRuntimeException.class)
     public void testBadPredicate() throws InterruptedException, URISyntaxException {
-        BProgram bpr = new StringBProgram(
+        new BProgramRunner(new StringBProgram(
                   "var es=bp.EventSet('bad',function(e){return 1;});\n"
                 + "bp.registerBThread('a',function(){\n"
                 + "  bsync({request:bp.Event('X')});"
@@ -53,8 +53,7 @@ public class JsEventSetTest {
                 + "bp.registerBThread('b',function(){\n"
                 + "  bsync({waitFor:es});\n"
                 + "});"
-        );
-        bpr.start();
+        )).start();
     }
     
     @Test
@@ -64,7 +63,7 @@ public class JsEventSetTest {
             BProgram bpr = new StringBProgram( "Eventset",
                       "var es=bp.EventSet('a',function(e){return e.name=='a';});\n"
             );
-            bpr.start();
+            new BProgramRunner(bpr).start();
             NativeJavaObject sut = (NativeJavaObject) bpr.getGlobalScope().get("es", bpr.getGlobalScope());
             JsEventSet jsSut = (JsEventSet) Context.jsToJava(sut, JsEventSet.class);
             assertEquals("a", jsSut.getName());

@@ -24,6 +24,7 @@
 package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.jsproxy;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import org.junit.Test;
 import static org.junit.Assert.assertEquals;
@@ -39,7 +40,7 @@ public class BProgramJsProxyTest {
         
         BProgram sut = new SingleResourceBProgram("RandomProxy.js");
         
-        sut.start();
+        new BProgramRunner(sut).start();
         Double boolCount = sut.getFromGlobalScope("boolCount", Double.class).get();
         assertEquals(500.0, boolCount, 100);
         

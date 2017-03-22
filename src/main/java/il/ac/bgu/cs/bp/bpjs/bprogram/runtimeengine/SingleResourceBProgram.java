@@ -3,7 +3,6 @@
  */
 package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
 
-import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionStrategy;
 import java.net.URL;
 import org.mozilla.javascript.Scriptable;
 
@@ -29,12 +28,7 @@ public class SingleResourceBProgram extends BProgram {
         super(aName);
         resourceName = aResourceName;
     }
-
-    public SingleResourceBProgram(String aResourceName, String aName, EventSelectionStrategy anEventSelectionStrategy) {
-        super(aName, anEventSelectionStrategy);
-        resourceName = aResourceName;
-    }
-
+    
     @Override
     protected void setupProgramScope(Scriptable scope) {
         evaluateResource( resourceName );

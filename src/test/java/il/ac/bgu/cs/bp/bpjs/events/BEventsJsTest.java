@@ -4,6 +4,7 @@
 package il.ac.bgu.cs.bp.bpjs.events;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import java.util.HashMap;
 import java.util.Map;
 import static org.junit.Assert.assertFalse;
@@ -55,7 +56,7 @@ public class BEventsJsTest {
                         "inline script" );
             }
         };
-        prog.start();
+        new BProgramRunner(prog).start();
     }
     
 

@@ -1,32 +1,23 @@
 package il.ac.bgu.cs.bp.bpjs.examples;
 
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
 import il.ac.bgu.cs.bp.bpjs.validation.eventpattern.EventPattern;
 import org.junit.Test;
 import static org.junit.Assert.assertTrue;
-import org.mozilla.javascript.Scriptable;
 
 /**
  * @author orelmosheweinstock
  * @author @michbarsinai
  */
 public class PushingExternalEventTest {
-
-    BProgram buildProgram() {
-        return new BProgram("PushingExternalEvent") {
-            @Override
-            protected void setupProgramScope( Scriptable aScope ) {
-                evaluateResource("PushingExternalEvent.js");
-            }
-        };
-    }
     
     @Test
     public void superStepTest() throws InterruptedException {
-        BProgram sut = buildProgram();
+        BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("PushingExternalEvent.js"));
         sut.addListener( new StreamLoggerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         

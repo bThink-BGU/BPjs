@@ -35,8 +35,17 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+
+
 ### 2017-03-21
 
+* :sparkles: New architecture: Running logic moved from `BProgram` to `BProgramRunner` - ongoing.
+* :sparkles: `BProgramListener`s notified before BPrograms are started.
+
+### 2017-03-21
+
+* :sparkles: New architecture: Running logic moved from `BProgram` to `BProgramRunner`. This will help implementing search.
+* :sparkles: `BProgramListener`s notified when a b-thread runs to completion.
 * :sparkles: `bp.getTime()` added.
 * :sparkles: Updated tutorial now includes the `bp` object.
 

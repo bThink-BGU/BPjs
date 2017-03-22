@@ -22,3 +22,5 @@ bp.registerBThread("AlternatorBt", function() {
     }
     bsync({request:bp.Event("allDone")});
 });
+
+bp.log.info("Setup done.");

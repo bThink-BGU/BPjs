@@ -15,11 +15,11 @@ bp.registerBThread("parentBThread", function () {
     bp.log.info("parent started");
     
     // first one, text for behavior on the start() method.
-    bp.registerBThread( function() {
+    bp.registerBThread( "kid a1", function() {
         bp.log.info("kid a1 started");
         bsync({request:kidADone, block:parentDone});
     });
-    bp.registerBThread( function() {
+    bp.registerBThread( "kid b1", function() {
         bp.log.info("kid b1 started");
         bsync({request:kidBDone, block:parentDone});
     });
@@ -27,10 +27,10 @@ bp.registerBThread("parentBThread", function () {
     
     
     // second round, test for behavior on the resume() method.
-    bp.registerBThread( function() {
+    bp.registerBThread( "kid a2", function() {
         bsync({request:kidADone, block:parentDone});
     });
-    bp.registerBThread( function() {
+    bp.registerBThread( "kid b2", function() {
         bsync({request:kidBDone, block:parentDone});
     });
     bsync( {request: parentDone} );

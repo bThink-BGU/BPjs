@@ -1,13 +1,13 @@
 package il.ac.bgu.cs.bp.bpjs.examples;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.validation.eventpattern.EventPattern;
-import org.junit.Test;
 import static org.junit.Assert.assertTrue;
-import org.mozilla.javascript.Scriptable;
+import org.junit.Test;
 
 /**
  *
@@ -15,25 +15,17 @@ import org.mozilla.javascript.Scriptable;
  */
 public class ExternalEventsTest {
 
-    BProgram buildProgram() {
-        return new BProgram("ExternalEvents") {
-            @Override
-            protected void setupProgramScope( Scriptable aScope ) {
-                evaluateResource("ExternalEvents.js");
-            }
-        };
-    }
     
     @Test
     public void superStepTest() throws InterruptedException {
         final BEvent in1a = new BEvent("in1a");
         final BEvent in1b = new BEvent("in1b");
         final BEvent ext1 = new BEvent("ext1");
-        final BProgram sut = buildProgram();
+        final BProgramRunner sut = new BProgramRunner( new SingleResourceBProgram("ExternalEvents.js"));
         sut.addListener( new StreamLoggerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
-        new Thread( ()->sut.enqueueExternalEvent(ext1) ).start();
+        new Thread( ()->sut.getBProgram().enqueueExternalEvent(ext1) ).start();
         
         sut.start();
         

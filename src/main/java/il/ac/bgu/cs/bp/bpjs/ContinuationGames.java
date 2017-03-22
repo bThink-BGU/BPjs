@@ -4,6 +4,7 @@
 package il.ac.bgu.cs.bp.bpjs;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,6 +19,8 @@ import org.mozilla.javascript.serialize.ScriptableOutputStream;
 /**
  * Playing around with continuations.
  *
+ * TODO: The BPP class should be a BProgramRunner now.
+ * 
  * @author michael
  */
 public class ContinuationGames {
@@ -38,7 +41,6 @@ public class ContinuationGames {
                     + "});", "");
         }
 
-        @Override
         public void mainEventLoop() throws InterruptedException {
             try {
                 BThreadSyncSnapshot bt = bthreads.iterator().next();
@@ -98,6 +100,6 @@ public class ContinuationGames {
     
     public static void main(String[] args) throws Exception {   
         BProgram bpp = new BPP();
-        bpp.start();
+        new BProgramRunner(bpp).start();
     }
 }
