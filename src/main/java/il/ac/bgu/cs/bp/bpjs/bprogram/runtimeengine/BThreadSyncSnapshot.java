@@ -83,7 +83,6 @@ public class BThreadSyncSnapshot implements Serializable {
         try {
             Context jsContext = Context.enter();
             jsContext.callFunctionWithContinuations(getEntryPoint(), getScope(), new Object[0]);
-            // TODO inform listeners bthread is done.
             return null;
 
         } catch (ContinuationPending cbs) {

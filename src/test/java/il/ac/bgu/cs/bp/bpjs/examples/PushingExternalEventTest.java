@@ -16,7 +16,7 @@ import static org.junit.Assert.assertTrue;
 public class PushingExternalEventTest {
     
     @Test
-    public void superStepTest() throws InterruptedException {
+    public void externalEventsFromABthread() throws InterruptedException {
         BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("PushingExternalEvent.js"));
         sut.addListener( new StreamLoggerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
@@ -28,6 +28,24 @@ public class PushingExternalEventTest {
                 .append(new BEvent("start"))
                 .append(new BEvent("external"))
                 .append(new BEvent("done"));
+        
+        assertTrue( expected.matches(eventLogger.getEvents()) );
+    }
+    
+    @Test
+    public void topLevelExternalEvents() throws InterruptedException {
+        BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("TopLevelExternalEvents.js"));
+        sut.addListener( new StreamLoggerListener() );
+        InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
+        
+        sut.start();
+        
+        eventLogger.getEvents().forEach(e->System.out.println(e) );
+        EventPattern expected = new EventPattern()
+                .append(new BEvent("ext1"))
+                .append(new BEvent("ext2"))
+                .append(new BEvent("ext3"))
+                .append(new BEvent("internal"));
         
         assertTrue( expected.matches(eventLogger.getEvents()) );
     }

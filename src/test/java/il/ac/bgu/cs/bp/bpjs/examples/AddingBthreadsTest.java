@@ -37,6 +37,11 @@ public class AddingBthreadsTest {
                 .append(kiddies)
                 .append(kiddies)
                 .append(parentDone);
+        
+        System.out.println("Actual events:");
+        eventLogger.getEvents().forEach( System.out::println );
+        System.out.println("/Actual events");
+        
         assertTrue( expected.matches(eventLogger.getEvents()) );
     }
 

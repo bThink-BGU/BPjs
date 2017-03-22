@@ -37,10 +37,12 @@ a link to this page somewhere in the documentation/system about section.
 
 
 
-### 2017-03-21
+### 2017-03-22
 
 * :sparkles: New architecture: Running logic moved from `BProgram` to `BProgramRunner` - ongoing.
 * :sparkles: `BProgramListener`s notified before BPrograms are started.
+* :bug: Fixed a bug where dynamically added b-threads that were added by other dynamically added b-threads would run one cycle too late. 
+* :bug: Fixed a bug where external events enqueued from top-level JS code where ignored.
 
 ### 2017-03-21
 

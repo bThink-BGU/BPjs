@@ -43,7 +43,7 @@ public class ContinuationGames {
 
         public void mainEventLoop() throws InterruptedException {
             try {
-                BThreadSyncSnapshot bt = bthreads.iterator().next();
+                BThreadSyncSnapshot bt = null; //recently.iterator().next();
                 Context ctxt = Context.enter();
                 Object cnt = bt.getContinuation();
                 final Scriptable scope = bt.getScope();

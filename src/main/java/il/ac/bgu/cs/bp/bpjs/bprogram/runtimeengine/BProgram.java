@@ -17,7 +17,6 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Scriptable;
-import static java.util.stream.Collectors.toSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.EvaluatorException;
@@ -51,11 +50,6 @@ public abstract class BProgram {
 
     // ------------- Instance Members ---------------
     
-    /**
-     * Snapshots of participating BThreads, when in bsync point.
-     */
-    protected Set<BThreadSyncSnapshot> bthreads;
-
     private String name;
 
     /**
@@ -84,7 +78,6 @@ public abstract class BProgram {
 
     public BProgram(String aName) {
         name = aName;
-        bthreads = new HashSet<>();
     }
 
     /**
@@ -162,23 +155,7 @@ public abstract class BProgram {
      */
     public void registerBThread(BThreadSyncSnapshot bt) {
         bt.setupScope(programScope);
-        if (started) {
-            recentlyRegisteredBthreads.add(bt);
-        } else {
-            bthreads.add(bt);
-        }
-    }
-    
-    /**
-     * Creates a set with the current {@link BSyncStatement}s of the current
-     * BThreads.
-     *
-     * @return Set of current BSyncStatements.
-     */
-    public Set<BSyncStatement> currentStatements() {
-        return bthreads.stream()
-                .map(BThreadSyncSnapshot::getBSyncStatement)
-                .collect(toSet());
+        recentlyRegisteredBthreads.add(bt);
     }
 
     /**
@@ -192,11 +169,16 @@ public abstract class BProgram {
 
     /**
      * Sets up the program scope and evaluates the program source.
+     * 
+     * @return a snapshot of the program, after source code was executed, and
+     *         before any registered b-threads have run.
      */
     BProgramSyncSnapshot setup() {
         if ( started ) { 
             throw new IllegalStateException("Program already set up.");
         }
+        Set<BThreadSyncSnapshot> bthreads = drainRecentlyRegisteredBthreads();
+        
         try {
             Context cx = ContextFactory.getGlobal().enterContext();
             cx.setOptimizationLevel(-1); // must use interpreter mode
@@ -206,7 +188,7 @@ public abstract class BProgram {
             Context.exit();
         }
         started = true;
-        return new BProgramSyncSnapshot(bthreads, new LinkedList<>());
+        return new BProgramSyncSnapshot(this, bthreads, new LinkedList<>());
     }
 
     protected void initProgramScope(Context cx) {

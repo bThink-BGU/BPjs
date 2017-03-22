@@ -66,14 +66,15 @@ public class BProgramRunner {
         
         // start it
         listeners.forEach(l -> l.started(bprog));
-        cur = cur.start(bprog, listeners);
+        cur = cur.start(listeners);
         
         // while snapshot not empty, select an event and get the next snapshot.
         boolean go=true;
-        while ( (!cur.isEmpty()) && go ) {
+        while ( (!cur.noBThreadsLeft()) && go ) {
             if (cur.getExternalEvents().remove(BProgram.NO_MORE_DAEMON)) {
                 bprog.setDaemonMode(false);
             }
+            
             Set<BEvent> possibleEvents = eventSelectionStrategy.selectableEvents(cur.getStatements(), cur.getExternalEvents());
             if ( possibleEvents.isEmpty() ) {
                 if ( bprog.isDaemonMode() ) {
@@ -105,7 +106,7 @@ public class BProgramRunner {
                     }
                     
                     listeners.forEach(l->l.eventSelected(bprog, esr.getEvent())); 
-                    cur = cur.triggerEvent(esr.getEvent(), bprog, listeners);
+                    cur = cur.triggerEvent(esr.getEvent(), listeners);
                     
                 } else {
                     go = false;
