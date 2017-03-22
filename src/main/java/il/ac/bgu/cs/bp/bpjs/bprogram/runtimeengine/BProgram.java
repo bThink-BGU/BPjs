@@ -170,10 +170,13 @@ public abstract class BProgram {
     /**
      * Sets up the program scope and evaluates the program source.
      * 
+     * <em>This method can only be called once per instance.</em>
+     * 
      * @return a snapshot of the program, after source code was executed, and
      *         before any registered b-threads have run.
+     * @throws IllegalStateException for repeated calls.
      */
-    BProgramSyncSnapshot setup() {
+    public BProgramSyncSnapshot setup() {
         if ( started ) { 
             throw new IllegalStateException("Program already set up.");
         }
