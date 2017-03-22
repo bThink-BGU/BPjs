@@ -36,6 +36,8 @@ public class ExternalEventsDaemonTest {
         
         sut.start();
         
+        assertTrue( sut.getBProgram().getFromGlobalScope("internalDaemonMode", Boolean.class).get() );
+        
         eventLogger.getEvents().forEach(e->System.out.println(e) );
         
         final BEvent in1a = new BEvent("in1a");
@@ -48,5 +50,7 @@ public class ExternalEventsDaemonTest {
                 .append(ext1).append(in1a).append(in1b);
         
         assertTrue( expected.matches(eventLogger.getEvents()) );
+        
+                
     }    
 }

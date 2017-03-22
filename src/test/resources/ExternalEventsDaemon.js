@@ -16,3 +16,5 @@ bp.registerBThread("handler", function() {
     }
     bp.setDaemonMode( false );
 });
+
+var internalDaemonMode = bp.isDaemonMode();

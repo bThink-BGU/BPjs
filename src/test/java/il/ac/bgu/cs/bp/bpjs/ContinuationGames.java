@@ -9,6 +9,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.jsproxy.BProgramJsProxy;
+import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.util.logging.Level;
@@ -32,8 +33,8 @@ public class ContinuationGames {
                     + "bp.registerBThread( \"bt\", function(){\n"
                     + "   bp.log.info(\"started\");"
                     + "   var i=1;"
-                    + "   bsync({request: bp.Event(\"e\")});\n"
-                    + "   bp.log.info('i:' + i + ' j:'+j);"
+                    + "   var evt = bsync({request: bp.Event(\"e\")});\n"
+                    + "   bp.log.info('i:' + i + ' j:'+j + ' event.name:' + evt.name);"
                     + "   i = i+1;"
                     + "   j = j+1;"
                     + "});";
@@ -103,9 +104,12 @@ public class ContinuationGames {
                     bprog.getGlobalScope().put("bp", bprog.getGlobalScope(), bp);
                     scope2.setParentScope(bprog.getGlobalScope());
 
-                    // go!!
-                    ctxt.resumeContinuation(cnt2, scope2, new Object[0]);
-                    ctxt.resumeContinuation(cnt2, scope2, new Object[0]);
+                    // go - we can push whicever event we want.
+                    ctxt.resumeContinuation(cnt2, scope2, new BEvent("e-"+i));
+                    
+                    // this extra run will use the same control flow, but the variable
+                    // values will be from the previous run. So don't do this :-)
+                    ctxt.resumeContinuation(cnt2, scope2, new BEvent("arbitrary/"+i));
                 }
             }   
         } finally {
