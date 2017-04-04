@@ -104,7 +104,7 @@ public class ContinuationGames {
                     bprog.getGlobalScope().put("bp", bprog.getGlobalScope(), bp);
                     scope2.setParentScope(bprog.getGlobalScope());
 
-                    // go - we can push whicever event we want.
+                    // go - we can push whichever event we want.
                     ctxt.resumeContinuation(cnt2, scope2, new BEvent("e-"+i));
                     
                     // this extra run will use the same control flow, but the variable
