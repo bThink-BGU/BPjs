@@ -1,65 +1,48 @@
 package il.ac.bgu.cs.bp.bpjs.diningphil;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramListener;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionResult;
 import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionStrategy;
+import il.ac.bgu.cs.bp.bpjs.eventselection.SimpleEventSelectionStrategy;
 
 public class Node {
-	private Set<BThreadSyncSnapshot> system_state;
+	private BProgramSyncSnapshot systemState;
 
-	private EventSelectionStrategy eventSelectionStrategy;
-	private BProgramSyncSnapshot cur;
-	private final List<BProgramListener> listeners = new ArrayList<>();
-	private Optional<EventSelectionResult> res = null;
 	private BProgram bp;
-	
-	Node(){}
-	
-	Node(BProgram bp){
+
+	private Set<BEvent> possibleEvents;
+	private static EventSelectionStrategy ess = new SimpleEventSelectionStrategy();
+
+	private Node(BProgram bp, BProgramSyncSnapshot systemState) {
 		this.bp = bp;
+		this.systemState = systemState;
+		
+		possibleEvents = ess.selectableEvents(systemState.getStatements(), systemState.getExternalEvents());
 	}
-	
+
 	@Override
 	public String toString() {
-		String str = "";
-		Object[] tmp = system_state.toArray();
-		for (int i = 0; i < system_state.size(); i++) {
-			str += tmp[i].toString() + '\n';
+		String str = "\n";
+		for (BThreadSyncSnapshot s : systemState.getBThreadSnapshots()) {
+			str += "\t" + s.toString() + " {"+ s.getBSyncStatement() +  "} \n";
 		}
 		return str;
 	}
 
-	public void addBTSS(BThreadSyncSnapshot BTSS)
-	{
-		system_state.add(BTSS);
+	public static Node getInitialNode(BProgram bp) throws Exception {
+		return new Node(bp, bp.setup().start());
 	}
-	
-	//problem with static
-	public static Node getInitialNode(BProgram bp) {
-		//BProgramSyncSnapshot cur = bp.setup();
-		listeners.forEach(l -> l.starting(bp));
-		Node n = new Node();
-		n.addBTSS((BThreadSyncSnapshot) cur.getBThreadSnapshots());
-		return n;
-	}
-	
+
 	/**
 	 * Get the events that can be triggered at the state.
 	 * 
 	 * @return The set of requested and not blocked events.
 	 */
 	public Set<BEvent> getPossibleEvents() {
-		//EventSelectionStrategy eventSelectionStrategy;
-		Set<BEvent> possibleEvents = eventSelectionStrategy.selectableEvents(cur.getStatements(), cur.getExternalEvents());
 		return possibleEvents;
 	}
 
@@ -69,32 +52,19 @@ public class Node {
 	 * 
 	 * @param e
 	 * @return
+	 * @throws InterruptedException 
 	 */
-	public Node getNextNode(BEvent e) {
-		//Optional<EventSelectionResult> res = eventSelectionStrategy.select(cur.getStatements(), cur.getExternalEvents(), getPossibleEvents());
-		res = eventSelectionStrategy.select(cur.getStatements(), cur.getExternalEvents(), getPossibleEvents());
-		if ( res.isPresent() ) {
-			EventSelectionResult esr = res.get();
-			listeners.forEach(l->l.eventSelected(bp, esr.getEvent())); 
-			try {
-				cur = cur.triggerEvent(esr.getEvent(), listeners);
-			} catch (InterruptedException e1) {
-				e1.printStackTrace();
-			}
-		}
-		return null;
+	public Node getNextNode(BEvent e) throws Exception {
+		return new Node(bp, systemState.clone().triggerEvent(e));
 	}
-	
+
 	/**
 	 * Check if this state is good or bad
 	 * 
 	 * @return True if the state is good.
 	 */
 	public boolean check() {
-		return res == null;
-
-		//return false;
+		return possibleEvents.isEmpty();
 	}
 
 }
-

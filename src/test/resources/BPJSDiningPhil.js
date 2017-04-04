@@ -9,6 +9,7 @@ R1L =  bp.Event("Rel1L");	//Phil1 release left
 R2R =  bp.Event("Rel2R");	//Phil2 release right
 R2L =  bp.Event("Rel2L");	//Phil2 release left
 
+
 bp.registerBThread( "Phil1", function() {
 	while(true) {
 		bsync( {request: P1R});	//requests to pick his right stick
