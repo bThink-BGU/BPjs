@@ -48,6 +48,13 @@ public abstract class BProgram {
     /** Counter for giving anonymous instances some semantic name. */
     private static final AtomicInteger INSTANCE_COUNTER = new AtomicInteger();
 
+    /**
+     * A callback interface invoked when a b-thread is added to {@code this}.
+     */
+    public static interface BThreadAddedCallback {
+        void bthreadAdded(BProgram bp, BThreadSyncSnapshot theBThread);
+    }
+
     // ------------- Instance Members ---------------
     
     private String name;
@@ -71,6 +78,8 @@ public abstract class BProgram {
     private volatile boolean started = false;
 
     protected Scriptable programScope;
+    
+    private Optional<BThreadAddedCallback> addBThreadCallback;
 
     public BProgram() {
         this("BProgram-" + INSTANCE_COUNTER.incrementAndGet());
@@ -156,6 +165,7 @@ public abstract class BProgram {
     public void registerBThread(BThreadSyncSnapshot bt) {
         bt.setupScope(programScope);
         recentlyRegisteredBthreads.add(bt);
+        addBThreadCallback.ifPresent( cb -> cb.bthreadAdded(this, bt));
     }
 
     /**
@@ -327,6 +337,10 @@ public abstract class BProgram {
         List<BEvent> out = new ArrayList<>(recentlyEnqueuedExternalEvents.size());
         recentlyEnqueuedExternalEvents.drainTo(out);
         return out;
+    }
+
+    public void setAddBThreadCallback(BThreadAddedCallback anAddBThreadCallback) {
+        addBThreadCallback = Optional.ofNullable(anAddBThreadCallback);
     }
     
     @Override

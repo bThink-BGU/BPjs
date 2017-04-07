@@ -35,7 +35,8 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- * Runs a {@link BProgram} to completion. 
+ * Runs a {@link BProgram} to completion. Uses an {@link EventSelectionStrategy}
+ * to select which event to choose at each point.
  * 
  * @author michael
  */
@@ -55,6 +56,9 @@ public class BProgramRunner {
     public BProgramRunner(BProgram aBProgram, EventSelectionStrategy ess) {
         bprog = aBProgram;
         eventSelectionStrategy = ess;
+        if ( bprog!=null ) {
+            bprog.setAddBThreadCallback( (bp,bt)->listeners.forEach(l->l.bthreadAdded(bp, bt)));
+        }
     }
     
     public void start() throws InterruptedException {
@@ -66,17 +70,20 @@ public class BProgramRunner {
         
         // start it
         listeners.forEach(l -> l.started(bprog));
-        cur = cur.start(listeners);
+        cur = cur.start();
         
         // while snapshot not empty, select an event and get the next snapshot.
         boolean go=true;
         while ( (!cur.noBThreadsLeft()) && go ) {
+            // first off, see if we need to stop being a daemon.
             if (cur.getExternalEvents().remove(BProgram.NO_MORE_DAEMON)) {
                 bprog.setDaemonMode(false);
             }
             
+            // see which events are selectable
             Set<BEvent> possibleEvents = eventSelectionStrategy.selectableEvents(cur.getStatements(), cur.getExternalEvents());
             if ( possibleEvents.isEmpty() ) {
+                // No events available or selection. Terminate or wait for external one (in daemon mode).
                 if ( bprog.isDaemonMode() ) {
                     listeners.forEach( l->l.superstepDone(bprog) );
                     BEvent next = bprog.takeExternalEvent(); // and now we wait.
@@ -91,7 +98,9 @@ public class BProgramRunner {
                     listeners.forEach(l->l.superstepDone(bprog));
                     go = false;
                 }
+                
             } else {
+                // we can select some events - select one and advance.
                 Optional<EventSelectionResult> res = eventSelectionStrategy.select(cur.getStatements(), cur.getExternalEvents(), possibleEvents);
 
                 if ( res.isPresent() ) {
@@ -121,7 +130,10 @@ public class BProgramRunner {
     }
 
     public void setBProgram(BProgram aBProgram) {
-        this.bprog = aBProgram;
+        bprog = aBProgram;
+        if ( bprog!=null ) {
+            bprog.setAddBThreadCallback( (bp,bt)->listeners.forEach(l->l.bthreadAdded(bp, bt)));
+        }
     }
     
     /**

@@ -17,7 +17,7 @@ public class Node {
 	private Set<BEvent> possibleEvents;
 	private static EventSelectionStrategy ess = new SimpleEventSelectionStrategy();
 
-	private Node(BProgram bp, BProgramSyncSnapshot systemState) {
+	protected Node(BProgram bp, BProgramSyncSnapshot systemState) {
 		this.bp = bp;
 		this.systemState = systemState;
 		
@@ -55,7 +55,8 @@ public class Node {
 	 * @throws InterruptedException 
 	 */
 	public Node getNextNode(BEvent e) throws Exception {
-		return new Node(bp, systemState.clone().triggerEvent(e));
+//		return new Node(bp, systemState.clone().triggerEvent(e));
+return null; // making this compile.
 	}
 
 	/**

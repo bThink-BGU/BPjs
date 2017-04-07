@@ -35,7 +35,8 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
-
+## 2017-04-08
+* :put_litter_in_its_place: Cleaned up the `BProgramRunner`-`BProgram`-`BProgramSyncSnapshot` trio such that listeners don't have to be passed around between them.
 
 ### 2017-03-22
 

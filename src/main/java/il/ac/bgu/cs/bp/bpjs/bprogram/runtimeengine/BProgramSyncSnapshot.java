@@ -53,20 +53,15 @@ public class BProgramSyncSnapshot {
     public BProgramSyncSnapshot copyWith( List<BEvent> updatedExternalEvents ) {
         return new BProgramSyncSnapshot(bprog, threadSnapshots, updatedExternalEvents);
     }
-    
-    public BProgramSyncSnapshot start() throws InterruptedException {
-        return start(Collections.emptySet());
-    }
 
     /**
      * Starts the BProgram - runs all the registered b-threads to their first 
      * {@code bsync}. 
      * 
-     * @param listeners 
      * @return A snapshot of the program at the first {@code bsync}.
      * @throws java.lang.InterruptedException
      */
-    public BProgramSyncSnapshot start(Iterable<BProgramListener> listeners) throws InterruptedException {
+    public BProgramSyncSnapshot start() throws InterruptedException {
         Set<BThreadSyncSnapshot> nextRound = new HashSet<>(threadSnapshots.size());
         nextRound.addAll(EXECUTORS.get().invokeAll(threadSnapshots.stream()
                     .map(bt -> new StartBThread(bt))
@@ -74,7 +69,7 @@ public class BProgramSyncSnapshot {
                 ).stream().map(f -> safeGet(f) ).collect(toList())
         );
         
-        executeAllAddedBThreads(listeners, nextRound);
+        executeAllAddedBThreads(nextRound);
         List<BEvent> nextExternalEvents = new ArrayList<>(getExternalEvents());
         nextExternalEvents.addAll( bprog.drainEnqueuedExternalEvents() );
         return new BProgramSyncSnapshot(bprog, nextRound, nextExternalEvents);
@@ -124,7 +119,7 @@ public class BProgramSyncSnapshot {
         resumingThisRound.stream().filter(t->!nextRoundIds.contains(t.getName()))
                 .forEach(t->listeners.forEach(l->l.bthreadDone(bprog, t)));
         
-        executeAllAddedBThreads(listeners, nextRound);
+        executeAllAddedBThreads(nextRound);
         nextExternalEvents.addAll( bprog.drainEnqueuedExternalEvents() );
         
         // carry over BThreads that did not advance this round to next round.
@@ -202,15 +197,10 @@ public class BProgramSyncSnapshot {
      * @param nextRound the set of b-threads that will participate in the next round
      * @throws InterruptedException 
      */
-    private void executeAllAddedBThreads(Iterable<BProgramListener> listeners, Set<BThreadSyncSnapshot> nextRound) throws InterruptedException {
+    private void executeAllAddedBThreads(Set<BThreadSyncSnapshot> nextRound) throws InterruptedException {
         // if any new bthreads are added, run and add their result
         Set<BThreadSyncSnapshot> added = bprog.drainRecentlyRegisteredBthreads();
         while ( ! added.isEmpty() ) {
-            for ( BProgramListener l : listeners ) {
-                for ( BThreadSyncSnapshot bss : added ) {
-                    l.bthreadAdded(bprog, bss);
-                }
-            }
             nextRound.addAll(EXECUTORS.get().invokeAll(
                     added.stream()
                             .map(bt -> new StartBThread(bt))

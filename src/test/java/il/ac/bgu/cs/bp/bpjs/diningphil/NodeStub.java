@@ -14,7 +14,7 @@ public class NodeStub extends Node {
 	static BEvent Y = new BEvent("Y");
 
 	public NodeStub(String name) {
-		super();
+		super(null,null); // making this compile
 		this.name = name;
 	}
 
@@ -57,7 +57,8 @@ public class NodeStub extends Node {
 				return new NodeStub("A,B");
 
 		}
-		return new Node();
+//		return new Node();
+		return null; // making this compile.
 	}
 
 	@Override
