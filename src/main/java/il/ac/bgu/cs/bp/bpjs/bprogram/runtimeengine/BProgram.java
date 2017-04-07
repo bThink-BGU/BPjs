@@ -79,7 +79,7 @@ public abstract class BProgram {
 
     protected Scriptable programScope;
     
-    private Optional<BThreadAddedCallback> addBThreadCallback;
+    private Optional<BThreadAddedCallback> addBThreadCallback = Optional.empty();
 
     public BProgram() {
         this("BProgram-" + INSTANCE_COUNTER.incrementAndGet());

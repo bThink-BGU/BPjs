@@ -16,6 +16,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.StringBProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 
 /**
@@ -27,7 +28,8 @@ import il.ac.bgu.cs.bp.bpjs.events.BEvent;
  */
 public class ContinuationGames {
     
-    static final String SRC = "j=1;\n" 
+    static final String SRC = 
+                      "j=1;\n" 
                     + "bp.registerBThread( \"bt\", function(){\n"
                     + "   bp.log.info(\"started\");"
                     + "   var i=1;"
@@ -69,7 +71,10 @@ public class ContinuationGames {
                     sc.delete("bp");
                     System.out.println("bp deleted.");
                 }
-                System.out.println("SCOPE END\n\n");
+                if ( sc.has("j", sc) ) {
+                    System.out.println("Found j:" + sc.get("j", sc));
+                }
+                System.out.println("SCOPE END\n");
             }
             
             // second, serialize
@@ -77,7 +82,6 @@ public class ContinuationGames {
             try (ByteArrayOutputStream bytes = new ByteArrayOutputStream(); 
                  ScriptableOutputStream outs = new ScriptableOutputStream(bytes, topLevelScope)) {
                 outs.writeObject(cnt);
-                outs.writeObject(scope);
                 outs.flush();
                 serializedContinuationAndScope = bytes.toByteArray();
             }
@@ -96,18 +100,16 @@ public class ContinuationGames {
                 try ( ScriptableInputStream sis = new ScriptableInputStream(new ByteArrayInputStream(serializedContinuationAndScope), topLevelScope)) {
                     // read cnt and scope
                     Scriptable cnt2 = (Scriptable) sis.readObject();
-                    Scriptable scope2 = (Scriptable) sis.readObject();
 
                     // re-add bp to the scope
-                    bprog.getGlobalScope().put("bp", bprog.getGlobalScope(), bp);
-                    scope2.setParentScope(bprog.getGlobalScope());
+                    cnt2.getParentScope().put("bp", cnt2.getParentScope(), new BProgramJsProxy(bprog));
 
                     // go - we can push whichever event we want.
-                    ctxt.resumeContinuation(cnt2, scope2, new BEvent("e-"+i));
+                    ctxt.resumeContinuation(cnt2, cnt2, new BEvent("e-"+i));
                     
                     // this extra run will use the same control flow, but the variable
                     // values will be from the previous run. So don't do this :-)
-                    ctxt.resumeContinuation(cnt2, scope2, new BEvent("arbitrary/"+i));
+                    ctxt.resumeContinuation(cnt2, cnt2, new BEvent("arbitrary/"+i));
                 }
             }   
         } finally {
