@@ -51,7 +51,7 @@ public abstract class BProgram {
     /**
      * A callback interface invoked when a b-thread is added to {@code this}.
      */
-    public static interface BThreadAddedCallback {
+    public static interface BProgramCallback {
         void bthreadAdded(BProgram bp, BThreadSyncSnapshot theBThread);
     }
 
@@ -79,7 +79,7 @@ public abstract class BProgram {
 
     protected Scriptable programScope;
     
-    private Optional<BThreadAddedCallback> addBThreadCallback = Optional.empty();
+    private Optional<BProgramCallback> addBThreadCallback = Optional.empty();
 
     public BProgram() {
         this("BProgram-" + INSTANCE_COUNTER.incrementAndGet());
@@ -339,7 +339,7 @@ public abstract class BProgram {
         return out;
     }
 
-    public void setAddBThreadCallback(BThreadAddedCallback anAddBThreadCallback) {
+    public void setAddBThreadCallback(BProgramCallback anAddBThreadCallback) {
         addBThreadCallback = Optional.ofNullable(anAddBThreadCallback);
     }
     
