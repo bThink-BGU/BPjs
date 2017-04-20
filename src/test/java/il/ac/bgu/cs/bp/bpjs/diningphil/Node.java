@@ -21,7 +21,7 @@ public class Node {
 	protected Node(BProgram bp, BProgramSyncSnapshot systemState) {
 		this.bp = bp;
 		this.systemState = systemState;
-		
+
 		possibleEvents = ess.selectableEvents(systemState.getStatements(), systemState.getExternalEvents());
 	}
 
@@ -29,7 +29,7 @@ public class Node {
 	public String toString() {
 		String str = "\n";
 		for (BThreadSyncSnapshot s : systemState.getBThreadSnapshots()) {
-			str += "\t" + s.toString() + " {"+ s.getBSyncStatement() +  "} \n";
+			str += "\t" + s.toString() + " {" + s.getBSyncStatement() + "} \n";
 		}
 		return str;
 	}
@@ -53,7 +53,7 @@ public class Node {
 	 * 
 	 * @param e
 	 * @return
-	 * @throws InterruptedException 
+	 * @throws InterruptedException
 	 */
 	public Node getNextNode(BEvent e) throws Exception {
 		return new Node(bp, new BProgramSyncSnapshotCloner().clone(systemState).triggerEvent(e));
