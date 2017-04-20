@@ -8,6 +8,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.eventselection.SimpleEventSelectionStrategy;
+import il.ac.bgu.cs.bp.bpjs.search.BProgramSyncSnapshotCloner;
 
 public class Node {
 	private BProgramSyncSnapshot systemState;
@@ -55,8 +56,7 @@ public class Node {
 	 * @throws InterruptedException 
 	 */
 	public Node getNextNode(BEvent e) throws Exception {
-//		return new Node(bp, systemState.clone().triggerEvent(e));
-return null; // making this compile.
+		return new Node(bp, new BProgramSyncSnapshotCloner().clone(systemState).triggerEvent(e));
 	}
 
 	/**
