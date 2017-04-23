@@ -14,5 +14,15 @@ public class BadTraceException extends Exception {
 	public List<Node> getBadTrace() {
 		return badTrace;
 	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#toString()
+	 */
+	@Override
+	public String toString() {
+		return "BadTraceException [badTrace=" + badTrace + "]";
+	}
+	
+	
 	
 }

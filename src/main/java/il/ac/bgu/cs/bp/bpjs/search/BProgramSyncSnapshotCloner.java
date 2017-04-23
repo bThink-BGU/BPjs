@@ -32,13 +32,14 @@ import java.io.IOException;
  * @author michael
  */
 public class BProgramSyncSnapshotCloner {
-    
-    public BProgramSyncSnapshot clone( BProgramSyncSnapshot src ) {
-        BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(src.getBProgram());
-        try {
-            return io.deserialize(io.serialize(src));
-        } catch (IOException | ClassNotFoundException ex) {
-            throw new RuntimeException("Failed to clone snapshot: " + ex.getMessage(), ex );
-        }
-    }
+
+	public BProgramSyncSnapshot clone(BProgramSyncSnapshot src) {
+		BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(src.getBProgram());
+		try {
+			BProgramSyncSnapshot result = io.deserialize(io.serialize(src));
+			return result;
+		} catch (IOException | ClassNotFoundException ex) {
+			throw new RuntimeException("Failed to clone snapshot: " + ex.getMessage(), ex);
+		}
+	}
 }

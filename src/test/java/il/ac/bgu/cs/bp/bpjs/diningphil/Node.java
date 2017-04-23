@@ -16,11 +16,14 @@ public class Node {
 	private BProgram bp;
 
 	private Set<BEvent> possibleEvents;
+
+	private BEvent lastEvent;
 	private static EventSelectionStrategy ess = new SimpleEventSelectionStrategy();
 
-	protected Node(BProgram bp, BProgramSyncSnapshot systemState) {
+	protected Node(BProgram bp, BProgramSyncSnapshot systemState, BEvent e) {
 		this.bp = bp;
 		this.systemState = systemState;
+		this.lastEvent = e;
 
 		possibleEvents = ess.selectableEvents(systemState.getStatements(), systemState.getExternalEvents());
 	}
@@ -31,11 +34,12 @@ public class Node {
 		for (BThreadSyncSnapshot s : systemState.getBThreadSnapshots()) {
 			str += "\t" + s.toString() + " {" + s.getBSyncStatement() + "} \n";
 		}
-		return str;
+		
+		return ((lastEvent!= null) ? "\t\nevent: "+lastEvent + "\n" : "") + str;
 	}
 
 	public static Node getInitialNode(BProgram bp) throws Exception {
-		return new Node(bp, bp.setup().start());
+		return new Node(bp, bp.setup().start(),null);
 	}
 
 	/**
@@ -48,7 +52,7 @@ public class Node {
 	}
 
 	/**
-	 * Get all a Node object for each possible state of the system after
+	 * Get a Node object for each possible state of the system after
 	 * triggering the given event.
 	 * 
 	 * @param e
@@ -56,7 +60,7 @@ public class Node {
 	 * @throws InterruptedException
 	 */
 	public Node getNextNode(BEvent e) throws Exception {
-		return new Node(bp, new BProgramSyncSnapshotCloner().clone(systemState).triggerEvent(e));
+		return new Node(bp, new BProgramSyncSnapshotCloner().clone(systemState).triggerEvent(e),e);
 	}
 
 	/**
@@ -65,7 +69,7 @@ public class Node {
 	 * @return True if the state is good.
 	 */
 	public boolean check() {
-		return possibleEvents.isEmpty();
+		return !possibleEvents.isEmpty();
 	}
 
 }

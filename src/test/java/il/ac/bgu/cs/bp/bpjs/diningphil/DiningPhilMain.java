@@ -36,10 +36,13 @@ public class DiningPhilMain {
 		while (!path_nodes.isEmpty()) {
 
 			Node element = path_nodes.peek();
-			System.out.println("Element=" + element);
+			// System.out.println("Element=" + element);
 			boolean flag = false;
 
 			loop: for (BEvent e : element.getPossibleEvents()) {
+
+				System.out.println("element=" + element);
+				System.out.println("e=" + e);
 				Node n = element.getNextNode(e);
 				if (!visited_nodes.contains(n)) {
 					flag = true;
@@ -47,11 +50,7 @@ public class DiningPhilMain {
 					visited_nodes.add(n);
 					path_nodes.add(n);
 
-					System.out.println("Pushing " + n);
-
 					if (!n.check()) {
-						path_nodes.add(n); 
-
 						// Found a problematic path :-)
 						throw new BadTraceException(path_nodes);
 					}

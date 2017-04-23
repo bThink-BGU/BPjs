@@ -43,6 +43,8 @@ public class BProgramSyncSnapshot {
     private final Set<BThreadSyncSnapshot> threadSnapshots;
     private final List<BEvent> externalEvents;
     private final BProgram bprog;
+
+	public boolean triggered=false;
     
     public BProgramSyncSnapshot(BProgram aBProgram, Set<BThreadSyncSnapshot> threadSnapshots, List<BEvent> externalEvents) {
         this.threadSnapshots = threadSnapshots;
@@ -76,6 +78,12 @@ public class BProgramSyncSnapshot {
     }
 
     public BProgramSyncSnapshot triggerEvent(BEvent anEvent) throws InterruptedException {
+    	if(triggered) {
+    		throw new IllegalArgumentException("A BProgramSyncSnapshot is not allowed to be triggered twice.");
+    	}
+    	
+    	triggered = true;
+    	
         return triggerEvent(anEvent, Collections.emptySet());
     }
     
