@@ -79,7 +79,7 @@ public class BProgramSyncSnapshot {
 
     public BProgramSyncSnapshot triggerEvent(BEvent anEvent) throws InterruptedException {
     	if(triggered) {
-    		throw new IllegalArgumentException("A BProgramSyncSnapshot is not allowed to be triggered twice.");
+    		throw new IllegalStateException("A BProgramSyncSnapshot is not allowed to be triggered twice.");
     	}
     	
     	triggered = true;

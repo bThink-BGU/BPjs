@@ -1,13 +1,52 @@
 package il.ac.bgu.cs.bp.bpjs.diningphil;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.Stack;
 
+import org.junit.Test;
+
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.search.BProgramSyncSnapshotCloner;
 
 public class DiningPhilMain {
+
+	@Test
+	public void test2() throws InterruptedException, IOException, ClassNotFoundException {
+
+		// 1. Setup the program
+		BProgram simpleProg = new SingleResourceBProgram("BPJSDiningPhil.js");
+		BProgramSyncSnapshot seed = simpleProg.setup().start(); // seed is after
+																// BThreads are
+																// registered
+																// and before
+																// they run.
+
+		BProgramSyncSnapshotCloner cloner = new BProgramSyncSnapshotCloner();
+
+		// three event orders we're about to explore
+		List<List<String>> eventOrderings = Arrays.asList(
+				Arrays.asList("Pick1R", "Rel1R", "D"),
+				Arrays.asList("Pick1R", "Pick1L", "Rel1L", "Rel1R"));
+
+		// explore each event ordering
+		for (List<String> events : eventOrderings) {
+			System.out.println("Running event set: " + events);
+			BProgramSyncSnapshot cur = cloner.clone(seed); // get a fresh copy
+			for (String s : events) {
+				cur = cloner.clone(cur).triggerEvent(new BEvent(s));
+				//cur = cur.triggerEvent(new BEvent(s));
+			}
+			System.out.println("..Done");
+		}
+
+	}
 
 	public static void main(String[] args) throws InterruptedException {
 		// Create a program
@@ -41,7 +80,7 @@ public class DiningPhilMain {
 
 			loop: for (BEvent e : element.getPossibleEvents()) {
 
-				System.out.println("element=" + element);
+				System.out.println("Element=" + element);
 				System.out.println("e=" + e);
 				Node n = element.getNextNode(e);
 				if (!visited_nodes.contains(n)) {

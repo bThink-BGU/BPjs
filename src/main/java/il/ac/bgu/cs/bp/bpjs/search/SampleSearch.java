@@ -23,13 +23,16 @@
  */
 package il.ac.bgu.cs.bp.bpjs.search;
 
+import java.io.IOException;
+import java.util.Arrays;
+import java.util.List;
+
+import org.junit.Test;
+
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.List;
 
 /**
  *
@@ -46,21 +49,23 @@ public class SampleSearch {
         BProgramSyncSnapshotCloner cloner = new BProgramSyncSnapshotCloner();
         
         // three event orders we're about to explore
-        List<List<String>> eventOrderings = Arrays.asList( Arrays.asList("A1","A2","B1","B2"),
-                                                        Arrays.asList("A1","B1","A2","B2"),
-                                                        Arrays.asList("B1","A1","B2","A2") );
+        List<List<String>> eventOrderings = Arrays.asList( Arrays.asList("A1","A2","A3","B1","B2","B3"),
+                                                        Arrays.asList("A1","B1","A2","B2","A3", "B3"),
+                                                        Arrays.asList("B1","A1","B2","B3","A2","A3") );
         
         // explore each event ordering
         for ( List<String> events : eventOrderings ) {
             System.out.println("Running event set: " + events);
             BProgramSyncSnapshot cur = cloner.clone(seed); // get a fresh copy
             for ( String s : events ) {
-                cur = cur.triggerEvent(new BEvent(s));
+                cur = cloner.clone(cur).triggerEvent(new BEvent(s));
+                cur = cloner.clone(cur).triggerEvent(new BEvent(s));
             }
             System.out.println("..Done");
         }
        
 
     }
-    
+
+
 }

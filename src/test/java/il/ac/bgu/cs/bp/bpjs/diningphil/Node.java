@@ -35,7 +35,7 @@ public class Node {
 			str += "\t" + s.toString() + " {" + s.getBSyncStatement() + "} \n";
 		}
 		
-		return ((lastEvent!= null) ? "\t\nevent: "+lastEvent + "\n" : "") + str;
+		return ((lastEvent!= null) ? "\n\tevent: "+lastEvent + "\n" : "") + str;
 	}
 
 	public static Node getInitialNode(BProgram bp) throws Exception {

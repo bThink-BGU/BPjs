@@ -10,6 +10,10 @@ bp.registerBThread(function () {
     bsync({request: bp.Event("A2")});
     bp.log.info("a=" + a);
     a++;
+    bsync({request: bp.Event("A3")});
+    bp.log.info("a=" + a);
+    a++;
+
 });
 
 bp.registerBThread(function () {
@@ -18,6 +22,9 @@ bp.registerBThread(function () {
     bp.log.info("b="+b);
     b++;
     bsync({request: bp.Event("B2")});
+    bp.log.info("b="+b);
+    b++;
+    bsync({request: bp.Event("B3")});
     bp.log.info("b="+b);
     b++;
 });
