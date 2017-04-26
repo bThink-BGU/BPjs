@@ -29,17 +29,9 @@ RR1RR = bp.Event("RRel1RR"); // Phil2 release right
 
 // Force the stick between p1 and p2 to be one
 bp.registerBThread("Stick between P1 and P2", function() {
-	var e;
-	var wt;
-
 	while (true) {
-		// e = bsync({ waitFor : [ P1R, P2L ], block : [ R1R, R2L ] });
-		e = bsync({ waitFor : P1R });  // The problem is with this assignment. It doesn't happen when we remove it ???
-
-		// wt = (e.equals(P1R) ? R1R : R2L);
-
+		e = bsync({ waitFor : P1R }); // The problem is with this assignment.
 		bsync({ waitFor : R1R });
-		// bsync({ waitFor : wt, block : [ P1R, P2L ] });
 	}
 });
 
