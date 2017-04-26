@@ -29,10 +29,9 @@ RR1RR = bp.Event("RRel1RR"); // Phil2 release right
 
 // Force the stick between p1 and p2 to be one
 bp.registerBThread("Stick between P1 and P2", function() {
-	while (true) {
-		e = bsync({ waitFor : P1R }); // The problem is with this assignment.
-		bsync({ waitFor : R1R });
-	}
+	e = bsync({ waitFor : P1R }); // The problem is with this assignment.
+	bsync({ waitFor : R1R });
+	bsync({ waitFor : R1R });
 });
 
 /*
