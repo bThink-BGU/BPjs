@@ -38,6 +38,7 @@ import java.util.Set;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.TopLevel;
 import org.mozilla.javascript.serialize.ScriptableInputStream;
 import org.mozilla.javascript.serialize.ScriptableOutputStream;
 
@@ -99,7 +100,7 @@ public class BProgramSyncSnapshotIO {
         try {
             Context ctxt = ContextFactory.getGlobal().enterContext();
             ctxt.setOptimizationLevel(-1); // must use interpreter mode
-            final Scriptable topLevelScope = ctxt.initSafeStandardObjects();
+            final Scriptable topLevelScope = ctxt.initSafeStandardObjects(new TopLevel());
             
             try ( ScriptableInputStream sis = new ScriptableInputStream(new ByteArrayInputStream(bytes), topLevelScope)) {
                 Header header = (Header) sis.readObject();

@@ -26,9 +26,6 @@ package il.ac.bgu.cs.bp.bpjs.search;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
-
-import org.junit.Test;
-
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;

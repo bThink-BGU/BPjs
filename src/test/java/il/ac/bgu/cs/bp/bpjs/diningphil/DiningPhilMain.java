@@ -32,16 +32,20 @@ public class DiningPhilMain {
 
 		// three event orders we're about to explore
 		List<List<String>> eventOrderings = Arrays.asList(
-				Arrays.asList("Pick1R", "Rel1R", "D"),
-				Arrays.asList("Pick1R", "Pick1L", "Rel1L", "Rel1R"));
+				Arrays.asList("A", "B", "C"),
+				Arrays.asList("P1R", "P1L", "R1L", "R1R"));
 
 		// explore each event ordering
 		for (List<String> events : eventOrderings) {
 			System.out.println("Running event set: " + events);
 			BProgramSyncSnapshot cur = cloner.clone(seed); // get a fresh copy
 			for (String s : events) {
-				cur = cloner.clone(cur).triggerEvent(new BEvent(s));
-				//cur = cur.triggerEvent(new BEvent(s));
+                System.out.println("Event " + s);
+				cur = cloner.clone(cur);
+                System.out.println("  cloned");
+                cur.triggerEvent(new BEvent(s));
+                System.out.println("  done");
+//				cur = cur.triggerEvent(new BEvent(s));
 			}
 			System.out.println("..Done");
 		}
