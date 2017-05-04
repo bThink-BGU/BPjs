@@ -12,6 +12,7 @@ import org.junit.Test;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.search.BProgramSyncSnapshotCloner;
 
@@ -20,28 +21,35 @@ public class DiningPhilMain {
 	@Test
 	public void test2() throws InterruptedException, IOException, ClassNotFoundException {
 
-		// 1. Setup the program
-		BProgram simpleProg = new SingleResourceBProgram("BPJSDiningPhil.js");
-		BProgramSyncSnapshot seed = simpleProg.setup().start(); // seed is after
-																// BThreads are
-																// registered
-																// and before
-																// they run.
+		String SRC = "" + //
+				"bp.registerBThread('', function() {" + //
+				"  var e = bsync({ waitFor : bp.Event('A') });" + //
+				"  bsync({ waitFor : bp.Event('A') });" + //
+				"  bsync({ waitFor : bp.Event('A') });" + //
+				"});";
 
-		BProgramSyncSnapshotCloner cloner = new BProgramSyncSnapshotCloner();
+		// Create a program
+		BProgram bprog = new StringBProgram(SRC);
+
+		// Get the initial state
+		BProgramSyncSnapshot seed = bprog.setup().start();
 
 		// three event orders we're about to explore
-		List<List<String>> eventOrderings = Arrays.asList(
-				Arrays.asList("Pick1R", "Rel1R", "D"),
-				Arrays.asList("Pick1R", "Pick1L", "Rel1L", "Rel1R"));
+		List<List<String>> eventOrderings = Arrays.asList( //
+				Arrays.asList("A"), //
+				Arrays.asList("A", "D"), //
+				Arrays.asList("A", "A", "D"), //
+				Arrays.asList("A", "A", "A", "D")//
+		);
 
 		// explore each event ordering
 		for (List<String> events : eventOrderings) {
 			System.out.println("Running event set: " + events);
-			BProgramSyncSnapshot cur = cloner.clone(seed); // get a fresh copy
+
+			BProgramSyncSnapshot cur = BProgramSyncSnapshotCloner.clone(seed);
+
 			for (String s : events) {
-				cur = cloner.clone(cur).triggerEvent(new BEvent(s));
-				//cur = cur.triggerEvent(new BEvent(s));
+				cur = BProgramSyncSnapshotCloner.clone(cur).triggerEvent(new BEvent(s));
 			}
 			System.out.println("..Done");
 		}
