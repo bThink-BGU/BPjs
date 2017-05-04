@@ -1,12 +1,15 @@
 package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
 
-import org.mozilla.javascript.*;
-
 import java.io.Serializable;
+import java.util.Optional;
+
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContinuationPending;
+import org.mozilla.javascript.Function;
+import org.mozilla.javascript.Scriptable;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.jsproxy.BThreadJsProxy;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import java.util.Optional;
 
 /**
  * The state of a BThread at {@code bsync}.
