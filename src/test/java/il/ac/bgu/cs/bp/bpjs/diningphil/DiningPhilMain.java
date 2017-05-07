@@ -23,7 +23,7 @@ public class DiningPhilMain {
 
 		String SRC = "" + //
 				"bp.registerBThread('', function() {" + //
-				"  var e = bsync({ waitFor : bp.Event('A') });" + //
+				"  var e1 = bsync({ waitFor : bp.Event('A') });" + //
 				"  bsync({ waitFor : bp.Event('A') });" + //
 				"  bsync({ waitFor : bp.Event('A') });" + //
 				"});";
@@ -32,28 +32,30 @@ public class DiningPhilMain {
 		BProgram bprog = new StringBProgram(SRC);
 
 		// Get the initial state
-		BProgramSyncSnapshot seed = bprog.setup().start();
-
+		BProgramSyncSnapshot seed = bprog.setup();
+		seed.start();
+		
 		// three event orders we're about to explore
 		List<List<String>> eventOrderings = Arrays.asList( //
-				Arrays.asList("A"), //
-				Arrays.asList("A", "D"), //
-				Arrays.asList("A", "A", "D"), //
-				Arrays.asList("A", "A", "A", "D")//
+				//Arrays.asList(), //
+				//Arrays.asList("A", "A", "D"), //
+				//Arrays.asList("A", "A", "A", "D"), //
+				//Arrays.asList("A", "D"), //
+				Arrays.asList("A", "A", "A", "A", "A", "D")//
 		);
 
+		
 		// explore each event ordering
 		for (List<String> events : eventOrderings) {
 			System.out.println("Running event set: " + events);
 
-			BProgramSyncSnapshot cur = BProgramSyncSnapshotCloner.clone(seed);
+			BProgramSyncSnapshot cur = seed;
 
 			for (String s : events) {
 				cur = BProgramSyncSnapshotCloner.clone(cur).triggerEvent(new BEvent(s));
 			}
 			System.out.println("..Done");
 		}
-
 	}
 
 	public static void main(String[] args) throws InterruptedException {
