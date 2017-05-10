@@ -18,27 +18,39 @@ import il.ac.bgu.cs.bp.bpjs.search.BProgramSyncSnapshotCloner;
 
 public class DiningPhilMain {
 
-	@Test
+//	@Test
 	public void test2() throws InterruptedException, IOException, ClassNotFoundException {
 
 		String SRC = "" + //
-				"bp.registerBThread('', function() {" + //
-				"  var e = bsync({ waitFor : bp.Event('A') });" + //
-				"  bsync({ waitFor : bp.Event('A') });" + //
-				"  bsync({ waitFor : bp.Event('A') });" + //
-				"});";
+				"bp.registerBThread('', function() {\n" + //
+                "  bp.log.info('Inside the bt');\n" + //
+                "  var f=function(){bp.log.info('hello from f');}; " + //
+                "  var es = bp.EventSet('none',function(e){return true;});\n" + //
+				"  bsync({ waitFor : es });\n" + //
+                "  f(); \n " + //
+                "  bp.log.info('post-first-bSync');\n" + //
+//                "  bp.log.info('e=' + e);\n" + //
+				"  var e=bsync({ waitFor : bp.Event('A') });\n" + //
+                "  bp.log.info('after 1st A');\n" + //
+//                "  bp.log.info('e=' + e);\n" + //
+				"  bsync({ waitFor : bp.Event('A') });\n" + //
+//                "  e=e.name;" + 
+                "  bp.log.info('after 2nd A');\n" + 
+				"  bsync({ waitFor : bp.Event('A') });\n" + //
+                "  bp.log.info('after 2nd A');\n" +
+				"});\n"
+                + "bp.log.info('setup done.');";
 
 		// Create a program
 		BProgram bprog = new StringBProgram(SRC);
 
 		// Get the initial state
-		BProgramSyncSnapshot seed = bprog.setup().start();
+        BProgramSyncSnapshot seed = bprog.setup().start();
 
 		// three event orders we're about to explore
 		List<List<String>> eventOrderings = Arrays.asList( //
-				Arrays.asList("A"), //
-				Arrays.asList("A", "D"), //
-				Arrays.asList("A", "A", "D"), //
+				Arrays.asList("A", "A", "A"), //
+				Arrays.asList("A", "A", "A", "A"), //
 				Arrays.asList("A", "A", "A", "D")//
 		);
 
@@ -46,12 +58,14 @@ public class DiningPhilMain {
 		for (List<String> events : eventOrderings) {
 			System.out.println("Running event set: " + events);
 
-			BProgramSyncSnapshot cur = BProgramSyncSnapshotCloner.clone(seed);
+			BProgramSyncSnapshot cur = seed;
 
 			for (String s : events) {
-				cur = BProgramSyncSnapshotCloner.clone(cur).triggerEvent(new BEvent(s));
+                System.out.println("Event " + s);
+				BProgramSyncSnapshot dup = BProgramSyncSnapshotCloner.clone(cur);
+                cur = dup.triggerEvent(new BEvent(s));
 			}
-			System.out.println("..Done");
+			System.out.println("..Doneֿ\n\n\n");
 		}
 
 	}
@@ -62,10 +76,7 @@ public class DiningPhilMain {
 
 		// DFS
 		try {
-
 			dfsUsingStack(Node.getInitialNode(bprog));
-
-			// dfsUsingStack(new NodeStub2("B,B"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

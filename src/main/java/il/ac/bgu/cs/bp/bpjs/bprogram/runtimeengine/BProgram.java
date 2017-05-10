@@ -51,7 +51,7 @@ public abstract class BProgram {
     /**
      * A callback interface invoked when a b-thread is added to {@code this}.
      */
-    public static interface BProgramCallback {
+    public interface BProgramCallback {
         void bthreadAdded(BProgram bp, BThreadSyncSnapshot theBThread);
     }
 
@@ -78,6 +78,12 @@ public abstract class BProgram {
     private volatile boolean started = false;
 
     protected Scriptable programScope;
+    
+    /**
+     * Objects that client code wishes to put in scope before the scope is 
+     * initialized are collected here.
+     */
+    protected Map<String,Object> initialScopeValues = new HashMap<>();
     
     private Optional<BProgramCallback> addBThreadCallback = Optional.empty();
 
@@ -201,7 +207,7 @@ public abstract class BProgram {
             Context.exit();
         }
         started = true;
-        return new BProgramSyncSnapshot(this, bthreads, new LinkedList<>());
+        return new BProgramSyncSnapshot(this, bthreads, Collections.emptyList());
     }
 
     protected void initProgramScope(Context cx) {
@@ -214,7 +220,8 @@ public abstract class BProgram {
                 Context.javaToJS(proxy, programScope));
 
 //        evaluateResource("globalScopeInit.js"); <-- Currently not needed. Leaving in as we might need it soon.
-
+        initialScopeValues.entrySet().forEach(e->putInGlobalScope(e.getKey(), e.getValue()));
+        initialScopeValues=null;
         setupProgramScope(programScope);
     }
 
@@ -293,7 +300,16 @@ public abstract class BProgram {
      * @param obj The object to be added to the program's scope.
      */
     public void putInGlobalScope( String name, Object obj ) {
-        getGlobalScope().put(name, programScope, Context.javaToJS(obj, programScope));
+        if ( getGlobalScope() == null ) {
+            initialScopeValues.put(name, obj);
+        } else {
+            try {
+                Context.enter();
+                getGlobalScope().put(name, programScope, Context.javaToJS(obj, programScope));
+            } finally {
+                Context.exit();
+            }
+        }
     }
     
     /**
