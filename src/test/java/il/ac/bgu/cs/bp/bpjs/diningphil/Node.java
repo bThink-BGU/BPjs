@@ -34,12 +34,12 @@ public class Node {
 
 	private String stateString() {
 
-		StringBuilder sb = new StringBuilder();
+		String str = "";
 		for (BThreadSyncSnapshot s : systemState.getBThreadSnapshots()) {
-			sb.append("\t").append(s.toString()).append(" {").append(s.getBSyncStatement()).append("} \n");
+			str += "\t" + s.toString() + " {" + s.getBSyncStatement() + "} \n";
 		}
 
-		return sb.toString();
+		return str;
 	}
 
 	@Override

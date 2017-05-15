@@ -18,6 +18,8 @@ import il.ac.bgu.cs.bp.bpjs.search.BProgramSyncSnapshotCloner;
 
 public class DiningPhilMain {
 
+	private static long count;
+
 	@Test
 	public void test2() throws InterruptedException, IOException, ClassNotFoundException {
 
@@ -67,19 +69,20 @@ public class DiningPhilMain {
 		// DFS
 		try {
 			dfsUsingStack(Node.getInitialNode(bprog));
-
+			
+			System.out.println("No error :-)");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-		System.out.println("..Done");
+		System.err.println("Scanned " + count + " states");
 
 	}
 
 	// Iterative DFS using stack
 	public static void dfsUsingStack(Node node) throws Exception {
-		Node initial = node;
-
+		count = 1;
+		
 		Stack<Node> path_nodes = new Stack<Node>();
 		Set<Node> visited_nodes = new HashSet<Node>();
 
@@ -98,12 +101,10 @@ public class DiningPhilMain {
 			loop: while (node.getEventIterator().hasNext()) {
 
 				BEvent e = node.getEventIterator().next();
-				if (node == initial) {
-					System.out.println("\te=" + e);
-				}
 
 				Node nextNode = node.getNextNode(e);
 				if (!visited_nodes.contains(nextNode)) {
+					count++;
 					flag = true;
 
 					visited_nodes.add(nextNode);
@@ -125,6 +126,7 @@ public class DiningPhilMain {
 				path_nodes.pop();
 			}
 		}
+		
 	}
 
 }
