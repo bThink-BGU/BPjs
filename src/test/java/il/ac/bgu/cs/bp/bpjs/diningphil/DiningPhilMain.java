@@ -22,8 +22,11 @@ public class DiningPhilMain {
 	public void test2() throws InterruptedException, IOException, ClassNotFoundException {
 
 		String SRC = "" + //
+
 				"bp.registerBThread('', function() {" + //
+				"  bp.log.info('1');" + //
 				"  var e1 = bsync({ waitFor : bp.Event('A') });" + //
+				"  bp.log.info('2');" + //
 				"  bsync({ waitFor : bp.Event('A') });" + //
 				"  bsync({ waitFor : bp.Event('A') });" + //
 				"});";
@@ -34,22 +37,21 @@ public class DiningPhilMain {
 		// Get the initial state
 		BProgramSyncSnapshot seed = bprog.setup();
 		seed.start();
-		
+
 		// three event orders we're about to explore
 		List<List<String>> eventOrderings = Arrays.asList( //
-				//Arrays.asList(), //
-				//Arrays.asList("A", "A", "D"), //
-				//Arrays.asList("A", "A", "A", "D"), //
-				//Arrays.asList("A", "D"), //
+				// Arrays.asList(), //
+				// Arrays.asList("A", "A", "D"), //
+				// Arrays.asList("A", "A", "A", "D"), //
+				// Arrays.asList("A", "D"), //
 				Arrays.asList("A", "A", "A", "A", "A", "D")//
 		);
 
-		
 		// explore each event ordering
 		for (List<String> events : eventOrderings) {
 			System.out.println("Running event set: " + events);
 
-			BProgramSyncSnapshot cur = seed;
+			BProgramSyncSnapshot cur = BProgramSyncSnapshotCloner.clone(seed.start());
 
 			for (String s : events) {
 				cur = BProgramSyncSnapshotCloner.clone(cur).triggerEvent(new BEvent(s));
@@ -64,18 +66,23 @@ public class DiningPhilMain {
 
 		// DFS
 		try {
-
 			dfsUsingStack(Node.getInitialNode(bprog));
 
-			// dfsUsingStack(new NodeStub2("B,B"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
+		System.out.println("..Done");
 
 	}
 
 	// Iterative DFS using stack
 	public static void dfsUsingStack(Node node) throws Exception {
+		Node initial = node;
+
+		// System.out.println("e1="+node.getEventIterator().next());
+		// System.out.println("e2="+node.getEventIterator().next());
+
 		Stack<Node> path_nodes = new Stack<Node>();
 		Set<Node> visited_nodes = new HashSet<Node>();
 
@@ -84,22 +91,30 @@ public class DiningPhilMain {
 
 		while (!path_nodes.isEmpty()) {
 
-			Node element = path_nodes.peek();
-			// System.out.println("Element=" + element);
+			node = path_nodes.peek();
+
+			// This flag remains false if node doesn't have an unvisited
+			// follower
 			boolean flag = false;
 
-			loop: for (BEvent e : element.getPossibleEvents()) {
+			loop: for (BEvent e : node.getPossibleEvents()) {
+				// loop: while (node.getEventIterator().hasNext()) {
 
-				System.out.println("Element=" + element);
-				System.out.println("e=" + e);
-				Node n = element.getNextNode(e);
-				if (!visited_nodes.contains(n)) {
+				// BEvent e = node.getEventIterator().next();
+				if (node == initial) {
+					System.out.println("\te=" + e);
+				}
+
+				node = node.getNextNode(e);
+				if (!visited_nodes.contains(node)) {
 					flag = true;
 
-					visited_nodes.add(n);
-					path_nodes.add(n);
+					visited_nodes.add(node);
+					path_nodes.add(node);
 
-					if (!n.check()) {
+					// System.out.println("Node="+node);
+
+					if (!node.check()) {
 						// Found a problematic path :-)
 						throw new BadTraceException(path_nodes);
 					}
@@ -110,7 +125,6 @@ public class DiningPhilMain {
 			}
 
 			if (!flag) {
-				System.out.println("popping " + element);
 				path_nodes.pop();
 			}
 		}

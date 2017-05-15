@@ -1,46 +1,59 @@
-/*Works Good*/
-P1R = bp.Event("Pick1R"); // Phil1 pickes right
-P1L = bp.Event("Pick1L"); // Phil1 pickes left
-P2R = bp.Event("Pick2R"); // Phil2 pickes right
-P2L = bp.Event("Pick2L"); // Phil2 pickes left
+P1R = bp.Event("Pick1R"); // Phil1 picks right
+P1L = bp.Event("Pick1L"); // Phil1 picks left
+P2R = bp.Event("Pick2R"); // Phil2 picks right
+P2L = bp.Event("Pick2L"); // Phil2 picks left
 
-R1L = bp.Event("Rel1L"); // Phil1 release left
-R2L = bp.Event("Rel2L"); // Phil2 release left
 R1R = bp.Event("Rel1R"); // Phil1 release right
+R1L = bp.Event("Rel1L"); // Phil1 release left
 R2R = bp.Event("Rel2R"); // Phil2 release right
-RR1RR = bp.Event("RRel1RR"); // Phil2 release right
+R2L = bp.Event("Rel2L"); // Phil2 release left
 
-/*
- * bp.registerBThread("Phil1", function() { while (true) { bsync({ request : P1R
- * }); // requests to pick his right stick bsync({ request : P1L }); // requests
- * to pick his left stick
- * 
- * bsync({ request : R1L }); // requests to release his left stick bsync({
- * request : R1R }); // requests to release his right stick } });
- * 
- * 
- * bp.registerBThread("Phil2", function() { while (true) { bsync({ request : P2L
- * }); // requests to pick his left stick bsync({ request : P2R }); // requests
- * to pick his right stick
- * 
- * bsync({ request : R2R }); // requests to release his right stick bsync({
- * request : R2L }); // requests to release his left stick } });
- */
+bp.registerBThread("Phil1", function() {
+	while (true) {
+		// Request to pick the right stick
+		bsync({ request : P1R });
 
-// Force the stick between p1 and p2 to be one
-bp.registerBThread("Stick between P1 and P2", function() {
-	e = bsync({ request : P1R }); // The problem is with this assignment.
-	bsync({ request : R1R });
-	bsync({ request : R1R });
+		// Request to pick the left stick
+		bsync({ request : P1L });
+
+		// Request to release the left stick
+		bsync({ request : R1L });
+
+		// Request to release the right stick
+		bsync({ request : R1R });
+	}
 });
 
-/*
- * // Force the stick between p2 and p1 to be one bp.registerBThread("Stick
- * between P2 and P1", function() { var e; var wt;
- * 
- * while (true) { // Waits for pick up e = bsync({ waitFor : [ P1L, P2R ], block : [
- * R1L, R2R ] });
- * 
- * wt = (e.equals(P1L)) ? R1L : R2R; // Waits for release by the same Phil
- * bsync({ waitFor : wt, block : [ P1L, P2R ] }); } });
- */
+bp.registerBThread("Phil2", function() {
+	while (true) {
+		// Request to pick the right stick
+		bsync({ request : P2L });
+
+		// Request to pick the left stick
+		bsync({ request : P2R });
+
+		// Request to release the left stick
+		bsync({ request : R2R });
+
+		// Request to release the right stick
+		bsync({ request : R2L });
+	}
+});
+
+bp.registerBThread("Stick between P1 and P2", function() {
+	while (true) {
+		var e = bsync({ waitFor : [ P1R, P2L ], block : [ R1R, R2L ] }).name; 
+
+		var wt = (e.equals(P1R.name)) ? R1R : R2L;
+		bsync({ waitFor : wt, block : [ P1R, P2L ] });  // // <-- wt=Rel1R
+	}
+});
+
+bp.registerBThread("Stick between P2 and P1", function() {
+	while (true) {
+		var e = bsync({ waitFor : [ P1L, P2R ], block : [ R1L, R2R ] }).name; // <--
+
+		var wt = (e.equals(P1L.name)) ? R1L : R2R;
+		bsync({ waitFor : wt, block : [ P1L, P2R ] });
+	}
+});
