@@ -1,59 +1,46 @@
-P1R = bp.Event("Pick1R"); // Phil1 picks right
-P1L = bp.Event("Pick1L"); // Phil1 picks left
-P2R = bp.Event("Pick2R"); // Phil2 picks right
-P2L = bp.Event("Pick2L"); // Phil2 picks left
+N = 4;
 
-R1R = bp.Event("Rel1R"); // Phil1 release right
-R1L = bp.Event("Rel1L"); // Phil1 release left
-R2R = bp.Event("Rel2R"); // Phil2 release right
-R2L = bp.Event("Rel2L"); // Phil2 release left
+addPhil = function(i) {
+	bp.registerBThread("Phil" + i, function() {
+		while (true) {
+			// Request to pick the right stick
+			bsync({ request : bp.Event("Pick" + i + "R") });
 
-bp.registerBThread("Phil1", function() {
-	while (true) {
-		// Request to pick the right stick
-		bsync({ request : P1R });
+			// Request to pick the left stick
+			bsync({ request : bp.Event("Pick" + i + "L") });
 
-		// Request to pick the left stick
-		bsync({ request : P1L });
+			// Request to release the left stick
+			bsync({ request : bp.Event("Rel" + i + "L") });
 
-		// Request to release the left stick
-		bsync({ request : R1L });
+			// Request to release the right stick
+			bsync({ request : bp.Event("Rel" + i + "R") });
+		}
+	});
+};
 
-		// Request to release the right stick
-		bsync({ request : R1R });
-	}
-});
+addStick = function(i) {
+	var j = (i % N) + 1;
 
-bp.registerBThread("Phil2", function() {
-	while (true) {
-		// Request to pick the right stick
-		bsync({ request : P2R });
+	bp.registerBThread("Stick " + i,
+			function() {
+				while (true) {
+					var e = bsync({
+						waitFor : [ bp.Event("Pick" + i + "R"),
+								bp.Event("Pick" + j + "L") ],
+						block : [ bp.Event("Rel" + i + "R"),
+								bp.Event("Rel" + j + "L") ] }).name;
 
-		// Request to pick the left stick
-		bsync({ request : P2L });
+					var wt = (e.equals("Pick" + i + "R")) ? "Rel" + i + "R"
+							: "Rel" + j + "L";
+					bsync({
+						waitFor : bp.Event(wt),
+						block : [ bp.Event("Pick" + i + "R"),
+								bp.Event("Pick" + j + "L") ] });
+				}
+			})
+};
 
-		// Request to release the left stick
-		bsync({ request : R2L });
-
-		// Request to release the right stick
-		bsync({ request : R2R });
-	}
-});
-
-bp.registerBThread("Stick between P1 and P2", function() {
-	while (true) {
-		var e = bsync({ waitFor : [ P1R, P2L ], block : [ R1R, R2L ] }).name; 
-
-		var wt = (e.equals(P1R.name)) ? R1R : R2L;
-		bsync({ waitFor : wt, block : [ P1R, P2L ] });  
-	}
-});
-
-bp.registerBThread("Stick between P2 and P1", function() {
-	while (true) {
-		var e = bsync({ waitFor : [ P1L, P2R ], block : [ R1L, R2R ] }).name; 
-
-		var wt = (e.equals(P1L.name)) ? R1L : R2R;
-		bsync({ waitFor : wt, block : [ P1L, P2R ] });
-	}
-});
+for (i = 1; i <= N; i++) {
+	addPhil(i);
+	addStick(i);
+}
