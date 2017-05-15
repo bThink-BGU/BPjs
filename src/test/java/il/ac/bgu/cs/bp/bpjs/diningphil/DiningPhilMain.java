@@ -24,41 +24,50 @@ public class DiningPhilMain {
 	public void test2() throws InterruptedException, IOException, ClassNotFoundException {
 
 		String SRC = "" + //
-
-				"bp.registerBThread('', function() {" + //
-				"  bp.log.info('1');" + //
-				"  var e1 = bsync({ waitFor : bp.Event('A') });" + //
-				"  bp.log.info('2');" + //
-				"  bsync({ waitFor : bp.Event('A') });" + //
-				"  bsync({ waitFor : bp.Event('A') });" + //
-				"});";
+				"bp.registerBThread('', function() {\n" + //
+                "  bp.log.info('Inside the bt');\n" + //
+                "  var f=function(){bp.log.info('hello from f');}; " + //
+                "  var es = bp.EventSet('none',function(e){return true;});\n" + //
+				"  bsync({ waitFor : es });\n" + //
+                "  f(); \n " + //
+                "  bp.log.info('post-first-bSync');\n" + //
+//                "  bp.log.info('e=' + e);\n" + //
+				"  var e=bsync({ waitFor : bp.Event('A') });\n" + //
+                "  bp.log.info('after 1st A');\n" + //
+//                "  bp.log.info('e=' + e);\n" + //
+				"  bsync({ waitFor : bp.Event('A') });\n" + //
+//                "  e=e.name;" + 
+                "  bp.log.info('after 2nd A');\n" + 
+				"  bsync({ waitFor : bp.Event('A') });\n" + //
+                "  bp.log.info('after 2nd A');\n" +
+				"});\n"
+                + "bp.log.info('setup done.');";
 
 		// Create a program
 		BProgram bprog = new StringBProgram(SRC);
 
 		// Get the initial state
-		BProgramSyncSnapshot seed = bprog.setup();
-		seed.start();
-
-		// three event orders we're about to explore
-		List<List<String>> eventOrderings = Arrays.asList( //
-				// Arrays.asList(), //
-				// Arrays.asList("A", "A", "D"), //
-				// Arrays.asList("A", "A", "A", "D"), //
-				// Arrays.asList("A", "D"), //
-				Arrays.asList("A", "A", "A", "A", "A", "D")//
+        BProgramSyncSnapshot seed = bprog.setup().start();
+		
+        // three event orders we're about to explore
+        List<List<String>> eventOrderings = Arrays.asList( //
+				Arrays.asList("A", "A", "A"), //
+				Arrays.asList("A", "A", "A", "A"), //
+				Arrays.asList("A", "A", "A", "D")//
 		);
 
 		// explore each event ordering
 		for (List<String> events : eventOrderings) {
 			System.out.println("Running event set: " + events);
 
-			BProgramSyncSnapshot cur = BProgramSyncSnapshotCloner.clone(seed.start());
+			BProgramSyncSnapshot cur = seed;
 
 			for (String s : events) {
-				cur = BProgramSyncSnapshotCloner.clone(cur).triggerEvent(new BEvent(s));
+                System.out.println("Event " + s);
+				BProgramSyncSnapshot dup = BProgramSyncSnapshotCloner.clone(cur);
+                cur = dup.triggerEvent(new BEvent(s));
 			}
-			System.out.println("..Done");
+			System.out.println("..Doneֿ\n\n\n");
 		}
 	}
 
@@ -83,8 +92,8 @@ public class DiningPhilMain {
 	public static void dfsUsingStack(Node node) throws Exception {
 		count = 1;
 
-		Stack<Node> path_nodes = new Stack<Node>();
-		Set<Node> visited_nodes = new HashSet<Node>();
+		Stack<Node> path_nodes = new Stack<>();
+		Set<Node> visited_nodes = new HashSet<>();
 
 		visited_nodes.add(node);
 		path_nodes.add(node);

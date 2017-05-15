@@ -27,16 +27,16 @@ bp.registerBThread("Phil1", function() {
 bp.registerBThread("Phil2", function() {
 	while (true) {
 		// Request to pick the right stick
-		bsync({ request : P2R });
-
-		// Request to pick the left stick
 		bsync({ request : P2L });
 
+		// Request to pick the left stick
+		bsync({ request : P2R });
+
 		// Request to release the left stick
-		bsync({ request : R2L });
+		bsync({ request : R2R });
 
 		// Request to release the right stick
-		bsync({ request : R2R });
+		bsync({ request : R2L });
 	}
 });
 

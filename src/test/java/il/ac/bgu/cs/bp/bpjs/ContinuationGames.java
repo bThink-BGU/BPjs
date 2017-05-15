@@ -22,8 +22,6 @@ import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 /**
  * Playing around with continuations.
  *
- * TODO: The BPP class should be a BProgramRunner now.
- * 
  * @author michael
  */
 public class ContinuationGames {

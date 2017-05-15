@@ -58,6 +58,25 @@ public class BThreadSyncSnapshot implements Serializable {
     }
     
     /**
+     * Fully detailed constructor. Mostly useful for getting objects out of 
+     * serialized forms.
+     * @param name
+     * @param entryPoint
+     * @param interruptHandler 
+     * @param scope
+     * @param continuation
+     * @param bSyncStatement 
+     */
+    public BThreadSyncSnapshot(String name, Function entryPoint, Function interruptHandler, Scriptable scope, Object continuation, BSyncStatement bSyncStatement) {
+        this.name = name;
+        this.entryPoint = entryPoint;
+        this.interruptHandler = interruptHandler;
+        this.scope = scope;
+        this.continuation = continuation;
+        this.bSyncStatement = bSyncStatement;
+    }
+    
+    /**
      * Creates the next snapshot of the BThread in a given run. 
      * @param aContinuation The BThread's continuation for the next sync.
      * @param aStatement The BThread's statement for the next sync.
@@ -90,6 +109,7 @@ public class BThreadSyncSnapshot implements Serializable {
 
         } catch (ContinuationPending cbs) {
             return copyWith(cbs.getContinuation(), (BSyncStatement) cbs.getApplicationState());
+            
         } finally {
             Context.exit();
         }

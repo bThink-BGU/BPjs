@@ -12,6 +12,6 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
 public interface BPEngineTask extends Callable<BThreadSyncSnapshot>{    
     
     @Override
-    public BThreadSyncSnapshot call() throws Exception;
+    BThreadSyncSnapshot call() throws Exception;
 
 }
