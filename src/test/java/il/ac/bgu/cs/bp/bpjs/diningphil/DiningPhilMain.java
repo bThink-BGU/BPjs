@@ -69,7 +69,7 @@ public class DiningPhilMain {
 		// DFS
 		try {
 			dfsUsingStack(Node.getInitialNode(bprog));
-			
+
 			System.out.println("No error :-)");
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -82,7 +82,7 @@ public class DiningPhilMain {
 	// Iterative DFS using stack
 	public static void dfsUsingStack(Node node) throws Exception {
 		count = 1;
-		
+
 		Stack<Node> path_nodes = new Stack<Node>();
 		Set<Node> visited_nodes = new HashSet<Node>();
 
@@ -97,7 +97,6 @@ public class DiningPhilMain {
 			// follower
 			boolean flag = false;
 
-			// loop: for (BEvent e : node.getPossibleEvents()) {
 			loop: while (node.getEventIterator().hasNext()) {
 
 				BEvent e = node.getEventIterator().next();
@@ -109,8 +108,6 @@ public class DiningPhilMain {
 
 					visited_nodes.add(nextNode);
 					path_nodes.add(nextNode);
-
-					// System.out.println("Node="+node);
 
 					if (!nextNode.check()) {
 						// Found a problematic path :-)
@@ -126,7 +123,7 @@ public class DiningPhilMain {
 				path_nodes.pop();
 			}
 		}
-		
+
 	}
 
 }
