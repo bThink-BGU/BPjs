@@ -80,9 +80,6 @@ public class DiningPhilMain {
 	public static void dfsUsingStack(Node node) throws Exception {
 		Node initial = node;
 
-		// System.out.println("e1="+node.getEventIterator().next());
-		// System.out.println("e2="+node.getEventIterator().next());
-
 		Stack<Node> path_nodes = new Stack<Node>();
 		Set<Node> visited_nodes = new HashSet<Node>();
 
@@ -97,24 +94,24 @@ public class DiningPhilMain {
 			// follower
 			boolean flag = false;
 
-			loop: for (BEvent e : node.getPossibleEvents()) {
-				// loop: while (node.getEventIterator().hasNext()) {
+			// loop: for (BEvent e : node.getPossibleEvents()) {
+			loop: while (node.getEventIterator().hasNext()) {
 
-				// BEvent e = node.getEventIterator().next();
+				BEvent e = node.getEventIterator().next();
 				if (node == initial) {
 					System.out.println("\te=" + e);
 				}
 
-				node = node.getNextNode(e);
-				if (!visited_nodes.contains(node)) {
+				Node nextNode = node.getNextNode(e);
+				if (!visited_nodes.contains(nextNode)) {
 					flag = true;
 
-					visited_nodes.add(node);
-					path_nodes.add(node);
+					visited_nodes.add(nextNode);
+					path_nodes.add(nextNode);
 
 					// System.out.println("Node="+node);
 
-					if (!node.check()) {
+					if (!nextNode.check()) {
 						// Found a problematic path :-)
 						throw new BadTraceException(path_nodes);
 					}

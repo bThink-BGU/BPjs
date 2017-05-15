@@ -45,13 +45,13 @@ bp.registerBThread("Stick between P1 and P2", function() {
 		var e = bsync({ waitFor : [ P1R, P2L ], block : [ R1R, R2L ] }).name; 
 
 		var wt = (e.equals(P1R.name)) ? R1R : R2L;
-		bsync({ waitFor : wt, block : [ P1R, P2L ] });  // // <-- wt=Rel1R
+		bsync({ waitFor : wt, block : [ P1R, P2L ] });  
 	}
 });
 
 bp.registerBThread("Stick between P2 and P1", function() {
 	while (true) {
-		var e = bsync({ waitFor : [ P1L, P2R ], block : [ R1L, R2R ] }).name; // <--
+		var e = bsync({ waitFor : [ P1L, P2R ], block : [ R1L, R2R ] }).name; 
 
 		var wt = (e.equals(P1L.name)) ? R1L : R2R;
 		bsync({ waitFor : wt, block : [ P1L, P2R ] });
