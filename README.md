@@ -35,8 +35,8 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Documentation
 
-* [Tutorial and Reference](http://readthedocs.org/projects/bpjs/badge/?version=develop)](http://bpjs.readthedocs.io/en/develop/)
-* [API Javadocs](https://img.shields.io/badge/javadocs-browse-green.svg)](http://www.javadoc.io/doc/com.github.bthink-bgu/BPjs/)
+* [Tutorial and Reference](http://bpjs.readthedocs.io/en/develop/)
+* [API Javadocs](http://www.javadoc.io/doc/com.github.bthink-bgu/BPjs/)
 
 ## Change log for the BPjs library.
 
