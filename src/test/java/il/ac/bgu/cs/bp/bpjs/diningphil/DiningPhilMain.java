@@ -21,7 +21,7 @@ public class DiningPhilMain {
 
 			System.out.println("No error :-)");
 		} catch (Exception e) {
-			e.printStackTrace();
+			e.printStackTrace(System.out);
 		}
 
 		System.out.println("Scanned " + count + " states");

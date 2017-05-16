@@ -16,7 +16,7 @@ a link to this page somewhere in the documentation/system about section.
 ---
 
 ## Getting BPjs
-* From Maven: Add as dependency to a Maven project. Note that the version number changes.
+* For Maven projects: Add bpjs as dependency. Note that the version number changes.
 
 ````
 <dependencies>
@@ -33,7 +33,15 @@ a link to this page somewhere in the documentation/system about section.
 * Clone, fork, or download the [starting project](https://github.com/bThink-BGU/SampleBPjsProject).
 * Download the `.jar` files directly from [Maven Central](https://repo.maven.apache.org/maven2/com/github/bthink-bgu/BPjs/).
 
+## Documentation
+
+* [Tutorial and Reference](http://readthedocs.org/projects/bpjs/badge/?version=develop)](http://bpjs.readthedocs.io/en/develop/)
+* [API Javadocs](https://img.shields.io/badge/javadocs-browse-green.svg)](http://www.javadoc.io/doc/com.github.bthink-bgu/BPjs/)
+
 ## Change log for the BPjs library.
+
+## 2017-05-16
+* :sparkles: README includes a more prominent reference to the documentation.
 
 ## 2017-05-10
 * :sparkles: Added an adapter class for `BProgramListener`.
