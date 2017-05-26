@@ -30,12 +30,12 @@ public class DiningPhilMain {
 
 	// Iterative DFS using stack
 	public static void dfsUsingStack(Node node) throws Exception {
-		Stack<Node> path_nodes = new Stack<>();
-		Set<Node> visited_nodes = new HashSet<>();
+		Stack<Node> path_nodes = new Stack<>();	//The bad trace
+		Set<Long> visited_nodes = new HashSet<>();	//All the visited nodes' id
 
-		visited_nodes.add(node);
+		visited_nodes.add(node.getId());
 		path_nodes.add(node);
-
+				
 		while (!path_nodes.isEmpty()) {
 
 			node = path_nodes.peek();
@@ -49,11 +49,13 @@ public class DiningPhilMain {
 				BEvent e = node.getEventIterator().next();
 
 				Node nextNode = node.getNextNode(e);
-				if (!visited_nodes.contains(nextNode)) {
+				if (!visited_nodes.contains(nextNode.getId())) {
 					count++;
 					flag = true;
-
-					visited_nodes.add(nextNode);
+					
+					System.out.println("---->node.getId(): "+ node.getId());
+					
+					visited_nodes.add(nextNode.getId());
 					path_nodes.add(nextNode);
 
 					if (!nextNode.check()) {
@@ -72,5 +74,52 @@ public class DiningPhilMain {
 		}
 
 	}
+	
+	//Works with N=4
+	
+	// Iterative DFS using stack
+//	public static void dfsUsingStack(Node node) throws Exception {
+//		Stack<Node> path_nodes = new Stack<>();	//The bad trace
+//		Set<Node> visited_nodes = new HashSet<>();	//All the visited nodes
+//
+//		visited_nodes.add(node);
+//		path_nodes.add(node);
+//
+//		while (!path_nodes.isEmpty()) {
+//
+//			node = path_nodes.peek();
+//
+//			// This flag remains false if node doesn't have an unvisited
+//			// follower
+//			boolean flag = false;
+//
+//			loop: while (node.getEventIterator().hasNext()) {
+//
+//				BEvent e = node.getEventIterator().next();
+//
+//				Node nextNode = node.getNextNode(e);
+//				if (!visited_nodes.contains(nextNode)) {
+//					count++;
+//					flag = true;
+//
+//					visited_nodes.add(nextNode);
+//					path_nodes.add(nextNode);
+//
+//					if (!nextNode.check()) {
+//						// Found a problematic path :-)
+//						throw new BadTraceException(path_nodes);
+//					}
+//
+//					break loop;
+//				}
+//
+//			}
+//
+//			if (!flag) {
+//				path_nodes.pop();
+//			}
+//		}
+//
+//	}
 
 }
