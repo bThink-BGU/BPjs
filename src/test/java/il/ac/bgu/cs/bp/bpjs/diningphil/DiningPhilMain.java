@@ -9,7 +9,7 @@ import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 
 public class DiningPhilMain {
 
-	public final static long MAX_PATH = 6;
+	public final static long MAX_PATH = 100;
 
 	private static long count = 1;
 
