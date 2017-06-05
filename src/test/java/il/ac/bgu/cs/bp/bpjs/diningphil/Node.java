@@ -12,21 +12,21 @@ import il.ac.bgu.cs.bp.bpjs.eventselection.SimpleEventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.search.BProgramSyncSnapshotCloner;
 
 public class Node {
+	
 	private BProgramSyncSnapshot systemState;
-
 	private BProgram bp;
-
 	private Set<BEvent> possibleEvents;
-	// private BProgramSyncSnapshot seed;
 	private BEvent lastEvent;
 	private static EventSelectionStrategy ess = new SimpleEventSelectionStrategy();
-
 	private Iterator<BEvent> iterator;
+	
+	private static long id = 0;	//new added
 
 	protected Node(BProgram bp, BProgramSyncSnapshot systemState, BEvent e) {
 		this.bp = bp;
 		this.systemState = systemState;
 		this.lastEvent = e;
+		this.id++;
 
 		possibleEvents = ess.selectableEvents(systemState.getStatements(), systemState.getExternalEvents());
 		iterator = possibleEvents.iterator();
@@ -103,6 +103,14 @@ public class Node {
 			return ((Node) obj).stateString().equals(stateString());
 		else
 			return false;
+	}
+
+	public static long getId() {
+		return id;
+	}
+
+	public static void setId(long id) {
+		Node.id = id;
 	}
 
 }
