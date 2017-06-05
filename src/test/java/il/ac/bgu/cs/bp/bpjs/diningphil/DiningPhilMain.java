@@ -17,7 +17,7 @@ public class DiningPhilMain {
 
 		long start=System.currentTimeMillis();;
 
-		// DFS
+		
 		try {
 			dfsUsingStack(Node.getInitialNode(bprog));
 

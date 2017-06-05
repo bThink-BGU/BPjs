@@ -1,4 +1,6 @@
-N = 5;
+N = 4;
+
+bp.log.info('Dinning philosophers with '+N+' philosophers')
 
 addPhil = function(i) {
 	bp.registerBThread("Phil" + i, function() {
