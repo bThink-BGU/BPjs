@@ -20,14 +20,11 @@ public class Node {
 	private static EventSelectionStrategy ess = new SimpleEventSelectionStrategy();
 	private Iterator<BEvent> iterator;
 	
-	private static long id = 0;	//new added
-
 	protected Node(BProgram bp, BProgramSyncSnapshot systemState, BEvent e) {
 		this.bp = bp;
 		this.systemState = systemState;
 		this.lastEvent = e;
-		this.id++;
-
+	
 		possibleEvents = ess.selectableEvents(systemState.getStatements(), systemState.getExternalEvents());
 		iterator = possibleEvents.iterator();
 	}
@@ -92,25 +89,39 @@ public class Node {
 		return iterator;
 	}
 
+	String stateString;
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
 	@Override
 	public int hashCode() {
-		return stateString().hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((systemState == null) ? 0 : systemState.hashCode());
+		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (obj instanceof Node)
-			return ((Node) obj).stateString().equals(stateString());
-		else
+		if (this == obj)
+			return true;
+		if (obj == null)
 			return false;
+		if (!(obj instanceof Node))
+			return false;
+		Node other = (Node) obj;
+		if (systemState == null) {
+			if (other.systemState != null)
+				return false;
+		} else if (!systemState.equals(other.systemState))
+			return false;
+		return true;
 	}
-
-	public static long getId() {
-		return id;
-	}
-
-	public static void setId(long id) {
-		Node.id = id;
-	}
+	
+	
 
 }
