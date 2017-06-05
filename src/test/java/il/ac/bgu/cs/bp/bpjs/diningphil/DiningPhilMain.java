@@ -9,11 +9,13 @@ import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 
 public class DiningPhilMain {
 
-	private static long count=1;
+	private static long count = 1;
 
 	public static void main(String[] args) throws InterruptedException {
 		// Create a program
 		final SingleResourceBProgram bprog = new SingleResourceBProgram("BPJSDiningPhil.js");
+
+		long start=System.currentTimeMillis();;
 
 		// DFS
 		try {
@@ -25,6 +27,7 @@ public class DiningPhilMain {
 		}
 
 		System.out.println("Scanned " + count + " states");
+		System.out.println("Time:" + (System.currentTimeMillis() - start)/1000 + " seconds");
 
 	}
 

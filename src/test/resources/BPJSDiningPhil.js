@@ -1,4 +1,4 @@
-N = 4;
+N = 5;
 
 addPhil = function(i) {
 	bp.registerBThread("Phil" + i, function() {
@@ -26,16 +26,21 @@ addStick = function(i) {
 				while (true) {
 					var e = bsync({
 						waitFor : [ bp.Event("Pick" + i + "R"),
-								bp.Event("Pick" + j + "L") ],
+								    bp.Event("Pick" + j + "L") ],
+								    
 						block : [ bp.Event("Rel" + i + "R"),
-								bp.Event("Rel" + j + "L") ] }).name;
+								  bp.Event("Rel" + j + "L") ], 
+					}).name;
 
-					var wt = (e.equals("Pick" + i + "R")) ? "Rel" + i + "R"
-							: "Rel" + j + "L";
+					var wt = (e.equals("Pick" + i + "R")) ? "Rel" + i + "R"	: "Rel" + j + "L";
+					
 					bsync({
 						waitFor : bp.Event(wt),
+						
 						block : [ bp.Event("Pick" + i + "R"),
-								bp.Event("Pick" + j + "L") ] });
+								  bp.Event("Pick" + j + "L") ] }
+					);
+					
 				}
 			})
 };
