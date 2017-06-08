@@ -221,20 +221,15 @@ public class BProgramSyncSnapshot {
         }
     }
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 		BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(getBProgram());
 		return io.hashCode();
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
+        
 		BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(((BProgramSyncSnapshot)obj).getBProgram());
 		return io.equals(getBProgram());
 	}
