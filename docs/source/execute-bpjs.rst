@@ -26,7 +26,7 @@ The example below executes the code from f1.js and the clipboard. ``pbpaste`` is
 From Java Code
 ---------------------
 
-.. todo:: write this
+BPjs programs can be embedded in larger Java (or any JVM langauge) applications. To learn how to run and interact with a BPjs program from a host application, see :doc:`embed-bpjs`.
 
 
 .. _Java: https://www.java.com/en/
