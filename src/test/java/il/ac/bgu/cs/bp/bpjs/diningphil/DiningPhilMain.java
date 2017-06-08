@@ -52,7 +52,7 @@ public class DiningPhilMain {
 				if (!visited_nodes.contains(nextNode)) {
 					count++;
 					flag = true;
-
+                    
 					visited_nodes.add(nextNode);
 					path_nodes.add(nextNode);
 
