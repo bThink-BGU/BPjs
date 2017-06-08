@@ -5,6 +5,9 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.tasks.ResumeBThread;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.tasks.StartBThread;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.search.BProgramSyncSnapshotCloner;
+import il.ac.bgu.cs.bp.bpjs.search.BProgramSyncSnapshotIO;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
@@ -217,5 +220,23 @@ public class BProgramSyncSnapshot {
             added = bprog.drainRecentlyRegisteredBthreads();
         }
     }
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#hashCode()
+	 */
+	@Override
+	public int hashCode() {
+		BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(getBProgram());
+		return io.hashCode();
+	}
+
+	/* (non-Javadoc)
+	 * @see java.lang.Object#equals(java.lang.Object)
+	 */
+	@Override
+	public boolean equals(Object obj) {
+		BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(((BProgramSyncSnapshot)obj).getBProgram());
+		return io.equals(getBProgram());
+	}
 
 }

@@ -1,5 +1,38 @@
 /* global bp, bsync */
-N = 4;
+N = 5;
+
+bp.log.info('Dinning philosophers with ' + N + ' philosophers')
+
+
+addStick = function(i) {
+	var j = (i % N) + 1;
+
+	bp.registerBThread("Stick " + i,
+			function() {
+				while (true) {
+					var e = bsync({
+						waitFor : [ bp.Event("Pick" + i + "R"),
+								bp.Event("Pick" + j + "L") ],
+
+						block : [ bp.Event("Rel" + i + "R"), 
+								bp.Event("Rel" + j + "L") ], }).name;
+
+					var wt = (e.equals("Pick" + i + "R")) ? "Rel" + i + "R"
+							: "Rel" + j + "L";
+
+					bsync({
+						waitFor : bp.Event(wt),
+
+						block : [ bp.Event("Pick" + i + "R"),
+								bp.Event("Pick" + j + "L") ] });
+					
+					wt = "";
+					e = "";
+				}
+			});
+};
+
+
 
 addPhil = function(i) {
 	bp.registerBThread("Phil" + i, function() {
@@ -19,29 +52,8 @@ addPhil = function(i) {
 	});
 };
 
-addStick = function(i) {
-	var j = (i % N) + 1;
-
-	bp.registerBThread("Stick " + i,
-			function() {
-				while (true) {
-					var e = bsync({
-						waitFor : [ bp.Event("Pick" + i + "R"),
-								    bp.Event("Pick" + j + "L") ],
-						block : [ bp.Event("Rel" + i + "R"),
-								  bp.Event("Rel" + j + "L") ] }).name;
-
-					var wt = (e.equals("Pick" + i + "R")) ? "Rel" + i + "R"
-							: "Rel" + j + "L";
-					bsync({
-						waitFor : bp.Event(wt),
-						block : [ bp.Event("Pick" + i + "R"),
-								  bp.Event("Pick" + j + "L") ] });
-				}
-			});
-};
 
 for (i = 1; i <= N; i++) {
-	addPhil(i);
 	addStick(i);
+	addPhil(i);
 }
