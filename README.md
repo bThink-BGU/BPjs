@@ -12,7 +12,7 @@ This repository contains a javascript-based [BP](http://www.b-prog.org) library.
 * BPjs is open sourced under the [MIT license](http://www.opensource.org/licenses/mit-license.php). If you use it in a system, please provide
 a link to this page somewhere in the documentation/system about section.
 * BPjs uses the Mozilla Rhino Javascript engine. See [here](https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino) for project page and source code.
-  
+
 ---
 
 ## Getting BPjs
@@ -35,6 +35,7 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Documentation
 
+* [Introductory Presentation](https://www.slideshare.net/MichaelBarSinai/introducing-bpjs-web)
 * [Tutorial and Reference](http://bpjs.readthedocs.io/en/develop/)
 * [API Javadocs](http://www.javadoc.io/doc/com.github.bthink-bgu/BPjs/)
 
@@ -58,7 +59,7 @@ a link to this page somewhere in the documentation/system about section.
 
 * :sparkles: New architecture: Running logic moved from `BProgram` to `BProgramRunner` - ongoing.
 * :sparkles: `BProgramListener`s notified before BPrograms are started.
-* :bug: Fixed a bug where dynamically added b-threads that were added by other dynamically added b-threads would run one cycle too late. 
+* :bug: Fixed a bug where dynamically added b-threads that were added by other dynamically added b-threads would run one cycle too late.
 * :bug: Fixed a bug where external events enqueued from top-level JS code where ignored.
 
 ### 2017-03-21
