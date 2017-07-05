@@ -27,7 +27,6 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramListener;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionResult;
 import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionStrategy;
-import il.ac.bgu.cs.bp.bpjs.eventselection.SimpleEventSelectionStrategy;
 import java.util.ArrayList;
 import static java.util.Collections.reverseOrder;
 import java.util.List;
@@ -43,19 +42,13 @@ import java.util.Set;
 public class BProgramRunner {
     
     private BProgram bprog = null;
-    private EventSelectionStrategy eventSelectionStrategy;
     private final List<BProgramListener> listeners = new ArrayList<>();
     
     public BProgramRunner(){
         this(null);
     }
     public BProgramRunner(BProgram aBProgram) {
-        this( aBProgram, new SimpleEventSelectionStrategy() );
-    }
-    
-    public BProgramRunner(BProgram aBProgram, EventSelectionStrategy ess) {
         bprog = aBProgram;
-        eventSelectionStrategy = ess;
         if ( bprog!=null ) {
             bprog.setAddBThreadCallback( (bp,bt)->listeners.forEach(l->l.bthreadAdded(bp, bt)));
         }
@@ -81,7 +74,7 @@ public class BProgramRunner {
             }
             
             // see which events are selectable
-            Set<BEvent> possibleEvents = eventSelectionStrategy.selectableEvents(cur.getStatements(), cur.getExternalEvents());
+            Set<BEvent> possibleEvents = bprog.getEventSelectionStrategy().selectableEvents(cur.getStatements(), cur.getExternalEvents());
             if ( possibleEvents.isEmpty() ) {
                 // No events available or selection. Terminate or wait for external one (in daemon mode).
                 if ( bprog.isDaemonMode() ) {
@@ -101,7 +94,7 @@ public class BProgramRunner {
                 
             } else {
                 // we can select some events - select one and advance.
-                Optional<EventSelectionResult> res = eventSelectionStrategy.select(cur.getStatements(), cur.getExternalEvents(), possibleEvents);
+                Optional<EventSelectionResult> res = bprog.getEventSelectionStrategy().select(cur.getStatements(), cur.getExternalEvents(), possibleEvents);
 
                 if ( res.isPresent() ) {
                     EventSelectionResult esr = res.get();
@@ -156,12 +149,4 @@ public class BProgramRunner {
         listeners.remove(aListener);
     }
 
-    public EventSelectionStrategy getEventSelectionStrategy() {
-        return eventSelectionStrategy;
-    }
-
-    public void setEventSelectionStrategy(EventSelectionStrategy eventSelectionStrategy) {
-        this.eventSelectionStrategy = eventSelectionStrategy;
-    }
-    
 }

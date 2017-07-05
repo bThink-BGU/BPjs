@@ -27,7 +27,9 @@ public class LoggingEventSelectionStrategyDecoratorTest {
     public void superStepTest() throws InterruptedException {
         StringWriter strOut = new StringWriter();
         LoggingEventSelectionStrategyDecorator sut = new LoggingEventSelectionStrategyDecorator(new SimpleEventSelectionStrategy(), new PrintWriter(strOut));
-        BProgramRunner runner = new BProgramRunner(new SingleResourceBProgram("HotNCold.js"), sut);
+        SingleResourceBProgram bp = new SingleResourceBProgram("HotNCold.js");
+        bp.setEventSelectionStrategy(sut);
+        BProgramRunner runner = new BProgramRunner(bp);
         runner.addListener( new StreamLoggerListener() );
         InMemoryEventLoggingListener eventLogger = runner.addListener( new InMemoryEventLoggingListener() );
         

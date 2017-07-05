@@ -2,6 +2,8 @@ package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionStrategy;
+import il.ac.bgu.cs.bp.bpjs.eventselection.SimpleEventSelectionStrategy;
 
 import java.util.*;
 import java.util.concurrent.*;
@@ -79,6 +81,8 @@ public abstract class BProgram {
 
     protected Scriptable programScope;
     
+    private EventSelectionStrategy eventSelectionStrategy;
+    
     /**
      * Objects that client code wishes to put in scope before the scope is 
      * initialized are collected here.
@@ -86,13 +90,31 @@ public abstract class BProgram {
     protected Map<String,Object> initialScopeValues = new HashMap<>();
     
     private Optional<BProgramCallback> addBThreadCallback = Optional.empty();
-
+    
+    /**
+     * Constructs a BProgram with a default name, guaranteed to be unique within 
+     * a given run.
+     */
     public BProgram() {
         this("BProgram-" + INSTANCE_COUNTER.incrementAndGet());
     }
 
+    /**
+     * Constructs a BProgram with a specific name.
+     * @param aName name for the new BProgram.
+     */
     public BProgram(String aName) {
         name = aName;
+    }
+    
+    /**
+     * Creates a BProgram with a specific name and an event selection strategy.
+     * @param aName Name for the program.
+     * @param anEss Event selection strategy.
+     */
+    public BProgram( String aName, EventSelectionStrategy anEss ) {
+        name = aName;
+        eventSelectionStrategy = anEss;
     }
 
     /**
@@ -198,6 +220,10 @@ public abstract class BProgram {
         }
         Set<BThreadSyncSnapshot> bthreads = drainRecentlyRegisteredBthreads();
         
+        if ( eventSelectionStrategy==null ) {
+            eventSelectionStrategy = new SimpleEventSelectionStrategy();
+        }
+        
         try {
             Context cx = ContextFactory.getGlobal().enterContext();
             cx.setOptimizationLevel(-1); // must use interpreter mode
@@ -206,6 +232,7 @@ public abstract class BProgram {
         } finally {
             Context.exit();
         }
+        
         started = true;
         return new BProgramSyncSnapshot(this, bthreads, Collections.emptyList());
     }
@@ -357,6 +384,14 @@ public abstract class BProgram {
 
     public void setAddBThreadCallback(BProgramCallback anAddBThreadCallback) {
         addBThreadCallback = Optional.ofNullable(anAddBThreadCallback);
+    }
+
+    public EventSelectionStrategy getEventSelectionStrategy() {
+        return eventSelectionStrategy;
+    }
+
+    public void setEventSelectionStrategy(EventSelectionStrategy eventSelectionStrategy) {
+        this.eventSelectionStrategy = eventSelectionStrategy;
     }
     
     @Override

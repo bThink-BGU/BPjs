@@ -84,9 +84,9 @@ public class RunFile {
             SimpleEventSelectionStrategy sess = new SimpleEventSelectionStrategy();
             EventSelectionStrategy ess = switchPresent("-v", args) ? new LoggingEventSelectionStrategyDecorator(sess) : sess;
 
-            System.out.println(ess);
+            bpp.setEventSelectionStrategy(ess);
             
-            BProgramRunner bpr = new BProgramRunner(bpp, ess);
+            BProgramRunner bpr = new BProgramRunner(bpp);
             if ( ! switchPresent("-v", args) ) {
                 bpr.addListener(new StreamLoggerListener());
             }

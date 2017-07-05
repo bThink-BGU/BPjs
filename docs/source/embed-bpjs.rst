@@ -14,7 +14,7 @@ The BP code (top layer) is the BPjs code, written in Javascript. It can interact
 the BPjs runtime using the :doc:`BPjsTutorial/bp-object`. The host application can make
 other Java objects available to the Javascript code, as will be explained later.
 
-The BPjs layer serves as a runtime environment to the BProgram. The host application has
+The BPjs layer serves as a runtime environment for the BProgram. The host application has
 to instantiate a ``BProgram`` object, and pass it to a ``BProgramRunner``. The host application
 can listen to events of the running b-program (such as start, end, b-thread added, and - of course - b-event selected).
 Additionally, the host application can provide custom event selection strategy, in case
@@ -38,8 +38,8 @@ the default one it not good enough.
   :align: center
 
   Class diagram describing the strucutre of an embedded b-program. The client code
-  generates a BProgram and a BProgramRunner. The runner object consults its event
-  selection strategy when selecting events for the b-program it runs. A list of
+  generates a BProgram and a BProgramRunner. The runner object consults the b-program's
+  event selection strategy when selecting events for the b-program it runs. A list of
   listener objects are informed whenever an event of interest, such as b-thread
   addition or b-event selection, occures.
   *Some methods and properties have been omitted for brevity.*
@@ -60,18 +60,26 @@ Steps for B-Program Embedding
 Code setup
 ~~~~~~~~~~
 
-* Add BPjs to your classpath. See :doc:`install-bpjs`.
-* Decide which ``BProgram`` subclass you need. `BProgram`_ is an abstract class. Its concrete sub-classes differ on how they obtain their source code. `SingleResourceBProgram`_ reads the code from a resource included with the code (typlically, a .js file bundled in the project's .jars). `StringBProgram`_, on the other hand, takes a Java String as source. Of course, ``BProgram`` can be directly extended as needed.
-* Write the BPjs code. The code will interact with the runtime using th ``bp`` object. Additional Java classes can be made available to it by using Rhino's `import directives`_, or by adding Java objects to the program's scope (see below).
+Add BPjs to your classpath.
+
+  See :doc:`install-bpjs`.
+
+Decide which ``BProgram`` subclass you need.
+
+  `BProgram`_ is an abstract class. Its concrete sub-classes differ on how they obtain their source code. `SingleResourceBProgram`_ reads the code from a resource included with the code (typlically, a .js file bundled in the project's .jars). `StringBProgram`_, on the other hand, takes a Java String as source. Of course, ``BProgram`` can be directly extended as needed.
+
+Write the BPjs code.
+
+  The code will interact with the runtime using the ``bp`` object. Additional Java classes can be made available to it by using Rhino's `import directives`_, or by adding Java objects to the program's scope (see below).
 
 At Runtime
 ~~~~~~~~~~
 
 * Instantiate the proper ``BProgram`` sub-class, and supply it with the source BPjs code.
+* If needed, set a new ``EventSelectionStrategy``. When no strategy is supplied, SimpleEventSelectionStrategy_ will by used. This strategy randomly selects an event from the set of events that are requested and not blocked.
 * If needed, add Java objects to the global b-program scope using `putInGlobalScope`_.
 * Instantiate a ``BProgramRunner`` object, and supply it with the ``BProgram`` instance.
-* If needed, set a new EventSelectionStrategy
-* Add listeners
+* Add listeners to the runner.
 * In the common case when the program needs to wait for external events (such as GUI interactions), set the ``isDaemon`` property of the ``BProgram`` to ``true``.
 * Call ``BProgramRunner::start()``.
 
@@ -80,6 +88,9 @@ The BProgram will start running. Lifecycle and behavioral events will be passed 
 .. tip::
   BPjs' source code contains many examples of embedded BPjs programs - most of the unit tests that involve a b-program. For a more complete example, refer to the `RunFile`_ class, which implements the command-line tool for running BPjs code.
 
+.. tip::
+  SampleBPjsProject_ can serve as a template project for embedding BPjs in a Java application. You can fork it on GitHub and start building your application from there.
+
 .. _import directives: https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino/Scripting_Java
 .. _BProgram: http://static.javadoc.io/com.github.bthink-bgu/BPjs/0.8.4/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/BProgram.html
 .. _SingleResourceBProgram: http://static.javadoc.io/com.github.bthink-bgu/BPjs/0.8.4/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/SingleResourceBProgram.html
@@ -87,3 +98,5 @@ The BProgram will start running. Lifecycle and behavioral events will be passed 
 .. _putInGlobalScope: http://static.javadoc.io/com.github.bthink-bgu/BPjs/0.8.4/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/BProgram.html#putInGlobalScope-java.lang.String-java.lang.Object-
 .. _enqueueExternalEvent: http://static.javadoc.io/com.github.bthink-bgu/BPjs/0.8.4/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/BProgram.html#enqueueExternalEvent-il.ac.bgu.cs.bp.bpjs.events.BEvent-
 .. _RunFile: https://github.com/bThink-BGU/BPjs/blob/develop/src/main/java/il/ac/bgu/cs/bp/bpjs/mains/RunFile.java
+.. _SimpleEventSelectionStrategy: http://static.javadoc.io/com.github.bthink-bgu/BPjs/0.8.4/il/ac/bgu/cs/bp/bpjs/eventselection/SimpleEventSelectionStrategy.html
+.. _SampleBPjsProject: https://github.com/bThink-BGU/SampleBPjsProject

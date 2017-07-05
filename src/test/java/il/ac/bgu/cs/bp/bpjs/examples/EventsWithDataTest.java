@@ -23,8 +23,8 @@ public class EventsWithDataTest {
 
     @Test
     public void testEventsWithData() throws Exception {
-        BProgram bpr = new SingleResourceBProgram( "EventsWithData.js", "programName" );
-        BProgramRunner rnr = new BProgramRunner(bpr, new SimpleEventSelectionStrategy(99l));
+        BProgram bpr = new SingleResourceBProgram( "EventsWithData.js", "programName", new SimpleEventSelectionStrategy(99l) );
+        BProgramRunner rnr = new BProgramRunner(bpr);
         rnr.addListener( new StreamLoggerListener() );
         InMemoryEventLoggingListener events = rnr.addListener( new InMemoryEventLoggingListener() );
         

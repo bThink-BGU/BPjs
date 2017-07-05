@@ -29,7 +29,7 @@ interface BProgramListener {
 
 clientCode .right.> BProgramRunner : manages
 BProgramRunner "1" *--> "1" BProgram
-BProgramRunner "1" *--> "1" EventSelectionStrategy
+BProgram "1" *--> "1" EventSelectionStrategy
 BProgramRunner     o--> "0..*" BProgramListener
 
 @enduml
