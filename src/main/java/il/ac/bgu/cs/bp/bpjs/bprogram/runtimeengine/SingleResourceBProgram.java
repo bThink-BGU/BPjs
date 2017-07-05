@@ -29,12 +29,12 @@ public class SingleResourceBProgram extends BProgram {
         super(aName);
         resourceName = aResourceName;
     }
-
-    public SingleResourceBProgram(String aResourceName, String aName, EventSelectionStrategy anEventSelectionStrategy) {
-        super(aName, anEventSelectionStrategy);
+   
+    public SingleResourceBProgram(String aResourceName, String aName, EventSelectionStrategy ess) {
+        super(aName, ess);
         resourceName = aResourceName;
     }
-
+    
     @Override
     protected void setupProgramScope(Scriptable scope) {
         evaluateResource( resourceName );

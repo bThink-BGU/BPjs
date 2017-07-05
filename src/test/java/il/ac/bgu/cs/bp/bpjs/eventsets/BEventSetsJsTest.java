@@ -5,6 +5,7 @@ package il.ac.bgu.cs.bp.bpjs.eventsets;
 
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import java.util.HashMap;
 import java.util.Map;
 import static org.junit.Assert.assertFalse;
@@ -25,7 +26,7 @@ public class BEventSetsJsTest {
     Map<String, EventSet> eventSets = new HashMap<>();
     
     @Before
-    public void setUp() {
+    public void setUp() throws InterruptedException {
         prog = new BProgram() {
             @Override
             protected void setupProgramScope(Scriptable aScope) {
@@ -56,13 +57,12 @@ public class BEventSetsJsTest {
                         "inline script" );
             }
         };
+        new BProgramRunner(prog).start();
     }
     
 
     @Test
     public void testContains_Name() throws InterruptedException {
-        prog.start(); // evaluate the Javascript code.
-        
         BEvent eName = events.get("eName");
         BEvent eNotName = events.get("eNotName");
         EventSet esName = eventSets.get("esName");
@@ -75,8 +75,6 @@ public class BEventSetsJsTest {
     
     @Test
     public void testContains_Data() throws Exception {
-        prog.start(); // evaluate the Javascript code.
-        
         BEvent eVizObj = events.get("eVizObj");
         BEvent eViz = events.get("eViz");
         BEvent eName = events.get("eName");

@@ -1,18 +1,13 @@
 package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.tasks.ResumeBThread;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.tasks.StartBThread;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.exceptions.BProgramException;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionStrategy;
+import il.ac.bgu.cs.bp.bpjs.eventselection.SimpleEventSelectionStrategy;
 
 import java.util.*;
 import java.util.concurrent.*;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramListener;
-import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionResult;
-import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionStrategy;
-import il.ac.bgu.cs.bp.bpjs.eventselection.SimpleEventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsCodeEvaluationException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
 import java.io.BufferedReader;
@@ -20,27 +15,25 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
-import static java.util.stream.Collectors.toList;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Scriptable;
-import static java.util.stream.Collectors.toSet;
-import static java.util.Collections.reverseOrder;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.WrappedException;
 
 /**
- * Base class for BPrograms. Contains the logic for managing {@link BThreadSyncSnapshot}s
- * and the main event loop. Concrete BProgram extend this class by implementing 
+ * Base class for BPrograms. Provides the context (Javascript scope, external 
+ * event queue, etc.) bthreads interact with while running.
+ * Concrete BProgram extend this class by implementing 
  * the {@link #setupProgramScope(org.mozilla.javascript.Scriptable)} method.
  * 
  * <p>
  * For creating a BProgram that uses a single Javascript file available in the
- * classpath, see {@link SingleResourceBProgram}.
+ * classpath, see {@link SingleResourceBProgram}. For creating them from a 
+ * hard-coded string, see {@link StringBProgram}.
  *
  * @author michael
  */
@@ -52,19 +45,20 @@ public abstract class BProgram {
      * "Poison pill" to insert to the external event queue. Used only to turn the
      * daemon mode off.
      */
-    private static final BEvent NO_MORE_DAEMON = new BEvent("NO_MORE_DAEMON");
+    static final BEvent NO_MORE_DAEMON = new BEvent("NO_MORE_DAEMON");
     
     /** Counter for giving anonymous instances some semantic name. */
     private static final AtomicInteger INSTANCE_COUNTER = new AtomicInteger();
 
+    /**
+     * A callback interface invoked when a b-thread is added to {@code this}.
+     */
+    public interface BProgramCallback {
+        void bthreadAdded(BProgram bp, BThreadSyncSnapshot theBThread);
+    }
+
     // ------------- Instance Members ---------------
     
-    /**
-     * Snapshots of participating BThreads, when in bsync point.
-     */
-    protected Set<BThreadSyncSnapshot> bthreads;
-    private Set<BThreadSyncSnapshot> nextRoundBthreads;
-
     private String name;
 
     /**
@@ -72,8 +66,6 @@ public abstract class BProgram {
      * internal ones are available.
      */
     private boolean daemonMode;
-    private final ExecutorService executor = new ForkJoinPool();
-    private EventSelectionStrategy eventSelectionStrategy;
 
     /**
      * Events are enqueued here by external threads
@@ -81,193 +73,48 @@ public abstract class BProgram {
     private final BlockingQueue<BEvent> recentlyEnqueuedExternalEvents = new LinkedBlockingQueue<>();
 
     /**
-     * At the BProgram's leisure, the external event are moved here, where they
-     * can be managed.
-     */
-    private final List<BEvent> enqueuedExternalEvents = new LinkedList<>();
-
-    /**
      * BThreads added between bsyncs are added here.
      */
     private final BlockingQueue<BThreadSyncSnapshot> recentlyRegisteredBthreads = new LinkedBlockingDeque<>();
 
-    private final List<BProgramListener> listeners = new ArrayList<>();
-
     private volatile boolean started = false;
 
     protected Scriptable programScope;
-
+    
+    private EventSelectionStrategy eventSelectionStrategy;
+    
+    /**
+     * Objects that client code wishes to put in scope before the scope is 
+     * initialized are collected here.
+     */
+    protected Map<String,Object> initialScopeValues = new HashMap<>();
+    
+    private Optional<BProgramCallback> addBThreadCallback = Optional.empty();
+    
+    /**
+     * Constructs a BProgram with a default name, guaranteed to be unique within 
+     * a given run.
+     */
     public BProgram() {
         this("BProgram-" + INSTANCE_COUNTER.incrementAndGet());
     }
 
-    public BProgram(String aName) {
-        this(aName, new SimpleEventSelectionStrategy());
-    }
-
-    public BProgram(String aName, EventSelectionStrategy anEventSelectionStrategy) {
-        name = aName;
-        bthreads = new HashSet<>();
-        eventSelectionStrategy = anEventSelectionStrategy;
-    }
-
-    public void start() throws InterruptedException {
-        try {
-            setup();
-            listeners.forEach(l -> l.started(this));
-            started = true;
-            
-            addToNextRound(executor.invokeAll(bthreads.stream()
-                    .map(bt -> new StartBThread(bt))
-                    .collect(toList())));
-            addToNextRound(startRecentlyRegisteredBThreads());
-            finalizeRound();
-            
-            if (bthreads.isEmpty()) {
-                // super corner case, where no bsyncs were called.
-                listeners.forEach(l -> l.ended(this));
-            } else {
-                do {
-                    mainEventLoop();
-                } while (isDaemonMode() && waitForExternalEvent());
-                listeners.forEach(l -> l.ended(this));
-            }
-        } catch ( WrappedException we ) {
-            throw new BProgramException("Failed to start program.", we.getCause());
-        }
-    }
-
     /**
-     * Advances the BProgram a single super-step, that is until there are no
-     * more internal events that can be selected.
-     *
-     * @throws InterruptedException If this thread is interrupted during the BProgram's execution.
+     * Constructs a BProgram with a specific name.
+     * @param aName name for the new BProgram.
      */
-    protected void mainEventLoop() throws InterruptedException {
-        boolean go = true;
-        while (go) {
-            // 1. Possibly select an event
-            recentlyEnqueuedExternalEvents.drainTo(enqueuedExternalEvents);
-            if (enqueuedExternalEvents.remove(NO_MORE_DAEMON)) {
-                daemonMode = false;
-            }
-            Set<BEvent> availableEvents = eventSelectionStrategy.selectableEvents(currentStatements(), enqueuedExternalEvents);
-            if ( availableEvents.isEmpty() ) {
-                go = false;
-            } else {
-                Optional<EventSelectionResult> res = eventSelectionStrategy.select(currentStatements(), enqueuedExternalEvents, availableEvents);
-
-                // 2.Trigger the event
-                if ( res.isPresent() ) {
-                    EventSelectionResult esr = res.get();
-                    try {
-                        esr.getIndicesToRemove().stream().sorted(reverseOrder())
-                                .forEach( idxObj -> enqueuedExternalEvents.remove(idxObj.intValue()) );
-                        triggerEvent(esr.getEvent());
-                        finalizeRound();
-                    } catch (InterruptedException ex) {
-                        throw new RuntimeException(ex);
-                    }
-                    if ( bthreads.isEmpty() ) {
-                        go = false; // no more BThreads left
-                    }
-                } else {
-                    go = false;
-                }
-            }
-        }
-        listeners.forEach(l -> l.superstepDone(this));
+    public BProgram(String aName) {
+        name = aName;
     }
     
     /**
-     * Awakens BThreads that waited for/requested this event in their last
-     * bsync, and waits for them to terminate.
-     *
-     * @param selectedEvent The event to trigger. Cannot be {@code null}.
-     * @throws InterruptedException If this thread is interrupted during the BProgram's execution
+     * Creates a BProgram with a specific name and an event selection strategy.
+     * @param aName Name for the program.
+     * @param anEss Event selection strategy.
      */
-    protected void triggerEvent( BEvent selectedEvent) throws InterruptedException {
-        if (selectedEvent == null) {
-            throw new IllegalArgumentException("Cannot trigger a null event.");
-        }
-        listeners.forEach(l -> l.eventSelected(this, selectedEvent));
-
-        bthreads.forEach(bt -> {
-            if (bt.getBSyncStatement() == null) {
-                System.err.println("SEVERE: " + bt.getName() + " Has null stmt");
-            }
-        });
-        
-        // We are about to execute Javascript code ////////////////
-        Context ctxt = Context.enter();
-        
-        Set<BThreadSyncSnapshot> brokenUpon = bthreads.stream()
-                .filter(bt -> bt.getBSyncStatement().getInterrupt().contains(selectedEvent))
-                .collect(toSet());
-
-        // Handle breakUpons
-        if (!brokenUpon.isEmpty()) {
-            bthreads.removeAll(brokenUpon);
-            brokenUpon.forEach(bt -> {
-                listeners.forEach(l -> l.bthreadRemoved(this, bt));
-                bt.getInterrupt()
-                      .ifPresent( func -> {
-                          final Scriptable scope = bt.getScope();
-                          scope.delete("bsync"); // can't call bsync from a break handler.
-                          try {
-                              ctxt.callFunctionWithContinuations(func, scope, new Object[]{selectedEvent});
-                          } catch ( ContinuationPending ise ) {
-                              throw new BProgramException("Cannot call bsync from a break-upon handler. Consider pushing an external event.");
-                          }
-                      });
-            });
-        }
-        
-        
-        // See who wakes up for the selected event and how skips this round.
-        Set<BThreadSyncSnapshot> resumingThisRound = new HashSet<>(bthreads.size());
-        Set<BThreadSyncSnapshot> sleepingThisRound = new HashSet<>(bthreads.size());
-        bthreads.forEach( snapshot -> {
-            (snapshot.getBSyncStatement().shouldWakeFor(selectedEvent) ? resumingThisRound : sleepingThisRound).add(snapshot);
-        });
-        
-        Context.exit();
-        
-        // Javascript code done ///////////////////////////////////
-        
-        // add the run results of all those who advance this stage
-        addToNextRound(executor.invokeAll(resumingThisRound.stream()
-                .map(bt -> new ResumeBThread(bt, selectedEvent))
-                .collect(toList())));
-        
-        // if any new bthreads are added, run and add them
-        addToNextRound(startRecentlyRegisteredBThreads());
-        
-        // carry over BThreads that did not advance this round to next round.
-        nextRoundBthreads.addAll(sleepingThisRound);
-    }
-
-    private List<Future<BThreadSyncSnapshot>> startRecentlyRegisteredBThreads() throws InterruptedException {
-        
-        // Setup the new BThread's scopes.
-        Set<BThreadSyncSnapshot> newThreads = new HashSet<>(recentlyRegisteredBthreads);
-        recentlyRegisteredBthreads.clear();
-        
-        try {
-            Context cx = ContextFactory.getGlobal().enterContext();
-            cx.setOptimizationLevel(-1); // must use interpreter mode
-            newThreads.forEach(this::setupAddedBThread);
-        } finally {
-            Context.exit();
-        }
-
-        // run the new BThreads.
-        final List<Future<BThreadSyncSnapshot>> result = executor.invokeAll(newThreads.stream()
-                .map(bt -> new StartBThread(bt))
-                .filter(Objects::nonNull)
-                .collect(toList()));
-        
-        return result;
+    public BProgram( String aName, EventSelectionStrategy anEss ) {
+        name = aName;
+        eventSelectionStrategy = anEss;
     }
 
     /**
@@ -338,44 +185,15 @@ public abstract class BProgram {
     }
     
     /**
-     * Creates a snapshot of the program, which includes the status of its BThreads, 
-     * and the enqueued external events.
-     * 
-     * <strong>
-     * This method will produce unexpected results when called while the program
-     * is not in BSync.
-     * </strong>
-     * @return A snapshot of the program.
-     */
-    public BProgramSyncSnapshot getSnapshot() {
-        return new BProgramSyncSnapshot(bthreads, enqueuedExternalEvents);
-    }
-
-    /**
      * Registers a BThread into the program. If the program started, the BThread
      * will take part in the current bstep.
      *
      * @param bt the BThread to be registered.
      */
     public void registerBThread(BThreadSyncSnapshot bt) {
-        listeners.forEach(l -> l.bthreadAdded(this, bt));
-        if (started) {
-            recentlyRegisteredBthreads.add(bt);
-        } else {
-            bthreads.add(bt);
-        }
-    }
-    
-    /**
-     * Creates a set with the current {@link BSyncStatement}s of the current
-     * BThreads.
-     *
-     * @return Set of current BSyncStatements.
-     */
-    public Set<BSyncStatement> currentStatements() {
-        return bthreads.stream()
-                .map(BThreadSyncSnapshot::getBSyncStatement)
-                .collect(toSet());
+        bt.setupScope(programScope);
+        recentlyRegisteredBthreads.add(bt);
+        addBThreadCallback.ifPresent( cb -> cb.bthreadAdded(this, bt));
     }
 
     /**
@@ -388,25 +206,35 @@ public abstract class BProgram {
     }
 
     /**
-     * Sets up internal data structures for running.
+     * Sets up the program scope and evaluates the program source.
+     * 
+     * <em>This method can only be called once per instance.</em>
+     * 
+     * @return a snapshot of the program, after source code was executed, and
+     *         before any registered b-threads have run.
+     * @throws IllegalStateException for repeated calls.
      */
-    protected void setup() {
+    public BProgramSyncSnapshot setup() {
+        if ( started ) { 
+            throw new IllegalStateException("Program already set up.");
+        }
+        Set<BThreadSyncSnapshot> bthreads = drainRecentlyRegisteredBthreads();
+        
+        if ( eventSelectionStrategy==null ) {
+            eventSelectionStrategy = new SimpleEventSelectionStrategy();
+        }
+        
         try {
             Context cx = ContextFactory.getGlobal().enterContext();
             cx.setOptimizationLevel(-1); // must use interpreter mode
             initProgramScope(cx);
-            setupBThreadScopes();
+            bthreads.forEach(bt -> bt.setupScope(programScope));
         } finally {
             Context.exit();
         }
-    }
-
-    protected void setupAddedBThread(BThreadSyncSnapshot bt) {
-        bt.setupScope(programScope);
-    }
-
-    protected void setupBThreadScopes() {
-        bthreads.forEach(bt -> bt.setupScope(programScope));
+        
+        started = true;
+        return new BProgramSyncSnapshot(this, bthreads, Collections.emptyList());
     }
 
     protected void initProgramScope(Context cx) {
@@ -419,7 +247,8 @@ public abstract class BProgram {
                 Context.javaToJS(proxy, programScope));
 
 //        evaluateResource("globalScopeInit.js"); <-- Currently not needed. Leaving in as we might need it soon.
-
+        initialScopeValues.entrySet().forEach(e->putInGlobalScope(e.getKey(), e.getValue()));
+        initialScopeValues=null;
         setupProgramScope(programScope);
     }
 
@@ -431,72 +260,23 @@ public abstract class BProgram {
      */
     protected abstract void setupProgramScope(Scriptable scope);
 
-    private boolean waitForExternalEvent() throws InterruptedException {
+    /**
+     * Blocks until an external event is added. Then, if that event
+     * is not the "stop daemon mode" one, returns the event. Otherwise,
+     * returns {@code null}.
+     * @return The event, or {@code null} in case the daemon mode
+     *         is turned off during the wait.
+     * @throws InterruptedException 
+     */
+    BEvent takeExternalEvent() throws InterruptedException {
         BEvent next = recentlyEnqueuedExternalEvents.take();
         
         if (next == NO_MORE_DAEMON) {
             daemonMode = false;
-            return false;
+            return null;
         } else {
-            enqueuedExternalEvents.add(next);
-            return true;
+            return next;
         }
-    }
-
-    /**
-     * Adds all the non-empty {@link BThreadSyncSnapshot} from {@code runResults} 
-     * to the next event loop round.
-     * 
-     * <em> All futures must be done when this method is called. This is the normal
-     * case for when calling {@link ExecutorService#invokeAll}, so normally not a big requirement.</em>
-     *
-     * @param runResults 
-     */
-    private void addToNextRound( List<Future<BThreadSyncSnapshot>> runResults ) {
-        if ( nextRoundBthreads == null ) {
-            nextRoundBthreads = new HashSet<>(runResults.size());
-        }
-        nextRoundBthreads.addAll( 
-            runResults.stream().map( f -> {
-                try {
-                    return f.get();
-                } catch ( InterruptedException | ExecutionException ie ) {
-                    System.out.println("**** Got an excetpion " + ie);
-                    System.out.println("**** Message " + ie.getMessage());
-                    ie.printStackTrace(System.out);
-                    return null;
-                }})
-            .filter( Objects::nonNull )
-            .collect(toList())
-        );
-    }
-
-    /**
-     * Prepares {@code this} for the next iteration of the event loop.
-     */
-    void finalizeRound() {
-        bthreads = nextRoundBthreads;
-        nextRoundBthreads = null;
-    }
-
-    /**
-     * Adds a listener to the BProgram.
-     * @param <R> Actual type of listener.
-     * @param aListener the listener to add.
-     * @return The added listener, to allow call chaining.
-     */
-    public <R extends BProgramListener> R addListener(R aListener) {
-        listeners.add(aListener);
-        return aListener;
-    }
-
-    /**
-     * Removes the listener from the program. If the listener is not registered,
-     * this call is ignored. In other words, this call is idempotent.
-     * @param aListener the listener to remove.
-     */
-    public void removeListener(BProgramListener aListener) {
-        listeners.remove(aListener);
     }
 
     /**
@@ -547,7 +327,16 @@ public abstract class BProgram {
      * @param obj The object to be added to the program's scope.
      */
     public void putInGlobalScope( String name, Object obj ) {
-        getGlobalScope().put(name, programScope, Context.javaToJS(obj, programScope));
+        if ( getGlobalScope() == null ) {
+            initialScopeValues.put(name, obj);
+        } else {
+            try {
+                Context.enter();
+                getGlobalScope().put(name, programScope, Context.javaToJS(obj, programScope));
+            } finally {
+                Context.exit();
+            }
+        }
     }
     
     /**
@@ -567,15 +356,6 @@ public abstract class BProgram {
     }
     
     /**
-     * Returns the snapshots of all current BThreads. This method will only yield 
-     * meaningful results when the program is at BSync state.
-     * @return snapshots of the current BThreads.
-     */
-    public Set<BThreadSyncSnapshot> getBThreadSnapshots() {
-        return bthreads;
-    }
-
-    /**
      * Sets the name of the program
      * @param name the new program's name
      */
@@ -589,7 +369,31 @@ public abstract class BProgram {
     public String getName() {
         return name;
     }
+    
+    Set<BThreadSyncSnapshot> drainRecentlyRegisteredBthreads() {
+        Set<BThreadSyncSnapshot> out = new HashSet<>();
+        recentlyRegisteredBthreads.drainTo(out);
+        return out;
+    }
+    
+    List<BEvent> drainEnqueuedExternalEvents() {
+        List<BEvent> out = new ArrayList<>(recentlyEnqueuedExternalEvents.size());
+        recentlyEnqueuedExternalEvents.drainTo(out);
+        return out;
+    }
 
+    public void setAddBThreadCallback(BProgramCallback anAddBThreadCallback) {
+        addBThreadCallback = Optional.ofNullable(anAddBThreadCallback);
+    }
+
+    public EventSelectionStrategy getEventSelectionStrategy() {
+        return eventSelectionStrategy;
+    }
+
+    public void setEventSelectionStrategy(EventSelectionStrategy eventSelectionStrategy) {
+        this.eventSelectionStrategy = eventSelectionStrategy;
+    }
+    
     @Override
     public String toString() {
         return "[BProgram " + getName() + "]";

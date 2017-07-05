@@ -22,7 +22,7 @@ public class EngineExceptionTest {
         };
         
         try { 
-            sut.start();
+            new BProgramRunner(sut).start();
             fail("System should have thrown an error due to bsync called outside of a BThread.");
         } catch (BPjsCodeEvaluationException exp) {
             assertEquals( 3, exp.getLineNumber() );
@@ -46,7 +46,7 @@ public class EngineExceptionTest {
         };
         
         try { 
-            sut.start();
+            new BProgramRunner(sut).start();
             fail("System should have thrown an error due to uncompilable Javascript code.");
         } catch (BPjsCodeEvaluationException exp) {
             assertEquals( 2, exp.getLineNumber() );

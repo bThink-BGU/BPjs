@@ -23,10 +23,16 @@
  */
 package il.ac.bgu.cs.bp.bpjs.examples;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
+import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import static java.util.stream.Collectors.toSet;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 /**
@@ -37,10 +43,12 @@ public class DynamicBThreadAdditionTest {
     
     @Test
     public void test() throws InterruptedException {
-        BProgram sut = new SingleResourceBProgram("dynamicBthreadAddition.js");
+        BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("dynamicBthreadAddition.js"));
         sut.addListener( new StreamLoggerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
         sut.start();
+        Set<String> expected = new HashSet<>(Arrays.asList("e0","e1","e2","e3"));
+        assertEquals( expected, eventLogger.getEvents().stream().map(BEvent::getName).collect(toSet()));
     }
 }

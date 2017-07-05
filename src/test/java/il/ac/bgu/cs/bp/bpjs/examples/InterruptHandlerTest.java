@@ -1,7 +1,8 @@
 package il.ac.bgu.cs.bp.bpjs.examples;
 
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.exceptions.BProgramException;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
@@ -9,25 +10,15 @@ import il.ac.bgu.cs.bp.bpjs.validation.eventpattern.EventPattern;
 import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import org.mozilla.javascript.Scriptable;
 
 /**
  * @author @michbarsinai
  */
 public class InterruptHandlerTest {
 
-    BProgram buildProgram(String jsFilename) {
-        return new BProgram(jsFilename) {
-            @Override
-            protected void setupProgramScope( Scriptable aScope ) {
-                evaluateResource(jsFilename + ".js");
-            }
-        };
-    }
-    
     @Test
     public void echoEventTest() throws InterruptedException {
-        BProgram sut = buildProgram("InterruptHandler");
+        BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("InterruptHandler.js") );
         sut.addListener( new StreamLoggerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
@@ -44,7 +35,7 @@ public class InterruptHandlerTest {
     
     @Test(expected=BProgramException.class)
     public void illegalBsyncTest() throws InterruptedException {
-        BProgram sut = buildProgram("InterruptHandler_illegal");
+        BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("InterruptHandler_illegal.js") );
         sut.addListener( new StreamLoggerListener() );
         
         sut.start();

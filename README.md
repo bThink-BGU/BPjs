@@ -12,11 +12,11 @@ This repository contains a javascript-based [BP](http://www.b-prog.org) library.
 * BPjs is open sourced under the [MIT license](http://www.opensource.org/licenses/mit-license.php). If you use it in a system, please provide
 a link to this page somewhere in the documentation/system about section.
 * BPjs uses the Mozilla Rhino Javascript engine. See [here](https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino) for project page and source code.
-  
+
 ---
 
 ## Getting BPjs
-* From Maven: Add as dependency to a Maven project. Note that the version number changes.
+* For Maven projects: Add bpjs as dependency. Note that the version number changes.
 
 ````xml
 <dependencies>
@@ -33,10 +33,44 @@ a link to this page somewhere in the documentation/system about section.
 * Clone, fork, or download the [starting project](https://github.com/bThink-BGU/SampleBPjsProject).
 * Download the `.jar` files directly from [Maven Central](https://repo.maven.apache.org/maven2/com/github/bthink-bgu/BPjs/).
 
+## Documentation
+
+* [Introductory Presentation](https://www.slideshare.net/MichaelBarSinai/introducing-bpjs-web)
+* [Tutorial and Reference](http://bpjs.readthedocs.io/en/develop/)
+* [API Javadocs](http://www.javadoc.io/doc/com.github.bthink-bgu/BPjs/)
+
 ## Change log for the BPjs library.
+
+## 2017-07-05
+* :sparkles: `bsync` now has an extra parameter, allowing b-threads to pass hinting data to custom `EventSelectionStrategy`s.
+* :arrows_counterclockwise: Moved event selection strategy to `BProgram`.
+* :sparkles: Added a mechanism to log the `BProgramState` at sync points.
+
+## 2017-06-08
+* :sparkles: Added documentation for embedding BPjs programs in larger Java apps.
+
+## 2017-05-16
+* :sparkles: README includes a more prominent reference to the documentation.
+
+## 2017-05-10
+* :sparkles: Added an adapter class for `BProgramListener`.
+* :bug: Fixed issues with adding objects to the program's scope.
+
+## 2017-04-08
+* :put_litter_in_its_place: Cleaned up the `BProgramRunner`-`BProgram`-`BProgramSyncSnapshot` trio such that listeners don't have to be passed around between them.
+* :sparkles: Cloning of `BProgramSyncSnapshot` ready. This is the basis for search.
+
+### 2017-03-22
+
+* :sparkles: New architecture: Running logic moved from `BProgram` to `BProgramRunner` - ongoing.
+* :sparkles: `BProgramListener`s notified before BPrograms are started.
+* :bug: Fixed a bug where dynamically added b-threads that were added by other dynamically added b-threads would run one cycle too late.
+* :bug: Fixed a bug where external events enqueued from top-level JS code where ignored.
 
 ### 2017-03-21
 
+* :sparkles: New architecture: Running logic moved from `BProgram` to `BProgramRunner`. This will help implementing search.
+* :sparkles: `BProgramListener`s notified when a b-thread runs to completion.
 * :sparkles: `bp.getTime()` added.
 * :sparkles: Updated tutorial now includes the `bp` object.
 

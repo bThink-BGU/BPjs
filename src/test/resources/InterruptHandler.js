@@ -1,6 +1,6 @@
 /* global bp */
 
-bp.registerBThread(function () {
+bp.registerBThread("interrupted", function () {
     var testValue = "internalValue";
     setInterruptHandler( function(evt){
        bp.enqueueExternalEvent(evt); 
@@ -9,7 +9,7 @@ bp.registerBThread(function () {
     bsync({interrupt:bp.Event("boom")});
 });
 
-bp.registerBThread(function(){
+bp.registerBThread("request-and-wait",function(){
    bsync({request:bp.Event("boom")});
    bsync({waitFor:bp.all});
    bsync({waitFor:bp.all});

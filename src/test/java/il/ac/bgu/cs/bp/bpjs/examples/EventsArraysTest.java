@@ -3,7 +3,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.examples;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
@@ -21,7 +21,7 @@ public class EventsArraysTest {
 
     @Test
     public void testEventsWithData() throws Exception {
-        BProgram bpr = new SingleResourceBProgram( "EventArrays.js" );
+        BProgramRunner bpr = new BProgramRunner(new SingleResourceBProgram("EventArrays.js"));
         bpr.addListener( new StreamLoggerListener() );
         InMemoryEventLoggingListener events = bpr.addListener( new InMemoryEventLoggingListener() );
         

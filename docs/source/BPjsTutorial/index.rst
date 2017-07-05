@@ -15,6 +15,8 @@ After calling ``bsync``, the b-thread is blocked, waiting for the rest of the b-
 
 Behavioral Programming was introduced by Harel, Marron and Weiss in 2012 in a `paper`_ published at the *Communications of the ACM*.
 
+.. note:: The ``bsync``\s in BPjs expand on the "classic" ``bsync``\s defined in the ACM paper: it contains an :doc:`interrupt <interrupts>` event set, and may contain a hint to the :doc:`event selection strategy <../extendBPjs/implement-ess>`.
+
 .. _paper: http://cacm.acm.org/magazines/2012/7/151241-behavioral-programming/fulltext
 .. _ACM Transactions on Computer Science: http://todo/fill/this
 
@@ -23,6 +25,8 @@ Tutorial
 This tutorial will introduce you to BP principles and to the BPjs api. After completing it, you will be able to write BPjs programs. That's the technical part, though. Properly thinking in BP and in general scenario-based programming - well, that would probably take longer, as with any new programming paradigm.
 
 .. toctree::
+  :maxdepth: 2
+
   hello-world
   eventsets
   logging

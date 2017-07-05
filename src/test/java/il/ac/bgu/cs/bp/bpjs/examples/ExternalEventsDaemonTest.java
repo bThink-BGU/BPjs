@@ -1,6 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.examples;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
@@ -9,26 +10,16 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.Test;
 import static org.junit.Assert.assertTrue;
-import org.mozilla.javascript.Scriptable;
 
 /**
  *
  * @author michael
  */
 public class ExternalEventsDaemonTest {
-    BProgram buildProgram() {
-        return new BProgram("ExternalEventsDaemon") {
-            @Override
-            protected void setupProgramScope( Scriptable aScope ) {
-                evaluateResource("ExternalEventsDaemon.js");
-            }
-            
-        };
-    }
     
     @Test
     public void superStepTest() throws InterruptedException {
-        final BProgram sut = buildProgram();
+        BProgramRunner sut = new BProgramRunner( new SingleResourceBProgram("ExternalEventsDaemon.js"));
         sut.addListener( new StreamLoggerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
@@ -36,7 +27,7 @@ public class ExternalEventsDaemonTest {
             try {
                 for ( int i=0; i<4; i++ ) {
                     Thread.sleep(500);
-                    sut.enqueueExternalEvent(new BEvent("ext1"));
+                    sut.getBProgram().enqueueExternalEvent(new BEvent("ext1"));
                 }
             } catch (InterruptedException ex) {
                 Logger.getLogger(ExternalEventsDaemonTest.class.getName()).log(Level.SEVERE, null, ex);
@@ -44,6 +35,8 @@ public class ExternalEventsDaemonTest {
         } ).start();
         
         sut.start();
+        
+        assertTrue( sut.getBProgram().getFromGlobalScope("internalDaemonMode", Boolean.class).get() );
         
         eventLogger.getEvents().forEach(e->System.out.println(e) );
         
@@ -57,5 +50,7 @@ public class ExternalEventsDaemonTest {
                 .append(ext1).append(in1a).append(in1b);
         
         assertTrue( expected.matches(eventLogger.getEvents()) );
+        
+                
     }    
 }

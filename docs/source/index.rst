@@ -30,7 +30,7 @@ Topics:
    BPjsTutorial/index
    execute-bpjs
    embed-bpjs
-   extend-bpjs
+   extendBPjs/index
    glossary
 
 
@@ -38,5 +38,4 @@ Indices and tables
 ==================
 
 * :ref:`genindex`
-* :ref:`modindex`
 * :ref:`search`

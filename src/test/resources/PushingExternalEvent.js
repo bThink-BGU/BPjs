@@ -1,6 +1,6 @@
 /* global bp */
-
-bp.registerBThread("HotBt", function () {
+//bp.setDaemonMode( true );
+bp.registerBThread( function () {
   // request hotEvent three times, in different verbosities.
     bsync({ request:bp.Event("start")} );
     bp.enqueueExternalEvent( bp.Event("external") );

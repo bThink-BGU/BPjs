@@ -9,6 +9,14 @@ import il.ac.bgu.cs.bp.bpjs.events.BEvent;
  * @author michael
  */
 public interface BProgramListener {
+    
+    /**
+     * Called before the BProgram is started (pre-setup).
+     * 
+     * @param bprog The BProgram about to start
+     */
+    void starting(BProgram bprog);
+    
     /**
      * Called when the {@link BProgram} {@code bp} was started.
      * 
@@ -35,17 +43,24 @@ public interface BProgramListener {
     
     /**
      * Called when a BThread is added to a BProgram.
-     * @param bp the program the thread was added to
+     * @param bp the program the thread was added to.
      * @param theBThread the new BThread
      */
     void bthreadAdded( BProgram bp, BThreadSyncSnapshot theBThread );
     
     /**
      * Called when a BThread is removed from a BProgram.
-     * @param bp the program the thread was removed from
+     * @param bp the program the thread was removed from.
      * @param theBThread the removed BThread
      */
     void bthreadRemoved( BProgram bp, BThreadSyncSnapshot theBThread );
+    
+    /**
+     * Called when a BThread has ran to completion.
+     * @param bp the program the thread ran in.
+     * @param theBThread the done BThread
+     */
+    void bthreadDone( BProgram bp, BThreadSyncSnapshot theBThread);
     
     /**
      * Called when a BProgram selects an event.
@@ -53,5 +68,6 @@ public interface BProgramListener {
      * @param theEvent the new event selected.
      */
     void eventSelected( BProgram bp, BEvent theEvent );
+    
     
 }

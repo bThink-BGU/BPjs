@@ -39,6 +39,12 @@ public class BSyncStatement implements java.io.Serializable {
      */
     private final EventSet interrupt;    
     
+    /**
+     * Optional data a BThread can pass to the event selector. This may serve as
+     * "hot/cold", "danger level", or any other hint for a specific event selection policy.
+     */
+    private final Object data;
+    
     private BThreadSyncSnapshot bthread;
     
     /**
@@ -51,21 +57,22 @@ public class BSyncStatement implements java.io.Serializable {
      * @return an empty statement
      */
     public static BSyncStatement make(BThreadSyncSnapshot creator) {
-        return new BSyncStatement(Collections.emptySet(), none, none, none).setBthread(creator);
+        return new BSyncStatement(Collections.emptySet(), none, none, none, null).setBthread(creator);
     }
     public static BSyncStatement make() {
-        return new BSyncStatement(Collections.emptySet(), none, none, none);
+        return new BSyncStatement(Collections.emptySet(), none, none, none, null);
     }
     
-    public BSyncStatement(Collection<? extends BEvent> request, EventSet waitFor, EventSet block, EventSet except) {
+    public BSyncStatement(Collection<? extends BEvent> request, EventSet waitFor, EventSet block, EventSet except, Object data) {
         this.request = new HashSet<>(request);
         this.waitFor = waitFor;
         this.block = block;
         this.interrupt = except;
+        this.data = data;
     }
 
     public BSyncStatement(Collection<? extends BEvent> request, EventSet waitFor, EventSet block) {
-        this(request, waitFor, block, none);
+        this(request, waitFor, block, none, null);
     }
     
     public boolean shouldWakeFor( BEvent anEvent ) {
@@ -79,27 +86,31 @@ public class BSyncStatement implements java.io.Serializable {
      * @return a new statement
      */
     public BSyncStatement request( Collection<? extends BEvent> toRequest ) {
-        return new BSyncStatement(toRequest, getWaitFor(), getBlock(), getInterrupt());
+        return new BSyncStatement(toRequest, getWaitFor(), getBlock(), getInterrupt(), getData());
     }
     public BSyncStatement request( BEvent requestedEvent ) {
         Set<BEvent> toRequest = new HashSet<>();
         toRequest.add(requestedEvent);
-        return new BSyncStatement(toRequest, getWaitFor(), getBlock(), getInterrupt());
+        return new BSyncStatement(toRequest, getWaitFor(), getBlock(), getInterrupt(), getData());
     }
     public BSyncStatement request( ExplicitEventSet ees ) {
-        return new BSyncStatement(ees.getCollection(), getWaitFor(), getBlock(), getInterrupt());
+        return new BSyncStatement(ees.getCollection(), getWaitFor(), getBlock(), getInterrupt(), getData());
     }
     
     public BSyncStatement waitFor( EventSet events ) {
-        return new BSyncStatement(getRequest(), events, getBlock(), getInterrupt());
+        return new BSyncStatement(getRequest(), events, getBlock(), getInterrupt(), getData());
     }
 
     public BSyncStatement block( EventSet events ) {
-        return new BSyncStatement(getRequest(), getWaitFor(), events, getInterrupt());
+        return new BSyncStatement(getRequest(), getWaitFor(), events, getInterrupt(), getData());
     }
     
     public BSyncStatement interrupt( EventSet events ) {
-        return new BSyncStatement(getRequest(), getWaitFor(), getBlock(), events);
+        return new BSyncStatement(getRequest(), getWaitFor(), getBlock(), events, getData());
+    }
+    
+    public BSyncStatement data( Object someData ) { 
+        return new BSyncStatement(getRequest(), getWaitFor(), getBlock(), getInterrupt(), someData);
     }
     
     public Collection<BEvent> getRequest() {
@@ -127,9 +138,17 @@ public class BSyncStatement implements java.io.Serializable {
         return this;
     }
     
+    public Object getData() {
+        return data;
+    }
+    
+    public boolean hasData() {
+        return data != null;
+    }
+    
     @Override
     public String toString() {
-        return String.format("[RWBStatement r:%s w:%s b:%s i:%s]", getRequest(), getWaitFor(), getBlock(), getInterrupt());
+        return String.format("[RWBStatement r:%s w:%s b:%s i:%s d:%s]", getRequest(), getWaitFor(), getBlock(), getInterrupt(), getData());
     }
 
     @Override
@@ -160,7 +179,10 @@ public class BSyncStatement implements java.io.Serializable {
         if (!Objects.equals(this.getBlock(), other.getBlock())) {
             return false;
         }
-        return Objects.equals(this.getInterrupt(), other.getInterrupt());
+        if (!Objects.equals(this.getInterrupt(), other.getInterrupt())) {
+            return false;
+        }
+        return Objects.equals(getData(), other.getData());
     }
 
 }

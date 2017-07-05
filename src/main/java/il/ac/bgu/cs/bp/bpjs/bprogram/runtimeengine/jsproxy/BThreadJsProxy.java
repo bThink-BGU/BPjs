@@ -43,6 +43,10 @@ public class BThreadJsProxy implements java.io.Serializable {
     }
     
     public void bsync( NativeObject jsRWB ) {
+        bsync(jsRWB, null);
+    }
+    
+    public void bsync( NativeObject jsRWB, Object data ) {
         Map<String, Object> jRWB = (Map)Context.jsToJava(jsRWB, Map.class);
         
         BSyncStatement stmt = BSyncStatement.make();
@@ -61,7 +65,8 @@ public class BThreadJsProxy implements java.io.Serializable {
         
         stmt = stmt.waitFor( convertToEventSet(jRWB.get("waitFor")) )
                      .block( convertToEventSet(jRWB.get("block")) )
-                 .interrupt( convertToEventSet(jRWB.get("interrupt")) );
+                 .interrupt( convertToEventSet(jRWB.get("interrupt")) )
+                      .data( data );
         
         captureBThreadState(stmt);
         

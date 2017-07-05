@@ -32,6 +32,10 @@ public class InMemoryEventLoggingListener implements BProgramListener {
     }
     
     @Override
+    public void starting(BProgram bp) {
+    }
+    
+    @Override
     public void started(BProgram bp) {
     }
 
@@ -41,6 +45,10 @@ public class InMemoryEventLoggingListener implements BProgramListener {
 
     @Override
     public void bthreadRemoved(BProgram bp, BThreadSyncSnapshot theBThread) {
+    }
+    
+    @Override
+    public void bthreadDone(BProgram bp, BThreadSyncSnapshot theBThread) {
     }
 
     @Override

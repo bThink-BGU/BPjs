@@ -1,6 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.examples;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
@@ -8,7 +9,6 @@ import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.validation.eventpattern.EventPattern;
 import org.junit.Test;
 import static org.junit.Assert.assertTrue;
-import org.mozilla.javascript.Scriptable;
 
 /**
  * Tests for a bhtread that adds bthreads as it works.
@@ -17,16 +17,6 @@ import org.mozilla.javascript.Scriptable;
  */
 public class AddingBthreadsTest {
     
-
-    BProgram buildProgram() {
-        return new BProgram("AddingBthreadsTest") {
-            @Override
-            protected void setupProgramScope( Scriptable aScope ) {
-                evaluateResource("AddingBthreads.js");
-            }
-        };
-    }
-    
     @Test
     public void superStepTest() throws InterruptedException {
         
@@ -34,7 +24,7 @@ public class AddingBthreadsTest {
         final BEvent kidADone = new BEvent("kidADone");
         final BEvent kidBDone = new BEvent("kidBDone");
         
-        BProgram sut = buildProgram();
+        BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("AddingBthreads.js"));
         sut.addListener( new StreamLoggerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
@@ -47,6 +37,11 @@ public class AddingBthreadsTest {
                 .append(kiddies)
                 .append(kiddies)
                 .append(parentDone);
+        
+        System.out.println("Actual events:");
+        eventLogger.getEvents().forEach( System.out::println );
+        System.out.println("/Actual events");
+        
         assertTrue( expected.matches(eventLogger.getEvents()) );
     }
 

@@ -4,6 +4,7 @@
 package il.ac.bgu.cs.bp.bpjs.examples;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
@@ -23,10 +24,11 @@ public class EventsWithDataTest {
     @Test
     public void testEventsWithData() throws Exception {
         BProgram bpr = new SingleResourceBProgram( "EventsWithData.js", "programName", new SimpleEventSelectionStrategy(99l) );
-        bpr.addListener( new StreamLoggerListener() );
-        InMemoryEventLoggingListener events = bpr.addListener( new InMemoryEventLoggingListener() );
+        BProgramRunner rnr = new BProgramRunner(bpr);
+        rnr.addListener( new StreamLoggerListener() );
+        InMemoryEventLoggingListener events = rnr.addListener( new InMemoryEventLoggingListener() );
         
-        bpr.start();
+        rnr.start();
         
         assertEquals( Arrays.asList("e1", "e2", "e1e2"),
                       events.getEvents().stream().map( BEvent::getName).collect(toList()) );

@@ -1,13 +1,13 @@
 package il.ac.bgu.cs.bp.bpjs.examples;
 
-import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
+import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.validation.eventpattern.EventPattern;
-import org.junit.Test;
 import static org.junit.Assert.assertTrue;
-import org.mozilla.javascript.Scriptable;
+import org.junit.Test;
 
 /**
  * @author orelmosheweinstock
@@ -19,18 +19,9 @@ public class HotNColdTest {
     final BEvent coldEvent = new BEvent("coldEvent");
     final BEvent allDoneEvent = new BEvent("allDone");
 
-    BProgram buildProgram() {
-        return new BProgram("HotAndCold") {
-            @Override
-            protected void setupProgramScope( Scriptable aScope ) {
-                evaluateResource("HotNCold.js");
-            }
-        };
-    }
-    
     @Test
     public void superStepTest() throws InterruptedException {
-        BProgram sut = buildProgram();
+        BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("HotNCold.js"));
         sut.addListener( new StreamLoggerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         

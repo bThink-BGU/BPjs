@@ -1,0 +1,35 @@
+@startuml
+skinparam backgroundcolor transparent
+
+class clientCode
+
+class BProgramRunner {
+  start()
+}
+
+abstract class BProgram {
+    - source
+    + isDaemon:boolean
+    + globalScope
+    enqueueExternalEvent(e)
+
+}
+
+interface EventSelectionStrategy {
+  selectableEvents(...): Set<BEvent>
+  select(...): BEvent
+}
+
+interface BProgramListener {
+  eventSelected(...)
+  started(...)
+  ended(...)
+  .. more methods ..
+}
+
+clientCode .right.> BProgramRunner : manages
+BProgramRunner "1" *--> "1" BProgram
+BProgram "1" *--> "1" EventSelectionStrategy
+BProgramRunner     o--> "0..*" BProgramListener
+
+@enduml
