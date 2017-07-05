@@ -42,7 +42,8 @@ a link to this page somewhere in the documentation/system about section.
 ## Change log for the BPjs library.
 
 ## 2017-07-05
-* :sparkles: Added a mechanism to log the BProgramState at sync points.
+* :arrows_counterclockwise: Moved event selection strategy to `BProgram`.
+* :sparkles: Added a mechanism to log the `BProgramState` at sync points.
 
 ## 2017-06-08
 * :sparkles: Added documentation for embedding BPjs programs in larger Java apps.
