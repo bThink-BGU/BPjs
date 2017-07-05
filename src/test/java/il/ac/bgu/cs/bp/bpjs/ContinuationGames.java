@@ -18,6 +18,10 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import java.util.HashMap;
+import java.util.Map;
+import org.mozilla.javascript.NativeContinuation;
+import org.mozilla.javascript.ScriptRuntime;
 
 /**
  * Playing around with continuations.
@@ -27,14 +31,14 @@ import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 public class ContinuationGames {
     
     static final String SRC = 
-                      "j=1;\n" 
+                      "gVar=1;\n" 
                     + "bp.registerBThread( \"bt\", function(){\n"
                     + "   bp.log.info(\"started\");"
-                    + "   var i=1;"
+                    + "   var bVar=1;"
                     + "   var evt = bsync({request: bp.Event(\"e\")});\n"
-                    + "   bp.log.info('i:' + i + ' j:'+j + ' event.name:' + evt.name);"
-                    + "   i = i+1;"
-                    + "   j = j+1;"
+                    + "   bp.log.info('gVar:' + gVar + ' bVar:'+bVar + ' event.name:' + evt.name);"
+                    + "   gVar = gVar+1;"
+                    + "   bVar = bVar+1;"
                     + "});";
     
     public static void main(String[] args) throws Exception {   
@@ -94,6 +98,7 @@ public class ContinuationGames {
             ctxt.setOptimizationLevel(-1); // must use interpreter mode
             final Scriptable topLevelScope = ctxt.initSafeStandardObjects();
             
+            
             for (int i = 0; i < 10; i++) {
                 try ( ScriptableInputStream sis = new ScriptableInputStream(new ByteArrayInputStream(serializedContinuationAndScope), topLevelScope)) {
                     // read cnt and scope
@@ -110,9 +115,54 @@ public class ContinuationGames {
                     ctxt.resumeContinuation(cnt2, cnt2, new BEvent("arbitrary/"+i));
                 }
             }   
+            
+            // create three continuation objects that should be the same.
+            Scriptable[] cnts = new Scriptable[3];
+            for (int i = 0; i < 3; i++) {
+                try ( ScriptableInputStream sis = new ScriptableInputStream(new ByteArrayInputStream(serializedContinuationAndScope), topLevelScope)) {
+                    // read cnt and scope
+                    cnts[i] = (Scriptable) sis.readObject();
+                }
+            }
+            
+            System.out.println(cnts[0].equals(cnts[0]));
+            System.out.println(cnts[0].equals(cnts[1]));
+            
+            System.out.println("continuationsEq = " + continuationEq( (NativeContinuation)cnts[0], (NativeContinuation)cnts[1]) );
+            
         } finally {
             Context.exit();
         }
     }
     
+    static boolean continuationEq( NativeContinuation a, NativeContinuation b ) {
+        // same heap
+        if ( ! ScriptRuntime.shallowEq(a.getParentScope(), b.getParentScope()) ) {
+            Map<Object,Object> scopeA = scopeValues(a);
+            Map<Object,Object> scopeB = scopeValues(b);
+            System.out.println("scopeA = " + scopeA);
+            System.out.println("scopeB = " + scopeB);
+            System.out.println("scopeB.equals(scopeA) = " + scopeB.equals(scopeA));
+            return false;
+        }
+        System.out.println("Same parent scope.");
+        
+        // same stack
+        System.out.println("implementation = " + a.getImplementation() );
+        
+        // same pc
+        
+        return true;
+    }
+    
+    static Map<Object, Object> scopeValues(NativeContinuation nc ){
+        Map<Object, Object> retVal = new HashMap<>();
+        
+        Scriptable current = nc;
+        // traverse prototype and parent chains, according to lookup algorithm.
+        for ( Object o : nc.getIds() ) {
+            retVal.put(o, nc.get(o));
+        }
+        return retVal;
+    }
 }

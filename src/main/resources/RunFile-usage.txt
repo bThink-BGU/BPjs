@@ -6,12 +6,8 @@ as a single BProgram.
 
 Use "-" to also read from stdin.
 
-Program log and event sequence are written to stdout.
+BProgram log and event sequence are written to stdout.
 
-Program output has the following format:
-* Lines that start with "#":
-     -  program load messages.
-* Lines that start with hyphens and ":" (e.g. "  --: TEXT"):
-     -  Program listener messages
-* Other lines are output from the BProgram itself.
-
+Switches:
+   -v ("verbose")
+        Print more data about the BProgram's status as synchronization points..

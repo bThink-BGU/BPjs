@@ -39,6 +39,8 @@ public class BSyncStatement implements java.io.Serializable {
      */
     private final EventSet interrupt;    
     
+    
+    
     private BThreadSyncSnapshot bthread;
     
     /**
