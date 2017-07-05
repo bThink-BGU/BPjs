@@ -42,6 +42,7 @@ a link to this page somewhere in the documentation/system about section.
 ## Change log for the BPjs library.
 
 ## 2017-07-05
+* :sparkles: `bsync` now has an extra parameter, allowing b-threads to pass hinting data to custom `EventSelectionStrategy`s.
 * :arrows_counterclockwise: Moved event selection strategy to `BProgram`.
 * :sparkles: Added a mechanism to log the `BProgramState` at sync points.
 
