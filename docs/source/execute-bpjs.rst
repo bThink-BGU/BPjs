@@ -23,6 +23,8 @@ The example below executes the code from f1.js and the clipboard. ``pbpaste`` is
   pbpaste | java -jar <path-to-uber-jar> f1.js -
 
 
+.. tip:: Unsure about why an event was or was not selected? Add a ``-v`` (for "verbose") switch to the above commandline. BPjs will print the synchronization statement for each BThread during program synchronization points.
+
 From Java Code
 ---------------------
 
