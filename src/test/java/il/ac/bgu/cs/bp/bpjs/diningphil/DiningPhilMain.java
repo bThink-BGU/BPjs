@@ -18,7 +18,6 @@ public class DiningPhilMain {
 		final SingleResourceBProgram bprog = new SingleResourceBProgram("BPJSDiningPhil.js");
 
 		long start = System.currentTimeMillis();
-		;
 
 		try {
 			dfsUsingStack(Node.getInitialNode(bprog));
