@@ -223,15 +223,28 @@ public class BProgramSyncSnapshot {
 
 	@Override
 	public int hashCode() {
-		BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(getBProgram());
-		return io.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((threadSnapshots == null) ? 0 : threadSnapshots.hashCode());
+		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-        
-		BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(((BProgramSyncSnapshot)obj).getBProgram());
-		return io.equals(getBProgram());
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BProgramSyncSnapshot other = (BProgramSyncSnapshot) obj;
+		if (threadSnapshots == null) {
+			if (other.threadSnapshots != null)
+				return false;
+		} else if (!threadSnapshots.equals(other.threadSnapshots))
+			return false;
+		return true;
 	}
+
 
 }

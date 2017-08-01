@@ -3,6 +3,10 @@
 bp.log.info('BPJSTestEquals')
 
 bp.registerBThread("BThread 1", function() {
-	var dudu = 1;
-	bsync({ request : bp.Event("X") });
+	while (true) {
+		for( var i=0; i<5; i++)
+			bsync({ request : bp.Event("X")	}, "X "+i);
+		
+		bsync({ request : bp.Event("O")	}, "O");
+	}
 });
