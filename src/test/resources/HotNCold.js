@@ -1,4 +1,4 @@
-/* global bp, emptySet, noEvents */
+/* global bp */
 
 var coldEvent = bp.Event("coldEvent");
 var hotEvent = bp.Event("hotEvent");

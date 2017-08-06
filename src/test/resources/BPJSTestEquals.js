@@ -1,6 +1,6 @@
 /* global bp, bsync */
 
-bp.log.info('BPJSTestEquals')
+bp.log.info('BPJSTestEquals');
 
 bp.registerBThread("BThread 1", function() {
 	while (true) {

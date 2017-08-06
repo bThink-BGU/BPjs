@@ -35,7 +35,7 @@ public class TestEquals {
 	// Iterative DFS using stack
 	public static void dfsUsingStack(Node node) throws Exception {
 		Stack<Node> path_nodes = new Stack<>(); // The bad trace
-		Set<Node> visited_nodes = new HashSet<>(); // All the visited nodes' id
+		Set<Node> visited_nodes = new HashSet<>(); // All the visited node ids
 
 		visited_nodes.add(node);
 		path_nodes.add(node);

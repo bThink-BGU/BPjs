@@ -207,33 +207,4 @@ public class BThreadSyncSnapshot implements Serializable {
 		return entryPoint;
 	}
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((bSyncStatement == null || bSyncStatement.getData() == null) ? 0
-				: bSyncStatement.getData().hashCode());
-		return result;
-	}
-
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		
-		BThreadSyncSnapshot other = (BThreadSyncSnapshot) obj;
-		
-		if (bSyncStatement == null || bSyncStatement.getData() == null) {
-			if (other.bSyncStatement == null || other.bSyncStatement.getData() != null)
-				return false;
-		} else if (!bSyncStatement.getData().equals(other.bSyncStatement.getData()))
-			return false;
-		
-		return true;
-	}
-
 }

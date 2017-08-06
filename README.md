@@ -35,11 +35,15 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Documentation
 
-* [Introductory Presentation](https://www.slideshare.net/MichaelBarSinai/introducing-bpjs-web)
+* Presentations: [Introduction](https://www.slideshare.net/MichaelBarSinai/introducing-bpjs-web)
+                 [Deeper dive](https://www.slideshare.net/MichaelBarSinai/deep-dive-into-bpjs)
 * [Tutorial and Reference](http://bpjs.readthedocs.io/en/develop/)
 * [API Javadocs](http://www.javadoc.io/doc/com.github.bthink-bgu/BPjs/)
 
 ## Change log for the BPjs library.
+
+## 2017-08-06
+* :sparkles: Added a class to compare continuations (base for comparing snapshots).
 
 ## 2017-07-05
 * :sparkles: `bsync` now has an extra parameter, allowing b-threads to pass hinting data to custom `EventSelectionStrategy`s.
