@@ -6,10 +6,12 @@ import java.util.Optional;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativeContinuation;
 import org.mozilla.javascript.Scriptable;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.jsproxy.BThreadJsProxy;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.search.ContinuationProgramState;
 
 /**
  * The state of a BThread at {@code bsync}.
@@ -205,6 +207,32 @@ public class BThreadSyncSnapshot implements Serializable {
 
 	public Function getEntryPoint() {
 		return entryPoint;
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((continuation == null) ? 0 : continuation.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BThreadSyncSnapshot other = (BThreadSyncSnapshot) obj;
+		if (continuation == null) {
+			if (other.continuation != null)
+				return false;
+		} else if (!new ContinuationProgramState((NativeContinuation) continuation)
+				.equals(new ContinuationProgramState((NativeContinuation) other.continuation)))
+			return false;
+		return true;
 	}
 
 }

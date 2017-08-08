@@ -7,33 +7,30 @@ addStick = function(i) {
 	var j = (i % N) + 1;
 
 	bp.registerBThread("Stick " + i, function() {
-		
-		var e = "";
-		var wt = "";
-		
+
 		while (true) {
-			e = bsync({
+			var e = bsync(
+					{
 						waitFor : [ bp.Event("Pick" + i + "R"),
-								    bp.Event("Pick" + j + "L") ],
+								bp.Event("Pick" + j + "L") ],
 
 						block : [ bp.Event("Rel" + i + "R"),
-			  					  bp.Event("Rel" + j + "L") ],
-			  					  
+								bp.Event("Rel" + j + "L") ],
+
 					}, "1 " + wt + e).name;
-			
-			
-			wt = (e.equals("Pick" + i + "R")) ? "Rel" + i + "R" : "Rel" + j + "L";
+
+			var wt = (e.equals("Pick" + i + "R")) ? "Rel" + i + "R" : "Rel" + j	+ "L";
 
 			bsync({
 				waitFor : bp.Event(wt),
 
 				block : [ bp.Event("Pick" + i + "R"),
-						  bp.Event("Pick" + j + "L") ]	
-			
+						bp.Event("Pick" + j + "L") ]
+
 			}, "2 " + wt + e);
 
-			wt = "";
-			e = "";
+			wt = undefined;
+			e = undefined;
 		}
 	});
 };
@@ -44,12 +41,12 @@ addPhil = function(i) {
 			// Request to pick the right stick
 			bsync({
 				request : bp.Event("Pick" + i + "R")
-			},"1");
+			}, "1");
 
 			// Request to pick the left stick
 			bsync({
 				request : bp.Event("Pick" + i + "L")
-			},"2");
+			}, "2");
 
 			// Request to release the left stick
 			bsync({
