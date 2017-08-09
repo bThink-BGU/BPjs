@@ -1,81 +1,71 @@
 package il.ac.bgu.cs.bp.bpjs.diningphil;
 
-import java.util.HashSet;
-import java.util.Set;
-import java.util.Stack;
+import static org.junit.Assert.*;
 
+import org.junit.Test;
+
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 
 public class TestEquals {
 
-	public final static long MAX_PATH = 100;
-
-	private static long count = 1;
-
-	public static void main(String[] args) throws InterruptedException {
+	static final String P1 = 
+			"bp.registerBThread(\"BThread 1\", function() {" +
+			"	while (true) {" +
+			"		bsync({request: bp.Event(\"X\")});" +
+			"		bsync({wait : bp.Event(\"X\")});" + 
+			"	}" + 
+			"});" 
+		;
+		
+	
+	
+	@Test
+	public void test1() throws Exception {
 		// Create a program
-		final SingleResourceBProgram bprog = new SingleResourceBProgram("BPJSTestEquals.js");
+		final BProgram bprog = new StringBProgram(P1);
 
-		long start = System.currentTimeMillis();
-
-		try {
-			dfsUsingStack(Node.getInitialNode(bprog));
-
-			System.out.println("No error :-)");
-		} catch (Exception e) {
-			e.printStackTrace(System.out);
+		Node[] nodes = new Node[10];
+		
+		nodes[0] = Node.getInitialNode(bprog);
+		
+		for(int i=1; i<10; i++) {
+			nodes[i] = nodes[i-1].getNextNode(new BEvent("X"));
 		}
 
-		System.out.println("Scanned " + count + " states");
-		System.out.println("Time:" + (System.currentTimeMillis() - start) / 1000 + " seconds");
-
+		for(int i=1; i<10; i+=2) {
+			assertTrue(nodes[i].equals(nodes[1]));
+			assertTrue(nodes[0].equals(nodes[i-1]));
+		}
 	}
 
-	// Iterative DFS using stack
-	public static void dfsUsingStack(Node node) throws Exception {
-		Stack<Node> path_nodes = new Stack<>(); // The bad trace
-		Set<Node> visited_nodes = new HashSet<>(); // All the visited node ids
+	
+	@Test
+	public void test2() throws Exception {
+		final BProgram bprog = new SingleResourceBProgram("BPJSDiningPhil.js");
 
-		visited_nodes.add(node);
-		path_nodes.add(node);
+		String events[] = {"Pick1R", "Pick2R", "Pick3R", "Pick4R", "Pick5R"};
+		Node[] nodes = new Node[events.length+1];
+		 
+		
+		nodes[0] = Node.getInitialNode(bprog);
+		
+		
+		for( int i=0; i<events.length; i++) {
+			nodes[i+1] = nodes[i].getNextNode(new BEvent(events[i]));
+		}
 
-		while (!path_nodes.isEmpty()) {
-
-			node = path_nodes.peek();
-
-			// This flag remains false if node doesn't have an unvisited
-			// follower
-			boolean flag = false;
-
-			loop: while (node.getEventIterator().hasNext()) {
-
-				BEvent e = node.getEventIterator().next();
-
-				Node nextNode = node.getNextNode(e);
-
-				if (!visited_nodes.contains(nextNode)) {
-					count++;
-					flag = true;
-
-					visited_nodes.add(nextNode);
-					path_nodes.add(nextNode);
-
-					if (!nextNode.check()) {
-						// Found a problematic path :-)
-						throw new BadTraceException(path_nodes);
-					}
-
-					break loop;
+		for(int i=0; i<nodes.length; i++) {
+			for(int j=0; j<nodes.length; j++) {
+				if( i!= j) {
+					assertFalse(nodes[i].equals(nodes[j]));
+					assertFalse(nodes[i].hashCode() == nodes[j].hashCode());
 				}
-
-			}
-
-			if (!flag || path_nodes.size() >= MAX_PATH) {
-				path_nodes.pop();
 			}
 		}
-
 	}
 
+	
 }

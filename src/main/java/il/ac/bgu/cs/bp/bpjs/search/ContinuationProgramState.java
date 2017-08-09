@@ -61,7 +61,7 @@ public class ContinuationProgramState {
         ScriptableObject current = currentScope;
         while ( current != null ) {
             for ( Object o : current.getIds() ) {
-                if ( ! variables.containsKey(o) ) {
+                if ( ! variables.containsKey(o) && o != "bp" ) {  // Reut and gera added the bp part. Michael?
                     variables.put(o, current.get(o));
                 }
             }
@@ -114,6 +114,7 @@ public class ContinuationProgramState {
         int hash = 3;
         hash = 31 * hash + this.programCounter;
         hash = 31 * hash + this.frameIndex;
+        hash = 31 * hash + this.variables.hashCode();
         return hash;
     }
 

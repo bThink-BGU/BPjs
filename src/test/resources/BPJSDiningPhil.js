@@ -1,5 +1,5 @@
 /* global bp, bsync */
-N = 5;
+N = 1;
 
 bp.log.info('Dinning philosophers with ' + N + ' philosophers')
 
@@ -12,12 +12,12 @@ addStick = function(i) {
 			var e = bsync(
 					{
 						waitFor : [ bp.Event("Pick" + i + "R"),
-								bp.Event("Pick" + j + "L") ],
+								    bp.Event("Pick" + j + "L") ],
 
 						block : [ bp.Event("Rel" + i + "R"),
-								bp.Event("Rel" + j + "L") ],
+								  bp.Event("Rel" + j + "L") ],
 
-					}, "1 " + wt + e).name;
+					}).name;
 
 			var wt = (e.equals("Pick" + i + "R")) ? "Rel" + i + "R" : "Rel" + j	+ "L";
 
@@ -25,9 +25,9 @@ addStick = function(i) {
 				waitFor : bp.Event(wt),
 
 				block : [ bp.Event("Pick" + i + "R"),
-						bp.Event("Pick" + j + "L") ]
+						  bp.Event("Pick" + j + "L") ]
 
-			}, "2 " + wt + e);
+			});
 
 			wt = undefined;
 			e = undefined;
@@ -41,22 +41,22 @@ addPhil = function(i) {
 			// Request to pick the right stick
 			bsync({
 				request : bp.Event("Pick" + i + "R")
-			}, "1");
+			});
 
 			// Request to pick the left stick
 			bsync({
 				request : bp.Event("Pick" + i + "L")
-			}, "2");
+			});
 
 			// Request to release the left stick
 			bsync({
 				request : bp.Event("Rel" + i + "L")
-			}, "3");
+			});
 
 			// Request to release the right stick
 			bsync({
 				request : bp.Event("Rel" + i + "R")
-			}, "4");
+			});
 		}
 	});
 };

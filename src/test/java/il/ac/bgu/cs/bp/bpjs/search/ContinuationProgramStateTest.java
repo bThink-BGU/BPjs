@@ -75,6 +75,18 @@ public class ContinuationProgramStateTest {
                     + "   f()\n"
                     + "});";
     
+    static final String SRC_LOOP = 
+            "var gVar='gVar content';\n" 
+          + "var shadowed='original content (you should not see this)';\n" 
+          + "bp.registerBThread( \"bt\", function(){\n"
+          + "   var f=function(){bsync({request: bp.Event(\"e\")});};\n"
+          + "   var fVar='fVar content';\n"
+          + "   var fObjVar={a:'obj->a content'}\n"
+          + "   var shadowed='updated content';\n" 
+          + "   while(true) { bsync({request: bp.Event(\"e\")}); }\n"
+          + "});";
+
+    
     @Test
     public void testCorrectExtraction() throws Exception {
          
