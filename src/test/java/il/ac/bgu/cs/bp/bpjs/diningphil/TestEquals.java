@@ -29,15 +29,18 @@ public class TestEquals {
 
 		Node[] nodes = new Node[10];
 		
-		nodes[0] = Node.getInitialNode(bprog);
+        BEvent eventX = new BEvent("X");
+        // Discard initial node, as it has no event, and so can't
+        // be used in the even/odd equalities later.
+		nodes[0] = Node.getInitialNode(bprog).getNextNode(eventX);
 		
-		for(int i=1; i<10; i++) {
-			nodes[i] = nodes[i-1].getNextNode(new BEvent("X"));
+		for ( int i=1; i<10; i++ ) {
+			nodes[i] = nodes[i-1].getNextNode(eventX);
 		}
 
-		for(int i=1; i<10; i+=2) {
-			assertTrue(nodes[i].equals(nodes[1]));
-			assertTrue(nodes[0].equals(nodes[i-1]));
+		for ( int i=1; i<10; i+=2 ) {
+			assertEquals(nodes[0], nodes[i-1]);
+			assertEquals(nodes[1], nodes[  i]);
 		}
 	}
 

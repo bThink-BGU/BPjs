@@ -13,11 +13,12 @@ import il.ac.bgu.cs.bp.bpjs.search.BProgramSyncSnapshotCloner;
 
 public class Node {
 	
+	private static final EventSelectionStrategy ess = new SimpleEventSelectionStrategy();
+    
 	private BProgramSyncSnapshot systemState;
 	private BProgram bp;
 	private Set<BEvent> possibleEvents;
 	private BEvent lastEvent;
-	private static EventSelectionStrategy ess = new SimpleEventSelectionStrategy();
 	private Iterator<BEvent> iterator;
 	
 	protected Node(BProgram bp, BProgramSyncSnapshot systemState, BEvent e) {
@@ -107,18 +108,18 @@ public class Node {
 	 */
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (!(obj instanceof Node))
-			return false;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (!(obj instanceof Node)) return false;
+        
 		Node other = (Node) obj;
 		if (systemState == null) {
-			if (other.systemState != null)
+			if (other.systemState != null) {
 				return false;
-		} else if (!systemState.equals(other.systemState))
+            }
+		} else if (!systemState.equals(other.systemState)) {
 			return false;
+        }
 		return true;
 	}
 	

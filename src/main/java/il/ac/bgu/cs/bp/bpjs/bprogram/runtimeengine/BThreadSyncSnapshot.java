@@ -219,24 +219,19 @@ public class BThreadSyncSnapshot implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		BThreadSyncSnapshot other = (BThreadSyncSnapshot) obj;
+		if (this == obj) return true;
+		if (obj == null) return false;
+		if (getClass() != obj.getClass()) return false;
+		
+        BThreadSyncSnapshot other = (BThreadSyncSnapshot) obj;
 		if (continuation == null) {
-			if (other.continuation != null)
-				return false;
+			return (other.continuation == null)
+                    
 		} else {
 			NativeContinuation natCont = (NativeContinuation) continuation;
 			NativeContinuation natOtherCont = (NativeContinuation) other.continuation;
-			if (!new ContinuationProgramState(natCont)
-					.equals(new ContinuationProgramState(natOtherCont)))
-				return false;
+			return new ContinuationProgramState(natCont).equals(new ContinuationProgramState(natOtherCont))
 		}
-		return true;
 	}
 
 }
