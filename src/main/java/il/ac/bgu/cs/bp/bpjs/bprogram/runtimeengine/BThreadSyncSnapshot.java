@@ -12,6 +12,7 @@ import org.mozilla.javascript.Scriptable;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.jsproxy.BThreadJsProxy;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.search.ContinuationProgramState;
+import java.util.Objects;
 
 /**
  * The state of a BThread at {@code bsync}.
@@ -219,18 +220,21 @@ public class BThreadSyncSnapshot implements Serializable {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
+		
+        // Quick circuit-breakers
+        if (this == obj) return true;
 		if (obj == null) return false;
 		if (getClass() != obj.getClass()) return false;
-		
         BThreadSyncSnapshot other = (BThreadSyncSnapshot) obj;
+		if ( ! Objects.equals(getName(), other.getName())) return false;
+        
 		if (continuation == null) {
-			return (other.continuation == null)
+			return (other.continuation == null);
                     
 		} else {
 			NativeContinuation natCont = (NativeContinuation) continuation;
 			NativeContinuation natOtherCont = (NativeContinuation) other.continuation;
-			return new ContinuationProgramState(natCont).equals(new ContinuationProgramState(natOtherCont))
+			return new ContinuationProgramState(natCont).equals(new ContinuationProgramState(natOtherCont));
 		}
 	}
 
