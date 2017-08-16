@@ -1,11 +1,11 @@
 package il.ac.bgu.cs.bp.bpjs.diningphil;
 
-import java.util.HashSet;
 import java.util.Set;
 import java.util.Stack;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import java.util.TreeSet;
 
 public class DiningPhilMain {
 
@@ -19,7 +19,11 @@ public class DiningPhilMain {
 
 		long start = System.currentTimeMillis();
         
-        bprog.putInGlobalScope("PHILOSOPHER_COUNT", 10);
+        int philosopherCount = 9;
+        if ( args.length > 1 ) {
+            philosopherCount = Integer.parseInt(args[1]);
+        }
+        bprog.putInGlobalScope("PHILOSOPHER_COUNT", philosopherCount);
         long end=0;
         
 		try {
@@ -44,9 +48,9 @@ public class DiningPhilMain {
 	// Iterative DFS using stack
 	public static void dfsUsingStack(Node node) throws BadTraceException, Exception {
 		Stack<Node> pathNodes = new Stack<>(); // The bad trace
-		Set<Node> visitesNodes = new HashSet<>(); // All the visited nodes' id
+		Set<Integer> visitesNodes = new TreeSet<>(); // All the visited nodes' id
 
-		visitesNodes.add(node);
+		visitesNodes.add(node.hashCode());
 		pathNodes.add(node);
 
 		while (!pathNodes.isEmpty()) {
@@ -63,11 +67,11 @@ public class DiningPhilMain {
 
 				Node nextNode = node.getNextNode(e);
 
-				if (!visitesNodes.contains(nextNode)) {
+				if (!visitesNodes.contains(nextNode.hashCode())) {
 					visitedStatesCount++;
 					flag = true;
                     
-					visitesNodes.add(nextNode);
+					visitesNodes.add(nextNode.hashCode());
 					pathNodes.add(nextNode);
 
 					if (!nextNode.check()) {

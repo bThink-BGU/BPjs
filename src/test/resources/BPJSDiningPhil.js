@@ -1,5 +1,9 @@
 /* global bp, bsync, PHILOSOPHER_COUNT */
-//PHILOSOPHER_COUNT = 9; // for convenience, this is now set up from the Java environment.
+
+// for convenience, PHILOSOPHER_COUNT is now set up from the Java environment.
+if ( ! PHILOSOPHER_COUNT ) {
+    PHILOSOPHER_COUNT = 5;
+} 
 
 bp.log.info('Dinning philosophers with ' + PHILOSOPHER_COUNT + ' philosophers');
 

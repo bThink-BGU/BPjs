@@ -48,8 +48,9 @@ public class TestEquals {
 	@Test
 	public void test2() throws Exception {
 		final BProgram bprog = new SingleResourceBProgram("BPJSDiningPhil.js");
-
-		String events[] = {"Pick1R", "Pick2R", "Pick3R", "Pick4R", "Pick5R"};
+        bprog.putInGlobalScope("PHILOSOPHER_COUNT", 5);
+		
+        String events[] = {"Pick1R", "Pick2R", "Pick3R", "Pick4R", "Pick5R"};
 		Node[] nodes = new Node[events.length+1];
 		 
 		
