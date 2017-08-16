@@ -11,68 +11,80 @@ public class DiningPhilMain {
 
 	public final static long MAX_PATH = 100;
 
-	private static long count = 1;
+	private static long visitedStatesCount = 1;
 
 	public static void main(String[] args) throws InterruptedException {
 		// Create a program
 		final SingleResourceBProgram bprog = new SingleResourceBProgram("BPJSDiningPhil.js");
 
 		long start = System.currentTimeMillis();
-
+        
+        bprog.putInGlobalScope("PHILOSOPHER_COUNT", 10);
+        long end=0;
+        
 		try {
 			dfsUsingStack(Node.getInitialNode(bprog));
+            end = System.currentTimeMillis();
+			System.out.println("No violating trace found.");
+            
+		} catch (BadTraceException bte) {
+            end = System.currentTimeMillis();
+            System.out.println("Found a violating trace:");
+			bte.getBadTrace().forEach( nd -> System.out.println(" " + nd.getLastEvent()));
+            
+		} catch (Exception ex) {
+            ex.printStackTrace(System.out);
+        }
 
-			System.out.println("No error :-)");
-		} catch (Exception e) {
-			e.printStackTrace(System.out);
-		}
-
-		System.out.println("Scanned " + count + " states");
-		System.out.println("Time:" + (System.currentTimeMillis() - start) / 1000 + " seconds");
+		System.out.printf("Scanned %,d states\n", visitedStatesCount );
+		System.out.printf("Time: %,d milliseconds\n", end - start);
 
 	}
 
 	// Iterative DFS using stack
-	public static void dfsUsingStack(Node node) throws Exception {
-		Stack<Node> path_nodes = new Stack<>(); // The bad trace
-		Set<Node> visited_nodes = new HashSet<>(); // All the visited nodes' id
+	public static void dfsUsingStack(Node node) throws BadTraceException, Exception {
+		Stack<Node> pathNodes = new Stack<>(); // The bad trace
+		Set<Node> visitesNodes = new HashSet<>(); // All the visited nodes' id
 
-		visited_nodes.add(node);
-		path_nodes.add(node);
+		visitesNodes.add(node);
+		pathNodes.add(node);
 
-		while (!path_nodes.isEmpty()) {
+		while (!pathNodes.isEmpty()) {
 
-			node = path_nodes.peek();
+			node = pathNodes.peek();
 
 			// This flag remains false if node doesn't have an unvisited
 			// follower
 			boolean flag = false;
 
-			loop: while (node.getEventIterator().hasNext()) {
+			while (node.getEventIterator().hasNext()) {
 
 				BEvent e = node.getEventIterator().next();
 
 				Node nextNode = node.getNextNode(e);
 
-				if (!visited_nodes.contains(nextNode)) {
-					count++;
+				if (!visitesNodes.contains(nextNode)) {
+					visitedStatesCount++;
 					flag = true;
                     
-					visited_nodes.add(nextNode);
-					path_nodes.add(nextNode);
+					visitesNodes.add(nextNode);
+					pathNodes.add(nextNode);
 
 					if (!nextNode.check()) {
 						// Found a problematic path :-)
-						throw new BadTraceException(path_nodes);
+						throw new BadTraceException(pathNodes);
 					}
 
-					break loop;
+					break;
 				}
+                if ( visitedStatesCount%10000==0 ) {
+                    System.out.printf("~ %,d states scanned\n", visitedStatesCount);
+                }
 
 			}
 
-			if (!flag || path_nodes.size() >= MAX_PATH) {
-				path_nodes.pop();
+			if (!flag || pathNodes.size() >= MAX_PATH) {
+				pathNodes.pop();
 			}
 		}
 

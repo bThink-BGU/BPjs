@@ -144,7 +144,9 @@ public class BThreadSyncSnapshot implements Serializable {
 		} catch (ContinuationPending cbs) {
 			return copyWith(cbs.getContinuation(), (BSyncStatement) cbs.getApplicationState());
 		} finally {
-			Context.exit();
+            if (Context.getCurrentContext() != null ) {
+    			Context.exit();
+            }
 		}
 	}
 

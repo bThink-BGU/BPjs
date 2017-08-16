@@ -20,7 +20,7 @@ public class Node {
 	private Set<BEvent> possibleEvents;
 	private BEvent lastEvent;
 	private Iterator<BEvent> iterator;
-	
+
 	protected Node(BProgram bp, BProgramSyncSnapshot systemState, BEvent e) {
 		this.bp = bp;
 		this.systemState = systemState;
@@ -90,11 +90,10 @@ public class Node {
 		return iterator;
 	}
 
-	String stateString;
+    public BEvent getLastEvent() {
+        return lastEvent;
+    }
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#hashCode()
-	 */
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -103,9 +102,6 @@ public class Node {
 		return result;
 	}
 
-	/* (non-Javadoc)
-	 * @see java.lang.Object#equals(java.lang.Object)
-	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (this == obj) return true;
