@@ -3,4 +3,4 @@
 /docs/build/
 /nbproject/
 settings.xml
-
+tst/results/*

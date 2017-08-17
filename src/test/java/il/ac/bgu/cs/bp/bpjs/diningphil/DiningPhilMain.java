@@ -52,9 +52,10 @@ public class DiningPhilMain {
 
 		visitesNodes.add(node.hashCode());
 		pathNodes.add(node);
-
+        
+        long iterationCount = 0;
 		while (!pathNodes.isEmpty()) {
-
+            iterationCount++;
 			node = pathNodes.peek();
 
 			// This flag remains false if node doesn't have an unvisited
@@ -81,12 +82,12 @@ public class DiningPhilMain {
 
 					break;
 				}
-                if ( visitedStatesCount%10000==0 ) {
-                    System.out.printf("~ %,d states scanned\n", visitedStatesCount);
-                }
 
 			}
 
+            if ( iterationCount%1000==0 ) {
+                System.out.printf("~ %,d states scanned (iteration %,d)\n", visitedStatesCount, iterationCount);
+            }
 			if (!flag || pathNodes.size() >= MAX_PATH) {
 				pathNodes.pop();
 			}
