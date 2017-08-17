@@ -94,6 +94,10 @@ public class Node {
         return lastEvent;
     }
 
+    public BProgramSyncSnapshot getSystemState() {
+        return systemState;
+    }
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
