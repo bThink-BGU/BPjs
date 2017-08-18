@@ -1,25 +1,31 @@
-package il.ac.bgu.cs.bp.bpjs.diningphil;
+package il.ac.bgu.cs.bp.bpjs.search;
 
 import java.util.Iterator;
 import java.util.Set;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramSyncSnapshot;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.eventselection.SimpleEventSelectionStrategy;
-import il.ac.bgu.cs.bp.bpjs.search.BProgramSyncSnapshotCloner;
 
+/**
+ * A single node in a program's execution tree. Contains the program's state, and
+ * the last event to happen when getting to this state.
+ * 
+ * @author Gera
+ * @author Reut
+ * @author michael
+ */
 public class Node {
 	
 	private static final EventSelectionStrategy ess = new SimpleEventSelectionStrategy();
     
-	private BProgramSyncSnapshot systemState;
-	private BProgram bp;
-	private Set<BEvent> possibleEvents;
-	private BEvent lastEvent;
-	private Iterator<BEvent> iterator;
+	private final BProgramSyncSnapshot systemState;
+	private final BProgram bp;
+	private final Set<BEvent> possibleEvents;
+	private final BEvent lastEvent;
+	private final Iterator<BEvent> iterator;
 
 	protected Node(BProgram bp, BProgramSyncSnapshot systemState, BEvent e) {
 		this.bp = bp;
@@ -32,12 +38,12 @@ public class Node {
 
 	private String stateString() {
 
-		String str = "";
-		for (BThreadSyncSnapshot s : systemState.getBThreadSnapshots()) {
-			str += "\t" + s.toString() + " {" + s.getBSyncStatement() + "} \n";
-		}
+		StringBuilder str = new StringBuilder();
+        systemState.getBThreadSnapshots().forEach( s  -> 
+            str.append("\t").append(s.toString()).append(" {").append(s.getBSyncStatement()).append("} \n")
+        );
 
-		return str;
+		return str.toString();
 	}
 
 	@Override

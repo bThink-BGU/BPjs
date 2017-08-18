@@ -1,5 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.diningphil;
 
+import il.ac.bgu.cs.bp.bpjs.search.Node;
 import static org.junit.Assert.*;
 
 import org.junit.Test;

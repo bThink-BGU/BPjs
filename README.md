@@ -42,6 +42,10 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+## 2017-08-18
+* :sparkles: Initial verification added. `DfsBProgramVerifier` scans the states of
+  a `BProgram` using DFS, and can return traces where there are no selectable events.
+
 ## 2017-08-06
 * :sparkles: Added a class to compare continuations (base for comparing snapshots).
 
