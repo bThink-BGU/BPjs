@@ -37,7 +37,7 @@ import java.util.TreeSet;
  * 
  * @author michael
  */
-public class StateHashVisitedNodeStore implements VisitedNodeStorage {
+public class StateHashVisitedNodeStore implements VisitedNodeStore {
     private final Set<Integer> visited = new TreeSet<>();
     
     @Override

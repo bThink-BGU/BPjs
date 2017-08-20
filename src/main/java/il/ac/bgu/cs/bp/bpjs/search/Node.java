@@ -1,13 +1,14 @@
 package il.ac.bgu.cs.bp.bpjs.search;
 
 import java.util.Iterator;
-import java.util.Set;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionStrategy;
-import il.ac.bgu.cs.bp.bpjs.eventselection.SimpleEventSelectionStrategy;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * A single node in a program's execution tree. Contains the program's state, and
@@ -19,8 +20,6 @@ import il.ac.bgu.cs.bp.bpjs.eventselection.SimpleEventSelectionStrategy;
  */
 public class Node {
 	
-	private static final EventSelectionStrategy ess = new SimpleEventSelectionStrategy();
-    
 	private final BProgramSyncSnapshot systemState;
 	private final BProgram bp;
 	private final Set<BEvent> possibleEvents;
@@ -32,7 +31,7 @@ public class Node {
 		this.systemState = systemState;
 		this.lastEvent = e;
 	
-		possibleEvents = ess.selectableEvents(systemState.getStatements(), systemState.getExternalEvents());
+		possibleEvents = bp.getEventSelectionStrategy().selectableEvents(systemState.getStatements(), systemState.getExternalEvents());
 		iterator = possibleEvents.iterator();
 	}
 
@@ -71,7 +70,8 @@ public class Node {
 	 * the given event.
 	 * 
 	 * @param e
-	 * @return
+	 * @return State of the BProgram after event {@code e} was selected while the 
+     *         program was at {@code this} node's state.
 	 * @throws InterruptedException
 	 */
 	public Node getNextNode(BEvent e) throws Exception {
@@ -108,7 +108,8 @@ public class Node {
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
-		result = prime * result + ((systemState == null) ? 0 : systemState.hashCode());
+		result = prime * result + Objects.hash(systemState);
+		result = prime * result + Objects.hash(lastEvent);
 		return result;
 	}
 

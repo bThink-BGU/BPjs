@@ -1,4 +1,5 @@
 /* global bp, bsync, PHILOSOPHER_COUNT */
+//PHILOSOPHER_COUNT = 9; // for convenience, this is now set up from the Java environment.
 
 // for convenience, PHILOSOPHER_COUNT is now set up from the Java environment.
 if ( ! PHILOSOPHER_COUNT ) {
@@ -7,10 +8,10 @@ if ( ! PHILOSOPHER_COUNT ) {
 
 bp.log.info('Dinning philosophers with ' + PHILOSOPHER_COUNT + ' philosophers');
 
-addStick = function(i) {
+ function addStick(i) {
 	var j = (i % PHILOSOPHER_COUNT) + 1;
 
-	bp.registerBThread("Stick " + i, function() {
+	bp.registerBThread("Stick" + i, function() {
 
 		while (true) {
 			var e = bsync(
@@ -28,39 +29,39 @@ addStick = function(i) {
 				block : [ bp.Event("Pick" + i + "R"),
 						  bp.Event("Pick" + j + "L") ]
 			});
-			wt = undefined;
-			e = undefined;
+			delete wt;
+			delete e;
 		}
 	});
 };
 
-addPhil = function(i) {
-	bp.registerBThread("Phil" + i, function() {
+function addPhil(philNum) {
+	bp.registerBThread("Phil" + philNum, function() {
 		while (true) {
 			// Request to pick the right stick
 			bsync({
-				request : bp.Event("Pick" + i + "R")
+				request : bp.Event("Pick" + philNum + "R")
 			});
 
 			// Request to pick the left stick
 			bsync({
-				request : bp.Event("Pick" + i + "L")
+				request : bp.Event("Pick" + philNum + "L")
 			});
 
 			// Request to release the left stick
 			bsync({
-				request : bp.Event("Rel" + i + "L")
+				request : bp.Event("Rel" + philNum + "L")
 			});
 
 			// Request to release the right stick
 			bsync({
-				request : bp.Event("Rel" + i + "R")
+				request : bp.Event("Rel" + philNum + "R")
 			});
 		}
 	});
 };
 
-for (i = 1; i <= PHILOSOPHER_COUNT; i++) {
+for (var i = 1; i <= PHILOSOPHER_COUNT; i++) {
 	addStick(i);
 	addPhil(i);
 }

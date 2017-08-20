@@ -28,7 +28,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 import org.mozilla.javascript.NativeContinuation;
+import org.mozilla.javascript.NativeFunction;
 import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.Undefined;
 import org.mozilla.javascript.UniqueTag;
 
 /**
@@ -62,7 +64,12 @@ public class ContinuationProgramState {
         while ( current != null ) {
             for ( Object o : current.getIds() ) {
                 if ( ! variables.containsKey(o) && o != "bp" ) {
-                    variables.put(o, current.get(o));
+                    Object variableContent = current.get(o);
+                    if ( variableContent instanceof Undefined ) continue;
+                    if ( variableContent instanceof NativeFunction ) {
+                        variableContent = ((NativeFunction)variableContent).getEncodedSource();
+                    }
+                    variables.put(o, variableContent);
                 }
             }
             if ( current.getPrototype() != null ) {
@@ -94,8 +101,13 @@ public class ContinuationProgramState {
             
             //  - 3: Now get the correct value for the name.
             for ( int i=0; i<argNames.length; i++ ) {
-                variables.put( argNames[i],
-                        objectsStack[i]==UniqueTag.DOUBLE_MARK ? doublesStack[i] : objectsStack[i]);
+                if ( objectsStack[i] instanceof Undefined ) continue;
+                Object variableContent = objectsStack[i]==UniqueTag.DOUBLE_MARK ? doublesStack[i] : objectsStack[i];
+                if ( variableContent instanceof NativeFunction ) {
+                    variableContent = ((NativeFunction)variableContent).getEncodedSource();
+                    System.out.println("variableContent = " + variableContent);
+                }
+                variables.put(argNames[i], variableContent);
             }
                         
         } catch (NoSuchFieldException | SecurityException | IllegalAccessException ex) {
@@ -141,7 +153,7 @@ public class ContinuationProgramState {
     
     @Override
     public String toString() {
-        return "[ActivationFrameStatus pc:" + programCounter + " stackHeight:" + frameIndex + " vars:" + variables + ']';
+        return "[ContinuationProgramState pc:" + programCounter + " stackHeight:" + frameIndex + " vars:" + variables + ']';
     }
 
     public Map<Object, Object> getVisibleVariables() {

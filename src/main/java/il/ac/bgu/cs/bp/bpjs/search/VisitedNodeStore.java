@@ -28,7 +28,7 @@ package il.ac.bgu.cs.bp.bpjs.search;
  * 
  * @author michael
  */
-public interface VisitedNodeStorage {
+public interface VisitedNodeStore {
     void store( Node nd );
     boolean isVisited( Node nd );
 }

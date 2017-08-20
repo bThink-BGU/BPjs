@@ -238,12 +238,7 @@ public class BProgramSyncSnapshot {
 		if (getClass() != obj.getClass())
 			return false;
 		BProgramSyncSnapshot other = (BProgramSyncSnapshot) obj;
-		if (threadSnapshots == null) {
-			if (other.threadSnapshots != null)
-				return false;
-		} else if (!threadSnapshots.equals(other.threadSnapshots))
-			return false;
-		return true;
+		return Objects.equals(threadSnapshots, other.threadSnapshots);
 	}
 
 

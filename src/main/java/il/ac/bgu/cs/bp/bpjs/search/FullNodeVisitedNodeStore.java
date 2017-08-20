@@ -23,28 +23,24 @@
  */
 package il.ac.bgu.cs.bp.bpjs.search;
 
+import java.util.HashSet;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
- *
- * A {@link VisitedNodeStorage} that stores the hashcode of a {@link Node}, rather
- * than the node itself. Far more memory efficient, but runs a (slim) risk of
- * hash collisions.
+ * A {@link VisitedNodeStroage} that stores the entire {@link Node}. 
  * 
  * @author michael
  */
-public class HashVisitedNodeStorage implements VisitedNodeStorage {
-    private final Set<Integer> visited = new TreeSet<>();
+public class FullNodeVisitedNodeStore  implements VisitedNodeStore {
+    private final Set<Node> visited = new HashSet<>();
     
     @Override
     public void store(Node nd) {
-        visited.add(nd.hashCode());
+        visited.add(nd);
     }
 
     @Override
     public boolean isVisited(Node nd) {
-        return visited.contains(nd.hashCode());
+        return visited.contains(nd);
     }   
-    
 }

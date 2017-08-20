@@ -25,13 +25,16 @@ package il.ac.bgu.cs.bp.bpjs.verification;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.search.ContinuationProgramState;
 import il.ac.bgu.cs.bp.bpjs.search.Node;
 import il.ac.bgu.cs.bp.bpjs.search.StateHashVisitedNodeStore;
-import il.ac.bgu.cs.bp.bpjs.search.VisitedNodeStorage;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
+import il.ac.bgu.cs.bp.bpjs.search.VisitedNodeStore;
+import org.mozilla.javascript.NativeContinuation;
 
 /**
  * 
@@ -49,7 +52,7 @@ public class DfsBProgramVerifier {
 
 	private long visitedStatesCount;
     
-    private final VisitedNodeStorage visited = new StateHashVisitedNodeStore();
+    private final VisitedNodeStore visited = new StateHashVisitedNodeStore();
     private long maxTraceLength = DEFAULT_MAX_TRACE;
 
     public VerificationResult verify( BProgram aBp ) throws Exception {
@@ -60,52 +63,62 @@ public class DfsBProgramVerifier {
         return new VerificationResult(counterEx, end-start, visitedStatesCount);
     }
     
-    protected List<Node> dfsUsingStack(Node node) throws Exception {
-		ArrayDeque<Node> pathNodes = new ArrayDeque<>(); // Current program stack.
+    protected List<Node> dfsUsingStack(Node aStartNode) throws Exception {
+		ArrayDeque<Node> pathNodes = new ArrayDeque<>(); // Current execution stack.
 
-		visited.store(node);
-		pathNodes.add(node);
-        
         long iterationCount = 0;
-		while (!pathNodes.isEmpty()) {
+		visited.store(aStartNode);
+		pathNodes.push(aStartNode);
+        
+		while ( !pathNodes.isEmpty() ) {
             iterationCount++;
-			node = pathNodes.peek();
-
-			boolean canGoForward = false;
-
-			while (node.getEventIterator().hasNext()) {
-
-				BEvent e = node.getEventIterator().next();
-
-				Node nextNode = node.getNextNode(e);
-
-				if (!visited.isVisited(nextNode) ) {
-					visitedStatesCount++;
-					canGoForward = true;
+			Node curNode = pathNodes.peek();
+            
+            if ( ! curNode.check() ) {
+                // Found a problematic path :-)
+                final ArrayList<Node> counterExampleTrace = new ArrayList<>(Arrays.asList(pathNodes.toArray(new Node[0])));
+                Collections.reverse(counterExampleTrace);
+                return counterExampleTrace;
+            }            
+            
+            if ( pathNodes.size() == maxTraceLength ) {
+                // fold stack;
+                pathNodes.pop();
+                
+            } else {
+                Node nextNode = getUnvisitedNextNode(curNode);
+                if ( nextNode == null ) {
+                    // fold stack, retry next iteration;
+                    pathNodes.pop();
                     
-					visited.store(nextNode);
-					pathNodes.add(nextNode);
-
-					if (!nextNode.check()) {
-						// Found a problematic path :-)
-						return new ArrayList<>(Arrays.asList(pathNodes.toArray(new Node[0])));
-					}
-
-					break;
-				}
-			}
-
+                } else {
+                    // go deeper 
+                    visited.store(nextNode);
+                    pathNodes.push(nextNode);
+                    visitedStatesCount++;
+                }
+            }
+            
             if ( iterationCount%1000==0 ) {
                 // TODO - switch to listener architecture.
                 System.out.printf("~ %,d states scanned (iteration %,d)\n", visitedStatesCount, iterationCount);
             }
-			if (!canGoForward || pathNodes.size() >= maxTraceLength) {
-				pathNodes.pop();
-			}
 		}
+        
         return null;
 	}
-
+    
+    protected Node getUnvisitedNextNode(Node src) throws Exception {
+        while ( src.getEventIterator().hasNext() ) {
+            final BEvent nextEvent = src.getEventIterator().next();
+            Node possibleNextNode = src.getNextNode(nextEvent);
+            if ( ! visited.isVisited(possibleNextNode) ) {
+                return possibleNextNode;
+            }
+        }
+        return null;
+    }
+    
     public void setMaxTraceLength(long maxTraceLength) {
         this.maxTraceLength = maxTraceLength;
     }

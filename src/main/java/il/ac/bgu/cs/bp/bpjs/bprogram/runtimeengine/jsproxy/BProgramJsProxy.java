@@ -42,7 +42,7 @@ public class BProgramJsProxy implements java.io.Serializable {
         
         public void log( LogLevel lvl, String msg ) {
             if ( level.compareTo(lvl) >= 0) {
-                System.out.println("[JS][" + lvl.name() + "] " + msg );
+                System.out.println("[BP][" + lvl.name() + "] " + msg );
             }
         }
         
