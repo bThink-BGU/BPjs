@@ -48,7 +48,7 @@ bp.registerBThread("DetectXWin", function() {
 	while (true) {
 		bsync({
 			waitFor : [ bp.Event("3XRow"),
-					    bp.Event("3XCol") ],
+					    bp.Event("3XCol"),
 						bp.Event("3XDia") ]
 		}).name;
 
@@ -67,7 +67,7 @@ bp.registerBThread("DetectOWin", function() {
 	while (true) {
 		bsync({
 			waitFor : [ bp.Event("3ORow"),
-					    bp.Event("3OCol") ],
+					    bp.Event("3OCol"),
 						bp.Event("3ODia") ]
 		}).name;
 
@@ -82,7 +82,9 @@ bp.registerBThread("DetectOWin", function() {
  */
 bp.registerBThread("DetectDraw", function() {
 	while (true) {
-		if(countX+countO == 9)
+		if ( countX+countO === 9 ) {
+            // TODO what?
+        }
 			
 	}
 });
