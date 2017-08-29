@@ -34,6 +34,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import il.ac.bgu.cs.bp.bpjs.search.VisitedNodeStore;
+import java.util.Deque;
 import org.mozilla.javascript.NativeContinuation;
 
 /**
@@ -52,7 +53,7 @@ public class DfsBProgramVerifier {
 
 	private long visitedStatesCount;
     
-    private final VisitedNodeStore visited = new StateHashVisitedNodeStore();
+    private VisitedNodeStore visited = new StateHashVisitedNodeStore();
     private long maxTraceLength = DEFAULT_MAX_TRACE;
 
     public VerificationResult verify( BProgram aBp ) throws Exception {
@@ -71,6 +72,7 @@ public class DfsBProgramVerifier {
 		pathNodes.push(aStartNode);
         
 		while ( !pathNodes.isEmpty() ) {
+            printStatus(iterationCount, pathNodes);
             iterationCount++;
 			Node curNode = pathNodes.peek();
             
@@ -126,5 +128,19 @@ public class DfsBProgramVerifier {
     public long getMaxTraceLength() {
         return maxTraceLength;
     }
-
+    
+    public void setVisitedNodeStore( VisitedNodeStore aVisitedNodeStore ) {
+        visited = aVisitedNodeStore;
+    }
+    
+    public VisitedNodeStore getVisitedNodeStore() {
+        return visited;
+    }
+           
+    void printStatus( long iteration, Deque<Node> path) {
+        System.out.println("Iteration " + iteration );
+        System.out.println("  visited: " + visitedStatesCount );
+        path.forEach( n -> System.out.println("  " + n.getLastEvent()));
+    }
+    
 }

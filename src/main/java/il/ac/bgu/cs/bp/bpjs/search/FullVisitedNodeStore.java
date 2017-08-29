@@ -31,7 +31,7 @@ import java.util.Set;
  * 
  * @author michael
  */
-public class FullNodeVisitedNodeStore  implements VisitedNodeStore {
+public class FullVisitedNodeStore  implements VisitedNodeStore {
     private final Set<Node> visited = new HashSet<>();
     
     @Override

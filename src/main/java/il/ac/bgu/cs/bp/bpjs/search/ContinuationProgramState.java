@@ -24,11 +24,19 @@
 package il.ac.bgu.cs.bp.bpjs.search;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Dictionary;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import org.mozilla.javascript.ConsString;
+import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeContinuation;
 import org.mozilla.javascript.NativeFunction;
+import org.mozilla.javascript.NativeJavaObject;
+import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 import org.mozilla.javascript.UniqueTag;
@@ -42,9 +50,9 @@ import org.mozilla.javascript.UniqueTag;
  *   <li>Mapping from variable names to their values.</li>
  * </ul>
  * 
- * Implementation Note: Gathering the data for this class is done in a very hackish
- * way, using shameless reflection. This might and probably will break if Rhino
- * changes their code, but it's the best we can do at this point.
+ * Implementation Note: Gathering the data for this class is done in a very
+ * hackish way, using shameless reflection. This might and probably will break
+ * if Rhino changes their code, but it's the best we can do at this point.
  * 
  * @author michael
  */
@@ -59,17 +67,14 @@ public class ContinuationProgramState {
     }
     
     private void collectScopeValues(NativeContinuation nc ){
+        ScriptableObject current = nc;
         ScriptableObject currentScope = nc;
-        ScriptableObject current = currentScope;
         while ( current != null ) {
             for ( Object o : current.getIds() ) {
-                if ( ! variables.containsKey(o) && o != "bp" ) {
+                if ( !variables.containsKey(o) && o != "bp" ) {
                     Object variableContent = current.get(o);
                     if ( variableContent instanceof Undefined ) continue;
-                    if ( variableContent instanceof NativeFunction ) {
-                        variableContent = ((NativeFunction)variableContent).getEncodedSource();
-                    }
-                    variables.put(o, variableContent);
+                    variables.put(o, collectJsValue(variableContent));
                 }
             }
             if ( current.getPrototype() != null ) {
@@ -103,16 +108,59 @@ public class ContinuationProgramState {
             for ( int i=0; i<argNames.length; i++ ) {
                 if ( objectsStack[i] instanceof Undefined ) continue;
                 Object variableContent = objectsStack[i]==UniqueTag.DOUBLE_MARK ? doublesStack[i] : objectsStack[i];
-                if ( variableContent instanceof NativeFunction ) {
-                    variableContent = ((NativeFunction)variableContent).getEncodedSource();
-                    System.out.println("variableContent = " + variableContent);
-                }
-                variables.put(argNames[i], variableContent);
+                variables.put(argNames[i], collectJsValue(variableContent) );
             }
                         
         } catch (NoSuchFieldException | SecurityException | IllegalAccessException ex) {
             throw new RuntimeException("Error extracting field values from Rhino stack: " + ex.getMessage(), ex);
         }
+    }
+    
+    /**
+     * Take a Javascript value from Rhino, build a Java value for it.
+     * @param jsValue
+     * @return 
+     */
+    private Object collectJsValue(Object jsValue) {
+        if ( jsValue == null ) {
+             return null;
+             
+        } else if ( jsValue instanceof NativeFunction ) {
+            return ((NativeFunction)jsValue).getEncodedSource();
+            
+        } else if ( jsValue instanceof NativeArray ) {
+            NativeArray jsArr = (NativeArray) jsValue;
+            List<Object> retVal = new ArrayList<>((int)jsArr.getLength());
+            for ( int idx=0; idx<jsArr.getLength(); idx++ ) {
+                retVal.add( collectJsValue(jsArr.get(idx)) );
+            }
+            return retVal;
+            
+        } else if ( jsValue instanceof ScriptableObject ) {
+            ScriptableObject jsObj = (ScriptableObject) jsValue;
+            Map<Object, Object> retVal = new HashMap<>();
+            for ( Object key:jsObj.getIds() ) {
+                retVal.put(key, collectJsValue(jsObj.get(key)) );
+            }
+            return retVal;
+            
+        } else if ( jsValue instanceof ConsString ) {
+            return ((ConsString)jsValue).toString();
+            
+        } else if ( jsValue instanceof NativeJavaObject ) {
+            NativeJavaObject jsJavaObj = (NativeJavaObject) jsValue;
+            Object obj = jsJavaObj.unwrap();
+            System.out.println("Got Java object: " + obj + " (" + obj.getClass() + ")");
+            return obj;
+            
+        } else {
+            String cn = jsValue.getClass().getCanonicalName();
+            if ( !cn.startsWith("java.") && (!cn.startsWith("il.ac.bgu")) ) {
+                System.out.println("collectJsValue: blind translation to java: " + jsValue + " (" + jsValue.getClass() + ")");
+            }
+            return jsValue;
+        }
+        
     }
     
     private Object getValue( Object instance, String fieldName ) throws NoSuchFieldException, IllegalAccessException {
