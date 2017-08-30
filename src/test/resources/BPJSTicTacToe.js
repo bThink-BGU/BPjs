@@ -5,6 +5,8 @@ bp.log.info('Tic-Tac-Toe - Let the game begin!');
 var countX = 0;
 var countO = 0;
 
+//GameRules
+
 /*
  * Block further marking of a square already
  * marked by X or O.
@@ -86,4 +88,16 @@ bp.registerBThread("DetectDraw", function() {
 			
 	}
 });
+
+//Tactics - DefaultOMoves
+
+
+
+
+
+
+//Environment
+
+
+
 
