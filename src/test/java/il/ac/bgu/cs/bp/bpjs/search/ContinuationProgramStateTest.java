@@ -86,6 +86,16 @@ public class ContinuationProgramStateTest {
           + "   while(true) { bsync({request: bp.Event(\"e\")}); }\n"
           + "});";
 
+    static final String SRC_WITH_COMPOUND_VARS = 
+                      "var obj={a:1, b:2, f:function(){return 9;}};\n" 
+                    + "var obj={a:{f:function(){return 9;}}, k:42};\n" 
+                    + "bp.registerBThread( \"bt\", function(){\n"
+                    + "   var f=function(){bsync({request: bp.Event(\"e\")});};\n"
+                    + "   var fVar='fVar content';\n"
+                    + "   var fObjVar={a:'obj->a content'}\n"
+                    + "   var shadowed='updated content';\n" 
+                    + "   bsync({request: bp.Event(\"e\")});\n"
+                    + "});";
     
     @Test
     public void testCorrectExtraction() throws Exception {
@@ -125,6 +135,32 @@ public class ContinuationProgramStateTest {
     }
     
     @Test
+    public void testEqualityComplexObj() throws Exception {
+         
+        // Generate continuation 1
+        BProgram bprog = new StringBProgram(SRC_WITH_COMPOUND_VARS);
+        BProgramSyncSnapshot cur = bprog.setup();
+        cur = cur.start();
+        BThreadSyncSnapshot snapshot = cur.getBThreadSnapshots().iterator().next();
+        NativeContinuation nc = (NativeContinuation) snapshot.getContinuation();
+        ContinuationProgramState sut1 = new ContinuationProgramState(nc);
+        
+        // Generate Continuation 2
+        bprog = new StringBProgram(SRC_WITH_COMPOUND_VARS);
+        cur = bprog.setup();
+        cur = cur.start();
+        snapshot = cur.getBThreadSnapshots().iterator().next();
+        
+        // Read frame data
+        nc = (NativeContinuation) snapshot.getContinuation();
+        ContinuationProgramState sut2 = new ContinuationProgramState(nc);
+        
+        assertTrue(sut1.equals(sut1)); // sanity
+        assertTrue(sut1.equals(sut2));
+        assertTrue(sut2.equals(sut1));
+    }
+    
+    @Test
     public void testEqualityFalse() throws Exception {
          
         // Generate a continuation
@@ -138,7 +174,7 @@ public class ContinuationProgramStateTest {
         ContinuationProgramState sut1 = new ContinuationProgramState(nc1);
         
         bprog = new StringBProgram(SRC_SHORT);
-         cur = bprog.setup();
+        cur = bprog.setup();
         cur = cur.start();
         final BThreadSyncSnapshot snapshot2 = cur.getBThreadSnapshots().iterator().next();
         NativeContinuation nc2 = (NativeContinuation) snapshot2.getContinuation();

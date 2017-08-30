@@ -120,14 +120,9 @@ public class Node {
 		if (!(obj instanceof Node)) return false;
         
 		Node other = (Node) obj;
-		if (systemState == null) {
-			if (other.systemState != null) {
-				return false;
-            }
-		} else if (!systemState.equals(other.systemState)) {
-			return false;
-        }
-		return true;
+        if ( ! Objects.equals(lastEvent, other.getLastEvent()) ) return false;
+
+        return Objects.equals(systemState, other.getSystemState());
 	}
 	
 	

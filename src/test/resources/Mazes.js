@@ -23,12 +23,17 @@
  */
 
 
-/* global bp, selectedMazeName */
+/* global bp, MAZE_NAME */
 
 var trivial = 
-  ["  t ",
-   "    ",
-   "s   "];
+  ["s  ",
+   "   ",
+   "  t"];
+
+var trivialPlus = 
+  ["s  ",
+   "## ",
+   "t  "];
 
 var simple =
   ["       t ",
@@ -53,21 +58,51 @@ var singleSolution =
    
 var mazes = {
      trivial:trivial,
+     trivialPlus:trivialPlus,
      simple:simple,
      complex:complex,
      singleSolution:singleSolution
  };
  
-if ( ! selectedMazName )  {
-    selectedMazName = trivial;
+var anyEntrance = bp.EventSet("AnyEntrance", function(evt){
+   return evt.name.indexOf("Enter") === 0;
+});
+
+function enterEvent(c,r) {
+    return bp.Event("Enter (" + c + ","  + r + ")");//, {col:c, row:r});
 }
 
-var maze = mazes[selectedMazeName];
+if ( ! MAZE_NAME )  {
+    MAZE_NAME = "trivial";
+}
+
+var maze = mazes[MAZE_NAME];
 
 parseMaze(maze);
 
+bp.registerBThread("curloc", function(){
+    var i=0;
+    while ( true ) { 
+        bsync({waitFor:anyEntrance});
+        i++;
+    }
+//    var e;
+//    var col;
+//    var row;
+//    while ( true ) {
+////      bsync({waitFor:anyEntrance});
+//        bp.log.info( "pre" );
+//        e = bsync({waitFor:anyEntrance});
+//        bp.log.info( "post" );
+////        var locString = e.name.split("\\(")[1].split("\\)")[0].split(",");
+////        col = locString[0];
+////        row = locString[1];
+//        delete e;
+//    }
+});
 
-/* functions */
+////////////////////////
+///// functions 
 function parseMaze(mazeLines) {
     for ( var row=0; row<mazeLines.length; row++ ) {
         for ( var col=0; col<mazeLines[row].length; col++ ) {
@@ -85,25 +120,27 @@ function parseMaze(mazeLines) {
     }
 }
 
-var anyEntrance = bp.EventSet("AnyEntrance", function(evt){
-   return evt.name.indexOf("Enter") === 0;
-});
 
-function enterEvent(c,r) {
-    return bp.Event("Enter (" + c + ","  + r + ")");
-}
-
+/**
+ * A cell the maze solver can enter. Waits for entrances to one of the cell's
+ * neighbours, then requests entrance to itself.
+ * @param {type} col
+ * @param {type} row
+ * @returns {undefined}
+ */
 function addEnterableCell( col, row ) {
-    bp.registerBThread("cell(" + col + "," + row + ",)",
+    bp.registerBThread("cell(c:"+col+" r:"+row+")",
         function() {
-            bsync({waitFor:[
-                    enterEvent(col-1, row), enterEvent(col+1, row),
-                    enterEvent(col, row-1), enterEvent(col, row-1)
-                ]});
-            bsync({
-                request: enterEvent(col, row),
-                waitFor: anyEntrance
-            });
+            while ( true ) {
+                bsync({waitFor:[
+                        enterEvent(col-1, row), enterEvent(col+1, row),
+                        enterEvent(col, row-1), enterEvent(col, row+1)
+                    ]});
+                bsync({
+                    request: enterEvent(col, row),
+                    waitFor: anyEntrance
+                });
+            }
         }
     );
 }
@@ -116,7 +153,7 @@ function addEnterableCell( col, row ) {
  * @returns {undefined}
  */
 function addTargetCell(col, row) {
-    bp.registerBThread("TargetWatch", function(){
+    bp.registerBThread("Target(c:"+col+" r:"+row+")", function(){
        bsync({
            waitFor: enterEvent(col, row)
        }); 
@@ -128,7 +165,7 @@ function addTargetCell(col, row) {
 }
 
 function addStartCell(col, row) {
-    bp.registerBThread("starter", function() {
+    bp.registerBThread("starter(c:"+col+" r:"+row+")", function() {
        bsync({
           request:enterEvent(col,row) 
        });
