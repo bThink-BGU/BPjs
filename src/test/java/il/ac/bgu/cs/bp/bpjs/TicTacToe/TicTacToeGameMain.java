@@ -27,6 +27,9 @@ class TicTacToeGameMain extends JFrame {
 	BProgramRunner rnr = new BProgramRunner(bprog);
 	rnr.addListener( new StreamLoggerListener() );
 	rnr.start();
+	
+//	bprog.add(new UpdatePlayingGUI(), 0.1); 
+//	bprog.add(new UserMove(), 0.5);
 	 
   } 
   

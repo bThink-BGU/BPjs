@@ -66,7 +66,8 @@ public class TTTDisplayGame implements ActionListener {
 	 */
 	public void actionPerformed(ActionEvent a) {
 		final TTTButton btt = ((TTTButton) a.getSource());
-		System.out.println("Listener got you");
+		buttons[btt.row][btt.col].setText("X");
+		
 //		BThread sc = new ClickHandler(btt.row,btt.col);
 //		bp.add(sc,20.0);
 //		sc.startBThread();
