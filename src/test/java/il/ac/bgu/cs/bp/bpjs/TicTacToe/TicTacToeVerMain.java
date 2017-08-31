@@ -16,21 +16,25 @@ import java.util.Set;
 import static java.util.function.Function.identity;
 import java.util.stream.Collectors;
 
+import javax.swing.JFrame;
+
 public class TicTacToeVerMain {
+	
+	// Add GUI for watching the model-checking run. 
+	public static TTTDisplayMC TTTdisplayMC;
 
 	public static void main(String[] args) throws InterruptedException {
 		// Create a program
 		final SingleResourceBProgram bprog = new SingleResourceBProgram("BPJSTicTacToe.js");
 
-//        int philosopherCount = 5;
-//        if ( args.length > 1 ) {
-//            philosopherCount = Integer.parseInt(args[1]);
-//        }
-//        bprog.putInGlobalScope("PHILOSOPHER_COUNT", philosopherCount);
-        
-//        BProgramRunner rnr = new BProgramRunner(bprog);
-//        rnr.addListener( new StreamLoggerListener() );
-//        rnr.start();
+		JFrame f = new TicTacToeGameMain();
+		//f.setVisible(true);
+		
+		TTTdisplayMC = new TTTDisplayMC(bprog); //for model checker
+
+		BProgramRunner rnr = new BProgramRunner(bprog);
+		rnr.addListener( new StreamLoggerListener() );
+		rnr.start();
         
 		try {
             DfsBProgramVerifier vfr = new DfsBProgramVerifier();

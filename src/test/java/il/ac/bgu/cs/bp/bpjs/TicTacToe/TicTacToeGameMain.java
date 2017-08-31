@@ -14,10 +14,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListene
 class TicTacToeGameMain extends JFrame {
 	
 	// GUI for interactively playing the game
-	public static TTTListener TTTlistener;
-		
-	// Add GUI for watching the model-checking run. 
-	public static TTTDisplay TTTdisplay;
+	public static TTTDisplayGame TTTdisplayGame;
 
   public static void main(String[] args) throws InterruptedException {
 	// Create a program
@@ -25,8 +22,7 @@ class TicTacToeGameMain extends JFrame {
 	JFrame f = new TicTacToeGameMain();
 	//f.setVisible(true);
 	
-	TTTdisplay = new TTTDisplay(bprog);
-	TTTlistener = new TTTListener(bprog);
+	TTTdisplayGame = new TTTDisplayGame(bprog);
 
 	BProgramRunner rnr = new BProgramRunner(bprog);
 	rnr.addListener( new StreamLoggerListener() );

@@ -17,7 +17,8 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 /**
  * Class that implements the Graphical User Interface for the game
  */
-public class TTTListener implements ActionListener {
+public class TTTDisplayGame implements ActionListener {
+	private BProgram bp;
 	private JFrame window = new JFrame("Tic-Tac-Toe");
 	public JButton buttons[][] = new JButton[3][];
 	public JLabel message = new JLabel();
@@ -26,8 +27,10 @@ public class TTTListener implements ActionListener {
 	 * Constructor.
 	 */
 
-	public TTTListener(BProgram bp) {
+	public TTTDisplayGame(BProgram BP) {
 
+		bp = BP;
+		
 		// Create window
 		window.setSize(150, 150);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -62,7 +65,8 @@ public class TTTListener implements ActionListener {
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	public void actionPerformed(ActionEvent a) {
-//		final TTTButton btt = ((TTTButton) a.getSource());
+		final TTTButton btt = ((TTTButton) a.getSource());
+		System.out.println("Listener got you");
 //		BThread sc = new ClickHandler(btt.row,btt.col);
 //		bp.add(sc,20.0);
 //		sc.startBThread();

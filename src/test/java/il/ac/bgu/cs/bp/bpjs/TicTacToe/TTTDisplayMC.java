@@ -3,6 +3,7 @@ package il.ac.bgu.cs.bp.bpjs.TicTacToe;
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -15,7 +16,8 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 /**
  * Class that implements the display of the game
  */
-public class TTTDisplay {
+public class TTTDisplayMC {
+	private BProgram bp;
 	private JFrame window = new JFrame("Tic-Tac-Toe");
 	public JButton buttons[][] = new JButton[3][];
 	public JLabel message = new JLabel();
@@ -24,8 +26,10 @@ public class TTTDisplay {
 	 * Constructor.
 	 */
 
-	public TTTDisplay(BProgram bp) {
+	public TTTDisplayMC(BProgram BP) {
 
+		bp = BP;
+		
 		// Create window
 		window.setSize(150, 150);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -54,19 +58,8 @@ public class TTTDisplay {
 		window.add(message, BorderLayout.SOUTH);
 
 		// Make the window visible
-		//window.setVisible(true);
+		window.setVisible(true);
 	}
-
-//		/**
-//		 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-//		 */
-//		public void actionPerformed(ActionEvent a) {
-//			final TTTButton btt = ((TTTButton) a.getSource());
-//			BThread sc = new ClickHandler(btt.row,btt.col);
-//			bp.add(sc,20.0);
-//			sc.startBThread();
-//	
-//	}
 
 	/**
 	 * A button that remembers its position on the board
