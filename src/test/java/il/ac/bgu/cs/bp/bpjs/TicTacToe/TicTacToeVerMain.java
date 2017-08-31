@@ -16,7 +16,7 @@ import java.util.Set;
 import static java.util.function.Function.identity;
 import java.util.stream.Collectors;
 
-public class TicTacToeMain {
+public class TicTacToeVerMain {
 
 	public static void main(String[] args) throws InterruptedException {
 		// Create a program
