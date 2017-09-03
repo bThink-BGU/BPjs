@@ -9,9 +9,7 @@ public class O extends Move {
 	 * Constructor.
 	 */
 	public O(int row, int col) {
-		super(row, col);
-		this.named("O(" + row + "," + col + ")");
-		//this.setName("O(" + row + "," + col + ")");
+		super(row, col, "O");
 	}
 
 	/**

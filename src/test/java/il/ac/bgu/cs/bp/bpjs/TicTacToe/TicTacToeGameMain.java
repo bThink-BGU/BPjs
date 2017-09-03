@@ -1,10 +1,9 @@
 package il.ac.bgu.cs.bp.bpjs.TicTacToe;
 
-import java.awt.BorderLayout;
-import java.awt.GridLayout;
-import java.awt.Point;
-import java.awt.event.*;
-import javax.swing.*;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+
+import org.mozilla.javascript.Scriptable;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
@@ -12,28 +11,43 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
 
 class TicTacToeGameMain extends JFrame {
-	
+
 	// GUI for interactively playing the game
 	public static TTTDisplayGame TTTdisplayGame;
 
-  public static void main(String[] args) throws InterruptedException {
-	// Create a program
-	final SingleResourceBProgram bprog = new SingleResourceBProgram("BPJSTicTacToe.js");
-	JFrame f = new TicTacToeGameMain();
-	//f.setVisible(true);
-	
-	TTTdisplayGame = new TTTDisplayGame(bprog);
+	public static boolean isModelChecking() {
+		return false;
+	}
 
-	BProgramRunner rnr = new BProgramRunner(bprog);
-	rnr.addListener( new StreamLoggerListener() );
-	rnr.start();
-	
-//	bprog.add(new UpdatePlayingGUI(), 0.1); 
-//	bprog.add(new UserMove(), 0.5);
-	 
-  } 
-  
-} 
+	public static void main(String[] args) throws InterruptedException {
+		// Create a program
+		BProgram bprog = new SingleResourceBProgram("BPJSTicTacToe.js") {
+			protected void setupProgramScope(Scriptable scope) {
+				putInGlobalScope("isModelChecking", false);
+				super.setupProgramScope(scope);
+			}
+		};
+		
+
+		bprog.setDaemonMode(true);
+		JFrame f = new TicTacToeGameMain();
+		// f.setVisible(true);
+
+		BProgramRunner rnr = new BProgramRunner(bprog);
+		rnr.addListener(new StreamLoggerListener());
+
+		TTTdisplayGame = new TTTDisplayGame(bprog, rnr);
+
+		rnr.start();
+
+		System.out.println("end of run");
+
+		// bprog.add(new UpdatePlayingGUI(), 0.1);
+		// bprog.add(new UserMove(), 0.5);
+
+	}
+
+}
 
 @SuppressWarnings("serial")
 class TTTButton extends JButton {

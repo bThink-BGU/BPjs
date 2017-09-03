@@ -57,12 +57,12 @@ public class SimpleEventSelectionStrategy implements EventSelectionStrategy {
                 .filter( stmt -> stmt!=null )
                 .map(BSyncStatement::getBlock )
                 .filter(r -> r != EventSets.none )
-                .collect( Collectors.toSet() ) );
+                .collect( toSet() ) );
         
         Set<BEvent> requested = statements.stream()
                 .filter( stmt -> stmt!=null )
                 .flatMap( stmt -> stmt.getRequest().stream() )
-                .collect( Collectors.toSet() );
+                .collect( toSet() );
         
         // Let's see what internal events are requested and not blocked (if any).
         try {

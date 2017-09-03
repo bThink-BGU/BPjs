@@ -1,105 +1,127 @@
-/* global bp, bsync, PHILOSOPHER_COUNT */
+/* global bp, bsync, PHILOSOPHER_COUNT,TicTacToeGameMain */
+
+importPackage(Packages.il.ac.bgu.cs.bp.bpjs.TicTacToe.events);
 
 bp.log.info('Tic-Tac-Toe - Let the game begin!');
 
 var countX = 0;
 var countO = 0;
 
-//GameRules
+// //GameRules
+//
+// /*
+// * Block further marking of a square already
+// * marked by X or O.
+// */
+//
 
-/*
- * Block further marking of a square already
- * marked by X or O.
- */
-bp.registerBThread("squareTaken", function() {
-	while (true) {
-		
-		var e = bsync(
-                {
-					waitFor : [ bp.Event("Pick" + i + "R"),
-							    bp.Event("Pick" + j + "L") ],
-					block : [ bp.Event("Rel" + i + "R"),
-							  bp.Event("Rel" + j + "L") ]
-				}).name;
+function addSquareBThreads(row, col) {
 
-		var wt = (e.equals("Pick" + i + "R")) ? "Rel" + i + "R" : "Rel" + j	+ "L";
-		// Request to pick the right stick
-		bsync({
-			request : bp.Event("Pick" + philNum + "R")
-		});
-
-	}
-});
-
-/*
- * Alternately block O moves while waiting
- * for X moves, and vice versa (we assume that X always plays first).
- */
-bp.registerBThread("EnforceTurns", function() {
-	while (true) {
-
-	}
-});
-
-/*
- * Wait for placement of three X marks
- * in a line and request XWin.
- * To-do: Priority-------------------------------------
- */
-bp.registerBThread("DetectXWin", function() {
-	while (true) {
-		bsync({
-			waitFor : [ bp.Event("3XRow"),
-					    bp.Event("3XCol"),
-						bp.Event("3XDia") ]
-		}).name;
-
-		bsync({
-			request : bp.Event("XWin")
-		});
-	}
-});
-
-/*
- * Wait for placement of three O marks 
- * in a line and request OWin.
- * To-do: Priority-------------------------------------
- */
-bp.registerBThread("DetectOWin", function() {
-	while (true) {
-		bsync({
-			waitFor : [ bp.Event("3ORow"),
-					    bp.Event("3OCol"),
-						bp.Event("3ODia") ]
-		}).name;
-
-		bsync({
-			request : bp.Event("OWin")
-		});
-	}
-});
-
-/*
- * Wait for nine moves and request draw event.
- */
-bp.registerBThread("DetectDraw", function() {
-	while (true) {
-		if ( countX+countO === 9 ) {
-            // TODO what?
-        }
+	
+	bp.registerBThread("ClickHandler(" + row + "," + col + ")", function() {
+		while (true) {
 			
+			if( ! isModelChecking ) {
+				bsync({
+					waitFor : [ Click(row, col) ]
+				});
+			}
+			
+			bsync({
+				request : [ X(row, col) ]
+			});
+		}
+	});
+
+	bp.registerBThread("SquareTaken(" + row + "," + col + ")", function() {
+		while (true) {
+			bsync({
+				waitFor : [ X(row, col), O(row, col) ]
+			});
+			bsync({
+				block : [ X(row, col), O(row, col) ]
+			});
+		}
+	});
+
+}
+
+for (var r = 0; r < 3; r++) {
+	for (var c = 0; c < 3; c++) {
+		addSquareBThreads(r, c);
 	}
-});
+}
 
-//Tactics - DefaultOMoves
-
-
-
-
-
-
-//Environment
-
-
-
-
+//
+// /*
+// * Alternately block O moves while waiting
+// * for X moves, and vice versa (we assume that X always plays first).
+// */
+// bp.registerBThread("EnforceTurns", function() {
+// while (true) {
+//
+// }
+// });
+//
+// /*
+// * Wait for placement of three X marks
+// * in a line and request XWin.
+// * To-do: Priority-------------------------------------
+// */
+// bp.registerBThread("DetectXWin", function() {
+// while (true) {
+// bsync({
+// waitFor : [ bp.Event("3XRow"),
+// bp.Event("3XCol"),
+// bp.Event("3XDia") ]
+// }).name;
+//
+// bsync({
+// request : bp.Event("XWin")
+// });
+// }
+// });
+//
+// /*
+// * Wait for placement of three O marks
+// * in a line and request OWin.
+// * To-do: Priority-------------------------------------
+// */
+// bp.registerBThread("DetectOWin", function() {
+// while (true) {
+// bsync({
+// waitFor : [ bp.Event("3ORow"),
+// bp.Event("3OCol"),
+// bp.Event("3ODia") ]
+// }).name;
+//
+// bsync({
+// request : bp.Event("OWin")
+// });
+// }
+// });
+//
+// /*
+// * Wait for nine moves and request draw event.
+// */
+// bp.registerBThread("DetectDraw", function() {
+// while (true) {
+// if ( countX+countO === 9 ) {
+// // TODO what?
+// }
+//			
+// }
+// });
+//
+// //Tactics - DefaultOMoves
+//
+//
+//
+//
+//
+//
+// //Environment
+//
+//
+//
+//

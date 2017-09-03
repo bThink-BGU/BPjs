@@ -28,12 +28,9 @@ public class Click extends BEvent {
 	 *            Column of the pressed button
 	 */
 	public Click(int row, int col) {
-		super();
+		super("Click(" + row + "," + col + ")");
 		this.row = row;
 		this.col = col;
-		this.named("Click(" + row + "," + col + ")");
-//		this.name = "Click(" + row + "," + col + ")";
-//		this.setName("Click(" + row + "," + col + ")");
 	}
 
 	/**

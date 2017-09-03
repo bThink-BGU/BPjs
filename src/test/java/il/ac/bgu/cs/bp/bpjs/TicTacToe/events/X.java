@@ -10,9 +10,7 @@ public class X extends Move {
 	 * Constructor.
 	 */
 	public X(int row, int col) {
-		super(row, col);
-		this.named("X(" + row + "," + col + ")");
-		//this.setName("X(" + row + "," + col + ")");
+		super(row, col, "X");
 	}
 
 	/**

@@ -12,8 +12,8 @@ public class Move extends BEvent {
 	public int row;
 	public int col;
 
-	public Move(int row, int col) {
-		super();
+	public Move(int row, int col, String type) {
+		super(type + "(" + row + "," + col + ")");
 		this.row = row;
 		this.col = col;
 	}

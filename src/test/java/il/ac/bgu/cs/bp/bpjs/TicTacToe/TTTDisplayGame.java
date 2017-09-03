@@ -12,24 +12,33 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.Click;
+import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.Move;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramListenerAdapter;
+import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 
 /**
  * Class that implements the Graphical User Interface for the game
  */
 public class TTTDisplayGame implements ActionListener {
 	private BProgram bp;
+	private BProgramRunner rnr;
+	
 	private JFrame window = new JFrame("Tic-Tac-Toe");
 	public JButton buttons[][] = new JButton[3][];
 	public JLabel message = new JLabel();
 	
 	/**
 	 * Constructor.
+	 * @param rnr 
 	 */
 
-	public TTTDisplayGame(BProgram BP) {
+	public TTTDisplayGame(BProgram bp, BProgramRunner rnr) {
 
-		bp = BP;
+		this.bp = bp;
+		this.rnr = rnr;
 		
 		// Create window
 		window.setSize(150, 150);
@@ -59,6 +68,23 @@ public class TTTDisplayGame implements ActionListener {
 
 		// Make the window visible
 		window.setVisible(true);
+		
+		
+		rnr.addListener( new BProgramListenerAdapter() {
+
+			@Override
+			public void eventSelected(BProgram bp, BEvent theEvent) {
+				try {
+					Move mv = (Move)theEvent;
+					buttons[mv.row][mv.col].setText(mv.displayString());
+				} catch( ClassCastException cce) {
+				}
+				
+				
+			}
+			
+		});
+
 	}
 
 	/**
@@ -66,11 +92,13 @@ public class TTTDisplayGame implements ActionListener {
 	 */
 	public void actionPerformed(ActionEvent a) {
 		final TTTButton btt = ((TTTButton) a.getSource());
-		buttons[btt.row][btt.col].setText("X");
+		//buttons[btt.row][btt.col].setText("X");
 		
 //		BThread sc = new ClickHandler(btt.row,btt.col);
 //		bp.add(sc,20.0);
 //		sc.startBThread();
+		
+		bp.enqueueExternalEvent(new Click(btt.row,btt.col));
 }
 
 /**
