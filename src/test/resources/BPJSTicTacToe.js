@@ -61,6 +61,19 @@ bp.registerBThread("EnforceTurns", function() {
 	}
 });
 
+
+//Player O defult strategy
+bp.registerBThread("PlayerO", function() {
+	while (true) {
+		
+		bsync({
+			request : [ O(0, 0), O(0, 1), O(0, 2), O(1, 0), O(1, 1), O(1, 2), O(2, 0), O(2, 1), O(2, 2) ]			
+		});
+				
+	}
+});
+
+
 for (var r = 0; r < 3; r++) {
 	for (var c = 0; c < 3; c++) {
 		addSquareBThreads(r, c);

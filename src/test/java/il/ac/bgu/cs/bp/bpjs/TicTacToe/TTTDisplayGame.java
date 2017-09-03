@@ -14,6 +14,7 @@ import javax.swing.SwingConstants;
 
 import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.Click;
 import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.Move;
+import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.X;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramListenerAdapter;
@@ -77,6 +78,8 @@ public class TTTDisplayGame implements ActionListener {
 				try {
 					Move mv = (Move)theEvent;
 					buttons[mv.row][mv.col].setText(mv.displayString());
+//					if(mv instanceof X)
+//						bp.enqueueExternalEvent(new Click(1,1));
 				} catch( ClassCastException cce) {
 				}
 				
@@ -91,13 +94,7 @@ public class TTTDisplayGame implements ActionListener {
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	public void actionPerformed(ActionEvent a) {
-		final TTTButton btt = ((TTTButton) a.getSource());
-		//buttons[btt.row][btt.col].setText("X");
-		
-//		BThread sc = new ClickHandler(btt.row,btt.col);
-//		bp.add(sc,20.0);
-//		sc.startBThread();
-		
+		final TTTButton btt = ((TTTButton) a.getSource());		
 		bp.enqueueExternalEvent(new Click(btt.row,btt.col));
 }
 
