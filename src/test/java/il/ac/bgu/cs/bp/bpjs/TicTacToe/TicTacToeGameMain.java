@@ -10,6 +10,11 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
 
+/**
+ *  For Gaming mode change isModelChecking to false.
+ *  For Model Checking mode change isModelChecking to true.
+ * @author reututy
+ */
 class TicTacToeGameMain extends JFrame {
 
 	// GUI for interactively playing the game
