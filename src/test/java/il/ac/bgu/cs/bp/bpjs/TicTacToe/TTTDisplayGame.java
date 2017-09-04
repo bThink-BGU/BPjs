@@ -85,13 +85,13 @@ public class TTTDisplayGame implements ActionListener {
 //					if(mv instanceof X)
 //						bp.enqueueExternalEvent(new Click(1,1));		
 				}	
-				else{
-					String msg;	
+				else {
+					String msg = "";	
 					if (theEvent == StaticEvents.XWin)
 						msg = "X Wins!";
 					else if (theEvent == StaticEvents.OWin)
 						msg = "O Wins!";
-					else
+					else if (theEvent == StaticEvents.draw )
 						msg = "It's a Draw!";
 					System.out.println(msg);
 					message.setText(msg);

@@ -5,7 +5,8 @@ importPackage(Packages.il.ac.bgu.cs.bp.bpjs.TicTacToe.events);
 bp.log.info('Tic-Tac-Toe - Let the game begin!');
 
 var SquareCount = 0;
-var xtry=1;
+var countX = 0;
+var countO = 0;
 
 // GameRules
 
@@ -59,29 +60,50 @@ bp.registerBThread("EnforceTurns", function() {
 		});
 	}
 });
-
-//Detect if X Wins
-bp.registerBThread("DetectXWin", function() {
-	while (true) {
-		if(xtry == 1){
-			bsync({
-				request : [ StaticEvents.XWin ]			
-			});
-			xtry--;
-		}	
-	}
-});
-
-//Declare Winner
-bp.registerBThread("DeclareWinner", function() {
-	while (true) {
-		
-		bsync({
-			waitFor : [ StaticEvents.XWin, StaticEvents.OWin, StaticEvents.XWin ]			
-		});
-				
-	}
-});
+//
+////Detect if X Wins
+//bp.registerBThread("DetectXWin", function() {
+//	while (true) {
+//		if(countX == 3){
+//			bsync({
+//				request : [ StaticEvents.XWin ]			
+//			});
+//		}	
+//	}
+//});
+//
+////Detect if O Wins
+//bp.registerBThread("DetectOWin", function() {
+//	while (true) {
+//		if(countO == 3){
+//			bsync({
+//				request : [ StaticEvents.OWin ]			
+//			});
+//		}	
+//	}
+//});
+//
+////Detect if it's a draw
+//bp.registerBThread("DetectDraw", function() {
+//	while (true) {
+//		if(SquareCount == 9 && countX < 3 && countO < 3){
+//			bsync({
+//				request : [ StaticEvents.draw ]			
+//			});
+//		}	
+//	}
+//});
+//
+////Declare Winner
+//bp.registerBThread("DeclareWinner", function() {
+//	while (true) {
+//		
+//		bsync({
+//			waitFor : [ StaticEvents.XWin, StaticEvents.OWin, StaticEvents.draw ]			
+//		});
+//				
+//	}
+//});
 
 //Player O defult strategy
 bp.registerBThread("PlayerO", function() {
