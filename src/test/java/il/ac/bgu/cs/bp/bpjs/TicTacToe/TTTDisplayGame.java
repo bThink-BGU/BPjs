@@ -12,8 +12,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
+import org.hamcrest.core.IsInstanceOf;
+
 import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.Click;
 import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.Move;
+import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.StaticEvents;
 import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.X;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
@@ -70,20 +73,29 @@ public class TTTDisplayGame implements ActionListener {
 		// Make the window visible
 		window.setVisible(true);
 		
-		
+		//Writs 'X' and 'O' on the buttons
 		rnr.addListener( new BProgramListenerAdapter() {
 
 			@Override
 			public void eventSelected(BProgram bp, BEvent theEvent) {
-				try {
+				if(theEvent instanceof Move){
+			
 					Move mv = (Move)theEvent;
 					buttons[mv.row][mv.col].setText(mv.displayString());
 //					if(mv instanceof X)
-//						bp.enqueueExternalEvent(new Click(1,1));
-				} catch( ClassCastException cce) {
+//						bp.enqueueExternalEvent(new Click(1,1));		
+				}	
+				else{
+					String msg;	
+					if (theEvent == StaticEvents.XWin)
+						msg = "X Wins!";
+					else if (theEvent == StaticEvents.OWin)
+						msg = "O Wins!";
+					else
+						msg = "It's a Draw!";
+					System.out.println(msg);
+					message.setText(msg);
 				}
-				
-				
 			}
 			
 		});
