@@ -5,8 +5,6 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.tasks.ResumeBThread;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.tasks.StartBThread;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import il.ac.bgu.cs.bp.bpjs.search.BProgramSyncSnapshotCloner;
-import il.ac.bgu.cs.bp.bpjs.search.BProgramSyncSnapshotIO;
 
 import java.util.ArrayList;
 import java.util.Collections;

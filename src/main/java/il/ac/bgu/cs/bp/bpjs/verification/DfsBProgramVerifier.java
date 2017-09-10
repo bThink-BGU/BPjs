@@ -26,6 +26,7 @@ package il.ac.bgu.cs.bp.bpjs.verification;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.search.ContinuationProgramState;
+import il.ac.bgu.cs.bp.bpjs.search.HashVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.search.Node;
 import il.ac.bgu.cs.bp.bpjs.search.StateHashVisitedNodeStore;
 import java.util.ArrayDeque;
@@ -53,7 +54,7 @@ public class DfsBProgramVerifier {
 
 	private long visitedStatesCount;
     
-    private VisitedNodeStore visited = new StateHashVisitedNodeStore();
+    private VisitedNodeStore visited = new HashVisitedNodeStore();
     private long maxTraceLength = DEFAULT_MAX_TRACE;
 
     public VerificationResult verify( BProgram aBp ) throws Exception {

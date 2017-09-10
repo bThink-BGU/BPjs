@@ -27,6 +27,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.StringBProgram;
+import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.mozilla.javascript.NativeContinuation;
@@ -85,6 +86,7 @@ public class ContinuationProgramStateTest {
           + "   var shadowed='updated content';\n" 
           + "   while(true) { bsync({request: bp.Event(\"e\")}); }\n"
           + "});";
+    
 
     static final String SRC_WITH_COMPOUND_VARS = 
                       "var obj={a:1, b:2, f:function(){return 9;}};\n" 
@@ -158,6 +160,49 @@ public class ContinuationProgramStateTest {
         assertTrue(sut1.equals(sut1)); // sanity
         assertTrue(sut1.equals(sut2));
         assertTrue(sut2.equals(sut1));
+    }
+   
+    static final String SRC_LOOP_UPDATED_VAR = 
+        "bp.registerBThread( function(){ \n" +
+        "var i=0;\n" +
+        "bsync({waitFor:bp.Event(\"e\")});\n" +
+        "i += 42;\n" +
+        "bp.log.info(\"pre-loop: i=\" + i);\n" +
+        "bsync({waitFor:bp.Event(\"e\")});\n" +
+        "while ( true ) { \n" +
+        "    i = i + 5;\n" +
+        "    bp.log.info(\"i=\" + i);\n" +
+        "    bsync({waitFor:bp.Event(\"e\")});\n" +
+        "}});";
+    
+//    @Test
+    public void testInequalityLoop() throws Exception {
+         
+        // Generate snapshot 1
+        BProgram bprog = new StringBProgram(SRC_LOOP_UPDATED_VAR);
+        BProgramSyncSnapshot cur = bprog.setup();
+        cur = cur.start();
+        BThreadSyncSnapshot snapshot = cur.getBThreadSnapshots().iterator().next();
+        NativeContinuation nc = (NativeContinuation) snapshot.getContinuation();
+        ContinuationProgramState sut1 = new ContinuationProgramState(nc);
+        
+        assertEquals( 0.0, sut1.getVisibleVariables().get("i"));
+        
+        // Generate snapshot 2, pre-loop
+        cur = cur.triggerEvent(new BEvent("e"));
+        snapshot = cur.getBThreadSnapshots().iterator().next();
+        nc = (NativeContinuation) snapshot.getContinuation();
+        ContinuationProgramState sut2 = new ContinuationProgramState(nc);
+        assertEquals( 42.0, sut2.getVisibleVariables().get("i"));
+        
+        // Generate snapshot 3, first loop
+        cur = cur.triggerEvent(new BEvent("e"));
+        snapshot = cur.getBThreadSnapshots().iterator().next();
+        nc = (NativeContinuation) snapshot.getContinuation();
+        ContinuationProgramState sut3 = new ContinuationProgramState(nc);
+        assertEquals( 47.0, sut3.getVisibleVariables().get("i"));
+        
+        assertFalse(sut2.equals(sut1));
     }
     
     @Test

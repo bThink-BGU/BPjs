@@ -42,6 +42,9 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+## 2017-09-10
+* :sparkles: Updated to Rhino 1.7.7.2.
+
 ## 2017-08-18
 * :sparkles: Initial verification added. `DfsBProgramVerifier` scans the states of
   a `BProgram` using DFS, and can return traces where there are no selectable events.

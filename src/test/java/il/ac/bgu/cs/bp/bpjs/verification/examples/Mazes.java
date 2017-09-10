@@ -70,8 +70,8 @@ public class Mazes {
 		try {
             DfsBProgramVerifier vfr = new DfsBProgramVerifier();
 //            vfr.setVisitedNodeStore(new FullVisitedNodeStore());
-            vfr.setVisitedNodeStore(new HashVisitedNodeStore());
-//            vfr.setVisitedNodeStore(new StateHashVisitedNodeStore());
+//            vfr.setVisitedNodeStore(new HashVisitedNodeStore());
+            vfr.setVisitedNodeStore(new StateHashVisitedNodeStore());
             final VerificationResult res = vfr.verify(bprog);
             
             NativeArray jsMaze = bprog.getFromGlobalScope(mazeName, NativeArray.class).get();

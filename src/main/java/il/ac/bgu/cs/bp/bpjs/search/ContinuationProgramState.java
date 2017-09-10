@@ -26,17 +26,16 @@ package il.ac.bgu.cs.bp.bpjs.search;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Dictionary;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import org.mozilla.javascript.ConsString;
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeContinuation;
 import org.mozilla.javascript.NativeFunction;
 import org.mozilla.javascript.NativeJavaObject;
-import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 import org.mozilla.javascript.UniqueTag;
@@ -69,22 +68,27 @@ public class ContinuationProgramState {
     private void collectScopeValues(NativeContinuation nc ){
         ScriptableObject current = nc;
         ScriptableObject currentScope = nc;
-        while ( current != null ) {
-            for ( Object o : current.getIds() ) {
-                if ( !variables.containsKey(o) && o != "bp" ) {
-                    Object variableContent = current.get(o);
-                    if ( variableContent instanceof Undefined ) continue;
-                    variables.put(o, collectJsValue(variableContent));
+        try {
+            Context.enter();
+            while ( current != null ) {
+                for ( Object o : current.getIds() ) {
+                    if ( !variables.containsKey(o) && o != "bp" ) {
+                        Object variableContent = current.get(o);
+                        if ( variableContent instanceof Undefined ) continue;
+                        variables.put(o, collectJsValue(variableContent));
+                    }
+                }
+                if ( current.getPrototype() != null ) {
+                    // advance along the prototype chain
+                    current = (ScriptableObject) current.getPrototype();
+                } else {
+                    // advance the scope chain
+                    current = (ScriptableObject) currentScope.getParentScope();
+                    currentScope = current;
                 }
             }
-            if ( current.getPrototype() != null ) {
-                // advance along the prototype chain
-                current = (ScriptableObject) current.getPrototype();
-            } else {
-                // advance the scope chain
-                current = (ScriptableObject) currentScope.getParentScope();
-                currentScope = current;
-            }
+        } finally {
+            Context.exit();
         }
     }
     
@@ -103,6 +107,7 @@ public class ContinuationProgramState {
             //  - 2: Get the stack variable names
             Object iData = getValue(stackFrame, "idata");
             String[] argNames = (String[]) getValue(iData, "argNames");
+            System.out.println("argNames = " + Arrays.toString(argNames));
             
             //  - 3: Now get the correct value for the name.
             for ( int i=0; i<argNames.length; i++ ) {
