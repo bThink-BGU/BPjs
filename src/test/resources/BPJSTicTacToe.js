@@ -116,23 +116,23 @@ bp.registerBThread("PlayerO", function() {
 	}
 });
 
-bp.registerBThread("AddThirdO", function() {
-	
-	var e;
-	var wt;
-	
-	while (true) {
-		bsync({
-			waitFor : [ O(0, 0) ]
-		});
-		
-		e = bsync({
-			waitFor : [ O(0,1) ]
-		}).name;
-		
-		wt = O(0,2);
-		
-		bp.log.info('e='+e);
+//bp.registerBThread("AddThirdO", function() {
+//	
+//	var e;
+//	var wt;
+//	
+//	while (true) {
+//		bsync({
+//			waitFor : [ O(0, 0) ]
+//		});
+//		
+//		e = bsync({
+//			waitFor : [ O(0,1) ]
+//		}).name;
+//		
+//		wt = O(0,2);
+//		
+//		bp.log.info('e='+e);
 		
 //		e = bsync({
 //			waitFor : [ O(0,1), O(0,2), O(1,0), O(1,2), 0(1,1), O(2,2) ]
@@ -154,14 +154,14 @@ bp.registerBThread("AddThirdO", function() {
 //			wt = O(1,1);
 			
 						
-		bsync({
-			request : [ wt ]
-		});	
-	
-		delete wt;
-		delete e;
-	}
-});
+//		bsync({
+//			request : [ wt ]
+//		});	
+//	
+//		delete wt;
+//		delete e;
+//	}
+//});
 
 for (var r = 0; r < 3; r++) {
 	for (var c = 0; c < 3; c++) {
