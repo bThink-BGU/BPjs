@@ -126,40 +126,15 @@ bp.registerBThread("AddThirdO", function() {
 			waitFor : [ O(0, 0) ]
 		});
 		
-		e = bsync({
+		bsync({
 			waitFor : [ O(0,1) ]
-		}).name;
-		
-		wt = O(0,2);
-		
-		bp.log.info('e='+e);
-		
-//		e = bsync({
-//			waitFor : [ O(0,1), O(0,2), O(1,0), O(1,2), 0(1,1), O(2,2) ]
-//		}).name;	
-//		//right
-//		if (e.equals("O(0,1)"))
-//			wt = O(0,2);
-//		else if(e.equals("O(0,2)"))
-//			wt = O(0,1);
-//		//down
-//		else if(e.equals("O(1,0)"))
-//			wt = O(2,0);
-//		else if(e.equals("O(2,0)"))
-//			wt = O(1,0);
-//		//diagonal
-//		else if(e.equals("O(1,1)"))
-//			wt = O(2,2);
-//		else if(e.equals("O(2,2)"))
-//			wt = O(1,1);
+		});
 			
 						
 		bsync({
-			request : [ wt ]
+			request : [ O(2,2,1)],
+			block:    [O(0,0), O(0,1), O(0,2), O(1,0), O(1,1), O(1,2), O(2,0), O(2,1), O(2,2)]
 		});	
-	
-		delete wt;
-		delete e;
 	}
 });
 

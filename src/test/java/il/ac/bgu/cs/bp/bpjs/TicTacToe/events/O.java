@@ -5,16 +5,18 @@ package il.ac.bgu.cs.bp.bpjs.TicTacToe.events;
  */
 @SuppressWarnings("serial")
 public class O extends Move {
-	/**
-	 * Constructor.
-	 */
+	
+	int priority;
+	
 	public O(int row, int col) {
+		this(row,col,0);
+	}
+	
+	public O(int row, int col, int priority) {
 		super(row, col, "O");
+		this.priority=priority;
 	}
 
-	/**
-	 * @see java.lang.Object#toString()
-	 */
 	/**
 	 * @see tictactoe.events.Move#displayString()
 	 */

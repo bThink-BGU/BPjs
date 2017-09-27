@@ -23,17 +23,21 @@ bp.log.info('Dinning philosophers with ' + PHILOSOPHER_COUNT + ' philosophers');
 					}).name;
 
 			var wt = (e.equals("Pick" + i + "R")) ? "Rel" + i + "R" : "Rel" + j	+ "L";
-
+	
 			bsync({
 				waitFor : bp.Event(wt),
 				block : [ bp.Event("Pick" + i + "R"),
 						  bp.Event("Pick" + j + "L") ]
 			});
+
 			delete wt;
 			delete e;
 		}
 	});
 };
+
+
+
 
 function addPhil(philNum) {
 	bp.registerBThread("Phil" + philNum, function() {

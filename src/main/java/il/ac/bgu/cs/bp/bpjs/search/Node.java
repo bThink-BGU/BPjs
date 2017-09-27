@@ -1,28 +1,28 @@
 package il.ac.bgu.cs.bp.bpjs.search;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Objects;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
 
 /**
- * A single node in a program's execution tree. Contains the program's state, and
- * the last event to happen when getting to this state.
+ * A single node in a program's execution tree. Contains the program's state,
+ * and the last event to happen when getting to this state.
  * 
  * @author Gera
  * @author Reut
  * @author michael
  */
 public class Node {
-	
+
 	private final BProgramSyncSnapshot systemState;
 	private final BProgram bp;
-	private final Set<BEvent> possibleEvents;
+	private final List<BEvent> possibleEvents;
 	private final BEvent lastEvent;
 	private final Iterator<BEvent> iterator;
 
@@ -30,17 +30,19 @@ public class Node {
 		this.bp = bp;
 		this.systemState = systemState;
 		this.lastEvent = e;
+
+		possibleEvents = new ArrayList<>(bp.getEventSelectionStrategy().selectableEvents(systemState.getStatements(),
+				systemState.getExternalEvents()));
 	
-		possibleEvents = bp.getEventSelectionStrategy().selectableEvents(systemState.getStatements(), systemState.getExternalEvents());
+		Collections.shuffle(possibleEvents);
 		iterator = possibleEvents.iterator();
 	}
 
 	private String stateString() {
 
 		StringBuilder str = new StringBuilder();
-        systemState.getBThreadSnapshots().forEach( s  -> 
-            str.append("\t").append(s.toString()).append(" {").append(s.getBSyncStatement()).append("} \n")
-        );
+		systemState.getBThreadSnapshots().forEach(
+				s -> str.append("\t").append(s.toString()).append(" {").append(s.getBSyncStatement()).append("} \n"));
 
 		return str.toString();
 	}
@@ -57,21 +59,12 @@ public class Node {
 	}
 
 	/**
-	 * Get the events that can be triggered at the state.
-	 * 
-	 * @return The set of requested and not blocked events.
-	 */
-	public Set<BEvent> getPossibleEvents() {
-		return possibleEvents;
-	}
-
-	/**
-	 * Get a Node object for each possible state of the system after triggering
-	 * the given event.
+	 * Get a Node object for each possible state of the system after triggering the
+	 * given event.
 	 * 
 	 * @param e
-	 * @return State of the BProgram after event {@code e} was selected while the 
-     *         program was at {@code this} node's state.
+	 * @return State of the BProgram after event {@code e} was selected while the
+	 *         program was at {@code this} node's state.
 	 * @throws InterruptedException
 	 */
 	public Node getNextNode(BEvent e) throws Exception {
@@ -96,13 +89,13 @@ public class Node {
 		return iterator;
 	}
 
-    public BEvent getLastEvent() {
-        return lastEvent;
-    }
+	public BEvent getLastEvent() {
+		return lastEvent;
+	}
 
-    public BProgramSyncSnapshot getSystemState() {
-        return systemState;
-    }
+	public BProgramSyncSnapshot getSystemState() {
+		return systemState;
+	}
 
 	@Override
 	public int hashCode() {
@@ -115,16 +108,18 @@ public class Node {
 
 	@Override
 	public boolean equals(Object obj) {
-		if (this == obj) return true;
-		if (obj == null) return false;
-		if (!(obj instanceof Node)) return false;
-        
-		Node other = (Node) obj;
-        if ( ! Objects.equals(lastEvent, other.getLastEvent()) ) return false;
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (!(obj instanceof Node))
+			return false;
 
-        return Objects.equals(systemState, other.getSystemState());
+		Node other = (Node) obj;
+		if (!Objects.equals(lastEvent, other.getLastEvent()))
+			return false;
+
+		return Objects.equals(systemState, other.getSystemState());
 	}
-	
-	
 
 }
