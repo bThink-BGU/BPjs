@@ -25,4 +25,7 @@ public class O extends Move {
 		return "O";
 	}
 
+	public void priority(int p) {
+		priority=p;
+	}
 }

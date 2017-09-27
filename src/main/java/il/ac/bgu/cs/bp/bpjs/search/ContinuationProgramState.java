@@ -107,7 +107,6 @@ public class ContinuationProgramState {
             //  - 2: Get the stack variable names
             Object iData = getValue(stackFrame, "idata");
             String[] argNames = (String[]) getValue(iData, "argNames");
-            System.out.println("argNames = " + Arrays.toString(argNames));
             
             //  - 3: Now get the correct value for the name.
             for ( int i=0; i<argNames.length; i++ ) {

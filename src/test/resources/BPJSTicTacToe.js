@@ -60,57 +60,27 @@ bp.registerBThread("EnforceTurns", function() {
 		});
 	}
 });
-//
-////Detect if X Wins
-//bp.registerBThread("DetectXWin", function() {
-//	while (true) {
-//		if(countX == 3){
-//			bsync({
-//				request : [ StaticEvents.XWin ]			
-//			});
-//		}	
-//	}
-//});
-//
-////Detect if O Wins
-//bp.registerBThread("DetectOWin", function() {
-//	while (true) {
-//		if(countO == 3){
-//			bsync({
-//				request : [ StaticEvents.OWin ]			
-//			});
-//		}	
-//	}
-//});
-//
-////Detect if it's a draw
-//bp.registerBThread("DetectDraw", function() {
-//	while (true) {
-//		if(SquareCount == 9 && countX < 3 && countO < 3){
-//			bsync({
-//				request : [ StaticEvents.draw ]			
-//			});
-//		}	
-//	}
-//});
-//
-////Declare Winner
-//bp.registerBThread("DeclareWinner", function() {
-//	while (true) {
-//		
-//		bsync({
-//			waitFor : [ StaticEvents.XWin, StaticEvents.OWin, StaticEvents.draw ]			
-//		});
-//				
-//	}
-//});
+
+
 
 //Player O defult strategy
-bp.registerBThread("PlayerO", function() {
+
+bp.registerBThread("Sides", function() {
+	while (true) {
+		bsync({
+			request : [ O(0,1,0).priority(0), O(1,0,0).priority(0), O(1,2).priority(0), O(2,1).priority(0) ]			
+		});
+				
+	}
+});
+
+
+
+bp.registerBThread("Corners", function() {
 	while (true) {
 		
 		bsync({
-			request : [ O(0,0), O(0,1), O(0,2), O(1,0), O(1,1), O(1,2), O(2,0), O(2,1), O(2,2) ]			
+			request : [ O(0,0).priority(1), O(0,2).priority(1), O(2,0).priority(1), O(2,2).priority(1) ]
 		});
 				
 	}
@@ -145,3 +115,51 @@ for (var r = 0; r < 3; r++) {
 }
 
 
+
+
+
+
+//
+////Detect if X Wins
+//bp.registerBThread("DetectXWin", function() {
+//while (true) {
+//	if(countX == 3){
+//		bsync({
+//			request : [ StaticEvents.XWin ]			
+//		});
+//	}	
+//}
+//});
+//
+////Detect if O Wins
+//bp.registerBThread("DetectOWin", function() {
+//while (true) {
+//	if(countO == 3){
+//		bsync({
+//			request : [ StaticEvents.OWin ]			
+//		});
+//	}	
+//}
+//});
+//
+////Detect if it's a draw
+//bp.registerBThread("DetectDraw", function() {
+//while (true) {
+//	if(SquareCount == 9 && countX < 3 && countO < 3){
+//		bsync({
+//			request : [ StaticEvents.draw ]			
+//		});
+//	}	
+//}
+//});
+//
+////Declare Winner
+//bp.registerBThread("DeclareWinner", function() {
+//while (true) {
+//	
+//	bsync({
+//		waitFor : [ StaticEvents.XWin, StaticEvents.OWin, StaticEvents.draw ]			
+//	});
+//			
+//}
+//});
