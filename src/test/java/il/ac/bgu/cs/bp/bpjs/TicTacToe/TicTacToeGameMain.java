@@ -9,6 +9,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
+import il.ac.bgu.cs.bp.bpjs.eventselection.BsyncBasedPriorityESS;
 
 /**
  *  For Gaming mode change isModelChecking to false.
@@ -33,7 +34,8 @@ class TicTacToeGameMain extends JFrame {
 			}
 		};
 		
-
+		bprog.setEventSelectionStrategy(new BsyncBasedPriorityESS());
+		
 		bprog.setDaemonMode(true);
 		JFrame f = new TicTacToeGameMain();
 		// f.setVisible(true);
