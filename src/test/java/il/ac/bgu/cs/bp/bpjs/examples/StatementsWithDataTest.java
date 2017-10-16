@@ -10,7 +10,8 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramListenerAda
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import il.ac.bgu.cs.bp.bpjs.eventselection.BsyncBasedPriorityESS;
+import il.ac.bgu.cs.bp.bpjs.eventselection.PrioritizedBSyncEventSelectionStrategy;
+
 import il.ac.bgu.cs.bp.bpjs.validation.eventpattern.EventPattern;
 
 /**
@@ -25,7 +26,7 @@ public class StatementsWithDataTest {
         sut.addListener( new StreamLoggerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         sut.setBProgram(bprog);
-        sut.getBProgram().setEventSelectionStrategy(new BsyncBasedPriorityESS());
+        sut.getBProgram().setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());
         sut.addListener( new BProgramListenerAdapter() {} );
         sut.start();
         

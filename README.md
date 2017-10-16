@@ -42,6 +42,11 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+## 2017-10-16
+* :sparkles: New base class for implementing event selection strategies.
+* :sparkles: New event selection strategy that can assign priorities to b-threads.
+* :sparkles: New event selection strategy that allows b-threads to add priority to their `bsync`s.
+
 ## 2017-09-10
 * :sparkles: Updated to Rhino 1.7.7.2.
 

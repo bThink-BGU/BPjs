@@ -39,7 +39,7 @@ public class PriorityBasedSelectionTest {
 					+ "});"//
 			);
 			
-			PriorityBasedEventSelectionStrategy eventSelectionStrategy = new PriorityBasedEventSelectionStrategy();
+			PrioritizedBThreadsEventSelectionStrategy eventSelectionStrategy = new PrioritizedBThreadsEventSelectionStrategy();
 			eventSelectionStrategy.setPriority("bt1", 1);
 
 			bProgram.setEventSelectionStrategy(eventSelectionStrategy);

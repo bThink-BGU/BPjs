@@ -25,25 +25,18 @@ import org.mozilla.javascript.Context;
  * </ol>
  * 
  * Under this strategy, if the selected event is internal, and has {@code equal} events queued externally,
- * these events are not removed.
+ * these events are <em>not</em> removed.
  * 
  * @author michael
  */
-public class SimpleEventSelectionStrategy implements EventSelectionStrategy {
+public class SimpleEventSelectionStrategy extends AbstractEventSelectionStrategy {
     
-    private final Random rnd;
-    private final long seed;
     
     public SimpleEventSelectionStrategy( long seed ) {
-        rnd = new Random(seed);
-        this.seed = seed;
+        super(seed);
     }
     
-    public SimpleEventSelectionStrategy() {
-        rnd = new Random();
-        seed = rnd.nextLong();
-        rnd.setSeed(seed);
-    }
+    public SimpleEventSelectionStrategy() {}
     
     
     @Override
@@ -80,28 +73,4 @@ public class SimpleEventSelectionStrategy implements EventSelectionStrategy {
         }
     }
 
-    @Override
-    public Optional<EventSelectionResult> select(Set<BSyncStatement> statements, List<BEvent> externalEvents, Set<BEvent> selectableEvents) {
-        if ( selectableEvents.isEmpty() ) {
-            return Optional.empty();
-        }
-        
-        BEvent chosen = new ArrayList<>(selectableEvents).get(rnd.nextInt(selectableEvents.size()));
-        
-        Set<BEvent> requested = statements.stream()
-                .filter( stmt -> stmt!=null )
-                .flatMap( stmt -> stmt.getRequest().stream() )
-                .collect( Collectors.toSet() );
-        
-        if (requested.contains(chosen)) {
-            return Optional.of(new EventSelectionResult(chosen));
-        } else {
-            // that was an internal event, need to find the first index 
-            return Optional.of(new EventSelectionResult(chosen, singleton(externalEvents.indexOf(chosen))));
-        }
-    }
-    
-    public long getSeed() {
-        return seed;
-    }
 }

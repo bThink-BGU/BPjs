@@ -4,12 +4,9 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toSet;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -22,25 +19,25 @@ import il.ac.bgu.cs.bp.bpjs.eventsets.ComposableEventSet;
 import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.eventsets.EventSets;
 
-public class PriorityBasedEventSelectionStrategy implements EventSelectionStrategy {
+/**
+ * An event selection strategy that prefers events from b-threads with higher priorities.
+ * 
+ * @author geraw
+ * @author michael
+ */
+public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSelectionStrategy {
+
+    public static final int DEFAULT_PRIORITY = -1;
     
-    private final Random rnd;
-    private final long seed;
+    /** A mapping of b-thread names to their priorities. */
+    final private Map<String, Integer> priorities = new HashMap<>();
     
-    // A mapping of b-thread names to their priorities.
-    private Map<String, Integer> priorities = new HashMap<String, Integer>();
-    
-    public PriorityBasedEventSelectionStrategy( long seed ) {
-        rnd = new Random(seed);
-        this.seed = seed;
+    public PrioritizedBThreadsEventSelectionStrategy( long seed ) {
+        super(seed);
     }
     
-    public PriorityBasedEventSelectionStrategy() {
-        rnd = new Random();
-        seed = rnd.nextLong();
-        rnd.setSeed(seed);
+    public PrioritizedBThreadsEventSelectionStrategy() {
     }
-    
     
     @Override
     public Set<BEvent> selectableEvents(Set<BSyncStatement> statements, List<BEvent> externalEvents) {
@@ -49,10 +46,10 @@ public class PriorityBasedEventSelectionStrategy implements EventSelectionStrate
             return externalEvents.isEmpty() ? emptySet() : singleton(externalEvents.get(0));
         }
         
-        EventSet blocked = ComposableEventSet.anyOf(statements.stream()
+        final EventSet blocked = ComposableEventSet.anyOf(statements.stream()
                 .filter( stmt -> stmt!=null )
-                .map(BSyncStatement::getBlock )
-                .filter(r -> r != EventSets.none )
+                .map( BSyncStatement::getBlock )
+                .filter( r -> r != EventSets.none )
                 .collect( toSet() ) );
         
         
@@ -72,7 +69,7 @@ public class PriorityBasedEventSelectionStrategy implements EventSelectionStrate
             Integer highestPriority = requestedAndNotBlockedWithPriorities.stream().map(p -> p.getRight()).max(Integer::max).get();
             
             Set<BEvent> requestedAndNotBlocked = requestedAndNotBlockedWithPriorities.stream()
-            	.filter(p -> p.getRight() == highestPriority)
+            	.filter(p -> p.getRight().intValue() == highestPriority.intValue())
             	.map(p->p.getLeft())
             	.collect(toSet());
 
@@ -85,42 +82,22 @@ public class PriorityBasedEventSelectionStrategy implements EventSelectionStrate
         }
     }
 
-    
     public void setPriority(String bThreadName, Integer priority) {
     	priorities.put(bThreadName, priority);
     }
     
     public Integer getPriority(String bThreadName) {
-    	Integer p = priorities.get(bThreadName);
-    	
-    	if( p == null) 
-    		return -1;
-    	else
-    		return p;
+    	return priorities.getOrDefault(bThreadName, DEFAULT_PRIORITY);
     }
     
-    @Override
-    public Optional<EventSelectionResult> select(Set<BSyncStatement> statements, List<BEvent> externalEvents, Set<BEvent> selectableEvents) {
-        if ( selectableEvents.isEmpty() ) {
-            return Optional.empty();
-        }
-        
-        BEvent chosen = new ArrayList<>(selectableEvents).get(rnd.nextInt(selectableEvents.size()));
-
-        
-        Set<BEvent> requested = statements.stream()
-                .filter( stmt -> stmt!=null )
-                .flatMap( stmt -> stmt.getRequest().stream() )
-                .collect( Collectors.toSet() );
-        
-        if (requested.contains(chosen)) {
-            return Optional.of(new EventSelectionResult(chosen));
-        } else {
-            // that was an external event, need to find the first index 
-            return Optional.of(new EventSelectionResult(chosen, singleton(externalEvents.indexOf(chosen))));
-        }
+    public int getHighestPriority() {
+        return priorities.values().stream().mapToInt( Integer::intValue ).max().orElse(DEFAULT_PRIORITY);
     }
     
+    public int getLowestPriority() {
+        return priorities.values().stream().mapToInt( Integer::intValue ).min().orElse(DEFAULT_PRIORITY);
+    }
+                    
     public long getSeed() {
         return seed;
     }

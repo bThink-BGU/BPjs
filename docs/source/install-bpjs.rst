@@ -9,7 +9,7 @@ BPjs is available in multiple packagings. Selecting the which packaging is right
 Running BPjs from the Commandline
 ---------------------------------
 
-This is a .jar file containing all the dependencies needed for running BPjs, so it's the only file you need. Useful for running BPjs stand-alone. This file is available at our `release page`_, with the suffix ".fat.jar".
+This is a .jar file containing all the dependencies needed for running BPjs, so it's the only file you need. Useful for running BPjs stand-alone. This file is available at our `release page`_, with the suffix ".uber.jar".
 
 Using Maven
 ------------
@@ -42,7 +42,7 @@ BPjs is a built using `Apache Maven`_. Thus, you need to install Maven, or have 
 
 #. To build a regular .jar, use ``mvn package``
 
-#. To build a "fat" jar, with all dependencies included, use ``mvn package -P fat-jar``
+#. To build an "über" jar, containing all program dependencies, use ``mvn package -P uber-jar``
 
 .. _release page: https://github.com/bThink-BGU/BPjs/releases
 .. _Apache Maven: https://maven.apache.org

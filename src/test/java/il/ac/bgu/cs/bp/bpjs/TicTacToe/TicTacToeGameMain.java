@@ -9,7 +9,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
-import il.ac.bgu.cs.bp.bpjs.eventselection.BsyncBasedPriorityESS;
+import il.ac.bgu.cs.bp.bpjs.eventselection.PrioritizedBThreadsEventSelectionStrategy;
 
 /**
  *  For Gaming mode change isModelChecking to false.
@@ -28,13 +28,14 @@ class TicTacToeGameMain extends JFrame {
 	public static void main(String[] args) throws InterruptedException {
 		// Create a program
 		BProgram bprog = new SingleResourceBProgram("BPJSTicTacToe.js") {
+            @Override
 			protected void setupProgramScope(Scriptable scope) {
 				putInGlobalScope("isModelChecking", false);
 				super.setupProgramScope(scope);
 			}
 		};
 		
-		bprog.setEventSelectionStrategy(new BsyncBasedPriorityESS());
+		bprog.setEventSelectionStrategy(new PrioritizedBThreadsEventSelectionStrategy());
 		
 		bprog.setDaemonMode(true);
 		JFrame f = new TicTacToeGameMain();
