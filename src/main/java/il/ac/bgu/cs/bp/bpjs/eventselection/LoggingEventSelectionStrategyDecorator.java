@@ -57,7 +57,16 @@ public class LoggingEventSelectionStrategyDecorator implements EventSelectionStr
 
     @Override
     public Set<BEvent> selectableEvents(Set<BSyncStatement> statements, List<BEvent> externalEvents) {
-        return decorated.selectableEvents(statements, externalEvents);
+        final Set<BEvent> selectableEvents = decorated.selectableEvents(statements, externalEvents);
+
+        out.println(" === Selectable Events ===");
+        if ( selectableEvents.isEmpty() ){
+            out.println(" - none -");
+        } else {
+            selectableEvents.stream().forEach( e -> out.println(" + " + e));
+        }
+
+        return selectableEvents;
     }
 
     @Override

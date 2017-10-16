@@ -76,7 +76,11 @@ public abstract class AbstractEventSelectionStrategy implements EventSelectionSt
             return Optional.empty();
         }
         BEvent chosen = new ArrayList<>(selectableEvents).get(rnd.nextInt(selectableEvents.size()));
-        Set<BEvent> requested = statements.stream().filter((BSyncStatement stmt) -> stmt != null).flatMap((BSyncStatement stmt) -> stmt.getRequest().stream()).collect(Collectors.toSet());
+        Set<BEvent> requested = statements.stream()
+                                          .filter((BSyncStatement stmt) -> stmt != null)
+                                          .flatMap((BSyncStatement stmt) -> stmt.getRequest().stream())
+                                          .collect(Collectors.toSet());
+        
         if (requested.contains(chosen)) {
             return Optional.of(new EventSelectionResult(chosen));
         } else {

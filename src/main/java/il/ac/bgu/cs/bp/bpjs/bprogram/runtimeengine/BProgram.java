@@ -387,6 +387,9 @@ public abstract class BProgram {
     }
 
     public EventSelectionStrategy getEventSelectionStrategy() {
+        if ( eventSelectionStrategy == null ) {
+            setEventSelectionStrategy( new SimpleEventSelectionStrategy() );
+        }
         return eventSelectionStrategy;
     }
 

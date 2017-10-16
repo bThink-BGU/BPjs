@@ -46,6 +46,8 @@ a link to this page somewhere in the documentation/system about section.
 * :sparkles: New base class for implementing event selection strategies.
 * :sparkles: New event selection strategy that can assign priorities to b-threads.
 * :sparkles: New event selection strategy that allows b-threads to add priority to their `bsync`s.
+* :arrow_up: `LoggingEventSelectionStrategyDecorator` also logs selectable events
+* :arrow_up: `BProgram` acts nicer when it has a `null` event selection strategy. 
 
 ## 2017-09-10
 * :sparkles: Updated to Rhino 1.7.7.2.
@@ -253,3 +255,4 @@ Legend:
 * :arrows_counterclockwise: Change
 * :sparkles:New feature
 * :put_litter_in_its_place: Deprecation
+* :arrow_up: Upgrade

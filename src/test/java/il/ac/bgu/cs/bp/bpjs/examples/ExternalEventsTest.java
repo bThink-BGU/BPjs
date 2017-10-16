@@ -5,6 +5,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.eventselection.LoggingEventSelectionStrategyDecorator;
 import il.ac.bgu.cs.bp.bpjs.validation.eventpattern.EventPattern;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -19,9 +20,11 @@ public class ExternalEventsTest {
     @Test
     public void superStepTest() throws InterruptedException {
         final BEvent in1a = new BEvent("in1a");
-        final BEvent in1b = new BEvent("in1b");
         final BEvent ext1 = new BEvent("ext1");
-        final BProgramRunner sut = new BProgramRunner( new SingleResourceBProgram("ExternalEvents.js"));
+        final BEvent in1b = new BEvent("in1b");
+        final SingleResourceBProgram bprog = new SingleResourceBProgram("ExternalEvents.js");
+        bprog.setEventSelectionStrategy(new LoggingEventSelectionStrategyDecorator(bprog.getEventSelectionStrategy()));
+        final BProgramRunner sut = new BProgramRunner(bprog);
         sut.addListener( new StreamLoggerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         

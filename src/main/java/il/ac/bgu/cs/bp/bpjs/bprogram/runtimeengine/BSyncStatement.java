@@ -18,7 +18,7 @@ import static il.ac.bgu.cs.bp.bpjs.eventsets.EventSets.none;
  * @author michael
  */
 public class BSyncStatement implements java.io.Serializable {
-   
+
     /**
      * The event requested by this statement
      */

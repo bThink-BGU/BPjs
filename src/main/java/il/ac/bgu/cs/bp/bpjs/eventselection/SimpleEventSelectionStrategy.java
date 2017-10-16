@@ -5,14 +5,10 @@ import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.eventsets.ComposableEventSet;
 import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.eventsets.EventSets;
-import java.util.ArrayList;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import java.util.List;
-import java.util.Optional;
-import java.util.Random;
 import java.util.Set;
-import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toSet;
 import org.mozilla.javascript.Context;
 
