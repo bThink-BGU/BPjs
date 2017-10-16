@@ -24,7 +24,7 @@ a link to this page somewhere in the documentation/system about section.
     <dependency>
         <groupId>com.github.bthink-bgu</groupId>
         <artifactId>BPjs</artifactId>
-        <version>0.8.4</version>
+        <version>0.8.6</version>
     </dependency>
     ...
 </dependencies>
@@ -44,8 +44,9 @@ a link to this page somewhere in the documentation/system about section.
 
 ## 2017-10-16
 * :sparkles: New base class for implementing event selection strategies.
-* :sparkles: New event selection strategy that can assign priorities to b-threads.
-* :sparkles: New event selection strategy that allows b-threads to add priority to their `bsync`s.
+* :sparkles: `OrderedEventSelectionStrategy` - A new event selection strategy that honors the order in which events are requested by a given b-thread.
+* :sparkles: `PrioritizedBThreadsEventSelectionStrategy` - A new event selection strategy that can assign priorities to b-threads.
+* :sparkles: `PrioritizedBSyncEventSelectionStrategy` - A new event selection strategy that allows b-threads to add priority to their `bsync`s.
 * :arrow_up: `LoggingEventSelectionStrategyDecorator` also logs selectable events
 * :arrow_up: `BProgram` acts nicer when it has a `null` event selection strategy. 
 

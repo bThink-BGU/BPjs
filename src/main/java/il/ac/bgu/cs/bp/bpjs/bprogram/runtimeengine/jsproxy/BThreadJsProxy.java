@@ -13,6 +13,7 @@ import java.util.Arrays;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import java.util.stream.Stream;
 import org.mozilla.javascript.Context;
@@ -59,7 +60,7 @@ public class BThreadJsProxy implements java.io.Serializable {
                 stmt = stmt.request(
                         Arrays.asList( arr.getIndexIds() ).stream()
                               .map( i -> (BEvent)arr.get(i) )
-                              .collect( toSet() ));
+                              .collect( toList() ));
             } 
         }
         

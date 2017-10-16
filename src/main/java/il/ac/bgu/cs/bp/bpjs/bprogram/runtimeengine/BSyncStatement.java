@@ -9,6 +9,8 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import static il.ac.bgu.cs.bp.bpjs.eventsets.EventSets.none;
+import il.ac.bgu.cs.bp.bpjs.internal.OrderedSet;
+import java.util.SortedSet;
 
 /**
  * A statement a BThread makes at a {@code bsync} point. Contains data about 
@@ -22,7 +24,7 @@ public class BSyncStatement implements java.io.Serializable {
     /**
      * The event requested by this statement
      */
-    private final Set<BEvent> request;
+    private final SortedSet<? extends BEvent> request;
     
     /**
      * The events waited for (wake thread up when these happen).
@@ -64,7 +66,7 @@ public class BSyncStatement implements java.io.Serializable {
     }
     
     public BSyncStatement(Collection<? extends BEvent> request, EventSet waitFor, EventSet block, EventSet except, Object data) {
-        this.request = new HashSet<>(request);
+        this.request = new OrderedSet<>(request);
         this.waitFor = waitFor;
         this.block = block;
         this.interrupt = except;
@@ -113,7 +115,7 @@ public class BSyncStatement implements java.io.Serializable {
         return new BSyncStatement(getRequest(), getWaitFor(), getBlock(), getInterrupt(), someData);
     }
     
-    public Collection<BEvent> getRequest() {
+    public Collection<? extends BEvent> getRequest() {
         return request;
     }
 
