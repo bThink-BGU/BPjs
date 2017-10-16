@@ -202,5 +202,10 @@ public class OrderedSet<T> implements SortedSet<T>, java.io.Serializable {
     public void forEach(Consumer<? super T> action) {
         SortedSet.super.forEach(action); 
     }
+    
+    @Override
+    public String toString() {
+        return "[OrderedSet " + items.toString() + "]";
+    }
    
 }
