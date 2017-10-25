@@ -58,57 +58,77 @@ bp.registerBThread("EnforceTurns", function() {
 	}
 });
 
-// Player O defult strategy
-
+// Player O default strategy
 bp.registerBThread("Sides", function() {
 	while (true) {
 		bsync({
-			request : [ O(0, 1, 0), O(1, 0, 0), O(1, 2), O(2, 1) ]
-		}, 10);
-
+			request : [ O(0, 1), O(1, 0), O(1, 2), O(2, 1) ]
+		},10);
 	}
 });
 
 bp.registerBThread("Corners", function() {
 	while (true) {
-
 		bsync({
 			request : [ O(0, 0), O(0, 2), O(2, 0), O(2, 2) ]
-		}, 9);
+		}, 20);
 
 	}
 });
 
 bp.registerBThread("Center", function() {
 	while (true) {
-
 		bsync({
 			request : [ O(1, 1) ]
-		}, 8);
+		}, 30);
 
 	}
 });
 
-function addLinePermutationBthreads(lp) {
-	bp.registerBThread("AddThirdO", function() {
-
-		var e;
-		var wt;
-
+function addLinePermutationBthreads(l,p) {
+	bp.registerBThread("PreventThirdX(<" + l[p[0]].x + "," + l[p[0]].y + ">," + 
+                                     "<" + l[p[1]].x + "," + l[p[1]].y + ">," + 
+                                     "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
 		while (true) {
 			bsync({
-				waitFor : [ O(lp[0].x(), lp[0].y()) ]
+				waitFor : [ X(l[p[0]].x, l[p[0]].y) ]
 			});
 
 			bsync({
-				waitFor : [ O(lp[1].x(), lp[1].y()) ]
+				waitFor : [ X(l[p[1]].x, l[p[1]].y) ]
 			});
 
 			bsync({
-				request : [ O(lp[2].x(), lp[2].y()) ]
-			}, 7);
+				request : [ O(l[p[2]].x, l[p[2]].y) ]
+			}, 40);
 		}
 	});
+
+	
+	
+	bp.registerBThread("AddThirdO(<" + l[p[0]].x + "," + l[p[0]].y +  ">," +
+			                     "<" + l[p[1]].x + "," + l[p[1]].y +  ">," +
+			                     "<" + l[p[2]].x + "," + l[p[2]].y +  ">)", function() {
+		while (true) {
+			bsync({
+				waitFor : [ O(l[p[0]].x, l[p[0]].y) ]
+			});
+
+			bsync({
+				waitFor : [ O(l[p[1]].x, l[p[1]].y) ]
+			});
+
+			bsync({
+				request : [ O(l[p[2]].x, l[p[2]].y) ]
+			},50);
+		}
+	});
+	
+	
+
+
+	
+	
 }
 
 for (var r = 0; r < 3; r++) {
@@ -117,9 +137,28 @@ for (var r = 0; r < 3; r++) {
 	}
 }
 
-var linePermutations = [
-	[{x:0, y:0}, {x:1, y:1}, {x:2, y:2}]
+var lines = [
+	[{x:0, y:0}, {x:0, y:1}, {x:0, y:2}], 
+	[{x:1, y:0}, {x:1, y:1}, {x:1, y:2}], 
+	[{x:2, y:0}, {x:2, y:1}, {x:2, y:2}], 
+	
+	[{x:0, y:0}, {x:1, y:0}, {x:2, y:0}], 
+	[{x:0, y:1}, {x:1, y:1}, {x:2, y:1}], 
+	[{x:0, y:2}, {x:1, y:2}, {x:2, y:2}], 
+
+	[{x:0, y:0}, {x:1, y:1}, {x:2, y:2}], 
+	[{x:0, y:2}, {x:1, y:1}, {x:2, y:0}]  
 ];
+
+var perms =[
+	[0,1,2],[0,2,1],[1,0,2],[1,2,0],[2,0,1],[2,1,0]
+];
+
+lines.forEach(function(l) {
+	perms.forEach(function(p) {
+		addLinePermutationBthreads(l,p);
+	});
+});
 
 
 
