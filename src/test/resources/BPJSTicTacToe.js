@@ -58,6 +58,17 @@ bp.registerBThread("EnforceTurns", function() {
 	}
 });
 
+if( isModelChecking ) {
+	bp.registerBThread("STAM", function() {
+		while (true) {
+			bsync({
+				request : [ bp.Event("STAM") ]
+			});
+		}
+	});
+}
+
+
 // Player O default strategy
 bp.registerBThread("Sides", function() {
 	while (true) {
@@ -86,6 +97,31 @@ bp.registerBThread("Center", function() {
 });
 
 function addLinePermutationBthreads(l,p) {
+
+	bp.registerBThread("DetectXWin(<" + l[p[0]].x + "," + l[p[0]].y + ">," + 
+                                  "<" + l[p[1]].x + "," + l[p[1]].y + ">," + 
+                                  "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
+		while (true) {
+			bsync({
+				waitFor : [ X(l[p[0]].x, l[p[0]].y) ]
+			});
+
+			bsync({
+				waitFor : [ X(l[p[1]].x, l[p[1]].y) ]
+			});
+
+			bsync({
+				waitFor : [ X(l[p[2]].x, l[p[2]].y) ]
+			});
+			
+			bsync({
+				block : bp.all
+			});
+
+		}
+	});
+
+	
 	bp.registerBThread("PreventThirdX(<" + l[p[0]].x + "," + l[p[0]].y + ">," + 
                                      "<" + l[p[1]].x + "," + l[p[1]].y + ">," + 
                                      "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
