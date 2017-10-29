@@ -114,12 +114,53 @@ function addLinePermutationBthreads(l,p) {
 				waitFor : [ X(l[p[2]].x, l[p[2]].y) ]
 			});
 			
+			bp.log.info('Game: X Wins!');
+			
 			bsync({
-				block : bp.all
+				block : bp.all			
 			});
-
+			
 		}
 	});
+	
+	bp.registerBThread("DetectOWin(<" + l[p[0]].x + "," + l[p[0]].y + ">," + 
+			                      "<" + l[p[1]].x + "," + l[p[1]].y + ">," + 
+                                  "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
+	while (true) {
+		bsync({
+			waitFor : [ O(l[p[0]].x, l[p[0]].y) ]
+		});
+		
+		bsync({
+			waitFor : [ O(l[p[1]].x, l[p[1]].y) ]
+		});
+		
+		bsync({
+			waitFor : [ O(l[p[2]].x, l[p[2]].y) ]
+		});
+		
+		bp.log.info('Game: O Wins!');
+		
+		bsync({
+			block : bp.all //?			
+		});
+		
+		}
+	});
+	
+//	bp.registerBThread("DetectDraw(<" + l[p[0]].x + "," + l[p[0]].y + ">," + 
+//								  "<" + l[p[1]].x + "," + l[p[1]].y + ">," + 
+//								  "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
+//	while (true) {
+//
+//		if (SquareCount == 9) {
+//			bp.log.info("Game: It's a Draw!");
+//			bsync({
+//				block : bp.all //?			
+//			});			
+//		}		
+//	}
+//});
 
 	
 	bp.registerBThread("PreventThirdX(<" + l[p[0]].x + "," + l[p[0]].y + ">," + 
@@ -158,13 +199,7 @@ function addLinePermutationBthreads(l,p) {
 				request : [ O(l[p[2]].x, l[p[2]].y) ]
 			},50);
 		}
-	});
-	
-	
-
-
-	
-	
+	});	
 }
 
 for (var r = 0; r < 3; r++) {
