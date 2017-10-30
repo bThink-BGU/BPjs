@@ -42,6 +42,9 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+## 2017-10-30
+* :arrow_up: Re-created program state cloning based on code from @szegedi. Cloning is now faster, more efficient, and can handle storage of events.
+
 ## 2017-10-16
 * :sparkles: New base class for implementing event selection strategies.
 * :sparkles: `OrderedEventSelectionStrategy` - A new event selection strategy that honors the order in which events are requested by a given b-thread.
@@ -80,27 +83,23 @@ a link to this page somewhere in the documentation/system about section.
 * :sparkles: Cloning of `BProgramSyncSnapshot` ready. This is the basis for search.
 
 ### 2017-03-22
-
 * :sparkles: New architecture: Running logic moved from `BProgram` to `BProgramRunner` - ongoing.
 * :sparkles: `BProgramListener`s notified before BPrograms are started.
 * :bug: Fixed a bug where dynamically added b-threads that were added by other dynamically added b-threads would run one cycle too late.
 * :bug: Fixed a bug where external events enqueued from top-level JS code where ignored.
 
 ### 2017-03-21
-
 * :sparkles: New architecture: Running logic moved from `BProgram` to `BProgramRunner`. This will help implementing search.
 * :sparkles: `BProgramListener`s notified when a b-thread runs to completion.
 * :sparkles: `bp.getTime()` added.
 * :sparkles: Updated tutorial now includes the `bp` object.
 
 ### 2017-03-15
-
 * :put_litter_in_its_place: Simplified the `examples` test package.
 * :put_litter_in_its_place: `all` and `none` are now only available via `bp`.
 * :arrows_counterclockwise: cleaner scope structure..
 
 ### 2017-03-14
-
 * :arrows_counterclockwise: Internal method name clean-ups.
 * :put_litter_in_its_place: Removed unneeded initializations.
 * :bug: Program and bthread scopes are treated as scopes rather than prototypes.
@@ -108,19 +107,15 @@ a link to this page somewhere in the documentation/system about section.
 * :sparkles: More tests.
 
 ### 2017-03-02
-
 * :sparkles: `bp.random` added.
 * :arrows_counterclockwise: Documentation updates
 * :sparkles: Added java accessors for putting and getting variables in the JS program
 * :arrows_counterclockwise: `fat.jar` is now `uber.jar`.
 
 ### 2017-02-03
-
 * :sparkles: the standard `.jar` file now contains only BPjs, and no dependencies. Fat jar (the jar that includes dependencies) is available via the releases tab.
 
-
 ### 2017-02-02
-
 * :arrows_counterclockwise: `Events` class renamed to `EventSets`. Some cleanup.
 * :arrows_counterclockwise: `emptySet` is now `none`.
 * :arrows_counterclockwise: `all` and `emptySet` are now available to BPjs code via `bp.all` and `bp.none`. This is to prevent name collisions with client code.
@@ -152,10 +147,8 @@ a maven-central quality grade.
 * :sparkles: Preparations for Maven Central
 * :arrows_counterclockwise: More Javadocs and code cleanup.
 
-
 ### 2017-01-05
 * :sparkles: `RunFile` can now accept multiple BPjs files for input, and runs them as a single BProgram. It also has improved help text.
-
 
 ### 2017-01-03
 * :sparkles: Added continuous code coverage with [Coveralls.io](https://coveralls.io/github/bThink-BGU/BPjs?branch=develop) (Thanks guys!).

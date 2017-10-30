@@ -25,10 +25,8 @@ package il.ac.bgu.cs.bp.bpjs.verification;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import il.ac.bgu.cs.bp.bpjs.search.ContinuationProgramState;
 import il.ac.bgu.cs.bp.bpjs.search.HashVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.search.Node;
-import il.ac.bgu.cs.bp.bpjs.search.StateHashVisitedNodeStore;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -36,7 +34,6 @@ import java.util.Collections;
 import java.util.List;
 import il.ac.bgu.cs.bp.bpjs.search.VisitedNodeStore;
 import java.util.Deque;
-import org.mozilla.javascript.NativeContinuation;
 
 /**
  * 

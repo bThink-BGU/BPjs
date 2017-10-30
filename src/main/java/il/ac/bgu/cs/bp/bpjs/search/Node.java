@@ -1,5 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.search;
 
+import il.ac.bgu.cs.bp.bpjs.search.bprogramio.BProgramSyncSnapshotCloner;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;

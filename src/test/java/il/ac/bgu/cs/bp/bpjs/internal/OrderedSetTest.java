@@ -48,6 +48,35 @@ public class OrderedSetTest {
         
         assertEquals( new HashSet<>(Arrays.asList("a","b","c")), sut);
     }
+    
+    @Test
+    public void testEquals() {
+        OrderedSet<String> sutA = OrderedSet.of();
+        OrderedSet<String> sutB = OrderedSet.of();
+        
+        assertEquals(sutA, sutA);
+        assertNotEquals(null, sutA);
+        assertNotEquals("not a set", sutA);
+        
+        assertEquals(sutB, sutA);
+        
+        sutA.add("A");
+        assertNotEquals(sutA, sutB);
+        assertNotEquals(sutB, sutA);
+        
+        sutB.add("A");
+        assertEquals(sutA, sutB);
+        assertEquals(sutB, sutA);
+        
+        // double addition should be ignored
+        sutA.add("A");
+        assertEquals(sutA, sutB);
+        assertEquals(sutB, sutA);
+        
+        sutA.add("X");
+        assertNotEquals(sutA, sutB);
+        assertNotEquals(sutB, sutA);
+    }
 
     
 }

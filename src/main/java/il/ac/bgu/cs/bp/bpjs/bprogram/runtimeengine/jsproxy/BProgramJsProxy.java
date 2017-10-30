@@ -1,6 +1,3 @@
-/*
- *  Author: Michael Bar-Sinai
- */
 package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.jsproxy;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
@@ -10,6 +7,7 @@ import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.eventsets.EventSets;
 import il.ac.bgu.cs.bp.bpjs.eventsets.JsEventSet;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.mozilla.javascript.Function;
 
@@ -171,6 +169,28 @@ public class BProgramJsProxy implements java.io.Serializable {
      */
     public long getTime() {
         return System.currentTimeMillis();
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + Objects.hashCode(this.program);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final BProgramJsProxy other = (BProgramJsProxy) obj;
+        return Objects.equals(this.program, other.program);
     }
     
     

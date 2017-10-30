@@ -21,25 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.search;
+package il.ac.bgu.cs.bp.bpjs.search.bprogramio;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramSyncSnapshot;
 import java.io.IOException;
+import java.io.InputStream;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.serialize.ScriptableInputStream;
 
 /**
- * Clones a {@link BProgramSyncSnapshot}.
- * 
+ *
  * @author michael
  */
-public class BProgramSyncSnapshotCloner {
+class BThreadSyncSnapshotInputStream extends ScriptableInputStream {
+    
+    private final StubProvider stubProvider;
+    
+    public BThreadSyncSnapshotInputStream(InputStream in, Scriptable scope, StubProvider aProvider) throws IOException {
+        super(in, scope);
+        stubProvider = aProvider;
+    }
 
-	public static BProgramSyncSnapshot clone(BProgramSyncSnapshot src) {
-		BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(src.getBProgram());
-		try {
-			BProgramSyncSnapshot result = io.deserialize(io.serialize(src));
-			return result;
-		} catch (IOException | ClassNotFoundException ex) {
-			throw new RuntimeException("Failed to clone snapshot: " + ex.getMessage(), ex);
-		}
-	}
+    @Override
+    protected Object resolveObject(Object obj) throws IOException {
+        return ( obj instanceof StreamObjectStub )
+            ? stubProvider.get((StreamObjectStub) obj)
+            : obj;
+    }
+
+    @Override
+    protected Object readObjectOverride() throws IOException, ClassNotFoundException {
+        return super.readObjectOverride(); //To change body of generated methods, choose Tools | Templates.
+    }
+    
 }

@@ -29,6 +29,8 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.Objects;
+import java.util.Set;
 import java.util.SortedSet;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -207,5 +209,37 @@ public class OrderedSet<T> implements SortedSet<T>, java.io.Serializable {
     public String toString() {
         return "[OrderedSet " + items.toString() + "]";
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + Objects.hashCode(this.items);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if ( obj instanceof Set) {
+            Set otherSet = (Set) obj;
+            if ( obj instanceof OrderedSet ) {
+                OrderedSet otherOrderedSet = (OrderedSet) otherSet;
+                return items.equals(otherOrderedSet.items);
+                
+            } else {
+                // regular set equality
+                return containsAll(otherSet) && otherSet.contains(this);
+            }
+            
+        } else {
+            return false;
+        }
+    }
    
+    
 }
