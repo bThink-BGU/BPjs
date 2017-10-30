@@ -15,9 +15,9 @@ import org.mozilla.javascript.Context;
 /**
  * An event selection strategy that:
  * <ol>
- * <li>Randomly selects an internal event that's requested and not blocked.<li>
+ * <li>Randomly selects an internal event that's requested and not blocked<li>
  * <li>If no such event is available, selects the first external event that's not blocked</li>
- * <li>If no such event is available, returns an empty result.</li>
+ * <li>If no such event is available, returns an empty result</li>
  * </ol>
  * 
  * Under this strategy, if the selected event is internal, and has {@code equal} events queued externally,
