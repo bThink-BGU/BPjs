@@ -28,11 +28,10 @@ public class ExternalEventsTest {
         sut.addListener( new StreamLoggerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
-        new Thread( ()->sut.getBProgram().enqueueExternalEvent(ext1) ).start();
-        
+        sut.getBProgram().enqueueExternalEvent(ext1);
         sut.start();
         
-        eventLogger.getEvents().forEach(e->System.out.println(e) );
+        eventLogger.getEvents().forEach( e->System.out.println(e) );
         
         EventPattern expected = new EventPattern()
                 .append(in1a).append(ext1).append(in1b);
