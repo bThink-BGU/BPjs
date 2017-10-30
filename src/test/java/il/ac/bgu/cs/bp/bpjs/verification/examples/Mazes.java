@@ -23,19 +23,11 @@
  */
 package il.ac.bgu.cs.bp.bpjs.verification.examples;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
-import il.ac.bgu.cs.bp.bpjs.search.FullVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.search.HashVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.search.Node;
-import il.ac.bgu.cs.bp.bpjs.search.StateHashVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.verification.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.verification.VerificationResult;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import org.mozilla.javascript.NativeArray;
 
@@ -70,8 +62,8 @@ public class Mazes {
 		try {
             DfsBProgramVerifier vfr = new DfsBProgramVerifier();
 //            vfr.setVisitedNodeStore(new FullVisitedNodeStore());
-//            vfr.setVisitedNodeStore(new HashVisitedNodeStore());
-            vfr.setVisitedNodeStore(new StateHashVisitedNodeStore());
+            vfr.setVisitedNodeStore(new HashVisitedNodeStore());
+//            vfr.setVisitedNodeStore(new StateHashVisitedNodeStore());
             final VerificationResult res = vfr.verify(bprog);
             
             NativeArray jsMaze = bprog.getFromGlobalScope(mazeName, NativeArray.class).get();

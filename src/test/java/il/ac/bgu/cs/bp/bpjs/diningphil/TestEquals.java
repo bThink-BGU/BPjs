@@ -6,6 +6,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
@@ -40,7 +41,12 @@ public class TestEquals {
 		}
 
 		for ( int i=1; i<10; i+=2 ) {
-			assertEquals(nodes[0], nodes[i-1]);
+            final BThreadSyncSnapshot sysState0 = nodes[0].getSystemState().getBThreadSnapshots().iterator().next();
+            final BThreadSyncSnapshot sysStatei_1 = nodes[i-1].getSystemState().getBThreadSnapshots().iterator().next();
+            
+            assertTrue( sysState0.equals(sysStatei_1) );
+			
+            assertEquals(nodes[0], nodes[i-1]);
 			assertEquals(nodes[1], nodes[  i]);
 		}
 	}

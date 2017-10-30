@@ -20,7 +20,7 @@ bp.log.info('Dinning philosophers with ' + PHILOSOPHER_COUNT + ' philosophers');
 								    bp.Event("Pick" + j + "L") ],
 						block : [ bp.Event("Rel" + i + "R"),
 								  bp.Event("Rel" + j + "L") ]
-					}).name;
+					});
 
 			var wt = (e.equals("Pick" + i + "R")) ? "Rel" + i + "R" : "Rel" + j	+ "L";
 	

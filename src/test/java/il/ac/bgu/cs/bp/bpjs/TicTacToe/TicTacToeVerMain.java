@@ -1,20 +1,10 @@
 package il.ac.bgu.cs.bp.bpjs.TicTacToe;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
-import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import il.ac.bgu.cs.bp.bpjs.search.Node;
 import il.ac.bgu.cs.bp.bpjs.verification.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.verification.VerificationResult;
-import java.util.Arrays;
-import java.util.List;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import static java.util.function.Function.identity;
-import java.util.stream.Collectors;
 
 import javax.swing.JFrame;
 
