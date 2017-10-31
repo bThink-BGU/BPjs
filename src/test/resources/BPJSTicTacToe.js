@@ -8,17 +8,19 @@ bp.log.info('Tic-Tac-Toe - Let the game begin!');
 
 function addSquareBThreads(row, col) {
 
-	// Detects mouse click
-	bp.registerBThread("ClickHandler(" + row + "," + col + ")", function() {
-		while (true) {
+	if (!isModelChecking) {
+		// Detects mouse click
+		bp.registerBThread("ClickHandler(" + row + "," + col + ")", function() {
+			while (true) {
 
-			if (!isModelChecking) {
-				bsync({ waitFor:[ Click(row, col) ] });
+				if (!isModelChecking) {
+					bsync({ waitFor:[ Click(row, col) ] });
+				}
+
+				bsync({ request:[ X(row, col) ] });
 			}
-
-			bsync({ request:[ X(row, col) ] });
-		}
-	});
+		});
+	}
 
 	// Block further marking of a square already marked by X or O.
 	bp.registerBThread("SquareTaken(" + row + "," + col + ")", function() {
@@ -48,9 +50,16 @@ bp.registerBThread("EndOfGame", function() {
 if (isModelChecking) {
 	bp.registerBThread("STAM", function() {
 		while (true) {
-			bsync({ request:[ bp.Event("STAM") ] });
+			bsync({ request:[ bp.Event("STAM") ], interrupt:[ StaticEvents.XWin ] });
 		}
 	});
+
+	bp.registerBThread("XMoves", function() {
+		while (true) {
+			bsync({ request:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), X(1, 1), X(1, 2), X(2, 0), X(2, 1), X(2, 2) ] });
+		}
+	});
+
 }
 
 // Player O default strategy
@@ -70,7 +79,6 @@ bp.registerBThread("Corners", function() {
 bp.registerBThread("Center", function() {
 	while (true) {
 		bsync({ request:[ O(1, 1) ] }, 30);
-
 	}
 });
 
@@ -142,7 +150,6 @@ for (var r = 0; r < 3; r++) {
 }
 
 var lines = [ [ { x:0, y:0 }, { x:0, y:1 }, { x:0, y:2 } ], [ { x:1, y:0 }, { x:1, y:1 }, { x:1, y:2 } ], [ { x:2, y:0 }, { x:2, y:1 }, { x:2, y:2 } ], [ { x:0, y:0 }, { x:1, y:0 }, { x:2, y:0 } ], [ { x:0, y:1 }, { x:1, y:1 }, { x:2, y:1 } ], [ { x:0, y:2 }, { x:1, y:2 }, { x:2, y:2 } ], [ { x:0, y:0 }, { x:1, y:1 }, { x:2, y:2 } ], [ { x:0, y:2 }, { x:1, y:1 }, { x:2, y:0 } ] ];
-
 var perms = [ [ 0, 1, 2 ], [ 0, 2, 1 ], [ 1, 0, 2 ], [ 1, 2, 0 ], [ 2, 0, 1 ], [ 2, 1, 0 ] ];
 
 lines.forEach(function(l) {
@@ -150,4 +157,3 @@ lines.forEach(function(l) {
 		addLinePermutationBthreads(l, p);
 	});
 });
-
