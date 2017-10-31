@@ -29,26 +29,27 @@ import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 public class TTTDisplayGame implements ActionListener {
 	private BProgram bp;
 	private BProgramRunner rnr;
-	
+
 	private JFrame window = new JFrame("Tic-Tac-Toe");
 	public JButton buttons[][] = new JButton[3][];
 	public JLabel message = new JLabel();
-	
+
 	/**
 	 * Constructor.
-	 * @param rnr 
+	 * 
+	 * @param rnr
 	 */
 
 	public TTTDisplayGame(BProgram bp, BProgramRunner rnr) {
 
 		this.bp = bp;
 		this.rnr = rnr;
-		
+
 		// Create window
 		window.setSize(150, 150);
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setLayout(new BorderLayout());
-		window.setLocation(new Point(600,100)); 
+		window.setLocation(new Point(600, 100));
 
 		// The board
 		JPanel board = new JPanel();
@@ -72,32 +73,26 @@ public class TTTDisplayGame implements ActionListener {
 
 		// Make the window visible
 		window.setVisible(true);
-		
-		//Writs 'X' and 'O' on the buttons
-		rnr.addListener( new BProgramListenerAdapter() {
+
+		// Writs 'X' and 'O' on the buttons
+		rnr.addListener(new BProgramListenerAdapter() {
 
 			@Override
 			public void eventSelected(BProgram bp, BEvent theEvent) {
-				if(theEvent instanceof Move){
-			
-					Move mv = (Move)theEvent;
+				if (theEvent instanceof Move) {
+					Move mv = (Move) theEvent;
 					buttons[mv.row][mv.col].setText(mv.displayString());
-//					if(mv instanceof X)
-//						bp.enqueueExternalEvent(new Click(1,1));		
-				}	
-				else {
-					String msg = "";	
-					if (theEvent == StaticEvents.XWin)
-						msg = "X Wins!";
-					else if (theEvent == StaticEvents.OWin)
-						msg = "O Wins!";
-					else if (theEvent == StaticEvents.draw )
-						msg = "It's a Draw!";
-					System.out.println(msg);
-					message.setText(msg);
+				} else {
+					if (theEvent == StaticEvents.XWin) {
+						message.setText("X Wins!");
+					} else if (theEvent == StaticEvents.OWin) {
+						message.setText("O Wins!");
+					} else if (theEvent == StaticEvents.draw) {
+						message.setText("It's a Draw!");
+					}
 				}
 			}
-			
+
 		});
 
 	}
@@ -106,31 +101,31 @@ public class TTTDisplayGame implements ActionListener {
 	 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
 	 */
 	public void actionPerformed(ActionEvent a) {
-		final TTTButton btt = ((TTTButton) a.getSource());		
-		bp.enqueueExternalEvent(new Click(btt.row,btt.col));
-}
-
-/**
- * A button that remembers its position on the board
- */
-@SuppressWarnings("serial")
-class TTTButton extends JButton {
-	int row;
-	int col;
-
-	/**
-	 * Constructor.
-	 *
-	 * @param row
-	 *            The row of the button.
-	 * @param col
-	 *            The column of the button.
-	 */
-	public TTTButton(int row, int col) {
-		super();
-		this.row = row;
-		this.col = col;
+		final TTTButton btt = ((TTTButton) a.getSource());
+		bp.enqueueExternalEvent(new Click(btt.row, btt.col));
 	}
 
-}
+	/**
+	 * A button that remembers its position on the board
+	 */
+	@SuppressWarnings("serial")
+	class TTTButton extends JButton {
+		int row;
+		int col;
+
+		/**
+		 * Constructor.
+		 *
+		 * @param row
+		 *            The row of the button.
+		 * @param col
+		 *            The column of the button.
+		 */
+		public TTTButton(int row, int col) {
+			super();
+			this.row = row;
+			this.col = col;
+		}
+
+	}
 }

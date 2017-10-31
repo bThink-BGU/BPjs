@@ -4,10 +4,6 @@ importPackage(Packages.il.ac.bgu.cs.bp.bpjs.TicTacToe.events);
 
 bp.log.info('Tic-Tac-Toe - Let the game begin!');
 
-var SquareCount = 0;
-var countX = 0;
-var countO = 0;
-
 // GameRules
 
 function addSquareBThreads(row, col) {
@@ -37,7 +33,6 @@ function addSquareBThreads(row, col) {
 			bsync({
 				block : [ X(row, col), O(row, col) ]
 			});
-			SquareCount++;
 		}
 	});
 }
@@ -58,7 +53,19 @@ bp.registerBThread("EnforceTurns", function() {
 	}
 });
 
-if( isModelChecking ) {
+bp.registerBThread("EndOfGame", function() {
+
+	bsync({
+		waitFor : [ StaticEvents.OWin, StaticEvents.XWin, StaticEvents.draw ]
+	});
+
+	bsync({
+		block : [ X(0, 0), X(0, 1), X(0, 2), X(1, 0), X(1, 1), X(1, 2), X(2, 0), X(2, 1), X(2, 2), O(0, 0), O(0, 1), O(0, 2), O(1, 0), O(1, 1),
+				O(1, 2), O(2, 0), O(2, 1), O(2, 2) ]
+	});
+});
+
+if (isModelChecking) {
 	bp.registerBThread("STAM", function() {
 		while (true) {
 			bsync({
@@ -68,13 +75,12 @@ if( isModelChecking ) {
 	});
 }
 
-
 // Player O default strategy
 bp.registerBThread("Sides", function() {
 	while (true) {
 		bsync({
 			request : [ O(0, 1), O(1, 0), O(1, 2), O(2, 1) ]
-		},10);
+		}, 10);
 	}
 });
 
@@ -96,11 +102,29 @@ bp.registerBThread("Center", function() {
 	}
 });
 
-function addLinePermutationBthreads(l,p) {
 
-	bp.registerBThread("DetectXWin(<" + l[p[0]].x + "," + l[p[0]].y + ">," + 
-                                  "<" + l[p[1]].x + "," + l[p[1]].y + ">," + 
-                                  "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
+var move = bp.EventSet( "Move events", function(e){
+    return e instanceof Move;
+} );
+
+
+bp.registerBThread("DetectDraw", function() {
+	 for( var i=0; i<9; i++ ) {
+			bsync({
+				waitFor : [move]
+			});
+	 }
+	 
+	 bsync({
+			request : [ StaticEvents.draw ]
+	 });
+});
+
+
+function addLinePermutationBthreads(l, p) {
+
+	bp.registerBThread("DetectXWin(<" + l[p[0]].x + "," + l[p[0]].y + ">," + "<" + l[p[1]].x + "," + l[p[1]].y + ">," + "<" + l[p[2]].x + ","
+			+ l[p[2]].y + ">)", function() {
 		while (true) {
 			bsync({
 				waitFor : [ X(l[p[0]].x, l[p[0]].y) ]
@@ -113,59 +137,39 @@ function addLinePermutationBthreads(l,p) {
 			bsync({
 				waitFor : [ X(l[p[2]].x, l[p[2]].y) ]
 			});
-			
-			bp.log.info('Game: X Wins!');
-			
-			bsync({
-				block : bp.all			
-			});
-			
-		}
-	});
-	
-	bp.registerBThread("DetectOWin(<" + l[p[0]].x + "," + l[p[0]].y + ">," + 
-			                      "<" + l[p[1]].x + "," + l[p[1]].y + ">," + 
-                                  "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
-	while (true) {
-		bsync({
-			waitFor : [ O(l[p[0]].x, l[p[0]].y) ]
-		});
-		
-		bsync({
-			waitFor : [ O(l[p[1]].x, l[p[1]].y) ]
-		});
-		
-		bsync({
-			waitFor : [ O(l[p[2]].x, l[p[2]].y) ]
-		});
-		
-		bp.log.info('Game: O Wins!');
-		
-		bsync({
-			block : bp.all //?			
-		});
-		
-		}
-	});
-	
-//	bp.registerBThread("DetectDraw(<" + l[p[0]].x + "," + l[p[0]].y + ">," + 
-//								  "<" + l[p[1]].x + "," + l[p[1]].y + ">," + 
-//								  "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
-//	while (true) {
-//
-//		if (SquareCount == 9) {
-//			bp.log.info("Game: It's a Draw!");
-//			bsync({
-//				block : bp.all //?			
-//			});			
-//		}		
-//	}
-//});
 
-	
-	bp.registerBThread("PreventThirdX(<" + l[p[0]].x + "," + l[p[0]].y + ">," + 
-                                     "<" + l[p[1]].x + "," + l[p[1]].y + ">," + 
-                                     "<" + l[p[2]].x + "," + l[p[2]].y + ">)", function() {
+			bsync({
+				request : [ StaticEvents.XWin ]
+			});
+
+		}
+	});
+
+	bp.registerBThread("DetectOWin(<" + l[p[0]].x + "," + l[p[0]].y + ">," + "<" + l[p[1]].x + "," + l[p[1]].y + ">," + "<" + l[p[2]].x + ","
+			+ l[p[2]].y + ">)", function() {
+		while (true) {
+			bsync({
+				waitFor : [ O(l[p[0]].x, l[p[0]].y) ]
+			});
+
+			bsync({
+				waitFor : [ O(l[p[1]].x, l[p[1]].y) ]
+			});
+
+			bsync({
+				waitFor : [ O(l[p[2]].x, l[p[2]].y) ]
+			});
+
+			bsync({
+				request : [ StaticEvents.OWin ]
+			});
+
+		}
+	});
+
+
+	bp.registerBThread("PreventThirdX(<" + l[p[0]].x + "," + l[p[0]].y + ">," + "<" + l[p[1]].x + "," + l[p[1]].y + ">," + "<" + l[p[2]].x + ","
+			+ l[p[2]].y + ">)", function() {
 		while (true) {
 			bsync({
 				waitFor : [ X(l[p[0]].x, l[p[0]].y) ]
@@ -181,11 +185,8 @@ function addLinePermutationBthreads(l,p) {
 		}
 	});
 
-	
-	
-	bp.registerBThread("AddThirdO(<" + l[p[0]].x + "," + l[p[0]].y +  ">," +
-			                     "<" + l[p[1]].x + "," + l[p[1]].y +  ">," +
-			                     "<" + l[p[2]].x + "," + l[p[2]].y +  ">)", function() {
+	bp.registerBThread("AddThirdO(<" + l[p[0]].x + "," + l[p[0]].y + ">," + "<" + l[p[1]].x + "," + l[p[1]].y + ">," + "<" + l[p[2]].x + ","
+			+ l[p[2]].y + ">)", function() {
 		while (true) {
 			bsync({
 				waitFor : [ O(l[p[0]].x, l[p[0]].y) ]
@@ -197,9 +198,9 @@ function addLinePermutationBthreads(l,p) {
 
 			bsync({
 				request : [ O(l[p[2]].x, l[p[2]].y) ]
-			},50);
+			}, 50);
 		}
-	});	
+	});
 }
 
 for (var r = 0; r < 3; r++) {
@@ -208,31 +209,91 @@ for (var r = 0; r < 3; r++) {
 	}
 }
 
-var lines = [
-	[{x:0, y:0}, {x:0, y:1}, {x:0, y:2}], 
-	[{x:1, y:0}, {x:1, y:1}, {x:1, y:2}], 
-	[{x:2, y:0}, {x:2, y:1}, {x:2, y:2}], 
-	
-	[{x:0, y:0}, {x:1, y:0}, {x:2, y:0}], 
-	[{x:0, y:1}, {x:1, y:1}, {x:2, y:1}], 
-	[{x:0, y:2}, {x:1, y:2}, {x:2, y:2}], 
+var lines = [ [ {
+	x : 0,
+	y : 0
+}, {
+	x : 0,
+	y : 1
+}, {
+	x : 0,
+	y : 2
+} ], [ {
+	x : 1,
+	y : 0
+}, {
+	x : 1,
+	y : 1
+}, {
+	x : 1,
+	y : 2
+} ], [ {
+	x : 2,
+	y : 0
+}, {
+	x : 2,
+	y : 1
+}, {
+	x : 2,
+	y : 2
+} ],
 
-	[{x:0, y:0}, {x:1, y:1}, {x:2, y:2}], 
-	[{x:0, y:2}, {x:1, y:1}, {x:2, y:0}]  
-];
+[ {
+	x : 0,
+	y : 0
+}, {
+	x : 1,
+	y : 0
+}, {
+	x : 2,
+	y : 0
+} ], [ {
+	x : 0,
+	y : 1
+}, {
+	x : 1,
+	y : 1
+}, {
+	x : 2,
+	y : 1
+} ], [ {
+	x : 0,
+	y : 2
+}, {
+	x : 1,
+	y : 2
+}, {
+	x : 2,
+	y : 2
+} ],
 
-var perms =[
-	[0,1,2],[0,2,1],[1,0,2],[1,2,0],[2,0,1],[2,1,0]
-];
+[ {
+	x : 0,
+	y : 0
+}, {
+	x : 1,
+	y : 1
+}, {
+	x : 2,
+	y : 2
+} ], [ {
+	x : 0,
+	y : 2
+}, {
+	x : 1,
+	y : 1
+}, {
+	x : 2,
+	y : 0
+} ] ];
+
+var perms = [ [ 0, 1, 2 ], [ 0, 2, 1 ], [ 1, 0, 2 ], [ 1, 2, 0 ], [ 2, 0, 1 ], [ 2, 1, 0 ] ];
 
 lines.forEach(function(l) {
 	perms.forEach(function(p) {
-		addLinePermutationBthreads(l,p);
+		addLinePermutationBthreads(l, p);
 	});
 });
-
-
-
 
 //
 // //Detect if X Wins
