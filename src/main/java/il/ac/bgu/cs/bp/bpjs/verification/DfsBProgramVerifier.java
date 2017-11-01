@@ -23,23 +23,25 @@
  */
 package il.ac.bgu.cs.bp.bpjs.verification;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
-import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import il.ac.bgu.cs.bp.bpjs.search.HashVisitedNodeStore;
-import il.ac.bgu.cs.bp.bpjs.search.Node;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
-import il.ac.bgu.cs.bp.bpjs.search.VisitedNodeStore;
 import java.util.Deque;
+import java.util.Iterator;
+import java.util.List;
+
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.search.HashVisitedNodeStore;
+import il.ac.bgu.cs.bp.bpjs.search.Node;
+import il.ac.bgu.cs.bp.bpjs.search.VisitedNodeStore;
 
 /**
  * 
- * Takes a BProgram, and verifies it does not get into a deadlock (i.e there
- * is always a selectable state). If the verification fails, returns a trace
- * that serves as a counter example.
+ * Takes a BProgram, and verifies it does not get into a deadlock (i.e there is
+ * always a selectable state). If the verification fails, returns a trace that
+ * serves as a counter example.
  * 
  * States are scanned using a DFS.
  * 
@@ -47,98 +49,112 @@ import java.util.Deque;
  */
 public class DfsBProgramVerifier {
 
-    public final static long DEFAULT_MAX_TRACE = 100;
+	public final static long DEFAULT_MAX_TRACE = 100;
 
 	private long visitedStatesCount;
-    
-    private VisitedNodeStore visited = new HashVisitedNodeStore();
-    private long maxTraceLength = DEFAULT_MAX_TRACE;
 
-    public VerificationResult verify( BProgram aBp ) throws Exception {
-        visitedStatesCount=1;
-        long start = System.currentTimeMillis();
-        List<Node> counterEx = dfsUsingStack(Node.getInitialNode(aBp));
-        long end = System.currentTimeMillis();
-        return new VerificationResult(counterEx, end-start, visitedStatesCount);
-    }
-    
-    protected List<Node> dfsUsingStack(Node aStartNode) throws Exception {
+	private VisitedNodeStore visited = new HashVisitedNodeStore();
+	private long maxTraceLength = DEFAULT_MAX_TRACE;
+
+	public VerificationResult verify(BProgram aBp) throws Exception {
+		visitedStatesCount = 1;
+		long start = System.currentTimeMillis();
+		List<Node> counterEx = dfsUsingStack(Node.getInitialNode(aBp));
+
+		long end = System.currentTimeMillis();
+		return new VerificationResult(counterEx, end - start, visitedStatesCount);
+	}
+
+	protected List<Node> dfsUsingStack(Node aStartNode) throws Exception {
 		ArrayDeque<Node> pathNodes = new ArrayDeque<>(); // Current execution stack.
 
-        long iterationCount = 0;
+		System.out.println("Followers of the start node:");
+
+		long iterationCount = 0;
 		visited.store(aStartNode);
 		pathNodes.push(aStartNode);
-        
-		while ( !pathNodes.isEmpty() ) {
-            printStatus(iterationCount, pathNodes);
-            iterationCount++;
-			Node curNode = pathNodes.peek();
-            
-            if ( ! curNode.check() ) {
-                // Found a problematic path :-)
-                final ArrayList<Node> counterExampleTrace = new ArrayList<>(Arrays.asList(pathNodes.toArray(new Node[0])));
-                Collections.reverse(counterExampleTrace);
-                return counterExampleTrace;
-            }            
-            
-            if ( pathNodes.size() == maxTraceLength ) {
-                // fold stack;
-                pathNodes.pop();
-                
-            } else {
-                Node nextNode = getUnvisitedNextNode(curNode);
-                if ( nextNode == null ) {
-                    // fold stack, retry next iteration;
-                    pathNodes.pop();
-                    
-                } else {
-                    // go deeper 
-                    visited.store(nextNode);
-                    pathNodes.push(nextNode);
-                    visitedStatesCount++;
-                }
-            }
-            
-            if ( iterationCount%1000==0 ) {
-                // TODO - switch to listener architecture.
-                System.out.printf("~ %,d states scanned (iteration %,d)\n", visitedStatesCount, iterationCount);
-            }
-		}
-        
-        return null;
-	}
-    
-    protected Node getUnvisitedNextNode(Node src) throws Exception {
-        while ( src.getEventIterator().hasNext() ) {
-            final BEvent nextEvent = src.getEventIterator().next();
-            Node possibleNextNode = src.getNextNode(nextEvent);
-            if ( ! visited.isVisited(possibleNextNode) ) {
-                return possibleNextNode;
-            }
-        }
-        return null;
-    }
-    
-    public void setMaxTraceLength(long maxTraceLength) {
-        this.maxTraceLength = maxTraceLength;
-    }
 
-    public long getMaxTraceLength() {
-        return maxTraceLength;
-    }
-    
-    public void setVisitedNodeStore( VisitedNodeStore aVisitedNodeStore ) {
-        visited = aVisitedNodeStore;
-    }
-    
-    public VisitedNodeStore getVisitedNodeStore() {
-        return visited;
-    }
-           
-    void printStatus( long iteration, Deque<Node> path) {
-        System.out.println("Iteration " + iteration );
-        System.out.println("  visited: " + visitedStatesCount );
-        path.forEach( n -> System.out.println("  " + n.getLastEvent()));
-    }
-    
+		while (!pathNodes.isEmpty()) {
+			printStatus(iterationCount, pathNodes);
+			iterationCount++;
+			Node curNode = pathNodes.peek();
+
+			if (!curNode.check()) {
+				// Found a problematic path :-)
+				final ArrayList<Node> counterExampleTrace = new ArrayList<>(
+						Arrays.asList(pathNodes.toArray(new Node[0])));
+
+				Collections.reverse(counterExampleTrace);
+				return counterExampleTrace;
+			}
+
+			if (pathNodes.size() == maxTraceLength) {
+				// fold stack;
+				pathNodes.pop();
+
+			} else {
+				Node nextNode = getUnvisitedNextNode(curNode);
+				if (nextNode == null) {
+					// fold stack, retry next iteration;
+					pathNodes.pop();
+
+				} else {
+					// go deeper
+					visited.store(nextNode);
+					pathNodes.push(nextNode);
+					visitedStatesCount++;
+				}
+			}
+
+			if (iterationCount % 1000 == 0) {
+				// TODO - switch to listener architecture.
+				System.out.printf("~ %,d states scanned (iteration %,d)\n", visitedStatesCount, iterationCount);
+			}
+		}
+
+		return null;
+	}
+
+	protected Node getUnvisitedNextNode(Node src) throws Exception {
+		while (src.getEventIterator().hasNext()) {
+			final BEvent nextEvent = src.getEventIterator().next();
+			Node possibleNextNode = src.getNextNode(nextEvent);
+			if (!visited.isVisited(possibleNextNode)) {
+				return possibleNextNode;
+			}
+		}
+		return null;
+	}
+
+	public void setMaxTraceLength(long maxTraceLength) {
+		this.maxTraceLength = maxTraceLength;
+	}
+
+	public long getMaxTraceLength() {
+		return maxTraceLength;
+	}
+
+	public void setVisitedNodeStore(VisitedNodeStore aVisitedNodeStore) {
+		visited = aVisitedNodeStore;
+	}
+
+	public VisitedNodeStore getVisitedNodeStore() {
+		return visited;
+	}
+
+	void printStatus(long iteration, Deque<Node> path) {
+		System.out.println("Iteration " + iteration);
+		System.out.println("  visited: " + visitedStatesCount);
+		path.forEach(n -> System.out.println("  " + n.getLastEvent()));
+	}
+
+	private void printFolowers(Node node) {
+		Iterator<BEvent> i = node.getEventIterator();
+
+		while (i.hasNext()) {
+			BEvent e = (BEvent) i.next();
+			System.out.println("\t" + e);
+		}
+	}
+
 }

@@ -56,7 +56,7 @@ if (isModelChecking) {
 
 	bp.registerBThread("XMoves", function() {
 		while (true) {
-			bsync({ request:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), X(1, 1), X(1, 2), X(2, 0), X(2, 1), X(2, 2) ] });
+			bsync({ request:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), X(1, 1), X(1, 2), X(2, 0), X(2, 1), X(2, 2) ] }, 10);
 		}
 	});
 
@@ -91,7 +91,7 @@ bp.registerBThread("DetectDraw", function() {
 		bsync({ waitFor:[ move ] });
 	}
 
-	bsync({ request:[ StaticEvents.draw ] });
+	bsync({ request:[ StaticEvents.draw ] }, 90);
 });
 
 function addLinePermutationBthreads(l, p) {
@@ -104,7 +104,7 @@ function addLinePermutationBthreads(l, p) {
 
 			bsync({ waitFor:[ X(l[p[2]].x, l[p[2]].y) ] });
 
-			bsync({ request:[ StaticEvents.XWin ] });
+			bsync({ request:[ StaticEvents.XWin ] }, 100);
 
 		}
 	});
@@ -117,7 +117,7 @@ function addLinePermutationBthreads(l, p) {
 
 			bsync({ waitFor:[ O(l[p[2]].x, l[p[2]].y) ] });
 
-			bsync({ request:[ StaticEvents.OWin ] });
+			bsync({ request:[ StaticEvents.OWin ] }, 100);
 
 		}
 	});
