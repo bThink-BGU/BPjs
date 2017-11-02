@@ -10,10 +10,13 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
 import il.ac.bgu.cs.bp.bpjs.eventselection.PrioritizedBSyncEventSelectionStrategy;
+import il.ac.bgu.cs.bp.bpjs.verification.DfsBProgramVerifier;
+import il.ac.bgu.cs.bp.bpjs.verification.VerificationResult;
 
 /**
- *  For Gaming mode change isModelChecking to false.
- *  For Model Checking mode change isModelChecking to true.
+ * For Gaming mode change isModelChecking to false. For Model Checking mode
+ * change isModelChecking to true.
+ * 
  * @author reututy
  */
 class TicTacToeGameMain extends JFrame {
@@ -22,37 +25,53 @@ class TicTacToeGameMain extends JFrame {
 	public static TTTDisplayGame TTTdisplayGame;
 
 	public static boolean isModelChecking() {
-		return false;
+		return true;
 	}
 
 	public static void main(String[] args) throws InterruptedException {
+
 		// Create a program
 		BProgram bprog = new SingleResourceBProgram("BPJSTicTacToe.js") {
-            @Override
+			@Override
 			protected void setupProgramScope(Scriptable scope) {
-				putInGlobalScope("isModelChecking", false);
+				putInGlobalScope("isModelChecking", isModelChecking());
 				super.setupProgramScope(scope);
 			}
 		};
-		
+
 		bprog.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());
-		
+
 		bprog.setDaemonMode(true);
 		JFrame f = new TicTacToeGameMain();
 		// f.setVisible(true);
 
 		BProgramRunner rnr = new BProgramRunner(bprog);
-		rnr.addListener(new PrintBProgramListener());
 
-		TTTdisplayGame = new TTTDisplayGame(bprog, rnr);
+		if (!isModelChecking()) {
+			rnr.addListener(new PrintBProgramListener());
+			TTTdisplayGame = new TTTDisplayGame(bprog, rnr);
+			rnr.start();
+		} else {
+			try {
+				DfsBProgramVerifier vfr = new DfsBProgramVerifier();
+				vfr.setMaxTraceLength(50);
+				final VerificationResult res = vfr.verify(bprog);
+				if (res.isCounterExampleFound()) {
+					System.out.println("Found a counterexample");
+					res.getCounterExampleTrace().forEach(nd -> System.out.println(" " + nd.getLastEvent()));
 
-		rnr.start();
+				} else {
+					System.out.println("No counterexample found.");
+				}
+				System.out.printf("Scanned %,d states\n", res.getStatesScanned());
+				System.out.printf("Time: %,d milliseconds\n", res.getTimeMillies());
+
+			} catch (Exception ex) {
+				ex.printStackTrace(System.out);
+			}
+		}
 
 		System.out.println("end of run");
-
-		// bprog.add(new UpdatePlayingGUI(), 0.1);
-		// bprog.add(new UserMove(), 0.5);
-
 	}
 
 }

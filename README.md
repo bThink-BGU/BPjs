@@ -42,6 +42,16 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+## 2017-11-02
+* :sparkles: the `DfsBProgramVerifier` is now accepting requirement objects over execution paths, instead of the hard-coded deadlock check.
+* :sparkles: new `PathRequirement` class. Requirements are passed to the verifiers for making sure the program conforms to them. Two implementation already present:
+    * `NoDeadlock` Breakes when there's a deadlock
+    * `EventNotPresent` Breaks when the last event in the ongoing path is a member of a given event set.
+* :sparkles: the `DfsBProgramVerifier` is now using listener architecture for reporting progress.
+* :sparkles: new event set from bp: `bp.allExcept(es)`.
+* :arrow_up: Efficient path stack implementation for `BfsBProgramVerifier` (no copying, reversal, etc.)
+* :arrow_up: `Mazes.java` Updates to fully use the new verifier features
+
 ## 2017-10-30
 * :arrow_up: Re-created program state cloning based on code from @szegedi. Cloning is now faster, more efficient, and can handle storage of events.
 

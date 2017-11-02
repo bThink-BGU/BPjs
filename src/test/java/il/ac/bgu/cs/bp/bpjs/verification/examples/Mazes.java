@@ -57,7 +57,7 @@ public class Mazes {
         
 		try {
             DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-            vfr.setPredicate(new EventNotPresent(targetFoundEvent) );
+            vfr.setRequirement(new EventNotPresent(targetFoundEvent) );
             vfr.setProgressListener( new BriefPrintDfsVerifierListener() );
             vfr.setIterationCountGap(10);
             vfr.setVisitedNodeStore(new HashVisitedNodeStore());

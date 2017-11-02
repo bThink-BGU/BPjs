@@ -23,13 +23,14 @@
  */
 package il.ac.bgu.cs.bp.bpjs.verification;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.search.HashVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.search.Node;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
 import il.ac.bgu.cs.bp.bpjs.search.VisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.verification.requirements.NoDeadlock;
 import il.ac.bgu.cs.bp.bpjs.verification.requirements.PathRequirement;
@@ -37,9 +38,9 @@ import java.util.Optional;
 
 /**
  * 
- * Takes a BProgram, and verifies it does not get into a deadlock (i.e there
- * is always a selectable state). If the verification fails, returns a trace
- * that serves as a counter example.
+ * Takes a BProgram, and verifies it does not get into a deadlock (i.e there is
+ * always a selectable state). If the verification fails, returns a trace that
+ * serves as a counter example.
  * 
  * States are scanned using a DFS.
  * 
@@ -106,7 +107,6 @@ public class DfsBProgramVerifier {
             iterationCount++;
 			Node curNode = peek();
             
-            
             if ( pathLength()== maxTraceLength ) {
                 if ( listenerOpt.isPresent() ){
                     listenerOpt.get().maxTraceLengthHit(currentPath, this);
@@ -132,8 +132,7 @@ public class DfsBProgramVerifier {
                 listenerOpt.get().iterationCount(iterationCount, visitedStatesCount, this);
             }
 		}
-        
-        return null;
+		return null;
 	}
     
     protected Node getUnvisitedNextNode(Node src) throws Exception {
@@ -163,11 +162,11 @@ public class DfsBProgramVerifier {
         return visited;
     }
 
-    public void setPredicate(PathRequirement predicate) {
+    public void setRequirement(PathRequirement predicate) {
         this.requirement = predicate;
     }
 
-    public PathRequirement getPredicate() {
+    public PathRequirement getRequirement() {
         return requirement;
     }
     

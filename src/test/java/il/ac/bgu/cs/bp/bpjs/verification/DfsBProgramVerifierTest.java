@@ -50,7 +50,7 @@ public class DfsBProgramVerifierTest {
         BProgram program = new SingleResourceBProgram("AAABTrace.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setProgressListener(new BriefPrintDfsVerifierListener());
-        sut.setPredicate(new EventNotPresent(new BEvent("B")) );
+        sut.setRequirement(new EventNotPresent(new BEvent("B")) );
         sut.setVisitedNodeStore(new NotVisitedStore());
         VerificationResult res = sut.verify(program);
         assertTrue( res.isCounterExampleFound() );
@@ -74,7 +74,7 @@ public class DfsBProgramVerifierTest {
     public void deadlockTrace() throws Exception {
         BProgram program = new SingleResourceBProgram("deadlocking.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        sut.setPredicate(new NoDeadlock() );
+        sut.setRequirement(new NoDeadlock() );
         sut.setVisitedNodeStore(new NotVisitedStore());
         VerificationResult res = sut.verify(program);
         assertTrue( res.isCounterExampleFound() );
