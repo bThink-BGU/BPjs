@@ -21,35 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
-
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
-import org.junit.Test;
-import static org.junit.Assert.*;
+package il.ac.bgu.cs.bp.bpjs.verification.requirements;
 
 /**
  *
  * @author michael
  */
-public class BProgramRunnerTest {
+public abstract class AbstractPathRequirement implements PathRequirement {
     
-    public BProgramRunnerTest() {
+    private String name;
+
+    public AbstractPathRequirement(String name) {
+        this.name = name;
     }
 
-    /**
-     * Test of start method, of class BProgramRunner.
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void testRun() throws Exception {
-        
-        BProgram bprog = new SingleResourceBProgram("HotNCold.js");
-        BProgramRunner sut = new BProgramRunner(bprog);
-        
-        sut.addListener(new PrintBProgramListener() );
-        
-        sut.start();
-        
+    @Override
+    public String getName() {
+        return name;
     }
 
+    protected void setName(String name) {
+        this.name = name;
+    }
+    
+    
+    
 }

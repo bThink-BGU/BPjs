@@ -24,10 +24,13 @@
 package il.ac.bgu.cs.bp.bpjs.verification.examples;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.search.HashVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.search.Node;
 import il.ac.bgu.cs.bp.bpjs.verification.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.verification.VerificationResult;
+import il.ac.bgu.cs.bp.bpjs.verification.listeners.BriefPrintDfsVerifierListener;
+import il.ac.bgu.cs.bp.bpjs.verification.requirements.EventNotPresent;
 import java.util.stream.Collectors;
 import org.mozilla.javascript.NativeArray;
 
@@ -42,27 +45,23 @@ public class Mazes {
     public static void main(String[] args) throws InterruptedException {
 		// Create a program
 		final SingleResourceBProgram bprog = new SingleResourceBProgram("Mazes.js");
+        final BEvent targetFoundEvent = BEvent.named("targetFound");
+        
+        // change commented line below to solve a different maze.
 //        String mazeName = "trivial";
 //        String mazeName = "trivialPlus";
 //        String mazeName = "complex";
         String mazeName = "singleSolution";
         bprog.putInGlobalScope("MAZE_NAME", mazeName);
-
-//        BProgramRunner rnr = new BProgramRunner(bprog);
-//        rnr.addListener( new StreamLoggerListener() );
-//        rnr.start();
-//
-//        NativeArray jsMaze = bprog.getFromGlobalScope(mazeName, NativeArray.class).get();
-//        char maze[][] = new char[(int)jsMaze.getLength()][];
-//        for ( int i=0; i<jsMaze.getLength(); i++ ) {
-//            maze[i] = jsMaze.get(i).toString().toCharArray();
-//        }
-//        printMaze(maze);
+        bprog.putInGlobalScope("TARGET_FOUND_EVENT", targetFoundEvent);
         
 		try {
             DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-//            vfr.setVisitedNodeStore(new FullVisitedNodeStore());
+            vfr.setPredicate(new EventNotPresent(targetFoundEvent) );
+            vfr.setProgressListener( new BriefPrintDfsVerifierListener() );
+            vfr.setIterationCountGap(10);
             vfr.setVisitedNodeStore(new HashVisitedNodeStore());
+//            vfr.setVisitedNodeStore(new FullVisitedNodeStore());
 //            vfr.setVisitedNodeStore(new StateHashVisitedNodeStore());
             final VerificationResult res = vfr.verify(bprog);
             
@@ -80,11 +79,13 @@ public class Mazes {
                     System.out.println(" " + nd.getLastEvent());
                     if ( nd.getLastEvent() != null ) {
                         String name = nd.getLastEvent().getName();
-                        String loc = name.split("\\(")[1].replace(")","").trim();
-                        String coord[] = loc.split(",");
-                        int col = Integer.parseInt(coord[0]);
-                        int row = Integer.parseInt(coord[1]);
-                        maze[row][col]='•';
+                        if ( name.startsWith("Enter") ) {
+                            String loc = name.split("\\(")[1].replace(")","").trim();
+                            String coord[] = loc.split(",");
+                            int col = Integer.parseInt(coord[0]);
+                            int row = Integer.parseInt(coord[1]);
+                            maze[row][col]='•';
+                        }
                     }
                 }
                 printMaze(maze);

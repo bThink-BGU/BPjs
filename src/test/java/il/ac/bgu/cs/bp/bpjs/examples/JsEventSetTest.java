@@ -8,7 +8,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.eventsets.JsEventSet;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
@@ -30,7 +30,7 @@ public class JsEventSetTest {
     @Test
     public void testRun() throws InterruptedException, URISyntaxException {
         BProgramRunner bpr = new BProgramRunner(new SingleResourceBProgram("JsEventSet.js"));
-        bpr.addListener( new StreamLoggerListener() );
+        bpr.addListener(new PrintBProgramListener() );
         InMemoryEventLoggingListener eventLogger = bpr.addListener( new InMemoryEventLoggingListener() );
         bpr.start();
         

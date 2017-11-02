@@ -23,7 +23,7 @@
  */
 
 
-/* global bp, MAZE_NAME */
+/* global bp, MAZE_NAME, TARGET_FOUND_EVENT */
 
 var trivial = 
   ["s  ",
@@ -157,9 +157,10 @@ function addTargetCell(col, row) {
        bsync({
            waitFor: enterEvent(col, row)
        }); 
-       bp.log.info("Target found!");
+       
        bsync({
-           block: bp.all
+           request: TARGET_FOUND_EVENT,
+           block: bp.allExcept( TARGET_FOUND_EVENT )
        });
     });
 }

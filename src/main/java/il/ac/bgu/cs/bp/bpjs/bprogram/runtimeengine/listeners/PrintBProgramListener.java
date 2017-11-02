@@ -10,15 +10,15 @@ import java.io.PrintStream;
  * Defaults to {@code System.out}.
  * @author michael
  */
-public class StreamLoggerListener implements BProgramListener {
+public class PrintBProgramListener implements BProgramListener {
     
     private final PrintStream out;
     
-    public StreamLoggerListener( PrintStream aStream ){
+    public PrintBProgramListener( PrintStream aStream ){
         out = aStream;
     }
     
-    public StreamLoggerListener() {
+    public PrintBProgramListener() {
         this( System.out );
     }
 

@@ -44,4 +44,17 @@ public final class EventSets {
         }
     };
     
+    public final static EventSet allExcept( EventSet es ) {
+        return new EventSet(){
+            @Override
+            public boolean contains(BEvent event) {
+                return ! es.contains(event);
+            }
+            
+            @Override
+            public String toString() {
+                return "{ all except " + es.toString() + "}";
+            }
+        };
+    }
 }

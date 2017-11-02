@@ -5,7 +5,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
 import il.ac.bgu.cs.bp.bpjs.search.FullVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.verification.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.verification.VerificationResult;
@@ -45,7 +45,7 @@ public class BProgramSyncSnapshotClonerTest {
     @Test
     public void testProgramIsOk() throws InterruptedException {
         BProgramRunner bpr = new BProgramRunner(new SingleResourceBProgram("BProgramSyncSnapshotClonerTest.js"));
-        bpr.addListener( new StreamLoggerListener() );
+        bpr.addListener(new PrintBProgramListener() );
         InMemoryEventLoggingListener events = bpr.addListener( new InMemoryEventLoggingListener() );
         
         bpr.start();

@@ -4,7 +4,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
 import il.ac.bgu.cs.bp.bpjs.validation.eventpattern.EventPattern;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -33,7 +33,7 @@ public class LoggingEventSelectionStrategyDecoratorTest {
             SingleResourceBProgram bp = new SingleResourceBProgram("HotNCold.js");
             bp.setEventSelectionStrategy(sut);
             BProgramRunner runner = new BProgramRunner(bp);
-            runner.addListener( new StreamLoggerListener() );
+            runner.addListener(new PrintBProgramListener() );
             InMemoryEventLoggingListener eventLogger = runner.addListener( new InMemoryEventLoggingListener() );
             
             runner.start();

@@ -7,7 +7,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.eventselection.SimpleEventSelectionStrategy;
 import java.util.Arrays;
@@ -25,7 +25,7 @@ public class EventsWithDataTest {
     public void testEventsWithData() throws Exception {
         BProgram bpr = new SingleResourceBProgram( "EventsWithData.js", "programName", new SimpleEventSelectionStrategy(99l) );
         BProgramRunner rnr = new BProgramRunner(bpr);
-        rnr.addListener( new StreamLoggerListener() );
+        rnr.addListener(new PrintBProgramListener() );
         InMemoryEventLoggingListener events = rnr.addListener( new InMemoryEventLoggingListener() );
         
         rnr.start();

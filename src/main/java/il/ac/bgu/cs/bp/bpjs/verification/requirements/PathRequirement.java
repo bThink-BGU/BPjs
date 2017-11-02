@@ -21,35 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
+package il.ac.bgu.cs.bp.bpjs.verification.requirements;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import il.ac.bgu.cs.bp.bpjs.search.Node;
+import java.util.List;
 
 /**
- *
+ * A requirement for execution paths. The {@link #checkConformance(java.util.List)} method returns {@code true} 
+ * when the execution path complies with the implemented requirement, and {@code false} otherwise.
+ * 
  * @author michael
  */
-public class BProgramRunnerTest {
+public interface PathRequirement {
     
-    public BProgramRunnerTest() {
-    }
-
+    String getName();
+    
     /**
-     * Test of start method, of class BProgramRunner.
-     * @throws java.lang.Exception
+     * Test that {@code trace} conforms to the implemented requirement.
+     * @param trace the BProgram trace thus far. Immutable.
+     * @return {@code true} iff the trace conforms to the requirement {@code this} implements; {@code false} otherwise.
      */
-    @Test
-    public void testRun() throws Exception {
-        
-        BProgram bprog = new SingleResourceBProgram("HotNCold.js");
-        BProgramRunner sut = new BProgramRunner(bprog);
-        
-        sut.addListener(new PrintBProgramListener() );
-        
-        sut.start();
-        
-    }
-
+    boolean checkConformance( List<Node> trace );
+    
 }

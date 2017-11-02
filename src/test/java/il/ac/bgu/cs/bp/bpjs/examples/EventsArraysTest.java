@@ -6,7 +6,7 @@ package il.ac.bgu.cs.bp.bpjs.examples;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import java.util.Arrays;
 import static java.util.stream.Collectors.toList;
@@ -22,7 +22,7 @@ public class EventsArraysTest {
     @Test
     public void testEventsWithData() throws Exception {
         BProgramRunner bpr = new BProgramRunner(new SingleResourceBProgram("EventArrays.js"));
-        bpr.addListener( new StreamLoggerListener() );
+        bpr.addListener(new PrintBProgramListener() );
         InMemoryEventLoggingListener events = bpr.addListener( new InMemoryEventLoggingListener() );
         
         bpr.start();

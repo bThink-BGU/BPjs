@@ -106,6 +106,10 @@ public class BProgramJsProxy implements java.io.Serializable {
         }
     }
     
+    public EventSet allExcept( EventSet es ) {
+        return EventSets.allExcept(es);
+    }
+    
     /**
      * Called from JS to add BThreads running func as their runnable code.
      *

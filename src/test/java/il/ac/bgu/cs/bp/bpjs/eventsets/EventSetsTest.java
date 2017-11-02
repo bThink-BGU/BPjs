@@ -21,35 +21,33 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
+package il.ac.bgu.cs.bp.bpjs.eventsets;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
+import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
  * @author michael
  */
-public class BProgramRunnerTest {
+public class EventSetsTest {
     
-    public BProgramRunnerTest() {
+    public EventSetsTest() {
     }
 
     /**
-     * Test of start method, of class BProgramRunner.
-     * @throws java.lang.Exception
+     * Test of allExcept method, of class EventSets.
      */
     @Test
-    public void testRun() throws Exception {
+    public void testAllExcept() {
+        BEvent evtIn  = new BEvent("In");
+        BEvent evtOut = new BEvent("Out");
+        EventSet es = EventSets.allExcept(evtOut);
         
-        BProgram bprog = new SingleResourceBProgram("HotNCold.js");
-        BProgramRunner sut = new BProgramRunner(bprog);
-        
-        sut.addListener(new PrintBProgramListener() );
-        
-        sut.start();
-        
+        assertFalse( es.contains(evtOut) );
+        assertTrue( es.contains(evtIn) );
     }
-
+    
 }

@@ -21,35 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
+package il.ac.bgu.cs.bp.bpjs.verification.requirements;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
+import il.ac.bgu.cs.bp.bpjs.search.Node;
+import java.util.List;
 
 /**
- *
+ * A requirement that's broken when a member of the passed event set is selected.
+ * 
  * @author michael
  */
-public class BProgramRunnerTest {
+public class EventNotPresent extends AbstractPathRequirement {
     
-    public BProgramRunnerTest() {
+    private final EventSet forbiddenEvents;
+    
+    public EventNotPresent( EventSet anEventSet ) {
+        super( anEventSet.toString() );
+        forbiddenEvents = anEventSet;
     }
 
-    /**
-     * Test of start method, of class BProgramRunner.
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void testRun() throws Exception {
-        
-        BProgram bprog = new SingleResourceBProgram("HotNCold.js");
-        BProgramRunner sut = new BProgramRunner(bprog);
-        
-        sut.addListener(new PrintBProgramListener() );
-        
-        sut.start();
-        
+    @Override
+    public boolean checkConformance(List<Node> trace) {
+        return ! forbiddenEvents.contains(trace.get(trace.size()-1).getLastEvent());
     }
-
+    
 }

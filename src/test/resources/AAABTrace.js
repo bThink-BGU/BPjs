@@ -1,4 +1,4 @@
-/*
+/* global bp, bsync
  * The MIT License
  *
  * Copyright 2017 michael.
@@ -21,35 +21,17 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
-import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
- *
- * @author michael
+ * Simple program whose trace is "A","A","A","B", 10 times.
  */
-public class BProgramRunnerTest {
-    
-    public BProgramRunnerTest() {
-    }
 
-    /**
-     * Test of start method, of class BProgramRunner.
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void testRun() throws Exception {
-        
-        BProgram bprog = new SingleResourceBProgram("HotNCold.js");
-        BProgramRunner sut = new BProgramRunner(bprog);
-        
-        sut.addListener(new PrintBProgramListener() );
-        
-        sut.start();
-        
+bp.registerBThread(function(){
+    for ( var i=0; i<10; i++ ) {
+        bsync({request:bp.Event("A")});
+        bsync({request:bp.Event("A")});
+        bsync({request:bp.Event("A")});
+        bsync({request:bp.Event("B")});
     }
-
-}
+});

@@ -21,35 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
+package il.ac.bgu.cs.bp.bpjs.verification.requirements;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import il.ac.bgu.cs.bp.bpjs.search.Node;
+import java.util.List;
 
 /**
- *
+ * A requirement that broken if the current trace leads to a deadlock (i.e no selectable event).
+ * 
  * @author michael
  */
-public class BProgramRunnerTest {
+public class NoDeadlock extends AbstractPathRequirement {
+
+    public NoDeadlock() {
+        super("Deadlock Detector");
+    }
     
-    public BProgramRunnerTest() {
+    @Override
+    public boolean checkConformance(List<Node> trace) {
+        Node last = trace.get(trace.size()-1);
+        return ! last.getSelectableEvents().isEmpty();
     }
-
-    /**
-     * Test of start method, of class BProgramRunner.
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void testRun() throws Exception {
-        
-        BProgram bprog = new SingleResourceBProgram("HotNCold.js");
-        BProgramRunner sut = new BProgramRunner(bprog);
-        
-        sut.addListener(new PrintBProgramListener() );
-        
-        sut.start();
-        
-    }
-
+    
 }

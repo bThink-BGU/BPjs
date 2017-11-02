@@ -1,4 +1,4 @@
-/*
+/* global bp, bsync
  * The MIT License
  *
  * Copyright 2017 michael.
@@ -21,35 +21,15 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
-import org.junit.Test;
-import static org.junit.Assert.*;
 
-/**
- *
- * @author michael
- */
-public class BProgramRunnerTest {
-    
-    public BProgramRunnerTest() {
-    }
+bp.registerBThread("Requester", function(){
+    bsync({request:bp.Event("A")});
+    bsync({request:bp.Event("A")});
+    bsync({request:bp.Event("A")});
+});
 
-    /**
-     * Test of start method, of class BProgramRunner.
-     * @throws java.lang.Exception
-     */
-    @Test
-    public void testRun() throws Exception {
-        
-        BProgram bprog = new SingleResourceBProgram("HotNCold.js");
-        BProgramRunner sut = new BProgramRunner(bprog);
-        
-        sut.addListener(new PrintBProgramListener() );
-        
-        sut.start();
-        
-    }
-
-}
+bp.registerBThread("Deadlocker", function(){
+    bsync({waitFor:bp.Event("A")});
+    bsync({block:bp.Event("A")});
+});

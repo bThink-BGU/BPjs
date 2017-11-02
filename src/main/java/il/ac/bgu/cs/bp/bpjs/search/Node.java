@@ -4,12 +4,12 @@ import il.ac.bgu.cs.bp.bpjs.search.bprogramio.BProgramSyncSnapshotCloner;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Objects;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import java.util.Set;
 
 /**
  * A single node in a program's execution tree. Contains the program's state,
@@ -20,10 +20,22 @@ import il.ac.bgu.cs.bp.bpjs.events.BEvent;
  * @author michael
  */
 public class Node {
+    
+    /**
+     * Get the initial nod ofr a run of the passed {@code BPorgram}.
+     * @param bp The {@link BProgram} being verified.
+     * @return Initial node for the BProgram run
+     * @throws Exception 
+     */
+	public static Node getInitialNode(BProgram bp) throws Exception {
+		BProgramSyncSnapshot seed = bp.setup().start();
 
+		return new Node(bp, seed, null);
+	}
+    
 	private final BProgramSyncSnapshot systemState;
 	private final BProgram bp;
-	private final List<BEvent> possibleEvents;
+	private final Set<BEvent> selectableEvents;
 	private final BEvent lastEvent;
 	private final Iterator<BEvent> iterator;
 
@@ -31,12 +43,18 @@ public class Node {
 		this.bp = bp;
 		this.systemState = systemState;
 		this.lastEvent = e;
-
-		possibleEvents = new ArrayList<>(bp.getEventSelectionStrategy().selectableEvents(systemState.getStatements(),
-				systemState.getExternalEvents()));
+        
+        if ( bp != null ) {
+            selectableEvents = bp.getEventSelectionStrategy().selectableEvents(systemState.getStatements(),
+				systemState.getExternalEvents());
+            ArrayList<BEvent> eventOrdered = new ArrayList<>(selectableEvents);
+            Collections.shuffle(eventOrdered);
+            iterator = eventOrdered.iterator();
+        } else {
+            selectableEvents = Collections.<BEvent>emptySet();
+            iterator = selectableEvents.iterator();
+        }
 	
-		Collections.shuffle(possibleEvents);
-		iterator = possibleEvents.iterator();
 	}
 
 	private String stateString() {
@@ -53,11 +71,6 @@ public class Node {
 		return ((lastEvent != null) ? "\n\tevent: " + lastEvent + "\n" : "") + stateString();
 	}
 
-	public static Node getInitialNode(BProgram bp) throws Exception {
-		BProgramSyncSnapshot seed = bp.setup().start();
-
-		return new Node(bp, seed, null);
-	}
 
 	/**
 	 * Get a Node object for each possible state of the system after triggering the
@@ -78,7 +91,7 @@ public class Node {
 	 * @return True if the state is good.
 	 */
 	public boolean check() {
-		return !possibleEvents.isEmpty();
+		return !selectableEvents.isEmpty();
 	}
 
 	/**
@@ -98,6 +111,10 @@ public class Node {
 		return systemState;
 	}
 
+    public Set<BEvent> getSelectableEvents() {
+        return selectableEvents;
+    }
+    
 	@Override
 	public int hashCode() {
 		final int prime = 31;

@@ -8,7 +8,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramListenerAdapter;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.eventselection.PrioritizedBSyncEventSelectionStrategy;
 
@@ -23,7 +23,7 @@ public class StatementsWithDataTest {
     public void superStepTest() throws InterruptedException {
         SingleResourceBProgram bprog = new SingleResourceBProgram("StatementsWithData.js");
         BProgramRunner sut = new BProgramRunner();
-        sut.addListener( new StreamLoggerListener() );
+        sut.addListener(new PrintBProgramListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         sut.setBProgram(bprog);
         sut.getBProgram().setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());

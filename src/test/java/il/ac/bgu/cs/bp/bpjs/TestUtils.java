@@ -21,35 +21,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
+package il.ac.bgu.cs.bp.bpjs;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
-import org.junit.Test;
-import static org.junit.Assert.*;
+import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.search.Node;
+import java.util.List;
+import java.util.Objects;
+import static java.util.stream.Collectors.joining;
 
 /**
- *
+ * Just a static place for some repeated methods useful for testing.
+ * 
  * @author michael
  */
-public class BProgramRunnerTest {
+public abstract class TestUtils {
     
-    public BProgramRunnerTest() {
-    }
-
+    
     /**
-     * Test of start method, of class BProgramRunner.
-     * @throws java.lang.Exception
+     * Preventing the instantiation of subclasses.
      */
-    @Test
-    public void testRun() throws Exception {
+    private TestUtils(){}
+    
+    
+    public static String traceEventNamesString( List<Node> trace, String delimiter ) {
         
-        BProgram bprog = new SingleResourceBProgram("HotNCold.js");
-        BProgramRunner sut = new BProgramRunner(bprog);
-        
-        sut.addListener(new PrintBProgramListener() );
-        
-        sut.start();
-        
+        return trace.stream()
+                    .map(Node::getLastEvent)
+                    .filter(Objects::nonNull)
+                    .map(BEvent::getName)
+                    .collect(joining(delimiter));
     }
-
+    
+    public static String eventNamesString( List<BEvent> trace, String delimiter ) {
+        return trace.stream()
+                    .map(BEvent::getName)
+                    .collect(joining(delimiter));
+    }
 }

@@ -27,13 +27,13 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.search.HashVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.search.Node;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import il.ac.bgu.cs.bp.bpjs.search.VisitedNodeStore;
-import java.util.Deque;
+import il.ac.bgu.cs.bp.bpjs.verification.requirements.NoDeadlock;
+import il.ac.bgu.cs.bp.bpjs.verification.requirements.PathRequirement;
+import java.util.Optional;
 
 /**
  * 
@@ -47,61 +47,89 @@ import java.util.Deque;
  */
 public class DfsBProgramVerifier {
 
-    public final static long DEFAULT_MAX_TRACE = 100;
-
-	private long visitedStatesCount;
     
+    public final static long DEFAULT_MAX_TRACE = 100;
+    
+    /** 
+     * Default number of iterations between invocation of {@link ProgressListener#iterationCount(long, long, il.ac.bgu.cs.bp.bpjs.verification.DfsBProgramVerifier) }.
+     */
+    public final static long DEFAULT_ITERATION_COUNT_GAP = 1000;
+    
+    /**
+     * A listener to the progress of the DFS state scanning.
+     */
+    public static interface ProgressListener {
+        void started( DfsBProgramVerifier v );
+        void iterationCount( long count, long statesHit, DfsBProgramVerifier v );
+        void maxTraceLengthHit( List<Node> trace, DfsBProgramVerifier v );
+        void done( DfsBProgramVerifier v );
+    }
+    
+	private long visitedStatesCount;
     private VisitedNodeStore visited = new HashVisitedNodeStore();
     private long maxTraceLength = DEFAULT_MAX_TRACE;
-
+    private final ArrayList<Node> currentPath = new ArrayList<>();
+    private Optional<ProgressListener> listenerOpt = Optional.empty();
+    private long iterationCountGap = DEFAULT_ITERATION_COUNT_GAP;
+    private BProgram currentBProgram;
+    
+    /**
+     * The requirement {@code this} verifier will test a {@link BProgram} for.
+     */
+    private PathRequirement requirement;
+    
     public VerificationResult verify( BProgram aBp ) throws Exception {
+        currentBProgram = aBp;
         visitedStatesCount=1;
+        currentPath.clear();
+        if ( requirement == null ) {
+            requirement = new NoDeadlock();
+        }
         long start = System.currentTimeMillis();
+        listenerOpt.ifPresent(l->l.started(this));
         List<Node> counterEx = dfsUsingStack(Node.getInitialNode(aBp));
         long end = System.currentTimeMillis();
+        listenerOpt.ifPresent(l->l.done(this));
         return new VerificationResult(counterEx, end-start, visitedStatesCount);
     }
     
     protected List<Node> dfsUsingStack(Node aStartNode) throws Exception {
-		ArrayDeque<Node> pathNodes = new ArrayDeque<>(); // Current execution stack.
-
         long iterationCount = 0;
 		visited.store(aStartNode);
-		pathNodes.push(aStartNode);
+		push(aStartNode);
         
-		while ( !pathNodes.isEmpty() ) {
-            printStatus(iterationCount, pathNodes);
-            iterationCount++;
-			Node curNode = pathNodes.peek();
-            
-            if ( ! curNode.check() ) {
+		while ( ! isPathEmpty() ) {
+            if ( ! requirement.checkConformance(Collections.unmodifiableList(currentPath)) ) {
                 // Found a problematic path :-)
-                final ArrayList<Node> counterExampleTrace = new ArrayList<>(Arrays.asList(pathNodes.toArray(new Node[0])));
-                Collections.reverse(counterExampleTrace);
-                return counterExampleTrace;
+                return currentPath;
             }            
+            iterationCount++;
+			Node curNode = peek();
             
-            if ( pathNodes.size() == maxTraceLength ) {
+            
+            if ( pathLength()== maxTraceLength ) {
+                if ( listenerOpt.isPresent() ){
+                    listenerOpt.get().maxTraceLengthHit(currentPath, this);
+                }
                 // fold stack;
-                pathNodes.pop();
+                pop();
                 
             } else {
                 Node nextNode = getUnvisitedNextNode(curNode);
                 if ( nextNode == null ) {
                     // fold stack, retry next iteration;
-                    pathNodes.pop();
+                    pop();
                     
                 } else {
                     // go deeper 
                     visited.store(nextNode);
-                    pathNodes.push(nextNode);
+                    push(nextNode);
                     visitedStatesCount++;
                 }
             }
             
-            if ( iterationCount%1000==0 ) {
-                // TODO - switch to listener architecture.
-                System.out.printf("~ %,d states scanned (iteration %,d)\n", visitedStatesCount, iterationCount);
+            if ( iterationCount%iterationCountGap==0 && listenerOpt.isPresent() ) {
+                listenerOpt.get().iterationCount(iterationCount, visitedStatesCount, this);
             }
 		}
         
@@ -134,11 +162,54 @@ public class DfsBProgramVerifier {
     public VisitedNodeStore getVisitedNodeStore() {
         return visited;
     }
-           
-    void printStatus( long iteration, Deque<Node> path) {
+
+    public void setPredicate(PathRequirement predicate) {
+        this.requirement = predicate;
+    }
+
+    public PathRequirement getPredicate() {
+        return requirement;
+    }
+    
+    public void setProgressListener( ProgressListener pl ) {
+        listenerOpt = Optional.of(pl);
+    }
+
+    public void setIterationCountGap(long iterationCountGap) {
+        this.iterationCountGap = iterationCountGap;
+    }
+
+    public long getIterationCountGap() {
+        return iterationCountGap;
+    }
+
+    public BProgram getCurrentBProgram() {
+        return currentBProgram;
+    }
+    
+    void printStatus( long iteration, List<Node> path) {
         System.out.println("Iteration " + iteration );
         System.out.println("  visited: " + visitedStatesCount );
         path.forEach( n -> System.out.println("  " + n.getLastEvent()));
     }
     
+    private void push( Node n ) {
+        currentPath.add(n);
+    }
+    
+    private int pathLength() {
+        return currentPath.size();
+    }
+    
+    private boolean isPathEmpty() {
+        return pathLength() == 0;
+    }
+    
+    private Node peek() {
+        return isPathEmpty() ? null : currentPath.get(currentPath.size()-1);
+    }
+    
+    private Node pop() {
+        return currentPath.remove(currentPath.size()-1);
+    }
 }

@@ -21,35 +21,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
+package il.ac.bgu.cs.bp.bpjs.verification.requirements;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
+import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.search.Node;
+import java.util.Arrays;
+import java.util.List;
+import static java.util.stream.Collectors.toList;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+class TestingNode extends Node {
+    TestingNode( BEvent e ) {
+        super(null, null, e);
+    }
+}
 
 /**
  *
  * @author michael
  */
-public class BProgramRunnerTest {
+public class EventDetectorTest {
     
-    public BProgramRunnerTest() {
-    }
-
+    private static final BEvent NOT_THIS = new BEvent("not-this");
+    private static final BEvent YES_THIS = new BEvent("YES-this");
+            
     /**
-     * Test of start method, of class BProgramRunner.
-     * @throws java.lang.Exception
+     * Test of checkConformance method, of class EventDetector.
      */
     @Test
-    public void testRun() throws Exception {
+    public void testCheckConformance() {
+        EventNotPresent sut = new EventNotPresent(YES_THIS);
+        List<Node> trace = Arrays.asList( NOT_THIS, NOT_THIS, NOT_THIS, YES_THIS )
+                .stream().map(e ->  new TestingNode(e) ).collect( toList() );
         
-        BProgram bprog = new SingleResourceBProgram("HotNCold.js");
-        BProgramRunner sut = new BProgramRunner(bprog);
+        assertFalse( sut.checkConformance(trace) );
         
-        sut.addListener(new PrintBProgramListener() );
+        trace.remove(trace.size()-1);
         
-        sut.start();
-        
+        assertTrue( sut.checkConformance(trace) );
     }
-
+    
 }
