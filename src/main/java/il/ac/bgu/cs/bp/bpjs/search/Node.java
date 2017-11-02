@@ -86,15 +86,6 @@ public class Node {
 	}
 
 	/**
-	 * Check if this state is good or bad
-	 * 
-	 * @return True if the state is good.
-	 */
-	public boolean check() {
-		return !selectableEvents.isEmpty();
-	}
-
-	/**
 	 * Get the events that can be triggered at the state.
 	 * 
 	 * @return An iterator for the set of requested and not blocked events.

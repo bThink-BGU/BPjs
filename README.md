@@ -32,6 +32,7 @@ a link to this page somewhere in the documentation/system about section.
 
 * Clone, fork, or download the [starting project](https://github.com/bThink-BGU/SampleBPjsProject).
 * Download the `.jar` files directly from [Maven Central](https://repo.maven.apache.org/maven2/com/github/bthink-bgu/BPjs/).
+* The project's [Google group](https://groups.google.com/forum/#!forum/bpjs)
 
 ## Documentation
 
