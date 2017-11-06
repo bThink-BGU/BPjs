@@ -43,7 +43,6 @@ class TicTacToeGameMain extends JFrame {
 
 		bprog.setDaemonMode(true);
 		JFrame f = new TicTacToeGameMain();
-		// f.setVisible(true);
 
 		BProgramRunner rnr = new BProgramRunner(bprog);
 

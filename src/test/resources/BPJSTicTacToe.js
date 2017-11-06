@@ -87,9 +87,20 @@ var move = bp.EventSet("Move events", function(e) {
 });
 
 bp.registerBThread("DetectDraw", function() {
-	for (var i = 0; i < 9; i++) {
-		bsync({ waitFor:[ move ] });
-	}
+//	for (var i = 0; i < 9; i++) {
+//		bsync({ waitFor:[ move ] });
+//	}
+	bsync({ waitFor:[ move ] });
+	bsync({ waitFor:[ move ] });
+	bsync({ waitFor:[ move ] });
+	
+	bsync({ waitFor:[ move ] });
+	bsync({ waitFor:[ move ] });
+	bsync({ waitFor:[ move ] });
+	
+	bsync({ waitFor:[ move ] });
+	bsync({ waitFor:[ move ] });
+	bsync({ waitFor:[ move ] });
 
 	bsync({ request:[ StaticEvents.draw ] }, 90);
 });
