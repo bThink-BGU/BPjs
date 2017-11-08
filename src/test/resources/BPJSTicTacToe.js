@@ -41,7 +41,6 @@ bp.registerBThread("EnforceTurns", function() {
 });
 
 bp.registerBThread("EndOfGame", function() {
-
 	bsync({ waitFor:[ StaticEvents.OWin, StaticEvents.XWin, StaticEvents.draw ] });
 
 	bsync({ block:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), X(1, 1), X(1, 2), X(2, 0), X(2, 1), X(2, 2), O(0, 0), O(0, 1), O(0, 2), O(1, 0), O(1, 1), O(1, 2), O(2, 0), O(2, 1), O(2, 2) ] });
@@ -50,7 +49,9 @@ bp.registerBThread("EndOfGame", function() {
 if (isModelChecking) {
 	bp.registerBThread("STAM", function() {
 		while (true) {
-			bsync({ request:[ bp.Event("STAM") ], interrupt:[ StaticEvents.XWin ] });
+			bsync({ request:[ bp.Event("STAM") ]
+					//, interrupt:[ StaticEvents.XWin] 
+					});
 		}
 	});
 
@@ -87,17 +88,14 @@ var move = bp.EventSet("Move events", function(e) {
 });
 
 bp.registerBThread("DetectDraw", function() {
-//	for (var i = 0; i < 9; i++) {
-//		bsync({ waitFor:[ move ] });
-//	}
 	bsync({ waitFor:[ move ] });
 	bsync({ waitFor:[ move ] });
 	bsync({ waitFor:[ move ] });
-	
+
 	bsync({ waitFor:[ move ] });
 	bsync({ waitFor:[ move ] });
 	bsync({ waitFor:[ move ] });
-	
+
 	bsync({ waitFor:[ move ] });
 	bsync({ waitFor:[ move ] });
 	bsync({ waitFor:[ move ] });

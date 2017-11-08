@@ -10,6 +10,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
 import il.ac.bgu.cs.bp.bpjs.eventselection.PrioritizedBSyncEventSelectionStrategy;
+import il.ac.bgu.cs.bp.bpjs.search.FullVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.verification.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.verification.VerificationResult;
 
@@ -31,7 +32,8 @@ class TicTacToeGameMain extends JFrame {
 	public static void main(String[] args) throws InterruptedException {
 
 		// Create a program
-		BProgram bprog = new SingleResourceBProgram("BPJSTicTacToe.js") {
+		//BProgram bprog = new SingleResourceBProgram("BPJSTicTacToe.js") {
+		BProgram bprog = new SingleResourceBProgram("STAM-TTT.js") {
 			@Override
 			protected void setupProgramScope(Scriptable scope) {
 				putInGlobalScope("isModelChecking", isModelChecking());
@@ -53,6 +55,8 @@ class TicTacToeGameMain extends JFrame {
 		} else {
 			try {
 				DfsBProgramVerifier vfr = new DfsBProgramVerifier();
+				vfr.setVisitedNodeStore(new FullVisitedNodeStore());
+				
 				vfr.setMaxTraceLength(50);
 				final VerificationResult res = vfr.verify(bprog);
 				if (res.isCounterExampleFound()) {

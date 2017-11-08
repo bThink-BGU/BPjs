@@ -100,6 +100,8 @@ public class DfsBProgramVerifier {
 		push(aStartNode);
         
 		while ( ! isPathEmpty() ) {
+			printStatus(iterationCount,Collections.unmodifiableList(currentPath));
+			
             if ( ! requirement.checkConformance(Collections.unmodifiableList(currentPath)) ) {
                 // Found a problematic path :-)
                 return currentPath;
