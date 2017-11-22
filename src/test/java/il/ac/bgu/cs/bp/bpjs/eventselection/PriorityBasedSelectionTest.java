@@ -3,7 +3,6 @@
  */
 package il.ac.bgu.cs.bp.bpjs.eventselection;
 
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,7 +13,6 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
-import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 
 /**
  *
