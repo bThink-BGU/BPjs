@@ -1,4 +1,4 @@
-/* global bp, bsync, TicTacToeGameMain, Packages, isModelChecking */
+/* global bp, bsync, TicTacToeGameMain, Packages, UseSimulatedPlayer */
 
 importPackage(Packages.il.ac.bgu.cs.bp.bpjs.TicTacToe.events);
 
@@ -9,12 +9,12 @@ bp.log.info('Tic-Tac-Toe - Let the game begin!');
 // This BThreads are on each square of the grid
 function addSquareBThreads(row, col) {
 
-	if (!isModelChecking) {
+	if (!UseSimulatedPlayer) {
 		// Detects mouse click
 		bp.registerBThread("ClickHandler(" + row + "," + col + ")", function() {
 			while (true) {
 
-				if (!isModelChecking) {
+				if (!UseSimulatedPlayer) {
 					bsync({ waitFor:[ Click(row, col) ] });
 				}
 
@@ -169,7 +169,7 @@ bp.registerBThread("Sides", function() {
 
 //TODO: Need to add Fork strategy
 
-if (isModelChecking) {
+if (UseSimulatedPlayer) {
 	bp.registerBThread("STAM", function() {
 		while (true) {
 			bsync({ request:[ bp.Event("STAM") ]

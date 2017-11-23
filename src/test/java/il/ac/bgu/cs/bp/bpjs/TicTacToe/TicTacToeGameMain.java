@@ -15,8 +15,8 @@ import il.ac.bgu.cs.bp.bpjs.verification.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.verification.VerificationResult;
 
 /**
- * For Gaming mode change isModelChecking to false. For Model Checking mode
- * change isModelChecking to true.
+ * For Gaming mode change UseSimulatedPlayer to false. For Model Checking mode
+ * change UseSimulatedPlayer to true.
  * 
  * @author reututy
  */
@@ -25,7 +25,7 @@ class TicTacToeGameMain extends JFrame {
 	// GUI for interactively playing the game
 	public static TTTDisplayGame TTTdisplayGame;
 
-	public static boolean isModelChecking() {
+	public static boolean UseSimulatedPlayer() {
 		return true;
 	}
 
@@ -36,7 +36,7 @@ class TicTacToeGameMain extends JFrame {
 		//BProgram bprog = new SingleResourceBProgram("STAM-TTT.js") {
 			@Override
 			protected void setupProgramScope(Scriptable scope) {
-				putInGlobalScope("isModelChecking", isModelChecking());
+				putInGlobalScope("UseSimulatedPlayer", UseSimulatedPlayer());
 				super.setupProgramScope(scope);
 			}
 		};
@@ -48,7 +48,7 @@ class TicTacToeGameMain extends JFrame {
 
 		BProgramRunner rnr = new BProgramRunner(bprog);
 
-		if (!isModelChecking()) {
+		if (!UseSimulatedPlayer()) {
 			rnr.addListener(new PrintBProgramListener());
 			TTTdisplayGame = new TTTDisplayGame(bprog, rnr);
 			rnr.start();
