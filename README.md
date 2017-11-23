@@ -47,6 +47,8 @@ a link to this page somewhere in the documentation/system about section.
 ## 2017-11-23
 * :arrow_up: `DfsProgramVerifier` uses `FullVisitedNodeStore` by default (preferring correctness over speed in the default case).
 * :arrow_up: Updated the Dining Philosopher example to use advanced features. Also added it as a unit test.
+* :put_litter_in_its_place: Removed `validation` package.
+* :sparkles: `ContinuationProgramState` correctly captures updated variable values. :tada:
 
 ## 2017-11-02
 * :sparkles: the `DfsBProgramVerifier` is now accepting requirement objects over execution paths, instead of the hard-coded deadlock check.

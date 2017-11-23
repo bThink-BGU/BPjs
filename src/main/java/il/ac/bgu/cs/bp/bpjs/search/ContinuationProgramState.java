@@ -100,8 +100,9 @@ public class ContinuationProgramState {
             
             // Grab the variables defined on the stack.
             //  - 1: Get the frame stack variables. They come in two arrays: for objects, and for doubles.
-            Object[] objectsStack = (Object[]) getValue(stackFrame, "stack");            
-            double[] doublesStack = (double[]) getValue(stackFrame, "sDbl");
+            Object varSource = getValue(stackFrame, "varSource");
+            Object[] objectsStack = (Object[]) getValue(varSource, "stack");            
+            double[] doublesStack = (double[]) getValue(varSource, "sDbl");
             
             //  - 2: Get the stack variable names
             Object iData = getValue(stackFrame, "idata");

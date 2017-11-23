@@ -12,7 +12,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListen
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.eventselection.PrioritizedBSyncEventSelectionStrategy;
 
-import il.ac.bgu.cs.bp.bpjs.validation.eventpattern.EventPattern;
+import il.ac.bgu.cs.bp.bpjs.verification.eventpattern.EventPattern;
 
 /**
  * @author @michbarsinai

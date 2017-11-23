@@ -6,7 +6,7 @@ import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
 import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
-import il.ac.bgu.cs.bp.bpjs.validation.eventpattern.EventPattern;
+import il.ac.bgu.cs.bp.bpjs.verification.eventpattern.EventPattern;
 import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 

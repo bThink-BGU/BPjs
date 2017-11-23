@@ -1,4 +1,4 @@
-package il.ac.bgu.cs.bp.bpjs.validation.eventpattern;
+package il.ac.bgu.cs.bp.bpjs.verification.eventpattern;
 
 import java.util.ArrayList;
 import java.util.List;

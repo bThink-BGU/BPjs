@@ -5,7 +5,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import il.ac.bgu.cs.bp.bpjs.validation.eventpattern.EventPattern;
+import il.ac.bgu.cs.bp.bpjs.verification.eventpattern.EventPattern;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.Test;
