@@ -30,6 +30,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeContinuation;
 
 /**
@@ -76,18 +77,6 @@ public class ContinuationProgramStateTest {
                     + "   f()\n"
                     + "});";
     
-    static final String SRC_LOOP = 
-            "var gVar='gVar content';\n" 
-          + "var shadowed='original content (you should not see this)';\n" 
-          + "bp.registerBThread( \"bt\", function(){\n"
-          + "   var f=function(){bsync({request: bp.Event(\"e\")});};\n"
-          + "   var fVar='fVar content';\n"
-          + "   var fObjVar={a:'obj->a content'}\n"
-          + "   var shadowed='updated content';\n" 
-          + "   while(true) { bsync({request: bp.Event(\"e\")}); }\n"
-          + "});";
-    
-
     static final String SRC_WITH_COMPOUND_VARS = 
                       "var obj={a:1, b:2, f:function(){return 9;}};\n" 
                     + "var obj={a:{f:function(){return 9;}}, k:42};\n" 
@@ -165,11 +154,10 @@ public class ContinuationProgramStateTest {
     static final String SRC_LOOP_UPDATED_VAR = 
         "bp.registerBThread( function(){ \n" +
         "var dbl=1;\n" +
-        "var str='a'\n"+
+        "var str='a';\n"+
         "bsync({waitFor:bp.Event(\"e\")});\n" +
         "dbl = 42;\n" +
         "str = 'b';\n" +
-        "bp.log.info(\"pre-loop: dbl=\" + dbl);\n" +
         "bsync({waitFor:bp.Event(\"e\")});\n" +
         "while ( true ) { \n" +
         "    dbl = dbl + 5;\n" +
@@ -217,6 +205,53 @@ public class ContinuationProgramStateTest {
         assertEquals( "baa", sut4.getVisibleVariables().get("str"));
         
         assertFalse(sut2.equals(sut1));
+    }
+    
+    
+    static final String SRC_LOOP = 
+            "var gVar='gVar content';\n" 
+          + "var shadowed='original content (you should not see this)';\n" 
+          + "bp.registerBThread( \"bt\", function(){\n"
+          + "   var f=function(){bsync({request: bp.Event(\"e\")});};\n"
+          + "   var fVar='fVar content';\n"
+          + "   var aVar=[1,2,3,4];\n"
+          + "   var fObjVar={a:'obj->a content'}\n"
+          + "   var shadowed='updated content';\n" 
+          + "   bsync({request: bp.Event(\"e\")}); "
+          + "   while(true) { "
+          + "       var loopLocal='ll';\n "
+          + "       bp.log.info('iteration.' + fVar  + ' ' + aVar); \n"
+          + "       bsync({request: bp.Event(\"e\")}); "
+          + "   }\n"
+          + "});";
+    
+    @Test
+    public void testLoopSameWhenNoVarChanges() throws Exception {
+         
+        // Generate snapshot 1
+        BProgram bprog = new StringBProgram(SRC_LOOP);
+        BProgramSyncSnapshot cur = bprog.setup();
+        cur = cur.start();
+        BThreadSyncSnapshot snapshot = cur.getBThreadSnapshots().iterator().next();
+        NativeContinuation nc = (NativeContinuation) snapshot.getContinuation();
+        ContinuationProgramState sutPre = new ContinuationProgramState(nc);
+        
+        cur = cur.triggerEvent(new BEvent("e"));
+        snapshot = cur.getBThreadSnapshots().iterator().next();
+        nc = (NativeContinuation) snapshot.getContinuation();
+        ContinuationProgramState sutLoop1 = new ContinuationProgramState(nc);
+        
+        // Generate more snapshots
+        for ( int i=0; i<10; i++ ) {
+            cur = cur.triggerEvent(new BEvent("e"));
+            snapshot = cur.getBThreadSnapshots().iterator().next();
+            nc = (NativeContinuation) snapshot.getContinuation();
+            ContinuationProgramState sutCurLoop = new ContinuationProgramState(nc);
+
+            assertEquals( sutLoop1, sutCurLoop );
+            assertNotEquals( sutPre, sutCurLoop );
+        }
+        
     }
     
     @Test
