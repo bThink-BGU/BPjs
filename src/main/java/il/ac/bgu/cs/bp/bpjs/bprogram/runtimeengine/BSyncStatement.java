@@ -73,10 +73,6 @@ public class BSyncStatement implements java.io.Serializable {
         this.data = data;
     }
 
-    public BSyncStatement(Collection<? extends BEvent> request, EventSet waitFor, EventSet block) {
-        this(request, waitFor, block, none, null);
-    }
-    
     public boolean shouldWakeFor( BEvent anEvent ) {
         return request.contains(anEvent) || waitFor.contains(anEvent);
     }
