@@ -10,7 +10,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 
-public class NodeEquals {
+public class NodeEqualsTest {
 
 	static final String P1 = 
 			"bp.registerBThread(\"BThread 1\", function() {" +
@@ -18,10 +18,7 @@ public class NodeEquals {
 			"		bsync({request: bp.Event(\"X\")});" +
 			"		bsync({wait : bp.Event(\"X\")});" + 
 			"	}" + 
-			"});" 
-		;
-		
-	
+			"});";
 	
 	@Test
 	public void test1() throws Exception {
@@ -74,5 +71,22 @@ public class NodeEquals {
 		}
 	}
 
-	
+    
+    @Test
+	public void basicsTest() throws Exception {
+		// Create a program
+		final BProgram bprog = new StringBProgram(P1);
+
+		Node[] nodes = new Node[10];
+		
+        BEvent eventX = new BEvent("X");
+        // Discard initial node, as it has no event, and so can't
+        // be used in the even/odd equalities later.
+		nodes[0] = Node.getInitialNode(bprog).getNextNode(eventX);
+		
+        assertTrue(nodes[0].equals(nodes[0]));
+        assertFalse(nodes[0].equals(null));
+        assertFalse(nodes[0].equals("Not a Node"));
+        
+	}
 }
