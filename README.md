@@ -43,6 +43,11 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+
+## 2017-11-23
+* :arrow_up: `DfsProgramVerifier` uses `FullVisitedNodeStore` by default (preferring correctness over speed in the default case).
+* :arrow_up: Updated the Dining Philosopher example to use advanced features. Also added it as a unit test.
+
 ## 2017-11-02
 * :sparkles: the `DfsBProgramVerifier` is now accepting requirement objects over execution paths, instead of the hard-coded deadlock check.
 * :sparkles: new `PathRequirement` class. Requirements are passed to the verifiers for making sure the program conforms to them. Two implementation already present:

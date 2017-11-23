@@ -29,6 +29,7 @@ import java.util.List;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.search.FullVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.search.HashVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.search.Node;
 import il.ac.bgu.cs.bp.bpjs.search.VisitedNodeStore;
@@ -67,7 +68,7 @@ public class DfsBProgramVerifier {
     }
     
 	private long visitedStatesCount;
-    private VisitedNodeStore visited = new HashVisitedNodeStore();
+    private VisitedNodeStore visited = new FullVisitedNodeStore();
     private long maxTraceLength = DEFAULT_MAX_TRACE;
     private final ArrayList<Node> currentPath = new ArrayList<>();
     private Optional<ProgressListener> listenerOpt = Optional.empty();
