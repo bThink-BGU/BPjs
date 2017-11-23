@@ -32,8 +32,8 @@ class TicTacToeGameMain extends JFrame {
 	public static void main(String[] args) throws InterruptedException {
 
 		// Create a program
-		//BProgram bprog = new SingleResourceBProgram("BPJSTicTacToe.js") {
-		BProgram bprog = new SingleResourceBProgram("STAM-TTT.js") {
+		BProgram bprog = new SingleResourceBProgram("BPJSTicTacToe.js") {
+		//BProgram bprog = new SingleResourceBProgram("STAM-TTT.js") {
 			@Override
 			protected void setupProgramScope(Scriptable scope) {
 				putInGlobalScope("isModelChecking", isModelChecking());
