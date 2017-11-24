@@ -162,4 +162,34 @@ public class BProgramTest {
 
         System.out.println("-- testPrependAndAppendSource DONE");
     }
+    
+    @Test( expected=IllegalStateException.class )
+    public void testIllegalAppend() throws InterruptedException {
+        String coreSource = "bp.registerBThread(function() {\n" +
+                            "    bsync( {request: bp.Event(\"1\")} );\n" +
+                            "    bsync( {request: bp.Event(\"2\")} );\n" +
+                            "    bsync( {request: bp.Event(\"3\")} );\n" +
+                            "});" +
+                            "bp.log.info('Source code evaluated');";
+        
+        BProgram sut = new StringBProgram(coreSource);
+        BProgramRunner rnr = new BProgramRunner(sut);
+        rnr.start();
+        sut.appendSource("bp.log.info('grrr');");
+    }
+   
+    @Test( expected=IllegalStateException.class )
+    public void testIllegalPrepend() throws InterruptedException {
+        String coreSource = "bp.registerBThread(function() {\n" +
+                            "    bsync( {request: bp.Event(\"1\")} );\n" +
+                            "    bsync( {request: bp.Event(\"2\")} );\n" +
+                            "    bsync( {request: bp.Event(\"3\")} );\n" +
+                            "});" +
+                            "bp.log.info('Source code evaluated');";
+        
+        BProgram sut = new StringBProgram(coreSource);        
+        BProgramRunner rnr = new BProgramRunner(sut);
+        rnr.start();
+        sut.prependSource("bp.log.info('grrr');");
+    }
 }
