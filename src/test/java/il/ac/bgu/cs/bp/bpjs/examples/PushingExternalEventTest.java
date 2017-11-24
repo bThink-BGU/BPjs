@@ -4,7 +4,7 @@ import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.verification.eventpattern.EventPattern;
 import org.junit.Test;
 import static org.junit.Assert.assertTrue;
@@ -18,7 +18,7 @@ public class PushingExternalEventTest {
     @Test
     public void externalEventsFromABthread() throws InterruptedException {
         BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("PushingExternalEvent.js"));
-        sut.addListener(new PrintBProgramListener() );
+        sut.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
         sut.start();
@@ -35,7 +35,7 @@ public class PushingExternalEventTest {
     @Test
     public void topLevelExternalEvents() throws InterruptedException {
         BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("TopLevelExternalEvents.js"));
-        sut.addListener(new PrintBProgramListener() );
+        sut.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
         sut.start();

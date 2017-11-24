@@ -44,6 +44,13 @@ a link to this page somewhere in the documentation/system about section.
 ## Change log for the BPjs library.
 
 
+## 2017-11-24
+* :sparkles: `BProgram` allows appending and prepending source code programmatically, using `appendSource` and `prependSource`. These can be used to add environment simulation
+              without touching the simulated model. Or just to act as includes, e.g. for common set-ups.
+* :bug: `InMemoryEventLoggingListener` cleans its event log when a run begins, so it can be reused for multiple runs.
+* :arrows_counterclockwise: Reduced method accessibility in `BProgram`, so subclassers have harder time getting into trouble. 
+* :put_trash_in_its_place: `BProgramListener` renamed to `BProgramRunnerListener`, since that is the object it listens to.
+
 ## 2017-11-23
 * :arrow_up: `DfsProgramVerifier` uses `FullVisitedNodeStore` by default (preferring correctness over speed in the default case).
 * :arrow_up: Updated the Dining Philosopher example to use advanced features. Also added it as a unit test.
@@ -268,3 +275,4 @@ Legend:
 * :sparkles:New feature
 * :put_litter_in_its_place: Deprecation
 * :arrow_up: Upgrade
+* :bug: Bug fix

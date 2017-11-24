@@ -23,7 +23,6 @@
  */
 package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramListener;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionResult;
 import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionStrategy;
@@ -32,6 +31,7 @@ import static java.util.Collections.reverseOrder;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramRunnerListener;
 
 /**
  * Runs a {@link BProgram} to completion. Uses an {@link EventSelectionStrategy}
@@ -42,7 +42,7 @@ import java.util.Set;
 public class BProgramRunner {
     
     private BProgram bprog = null;
-    private final List<BProgramListener> listeners = new ArrayList<>();
+    private final List<BProgramRunnerListener> listeners = new ArrayList<>();
     
     public BProgramRunner(){
         this(null);
@@ -135,7 +135,7 @@ public class BProgramRunner {
      * @param aListener the listener to add.
      * @return The added listener, to allow call chaining.
      */
-    public <R extends BProgramListener> R addListener(R aListener) {
+    public <R extends BProgramRunnerListener> R addListener(R aListener) {
         listeners.add(aListener);
         return aListener;
     }
@@ -145,7 +145,7 @@ public class BProgramRunner {
      * this call is ignored. In other words, this call is idempotent.
      * @param aListener the listener to remove.
      */
-    public void removeListener(BProgramListener aListener) {
+    public void removeListener(BProgramRunnerListener aListener) {
         listeners.remove(aListener);
     }
 

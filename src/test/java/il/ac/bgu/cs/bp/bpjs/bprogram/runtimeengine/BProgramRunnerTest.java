@@ -23,7 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramRunnerListener;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -46,7 +46,7 @@ public class BProgramRunnerTest {
         BProgram bprog = new SingleResourceBProgram("HotNCold.js");
         BProgramRunner sut = new BProgramRunner(bprog);
         
-        sut.addListener(new PrintBProgramListener() );
+        sut.addListener(new PrintBProgramRunnerListener() );
         
         sut.start();
         

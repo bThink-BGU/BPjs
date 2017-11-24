@@ -1,7 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.exceptions.BProgramException;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.tasks.ResumeBThread;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.tasks.StartBThread;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
@@ -23,6 +22,7 @@ import static java.util.stream.Collectors.toSet;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.Scriptable;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramRunnerListener;
 
 /**
  * The state of a {@link BProgram} when all its BThreads are at {@code bsync}.
@@ -95,7 +95,7 @@ public class BProgramSyncSnapshot {
      * @return A set of b-thread snapshots that should participate in the next cycle.
      * @throws InterruptedException 
      */
-    public BProgramSyncSnapshot triggerEvent(BEvent anEvent, Iterable<BProgramListener> listeners) throws InterruptedException {
+    public BProgramSyncSnapshot triggerEvent(BEvent anEvent, Iterable<BProgramRunnerListener> listeners) throws InterruptedException {
         if (anEvent == null) throw new IllegalArgumentException("Cannot trigger a null event.");
         
         Set<BThreadSyncSnapshot> resumingThisRound = new HashSet<>(threadSnapshots.size());
@@ -137,7 +137,7 @@ public class BProgramSyncSnapshot {
         return new BProgramSyncSnapshot(bprog, nextRound, nextExternalEvents);
     }
 
-    private void handleInterrupts(BEvent anEvent, Iterable<BProgramListener> listeners, BProgram bprog, Context ctxt) {
+    private void handleInterrupts(BEvent anEvent, Iterable<BProgramRunnerListener> listeners, BProgram bprog, Context ctxt) {
         Set<BThreadSyncSnapshot> interrupted = threadSnapshots.stream()
                 .filter(bt -> bt.getBSyncStatement().getInterrupt().contains(anEvent))
                 .collect(toSet());

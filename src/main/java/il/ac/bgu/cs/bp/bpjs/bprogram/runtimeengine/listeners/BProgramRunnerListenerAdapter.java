@@ -28,12 +28,12 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 
 /**
- * A {@link BProgramListener} with all methods defaultly implemented. Use when
+ * A {@link BProgramRunnerListener} with all methods defaultly implemented. Use when
  * you only need to override some methods.
  * 
  * @author michael
  */
-public abstract class BProgramListenerAdapter implements BProgramListener {
+public abstract class BProgramRunnerListenerAdapter implements BProgramRunnerListener {
 
     @Override
     public void starting(BProgram bprog) {}

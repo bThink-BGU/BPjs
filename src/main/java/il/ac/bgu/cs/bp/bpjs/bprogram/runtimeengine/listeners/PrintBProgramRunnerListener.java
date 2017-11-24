@@ -10,15 +10,15 @@ import java.io.PrintStream;
  * Defaults to {@code System.out}.
  * @author michael
  */
-public class PrintBProgramListener implements BProgramListener {
+public class PrintBProgramRunnerListener implements BProgramRunnerListener {
     
     private final PrintStream out;
     
-    public PrintBProgramListener( PrintStream aStream ){
+    public PrintBProgramRunnerListener( PrintStream aStream ){
         out = aStream;
     }
     
-    public PrintBProgramListener() {
+    public PrintBProgramRunnerListener() {
         this( System.out );
     }
 

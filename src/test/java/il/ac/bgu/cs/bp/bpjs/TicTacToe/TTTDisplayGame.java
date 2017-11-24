@@ -20,7 +20,7 @@ import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.StaticEvents;
 import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.X;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramListenerAdapter;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramRunnerListenerAdapter;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 
 /**
@@ -75,7 +75,7 @@ public class TTTDisplayGame implements ActionListener {
 		window.setVisible(true);
 
 		// Writs 'X' and 'O' on the buttons
-		rnr.addListener(new BProgramListenerAdapter() {
+		rnr.addListener(new BProgramRunnerListenerAdapter() {
 
 			@Override
 			public void eventSelected(BProgram bp, BEvent theEvent) {

@@ -4,7 +4,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.verification.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.verification.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramRunnerListener;
 
 import javax.swing.JFrame;
 
@@ -23,7 +23,7 @@ public class TicTacToeVerMain {
 		TTTdisplayMC = new TTTDisplayMC(bprog); //for model checker
 
 		BProgramRunner rnr = new BProgramRunner(bprog);
-		rnr.addListener(new PrintBProgramListener() );
+		rnr.addListener(new PrintBProgramRunnerListener() );
 		rnr.start();
         
 		try {

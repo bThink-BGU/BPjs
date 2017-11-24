@@ -28,7 +28,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.search.NotVisitedStore;
 import il.ac.bgu.cs.bp.bpjs.verification.requirements.EventNotPresent;
@@ -62,7 +62,7 @@ public class DfsBProgramVerifierTest {
         BProgram program = new SingleResourceBProgram("AAABTrace.js");
         BProgramRunner rnr = new BProgramRunner(program);
         
-        rnr.addListener(new PrintBProgramListener() );
+        rnr.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = rnr.addListener( new InMemoryEventLoggingListener() );
         rnr.start();
         
@@ -86,7 +86,7 @@ public class DfsBProgramVerifierTest {
         BProgram program = new SingleResourceBProgram("deadlocking.js");
         BProgramRunner rnr = new BProgramRunner(program);
         
-        rnr.addListener(new PrintBProgramListener() );
+        rnr.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = rnr.addListener( new InMemoryEventLoggingListener() );
         rnr.start();
         

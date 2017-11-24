@@ -3,7 +3,7 @@ package il.ac.bgu.cs.bp.bpjs.examples;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.verification.eventpattern.EventPattern;
 import java.util.logging.Level;
@@ -20,7 +20,7 @@ public class ExternalEventsDaemonTest {
     @Test
     public void superStepTest() throws InterruptedException {
         BProgramRunner sut = new BProgramRunner( new SingleResourceBProgram("ExternalEventsDaemon.js"));
-        sut.addListener(new PrintBProgramListener() );
+        sut.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
         new Thread( ()-> {

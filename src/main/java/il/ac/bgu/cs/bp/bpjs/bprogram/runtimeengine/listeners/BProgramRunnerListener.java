@@ -5,10 +5,10 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 
 /**
- * An object interested in the life-cycle of a {@link BProgram}.
+ * An object interested in the life-cycle of a {@link BProgram} being run by a {@link BProgramRunner}.
  * @author michael
  */
-public interface BProgramListener {
+public interface BProgramRunnerListener {
     
     /**
      * Called before the BProgram is started (pre-setup).

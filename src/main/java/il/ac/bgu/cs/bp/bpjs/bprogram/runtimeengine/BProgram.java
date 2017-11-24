@@ -91,6 +91,9 @@ public abstract class BProgram {
     
     private Optional<BProgramCallback> addBThreadCallback = Optional.empty();
     
+    private List<String> appendedCode;
+    private List<String> prependedCode;
+    
     /**
      * Constructs a BProgram with a default name, guaranteed to be unique within 
      * a given run.
@@ -130,6 +133,44 @@ public abstract class BProgram {
             evaluate(resource, pathInJar);
         } catch (IOException ex) {
             throw new RuntimeException("Error reading resource: '" + pathInJar +"': " + ex.getMessage(), ex);
+        }
+    }
+    
+    /**
+     * Adds more source code to be evaluated <em>after</em> {@link #setupProgramScope(org.mozilla.javascript.Scriptable)}
+     * is called. This method allows to programatically add code, e.g. for adding standard environment, mocking non-modeled
+     * parts for model-checking.
+     * 
+     * @throws IllegalStateException if the code is appended after the bprogram started.
+     * @param source 
+     */
+    public void appendSource( String source ) {
+        if ( started ) {
+            throw new IllegalStateException("Cannot append code after the program had started.");
+        } else {
+            if ( appendedCode == null ) {
+                appendedCode = new ArrayList<>();
+            }
+            appendedCode.add(source);
+        }
+    }
+    
+    /**
+     * Adds more source code to be evaluated <em>before</em> {@link #setupProgramScope(org.mozilla.javascript.Scriptable)}
+     * is called. This method allows to programatically add code, e.g. for adding standard environment, mocking non-modeled
+     * parts for model-checking.
+     * 
+     * @throws IllegalStateException if the code is appended after the bprogram started.
+     * @param source 
+     */
+    public void prependSource( String source ) {
+        if ( started ) {
+            throw new IllegalStateException("Cannot append code after the program had started.");
+        } else {
+            if ( prependedCode == null ) {
+                prependedCode = new ArrayList<>();
+            }
+            prependedCode.add(source);
         }
     }
     
@@ -228,7 +269,14 @@ public abstract class BProgram {
             Context cx = ContextFactory.getGlobal().enterContext();
             cx.setOptimizationLevel(-1); // must use interpreter mode
             initProgramScope(cx);
+            if ( prependedCode != null ) {
+                prependedCode.forEach( s -> evaluate(s, "prependedCode") );
+            }
+            setupProgramScope(programScope);
             bthreads.forEach(bt -> bt.setupScope(programScope));
+            if ( appendedCode != null ) {
+                appendedCode.forEach( s -> evaluate(s, "appendedCode") );
+            }
         } finally {
             Context.exit();
         }
@@ -237,7 +285,7 @@ public abstract class BProgram {
         return new BProgramSyncSnapshot(this, bthreads, Collections.emptyList());
     }
 
-    protected void initProgramScope(Context cx) {
+    private void initProgramScope(Context cx) {
         // load and execute globalScopeInit.js
         ImporterTopLevel importer = new ImporterTopLevel(cx);
         programScope = cx.initStandardObjects(importer);
@@ -249,7 +297,6 @@ public abstract class BProgram {
 //        evaluateResource("globalScopeInit.js"); <-- Currently not needed. Leaving in as we might need it soon.
         initialScopeValues.entrySet().forEach(e->putInGlobalScope(e.getKey(), e.getValue()));
         initialScopeValues=null;
-        setupProgramScope(programScope);
     }
 
     /**

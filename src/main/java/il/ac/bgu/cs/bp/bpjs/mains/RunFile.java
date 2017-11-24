@@ -5,7 +5,7 @@ package il.ac.bgu.cs.bp.bpjs.mains;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.eventselection.LoggingEventSelectionStrategyDecorator;
 import il.ac.bgu.cs.bp.bpjs.eventselection.SimpleEventSelectionStrategy;
@@ -88,7 +88,7 @@ public class RunFile {
             
             BProgramRunner bpr = new BProgramRunner(bpp);
             if ( ! switchPresent("-v", args) ) {
-                bpr.addListener(new PrintBProgramListener());
+                bpr.addListener(new PrintBProgramRunnerListener());
             }
             
             bpr.start();

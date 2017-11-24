@@ -12,7 +12,7 @@ import java.util.List;
  * 
  * @author michael
  */
-public class InMemoryEventLoggingListener implements BProgramListener {
+public class InMemoryEventLoggingListener implements BProgramRunnerListener {
     
     private final List<BEvent> events = new ArrayList<>();
     
@@ -33,6 +33,7 @@ public class InMemoryEventLoggingListener implements BProgramListener {
     
     @Override
     public void starting(BProgram bp) {
+        events.clear();
     }
     
     @Override

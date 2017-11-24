@@ -8,7 +8,7 @@ import org.mozilla.javascript.Scriptable;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramListener;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.eventselection.PrioritizedBSyncEventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.search.FullVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.verification.DfsBProgramVerifier;
@@ -49,7 +49,7 @@ class TicTacToeGameMain extends JFrame {
 		BProgramRunner rnr = new BProgramRunner(bprog);
 
 		if (!UseSimulatedPlayer()) {
-			rnr.addListener(new PrintBProgramListener());
+			rnr.addListener(new PrintBProgramRunnerListener());
 			TTTdisplayGame = new TTTDisplayGame(bprog, rnr);
 			rnr.start();
 		} else {
