@@ -226,7 +226,7 @@ public class BThreadSyncSnapshot implements Serializable {
         // Quick circuit-breakers
         if (this == obj) return true;
 		if (obj == null) return false;
-		if (getClass() != obj.getClass()) return false;
+		if (! (obj instanceof BThreadSyncSnapshot)) return false;
         BThreadSyncSnapshot other = (BThreadSyncSnapshot) obj;
 		if ( ! Objects.equals(getName(), other.getName())) return false;
         

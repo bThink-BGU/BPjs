@@ -45,11 +45,19 @@ a link to this page somewhere in the documentation/system about section.
 
 
 ## 2017-11-24
-* :sparkles: `BProgram` allows appending and prepending source code programmatically, using `appendSource` and `prependSource`. These can be used to add environment simulation
-              without touching the simulated model. Or just to act as includes, e.g. for common set-ups.
+* :sparkles: `BProgram` allows appending and prepending source code programmatically, using `appendSource` and `prependSource`.
+              These can be used to add environment simulation without touching the simulated model. Or just to act as includes,
+              e.g. for common set-ups.
+* :sparkles: Added new class: `PathRequirements`, to hold path requirements that do not require state (e.g. "no deadlock").
+* :sparkles: `DfsBProgramVerifier` now has a "debug mode" (set/get via `get/isDebugMode`). On debug mode, it prints
+             verbose information to `System.out`.
+* :sparkles: Added new class: `BThreadStateVisitedNodeStore`, looks only into the states of the b-threads when deciding whether a 
+             search node was already visited or not.
 * :bug: `InMemoryEventLoggingListener` cleans its event log when a run begins, so it can be reused for multiple runs.
 * :arrows_counterclockwise: Reduced method accessibility in `BProgram`, so subclassers have harder time getting into trouble. 
 * :put_trash_in_its_place: `BProgramListener` renamed to `BProgramRunnerListener`, since that is the object it listens to.
+* :put_trash_in_its_place: `NoDeadlock` class deleted. Use `PathRequirements.NO_DEADLOCK` instead.
+* :sparkles: `PathRequirements.ACCEPT_ALL`, is a new requirement that's always true. Useful for scanning a program state space.
 
 ## 2017-11-23
 * :arrow_up: `DfsProgramVerifier` uses `FullVisitedNodeStore` by default (preferring correctness over speed in the default case).

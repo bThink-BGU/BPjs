@@ -30,11 +30,10 @@ import java.util.List;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.search.FullVisitedNodeStore;
-import il.ac.bgu.cs.bp.bpjs.search.HashVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.search.Node;
 import il.ac.bgu.cs.bp.bpjs.search.VisitedNodeStore;
-import il.ac.bgu.cs.bp.bpjs.verification.requirements.NoDeadlock;
 import il.ac.bgu.cs.bp.bpjs.verification.requirements.PathRequirement;
+import il.ac.bgu.cs.bp.bpjs.verification.requirements.PathRequirements;
 import java.util.Optional;
 
 /**
@@ -74,19 +73,17 @@ public class DfsBProgramVerifier {
     private Optional<ProgressListener> listenerOpt = Optional.empty();
     private long iterationCountGap = DEFAULT_ITERATION_COUNT_GAP;
     private BProgram currentBProgram;
+    private boolean debugMode = false;
     
     /**
      * The requirement {@code this} verifier will test a {@link BProgram} for.
      */
-    private PathRequirement requirement;
+    private PathRequirement requirement = PathRequirements.NO_DEADLOCK;
     
     public VerificationResult verify( BProgram aBp ) throws Exception {
         currentBProgram = aBp;
         visitedStatesCount=1;
         currentPath.clear();
-        if ( requirement == null ) {
-            requirement = new NoDeadlock();
-        }
         long start = System.currentTimeMillis();
         listenerOpt.ifPresent(l->l.started(this));
         List<Node> counterEx = dfsUsingStack(Node.getInitialNode(aBp));
@@ -97,11 +94,15 @@ public class DfsBProgramVerifier {
     
     protected List<Node> dfsUsingStack(Node aStartNode) throws Exception {
         long iterationCount = 0;
-		visited.store(aStartNode);
+        visitedStatesCount = 0;
+		
+        visited.store(aStartNode);
 		push(aStartNode);
         
 		while ( ! isPathEmpty() ) {
-			printStatus(iterationCount,Collections.unmodifiableList(currentPath));
+            if ( debugMode ) {
+                printStatus(iterationCount,Collections.unmodifiableList(currentPath));
+            }
 			
             if ( ! requirement.checkConformance(Collections.unmodifiableList(currentPath)) ) {
                 // Found a problematic path :-)
@@ -122,10 +123,13 @@ public class DfsBProgramVerifier {
                 if ( nextNode == null ) {
                     // fold stack, retry next iteration;
                     pop();
-                    
+                    if ( isDebugMode() ){System.out.println("-pop!-");}
                 } else {
                     // go deeper 
                     visited.store(nextNode);
+                    if ( isDebugMode() ){
+                        System.out.println("-visiting: " + nextNode);
+                    }
                     push(nextNode);
                     visitedStatesCount++;
                 }
@@ -214,4 +218,13 @@ public class DfsBProgramVerifier {
     private Node pop() {
         return currentPath.remove(currentPath.size()-1);
     }
+
+    public boolean isDebugMode() {
+        return debugMode;
+    }
+
+    public void setDebugMode(boolean debugMode) {
+        this.debugMode = debugMode;
+    }
+    
 }

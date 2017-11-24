@@ -93,7 +93,7 @@ public class Mazes {
             } else {
                 System.out.println("No counterexample found.");
             }
-            System.out.printf("Scanned %,d states\n", res.getStatesScanned() );
+            System.out.printf("Scanned %,d states\n", res.getScannedStatesCount() );
             System.out.printf("Time: %,d milliseconds\n", res.getTimeMillies() );
             
 		} catch (Exception ex) {

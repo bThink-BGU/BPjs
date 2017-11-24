@@ -23,31 +23,24 @@
  */
 package il.ac.bgu.cs.bp.bpjs.search;
 
-import java.util.Set;
-import java.util.TreeSet;
-
 /**
- *
- * A {@link VisitedNodeStore} that stores the hash of the {@link Node}'s state.
- * This storage offers small memory footprint and good "similar-state" detection,
- * since it does not consider the event leading up to the node in its hash 
- * calculations.
- * Runs the risk of hash collisions, which will result in {@link #isVisited}
- * returning false positives.
+ * A VisitedNodeStore that does not remember any visited node. When the program 
+ * search graph is a tree, ensures that all the nodes are visited. When the program
+ * search graph contains even a single loop, pretty much ensures an infinite verification
+ * run. So use with caution.
  * 
  * @author michael
  */
-public class StateHashVisitedNodeStore implements VisitedNodeStore {
-    private final Set<Integer> visited = new TreeSet<>();
-    
+public class ForgetfulVisitedNodeStore implements VisitedNodeStore {
+
     @Override
     public void store(Node nd) {
-        visited.add(nd.getSystemState().hashCode());
+        // ignore.
     }
 
     @Override
     public boolean isVisited(Node nd) {
-        return visited.contains(nd.getSystemState().hashCode());
-    }   
+        return false;
+    }
     
 }

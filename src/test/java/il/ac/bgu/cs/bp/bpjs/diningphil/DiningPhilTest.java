@@ -55,7 +55,7 @@ public class DiningPhilTest {
             vfr.setMaxTraceLength(50);
             final VerificationResult res = vfr.verify(bprog);
 
-            System.out.printf("Scanned %,d states\n", res.getStatesScanned());
+            System.out.printf("Scanned %,d states\n", res.getScannedStatesCount());
             System.out.printf("Time: %,d milliseconds\n", res.getTimeMillies());
 
             return res;

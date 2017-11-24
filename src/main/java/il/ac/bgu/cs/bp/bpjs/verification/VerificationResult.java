@@ -47,7 +47,7 @@ public class VerificationResult {
         return timeMillies;
     }
 
-    public long getStatesScanned() {
+    public long getScannedStatesCount() {
         return statesScanned;
     }
 

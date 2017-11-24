@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 michael.
+ * Copyright 2017 BPjs group BGU.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -27,20 +27,36 @@ import il.ac.bgu.cs.bp.bpjs.search.Node;
 import java.util.List;
 
 /**
- * A requirement that broken if the current trace leads to a deadlock (i.e no selectable event).
+ * Convenience class for obtaining {@link PathRequirement}s.
  * 
  * @author michael
  */
-public class NoDeadlock extends AbstractPathRequirement {
-
-    public NoDeadlock() {
-        super("Deadlock Detector");
-    }
+public class PathRequirements {
+   
+    /**
+     * A requirement that detects deadlocks (as in, no selectable events).
+     */
+    public static final PathRequirement NO_DEADLOCK = new AbstractPathRequirement("Deadlock Detector") {
+        @Override
+        public boolean checkConformance(List<Node> trace) {
+            Node last = trace.get(trace.size()-1);
+            return ! last.getSelectableEvents().isEmpty();
+        }
+    };
     
-    @Override
-    public boolean checkConformance(List<Node> trace) {
-        Node last = trace.get(trace.size()-1);
-        return ! last.getSelectableEvents().isEmpty();
+    /**
+     * A requirement that accepts all paths (LTL: {@code true*}). Useful for going over all states 
+     * of a search graph.
+     */
+    public static final PathRequirement ACCEPT_ALL = new AbstractPathRequirement("Accept All") {
+        @Override
+        public boolean checkConformance(List<Node> trace) {
+            return true;
+        }
+    };
+    
+    private PathRequirements(){
+        // prevent instantiation.
     }
     
 }
