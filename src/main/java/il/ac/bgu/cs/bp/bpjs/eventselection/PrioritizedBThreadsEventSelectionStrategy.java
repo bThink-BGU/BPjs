@@ -52,7 +52,6 @@ public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSele
                 .filter( r -> r != EventSets.none )
                 .collect( toSet() ) );
         
-        
         Set<Pair<BEvent,Integer>> requested = statements.stream()
                 .filter( stmt -> stmt!=null )
                 .flatMap( stmt -> stmt.getRequest().stream().map(e -> Pair.of(e, getPriority(stmt.getBthread().getName()))))
@@ -98,6 +97,7 @@ public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSele
         return priorities.values().stream().mapToInt( Integer::intValue ).min().orElse(DEFAULT_PRIORITY);
     }
                     
+    @Override
     public long getSeed() {
         return seed;
     }

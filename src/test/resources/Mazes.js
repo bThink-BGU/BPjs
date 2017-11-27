@@ -55,11 +55,21 @@ var singleSolution =
    "  * *    ",
    "*** *****",
    "  *s*    "];
-   
+var cow = 
+        [" ______ ",
+         "< BPjs >       @@@@@@@@@   t",
+         " ------ ",
+         "        \   ^__^    @@@@@@@@",
+         "      @  \  (oo)\_______",
+         "@@@@@@@     (__)\       )\\/\\",
+         " s              ||----w |",
+         "@@@@@@@         ||     ||"];
+
 var mazes = {
      trivial:trivial,
      trivialPlus:trivialPlus,
      simple:simple,
+     cow:cow,
      complex:complex,
      singleSolution:singleSolution
  };

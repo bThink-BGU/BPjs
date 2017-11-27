@@ -52,6 +52,7 @@ public class Mazes {
 //        String mazeName = "trivialPlus";
 //        String mazeName = "simple";
         String mazeName = "complex";
+//        String mazeName = "cow";
 //        String mazeName = "singleSolution";
         bprog.putInGlobalScope("MAZE_NAME", mazeName);
         bprog.putInGlobalScope("TARGET_FOUND_EVENT", targetFoundEvent);
