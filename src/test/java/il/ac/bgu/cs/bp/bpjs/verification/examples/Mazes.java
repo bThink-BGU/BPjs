@@ -25,7 +25,7 @@ package il.ac.bgu.cs.bp.bpjs.verification.examples;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import il.ac.bgu.cs.bp.bpjs.search.HashVisitedNodeStore;
+import il.ac.bgu.cs.bp.bpjs.search.FullVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.search.Node;
 import il.ac.bgu.cs.bp.bpjs.verification.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.verification.VerificationResult;
@@ -50,8 +50,9 @@ public class Mazes {
         // change commented line below to solve a different maze.
 //        String mazeName = "trivial";
 //        String mazeName = "trivialPlus";
-//        String mazeName = "complex";
-        String mazeName = "singleSolution";
+//        String mazeName = "simple";
+        String mazeName = "complex";
+//        String mazeName = "singleSolution";
         bprog.putInGlobalScope("MAZE_NAME", mazeName);
         bprog.putInGlobalScope("TARGET_FOUND_EVENT", targetFoundEvent);
         
@@ -60,8 +61,8 @@ public class Mazes {
             vfr.setRequirement(new EventNotPresent(targetFoundEvent) );
             vfr.setProgressListener( new BriefPrintDfsVerifierListener() );
             vfr.setIterationCountGap(10);
-            vfr.setVisitedNodeStore(new HashVisitedNodeStore());
-//            vfr.setVisitedNodeStore(new FullVisitedNodeStore());
+//            vfr.setVisitedNodeStore(new HashVisitedNodeStore());
+            vfr.setVisitedNodeStore(new FullVisitedNodeStore());
 //            vfr.setVisitedNodeStore(new StateHashVisitedNodeStore());
             final VerificationResult res = vfr.verify(bprog);
             

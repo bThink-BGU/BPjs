@@ -80,25 +80,12 @@ var maze = mazes[MAZE_NAME];
 
 parseMaze(maze);
 
-bp.registerBThread("curloc", function(){
-    var i=0;
-    while ( true ) { 
-        bsync({waitFor:anyEntrance});
-        i++;
+bp.registerBThread("onlyOnce", function(){
+    var block = [];
+    while ( true ) {
+        var evt = bsync({waitFor:anyEntrance, block:block});
+        block.push(evt);
     }
-//    var e;
-//    var col;
-//    var row;
-//    while ( true ) {
-////      bsync({waitFor:anyEntrance});
-//        bp.log.info( "pre" );
-//        e = bsync({waitFor:anyEntrance});
-//        bp.log.info( "post" );
-////        var locString = e.name.split("\\(")[1].split("\\)")[0].split(",");
-////        col = locString[0];
-////        row = locString[1];
-//        delete e;
-//    }
 });
 
 ////////////////////////
