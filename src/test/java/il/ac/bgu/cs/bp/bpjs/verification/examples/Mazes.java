@@ -23,7 +23,10 @@
  */
 package il.ac.bgu.cs.bp.bpjs.verification.examples;
 
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.search.FullVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.search.Node;
@@ -36,26 +39,42 @@ import org.mozilla.javascript.NativeArray;
 
 /**
  * 
- * This class runs the mazes.js
+ * This class runs the Mazes(Positive|Negative).js
  * 
  * @author michael
  */
 public class Mazes {
 
+//    String implementation = "MazesPositive.js"; 
+    String implementation = "MazesNegative.js";
+    final BEvent targetFoundEvent = BEvent.named("targetFound");
+
+    // change commented line below to solve a different maze.
+//    String mazeName = "trivial";
+//      String mazeName = "trivialPlus";
+//      String mazeName = "simple";
+      String mazeName = "complex";
+//      String mazeName = "cow";
+//      String mazeName = "singleSolution";
+    
+    
     public static void main(String[] args) throws InterruptedException {
-		// Create a program
-		final SingleResourceBProgram bprog = new SingleResourceBProgram("Mazes.js");
-        final BEvent targetFoundEvent = BEvent.named("targetFound");
+        Mazes it = new Mazes();
+//        it.run();
+        it.verify();
+    }
+    
+    public void run() throws InterruptedException {
+        SingleResourceBProgram bprog = prepareProgram();
+        BProgramRunner rnr = new BProgramRunner(bprog);
+        rnr.addListener( new PrintBProgramRunnerListener() );
+        rnr.start();
+        printMaze(getMaze(bprog));
         
-        // change commented line below to solve a different maze.
-//        String mazeName = "trivial";
-//        String mazeName = "trivialPlus";
-//        String mazeName = "simple";
-        String mazeName = "complex";
-//        String mazeName = "cow";
-//        String mazeName = "singleSolution";
-        bprog.putInGlobalScope("MAZE_NAME", mazeName);
-        bprog.putInGlobalScope("TARGET_FOUND_EVENT", targetFoundEvent);
+    }
+    
+    public void verify() throws InterruptedException {
+        SingleResourceBProgram bprog = prepareProgram();
         
 		try {
             DfsBProgramVerifier vfr = new DfsBProgramVerifier();
@@ -67,14 +86,8 @@ public class Mazes {
 //            vfr.setVisitedNodeStore(new StateHashVisitedNodeStore());
             final VerificationResult res = vfr.verify(bprog);
             
-            NativeArray jsMaze = bprog.getFromGlobalScope(mazeName, NativeArray.class).get();
-            char maze[][] = new char[(int)jsMaze.getLength()][];
-            for ( int i=0; i<jsMaze.getLength(); i++ ) {
-                maze[i] = jsMaze.get(i).toString().toCharArray();
-            }
+            char[][] maze = getMaze(bprog);
             printMaze(maze);
-
-            
             if ( res.isCounterExampleFound() ) {
                 System.out.println("Found a counterexample");
                 for ( Node nd : res.getCounterExampleTrace() ) {
@@ -102,6 +115,24 @@ public class Mazes {
             ex.printStackTrace(System.out);
         }
 	}
+
+    private SingleResourceBProgram prepareProgram() {
+        // Create a program
+        final SingleResourceBProgram bprog = new SingleResourceBProgram(implementation);
+        bprog.putInGlobalScope("MAZE_NAME", mazeName);
+        bprog.putInGlobalScope("TARGET_FOUND_EVENT", targetFoundEvent);
+        return bprog;
+    }
+    
+    char[][] getMaze( BProgram bprog ) {
+        NativeArray jsMaze = bprog.getFromGlobalScope(mazeName, NativeArray.class).get();
+        char maze[][] = new char[(int)jsMaze.getLength()][];
+        for ( int i=0; i<jsMaze.getLength(); i++ ) {
+            maze[i] = jsMaze.get(i).toString().toCharArray();
+        }
+        
+        return maze;
+    }
     
     private static void printMaze(char[][] maze) {
         String sep = new String(maze[0]).chars().mapToObj(c->"-").collect( Collectors.joining("+", "+", "+"));

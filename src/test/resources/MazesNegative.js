@@ -74,12 +74,18 @@ var mazes = {
      singleSolution:singleSolution
  };
  
+function enterEvent(c,r) {
+    return bp.Event("Enter (" + c + ","  + r + ")");//, {col:c, row:r});
+}
+
 var anyEntrance = bp.EventSet("AnyEntrance", function(evt){
    return evt.name.indexOf("Enter") === 0;
 });
 
-function enterEvent(c,r) {
-    return bp.Event("Enter (" + c + ","  + r + ")");//, {col:c, row:r});
+function surroundingCellEntries(col, row) {
+    return [enterEvent(col + 1, row), enterEvent(col - 1, row),
+        enterEvent(col, row + 1), enterEvent(col, row - 1)];
+
 }
 
 if ( ! MAZE_NAME )  {
@@ -129,10 +135,7 @@ function addEnterableCell( col, row ) {
     bp.registerBThread("cell(c:"+col+" r:"+row+")",
         function() {
             while ( true ) {
-                bsync({waitFor:[
-                        enterEvent(col-1, row), enterEvent(col+1, row),
-                        enterEvent(col, row-1), enterEvent(col, row+1)
-                    ]});
+                bsync({waitFor:surroundingCellEntries(col, row)});
                 bsync({
                     request: enterEvent(col, row),
                     waitFor: anyEntrance
