@@ -12,7 +12,7 @@ import org.junit.Test;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BSyncStatement;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 
-@Ignore
+//@Ignore
 public class PrioritizedBThreadsEventSelectionStrategyTest {
 
 	private static final BEvent evt1 = new BEvent("evt1");

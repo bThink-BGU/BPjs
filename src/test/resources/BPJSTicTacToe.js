@@ -133,6 +133,8 @@ function addLinePermutationBthreads(l, p) {
 	});
 }
 
+//Player O strategy:
+
 var lines = [ [ { x:0, y:0 }, { x:0, y:1 }, { x:0, y:2 } ], [ { x:1, y:0 }, { x:1, y:1 }, { x:1, y:2 } ], [ { x:2, y:0 }, { x:2, y:1 }, { x:2, y:2 } ], [ { x:0, y:0 }, { x:1, y:0 }, { x:2, y:0 } ], [ { x:0, y:1 }, { x:1, y:1 }, { x:2, y:1 } ], [ { x:0, y:2 }, { x:1, y:2 }, { x:2, y:2 } ], [ { x:0, y:0 }, { x:1, y:1 }, { x:2, y:2 } ], [ { x:0, y:2 }, { x:1, y:1 }, { x:2, y:0 } ] ];
 var perms = [ [ 0, 1, 2 ], [ 0, 2, 1 ], [ 1, 0, 2 ], [ 1, 2, 0 ], [ 2, 0, 1 ], [ 2, 1, 0 ] ];
 
@@ -142,13 +144,113 @@ lines.forEach(function(l) {
 	});
 });
 
+function addFork22PermutationBthreads(f, p) {
+	
+	// Player O strategy to prevent the Fork22 of player X
+	bp.registerBThread("PreventFork22X(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function() {
+		while (true) {
+			bsync({ waitFor:[ X(f[p[0]].x, f[p[0]].y) ] });
 
-//Player O strategy:
+			bsync({ waitFor:[ X(f[p[1]].x, f[p[1]].y) ] });
+
+			bsync({ request:[ O(2,2) ] }, 30);
+		}
+	});
+}
+
+function addFork02PermutationBthreads(f, p) {
+	// Player O strategy to prevent the Fork02 of player X
+	bp.registerBThread("PreventFork02X(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function() {
+		while (true) {
+			bsync({ waitFor:[ X(f[p[0]].x, f[p[0]].y) ] });
+
+			bsync({ waitFor:[ X(f[p[1]].x, f[p[1]].y) ] });
+
+			bsync({ request:[ O(0,2) ] }, 30);
+		}
+	});
+}
+
+function addFork20PermutationBthreads(f, p) {
+	// Player O strategy to prevent the Fork20 of player X
+	bp.registerBThread("PreventFork20X(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function() {
+		while (true) {
+			bsync({ waitFor:[ X(f[p[0]].x, f[p[0]].y) ] });
+
+			bsync({ waitFor:[ X(f[p[1]].x, f[p[1]].y) ] });
+
+			bsync({ request:[ O(2,0) ] }, 30);
+		}
+	});
+}
+
+function addFork00PermutationBthreads(f, p) {
+	// Player O strategy to prevent the Fork00 of player X
+	bp.registerBThread("PreventFork00X(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function() {
+		while (true) {
+			bsync({ waitFor:[ X(f[p[0]].x, f[p[0]].y) ] });
+
+			bsync({ waitFor:[ X(f[p[1]].x, f[p[1]].y) ] });
+
+			bsync({ request:[ O(0,0) ] }, 30);
+		}
+	});
+}
+
+function addForkdiagPermutationBthreads(f, p) {
+	// Player O strategy to prevent the Forkdiagonal of player X
+	bp.registerBThread("PreventForkdiagX(<" + f[p[0]].x + "," + f[p[0]].y + ">," + "<" + f[p[1]].x + "," + f[p[1]].y + ">)", function() {
+		while (true) {
+			bsync({ waitFor:[ X(f[p[0]].x, f[p[0]].y) ] });
+
+			bsync({ waitFor:[ X(f[p[1]].x, f[p[1]].y) ] });
+
+			bsync({ request:[ O(0, 1), O(1, 0), O(1, 2), O(2, 1) ] }, 30);
+		}
+	});
+}
+
+var forks22 = [ [ { x:1, y:2 }, { x:2, y:0 } ], [ { x:2, y:1 }, { x:0, y:2 } ] ];
+var forks02 = [ [ { x:1, y:2 }, { x:0, y:0 } ], [ { x:0, y:1 }, { x:2, y:2 } ] ];
+var forks20 = [ [ { x:1, y:0 }, { x:2, y:2 } ], [ { x:2, y:1 }, { x:0, y:0 } ] ];
+var forks00 = [ [ { x:0, y:1 }, { x:2, y:0 } ], [ { x:1, y:0 }, { x:0, y:2 } ] ];
+var forksdiag = [ [ { x:0, y:2 }, { x:2, y:0 } ], [ { x:0, y:0 }, { x:2, y:2 } ] ];
+var permsforks = [ [0, 1], [1, 0] ];
+		
+forks22.forEach(function(f) {
+	permsforks.forEach(function(p) {
+		addFork22PermutationBthreads(f, p);
+	});
+});
+
+forks02.forEach(function(f) {
+	permsforks.forEach(function(p) {
+		addFork02PermutationBthreads(f, p);
+	});
+});
+
+forks20.forEach(function(f) {
+	permsforks.forEach(function(p) {
+		addFork20PermutationBthreads(f, p);
+	});
+});
+
+forks00.forEach(function(f) {
+	permsforks.forEach(function(p) {
+		addFork00PermutationBthreads(f, p);
+	});
+});
+
+forksdiag.forEach(function(f) {
+	permsforks.forEach(function(p) {
+		addForkdiagPermutationBthreads(f, p);
+	});
+});
 
 //Preference to put O on the center
 bp.registerBThread("Center", function() {
 	while (true) {
-		bsync({ request:[ O(1, 1) ] }, 30);
+		bsync({ request:[ O(1, 1) ] }, 35);
 	}
 });
 
