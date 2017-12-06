@@ -26,7 +26,7 @@ class TicTacToeGameMain extends JFrame {
 	public static TTTDisplayGame TTTdisplayGame;
 
 	public static boolean UseSimulatedPlayer() {
-		return false;
+		return true;
 	}
 
 	public static void main(String[] args) throws InterruptedException {
