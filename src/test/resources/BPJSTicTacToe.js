@@ -205,7 +205,7 @@ function addForkdiagPermutationBthreads(f, p) {
 
 			bsync({ waitFor:[ X(f[p[1]].x, f[p[1]].y) ] });
 
-			bsync({ request:[ O(0, 1), O(1, 0), O(1, 2), O(2, 1) ] }, 28);
+			bsync({ request:[ O(0, 1), O(1, 0), O(1, 2), O(2, 1) ] }, 30);
 		}
 	});
 }
@@ -214,7 +214,7 @@ var forks22 = [ [ { x:1, y:2 }, { x:2, y:0 } ], [ { x:2, y:1 }, { x:0, y:2 } ], 
 var forks02 = [ [ { x:1, y:2 }, { x:0, y:0 } ], [ { x:0, y:1 }, { x:2, y:2 } ], [ { x:1, y:2 }, { x:0, y:1 } ] ];
 var forks20 = [ [ { x:1, y:0 }, { x:2, y:2 } ], [ { x:2, y:1 }, { x:0, y:0 } ], [ { x:2, y:1 }, { x:1, y:0 } ] ];
 var forks00 = [ [ { x:0, y:1 }, { x:2, y:0 } ], [ { x:1, y:0 }, { x:0, y:2 } ], [ { x:0, y:1 }, { x:1, y:0 } ] ];
-var forksdiag = [ [ { x:0, y:2 }, { x:2, y:0 } ], [ { x:0, y:0 }, { x:2, y:2 } ], [ { x:1, y:2 }, { x:2, y:1 } ] ];
+var forksdiag = [ [ { x:0, y:2 }, { x:2, y:0 } ], [ { x:0, y:0 }, { x:2, y:2 } ] ];
 var permsforks = [ [0, 1], [1, 0] ];
 		
 forks22.forEach(function(f) {
