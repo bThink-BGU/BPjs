@@ -152,7 +152,8 @@ function addFork22PermutationBthreads(f, p) {
 
 			bsync({ waitFor:[ X(f[p[1]].x, f[p[1]].y) ] });
 
-			bsync({ request:[ O(2, 2) ] }, 30);
+			bsync({ request:[ O(2, 2), O(0,2), O(2,0) ] }, 30);
+//			bsync({ block:[ O(0,0), O(0,1), O(1,0) ] },30); // Problematic - stays all the time
 		}
 	});
 }
@@ -165,7 +166,7 @@ function addFork02PermutationBthreads(f, p) {
 
 			bsync({ waitFor:[ X(f[p[1]].x, f[p[1]].y) ] });
 
-			bsync({ request:[ O(0, 2) ] }, 30);
+			bsync({ request:[ O(0, 2), O(0,0), O(2,2) ] }, 30);
 		}
 	});
 }
@@ -178,7 +179,7 @@ function addFork20PermutationBthreads(f, p) {
 
 			bsync({ waitFor:[ X(f[p[1]].x, f[p[1]].y) ] });
 
-			bsync({ request:[ O(2, 0) ] }, 30);
+			bsync({ request:[ O(2, 0), O(0,0), O(2,2) ] }, 30);
 		}
 	});
 }
@@ -191,7 +192,7 @@ function addFork00PermutationBthreads(f, p) {
 
 			bsync({ waitFor:[ X(f[p[1]].x, f[p[1]].y) ] });
 
-			bsync({ request:[ O(0, 0) ] }, 30);
+			bsync({ request:[ O(0, 0), O(0,2), O(2,0) ] }, 30);
 		}
 	});
 }
