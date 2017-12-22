@@ -51,6 +51,7 @@ a link to this page somewhere in the documentation/system about section.
 * :sparkles: New method: `bp.getJavaThreadName`: Returns the name of the Java thread executing the b-thread while this method was called. 
 * :tada: Some changes in this version were requested by actual users. :tada:
 * :sparkles: Documentation updated to mention verification (full-length text to be added post-paper).
+* :bug: `BThreadJSProxy.get/setBthread` updated to use capital `T`, like the resp fo the code.
 * :arrows_counterclockwise: Test clean-up
 * :arrows_counterclockwise: Documentation clean-up
 

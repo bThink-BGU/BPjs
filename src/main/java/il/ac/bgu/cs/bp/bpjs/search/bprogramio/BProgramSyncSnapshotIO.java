@@ -169,7 +169,7 @@ public class BProgramSyncSnapshotIO {
             Object cont               = bssis.readObject();
             final BThreadSyncSnapshot bThreadSyncSnapshot = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, btScope, cont, stmt);
 
-            btProxy.setBthread(bThreadSyncSnapshot);
+            btProxy.setBThread(bThreadSyncSnapshot);
             return bThreadSyncSnapshot;
         }
         

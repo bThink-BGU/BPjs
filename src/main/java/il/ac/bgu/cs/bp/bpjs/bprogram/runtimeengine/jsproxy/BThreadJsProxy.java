@@ -113,11 +113,11 @@ public class BThreadJsProxy implements java.io.Serializable {
         throw capturedContinuation;
     }
 
-    public void setBthread(BThreadSyncSnapshot bthread) {
+    public void setBThread(BThreadSyncSnapshot bthread) {
         this.bthread = bthread;
     }
 
-    public BThreadSyncSnapshot getBthread() {
+    public BThreadSyncSnapshot getBThread() {
         return bthread;
     }
     
