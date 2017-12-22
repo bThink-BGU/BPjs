@@ -1,6 +1,3 @@
-/*
- *  Author: Michael Bar-Sinai
- */
 package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.jsproxy;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
@@ -10,6 +7,7 @@ import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.eventsets.EventSets;
 import il.ac.bgu.cs.bp.bpjs.eventsets.JsEventSet;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.mozilla.javascript.Function;
 
@@ -42,7 +40,7 @@ public class BProgramJsProxy implements java.io.Serializable {
         
         public void log( LogLevel lvl, String msg ) {
             if ( level.compareTo(lvl) >= 0) {
-                System.out.println("[JS][" + lvl.name() + "] " + msg );
+                System.out.println("[BP][" + lvl.name() + "] " + msg );
             }
         }
         
@@ -108,6 +106,10 @@ public class BProgramJsProxy implements java.io.Serializable {
         }
     }
     
+    public EventSet allExcept( EventSet es ) {
+        return EventSets.allExcept(es);
+    }
+    
     /**
      * Called from JS to add BThreads running func as their runnable code.
      *
@@ -171,6 +173,38 @@ public class BProgramJsProxy implements java.io.Serializable {
      */
     public long getTime() {
         return System.currentTimeMillis();
+    }
+
+    /**
+     * Gets the name of the Java thread executing this b-thread at the moment. Useful for
+     * debugging Java runtime issues.
+     * 
+     * @return the name of the Java thread executing this b-thread at the moment.
+     */
+    public String getJavaThreadName() {
+        return Thread.currentThread().getName();
+    }
+    
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + Objects.hashCode(this.program);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final BProgramJsProxy other = (BProgramJsProxy) obj;
+        return Objects.equals(this.program, other.program);
     }
     
     

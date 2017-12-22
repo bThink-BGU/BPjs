@@ -23,7 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramListenerAdapter;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramRunnerListenerAdapter;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
@@ -54,7 +54,7 @@ public class PutInContextTest {
         
         BProgram sut = new StringBProgram(program);
         BProgramRunner runner = new BProgramRunner(sut);
-        runner.addListener( new BProgramListenerAdapter() {
+        runner.addListener(new BProgramRunnerListenerAdapter() {
             int counter = 0;
             @Override
             public void eventSelected(BProgram bp, BEvent theEvent) {

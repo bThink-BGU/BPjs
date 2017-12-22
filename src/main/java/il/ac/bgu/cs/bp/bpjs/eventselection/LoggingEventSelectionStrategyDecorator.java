@@ -57,12 +57,9 @@ public class LoggingEventSelectionStrategyDecorator implements EventSelectionStr
 
     @Override
     public Set<BEvent> selectableEvents(Set<BSyncStatement> statements, List<BEvent> externalEvents) {
-        return decorated.selectableEvents(statements, externalEvents);
-    }
+        final Set<BEvent> selectableEvents = decorated.selectableEvents(statements, externalEvents);
 
-    @Override
-    public Optional<EventSelectionResult> select(Set<BSyncStatement> statements, List<BEvent> externalEvents, Set<BEvent> selectableEvents) {
-        out.println("== Event Selection ==");
+        out.println("== Choosing Selectable Events ==");
         out.println("BThread Sync Statements:");
         statements.forEach( stmt -> {
             out.println("+ " + stmt.getBthread().getName() + ":");
@@ -72,9 +69,25 @@ public class LoggingEventSelectionStrategyDecorator implements EventSelectionStr
             out.println("    Interrupt: " + stmt.getInterrupt());
         });
         out.println("+ ExternalEvents: " + externalEvents);
+        
+        out.println("-- Selectable Events -----------");
+        if ( selectableEvents.isEmpty() ){
+            out.println(" - none -");
+        } else {
+            selectableEvents.stream().forEach( e -> out.println(" + " + e));
+        }
+        out.println("================================");
+        out.flush();
+
+        return selectableEvents;
+    }
+
+    @Override
+    public Optional<EventSelectionResult> select(Set<BSyncStatement> statements, List<BEvent> externalEvents, Set<BEvent> selectableEvents) {
         Optional<EventSelectionResult> selectedEvent = decorated.select(statements, externalEvents, selectableEvents);
-        out.println("> Selected Event: " + selectedEvent);
-        out.println();
+        out.println("== Actual Event Selection ======");
+        out.println( selectedEvent.toString() );
+        out.println("================================");
         out.flush();
         return selectedEvent;
     }

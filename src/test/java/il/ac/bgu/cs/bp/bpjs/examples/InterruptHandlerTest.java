@@ -5,8 +5,8 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.exceptions.BProgramException;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
-import il.ac.bgu.cs.bp.bpjs.validation.eventpattern.EventPattern;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramRunnerListener;
+import il.ac.bgu.cs.bp.bpjs.verification.eventpattern.EventPattern;
 import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -19,7 +19,7 @@ public class InterruptHandlerTest {
     @Test
     public void echoEventTest() throws InterruptedException {
         BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("InterruptHandler.js") );
-        sut.addListener( new StreamLoggerListener() );
+        sut.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
         sut.start();
@@ -36,7 +36,7 @@ public class InterruptHandlerTest {
     @Test(expected=BProgramException.class)
     public void illegalBsyncTest() throws InterruptedException {
         BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("InterruptHandler_illegal.js") );
-        sut.addListener( new StreamLoggerListener() );
+        sut.addListener(new PrintBProgramRunnerListener() );
         
         sut.start();
         

@@ -2,6 +2,7 @@ package il.ac.bgu.cs.bp.bpjs.eventselection;
 
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BSyncStatement;
+import il.ac.bgu.cs.bp.bpjs.eventsets.ExplicitEventSet;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -77,9 +78,11 @@ public class SimpleEventSelectionStrategyTest {
     
     @Test
     public void testDeadlock() {
+        ExplicitEventSet setOfEvt2 = new ExplicitEventSet();
+        setOfEvt2.add(eventTwo);
         Set<BSyncStatement> sets = new HashSet<>(Arrays.asList(
                 BSyncStatement.make(null).request(eventOne),
-                BSyncStatement.make(null).request(eventTwo),
+                BSyncStatement.make(null).request(setOfEvt2),
                 BSyncStatement.make(null).block(eventTwo),
                 BSyncStatement.make(null).block(eventOne)
         ));

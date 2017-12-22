@@ -23,12 +23,16 @@
  */
 package il.ac.bgu.cs.bp.bpjs.eventselection;
 
-import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.junit.Test;
-import static org.junit.Assert.*;
+
+import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 
 /**
  *

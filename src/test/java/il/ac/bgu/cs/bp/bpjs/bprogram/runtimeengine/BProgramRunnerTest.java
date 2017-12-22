@@ -23,9 +23,9 @@
  */
 package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramRunnerListener;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -46,10 +46,25 @@ public class BProgramRunnerTest {
         BProgram bprog = new SingleResourceBProgram("HotNCold.js");
         BProgramRunner sut = new BProgramRunner(bprog);
         
-        sut.addListener( new StreamLoggerListener() );
+        sut.addListener(new PrintBProgramRunnerListener() );
         
         sut.start();
         
+    }
+    
+    @Test
+    public void testExecutorName() throws InterruptedException {
+        BProgram bprog = new StringBProgram(
+                "var exName = 'initial value'\n"
+               + "bp.registerBThread( function(){\n"
+               + "  exName = bp.getJavaThreadName();\n"
+               + "});"
+        );
+        
+        new BProgramRunner(bprog).start();
+        String exName = bprog.getFromGlobalScope("exName", String.class).get();
+        assertTrue( "Java executor name is wrong (got:'" + exName + "')", 
+                exName.startsWith("bpjs-executor-"));
     }
 
 }

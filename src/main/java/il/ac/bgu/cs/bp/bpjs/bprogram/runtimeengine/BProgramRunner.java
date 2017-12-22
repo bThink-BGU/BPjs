@@ -23,7 +23,6 @@
  */
 package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramListener;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionResult;
 import il.ac.bgu.cs.bp.bpjs.eventselection.EventSelectionStrategy;
@@ -32,6 +31,11 @@ import static java.util.Collections.reverseOrder;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramRunnerListener;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Runs a {@link BProgram} to completion. Uses an {@link EventSelectionStrategy}
@@ -41,8 +45,39 @@ import java.util.Set;
  */
 public class BProgramRunner {
     
+    // Instance-holder pattern to ensure thread-safe, lazy evaluated, single executor service for this
+    // JVM (or, at least, ClassLoader).
+    public interface ExecutorProvider {
+        ExecutorService get();
+    }
+    
+    private static class ExecutorProviderImpl implements ExecutorProvider {
+        static final ExecutorProviderImpl INSTANCE = new ExecutorProviderImpl();
+        
+        private final ExecutorService prv;
+        private ExecutorProviderImpl(){
+            final ThreadFactory dtf = Executors.defaultThreadFactory();
+            final AtomicInteger threadCoutner = new AtomicInteger(0);
+            ThreadFactory tf = (Runnable r) -> {
+                Thread retVal = dtf.newThread(r);
+                retVal.setName("bpjs-executor-" + threadCoutner.incrementAndGet());
+                return retVal;
+            };
+            prv = Executors.newCachedThreadPool(tf);
+        }
+        
+        @Override
+        public ExecutorService get() {
+            return prv;
+        }
+    }
+    
+    public static ExecutorService getExecutorService() {
+        return ExecutorProviderImpl.INSTANCE.get();
+    }
+    
     private BProgram bprog = null;
-    private final List<BProgramListener> listeners = new ArrayList<>();
+    private final List<BProgramRunnerListener> listeners = new ArrayList<>();
     
     public BProgramRunner(){
         this(null);
@@ -68,10 +103,6 @@ public class BProgramRunner {
         // while snapshot not empty, select an event and get the next snapshot.
         boolean go=true;
         while ( (!cur.noBThreadsLeft()) && go ) {
-            // first off, see if we need to stop being a daemon.
-            if (cur.getExternalEvents().remove(BProgram.NO_MORE_DAEMON)) {
-                bprog.setDaemonMode(false);
-            }
             
             // see which events are selectable
             Set<BEvent> possibleEvents = bprog.getEventSelectionStrategy().selectableEvents(cur.getStatements(), cur.getExternalEvents());
@@ -135,7 +166,7 @@ public class BProgramRunner {
      * @param aListener the listener to add.
      * @return The added listener, to allow call chaining.
      */
-    public <R extends BProgramListener> R addListener(R aListener) {
+    public <R extends BProgramRunnerListener> R addListener(R aListener) {
         listeners.add(aListener);
         return aListener;
     }
@@ -145,7 +176,7 @@ public class BProgramRunner {
      * this call is ignored. In other words, this call is idempotent.
      * @param aListener the listener to remove.
      */
-    public void removeListener(BProgramListener aListener) {
+    public void removeListener(BProgramRunnerListener aListener) {
         listeners.remove(aListener);
     }
 

@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 michael.
+ * Copyright 2017 BPjs Group BGU.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,6 +23,12 @@
  */
 package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
 
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramRunnerListener;
+import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import static java.util.Arrays.asList;
+import java.util.Optional;
+import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import org.junit.Test;
@@ -43,4 +49,147 @@ public class BProgramTest {
         assertFalse( sut.getFromGlobalScope("does-not-exist", Double.class).isPresent() );
     }
     
+    
+    @Test
+    public void testAppendSource() throws InterruptedException {
+        String coreSource = "bp.registerBThread(function() {\n" +
+                            "    bsync( {request: bp.Event(\"1\")} );\n" +
+                            "    bsync( {request: bp.Event(\"2\")} );\n" +
+                            "    bsync( {request: bp.Event(\"3\")} );\n" +
+                            "});" +
+                            "bp.log.info('Source code evaluated');";
+        
+        String additionalSource = "bp.registerBThread(function(){\n" +
+                                  "   bsync({waitFor: bp.Event(\"2\")});\n" +
+                                  "   bsync({request: bp.Event(\"2a\"),\n" +
+                                  "            block: bp.Event(\"3\")});\n" +
+                                  "});\n" +
+                                  "bp.log.info('Additional code evaluated');";
+        BProgram sanitySut = new StringBProgram(coreSource);
+        
+        BProgramRunner rnr = new BProgramRunner(sanitySut);
+        rnr.addListener(new PrintBProgramRunnerListener() );
+        InMemoryEventLoggingListener el = rnr.addListener( new InMemoryEventLoggingListener());
+        System.out.println("Sanity run");
+        rnr.start();
+        System.out.println("/Sanity run");
+        System.out.println("");
+        
+        assertEquals( asList("1","2","3"), 
+                      el.getEvents().stream().map(BEvent::getName).collect(toList()) );
+        
+        System.out.println("Test Run");
+        BProgram sut = new StringBProgram(coreSource);
+        sut.appendSource(additionalSource);
+        rnr.setBProgram(sut);
+
+        rnr.start();
+        
+        assertEquals( asList("1","2","2a", "3"), 
+                      el.getEvents().stream().map(BEvent::getName).collect(toList()) );
+        
+    }
+    
+    @Test
+    public void testPrependSource() throws InterruptedException {
+        String prependedCode = "var e1=bp.Event(\"1\");\n"
+                             + "var e2=bp.Event(\"2\");\n"
+                             + "var e3=bp.Event(\"3\");\n"
+                             + "bp.log.info('Prepended code evaluated');";
+        
+        String coreSource = "bp.registerBThread(function() {\n" +
+                            "    bsync( {request: e1} );\n" +
+                            "    bsync( {request: e2} );\n" +
+                            "    bsync( {request: e3} );\n" +
+                            "});" +
+                            "bp.log.info('Source code evaluated');";
+        
+        BProgramRunner rnr = new BProgramRunner();
+        rnr.addListener(new PrintBProgramRunnerListener() );
+        InMemoryEventLoggingListener el = rnr.addListener( new InMemoryEventLoggingListener());
+        BProgram sut = new StringBProgram(coreSource);
+        sut.prependSource(prependedCode);
+        rnr.setBProgram(sut);
+
+        rnr.start();
+        
+        assertEquals( asList("1", "2", "3"), 
+                      el.getEvents().stream().map(BEvent::getName).collect(toList()) );
+        
+    }
+    
+    @Test
+    public void testPrependAndAppendSource() throws InterruptedException {
+        System.out.println("\n\ntestPrependAndAppendSource");
+        String prependedCode = "var e1=bp.Event(\"1\");\n"
+                             + "var e2=bp.Event(\"2\");\n"
+                             + "var e3=bp.Event(\"3\");\n"
+                             + "bp.log.info('prepended code evaluated');\n"
+                + "var o1=1; var o2=1; var o3=1;";
+        
+        String coreSource = "bp.registerBThread(function() {\n" +
+                            "    bsync( {request: e1} );\n" +
+                            "    bsync( {request: e2} );\n" +
+                            "    bsync( {request: e3} );\n" +
+                            "});" +
+                            "bp.log.info('main code evaluated');\n"
+                + "var o2=2; var o3=2;";
+        
+        String appendedSource = "bp.registerBThread(function(){\n" +
+                                  "   bsync({waitFor: e2});\n" +
+                                  "   bsync({request: bp.Event(\"2a\"),\n" +
+                                  "            block: e3});\n" +
+                                  "});\n" +
+                                  "bp.log.info('appended code evaluated');\n"
+                + "var o3=3;";
+        
+        BProgramRunner rnr = new BProgramRunner();
+        rnr.addListener(new PrintBProgramRunnerListener() );
+        InMemoryEventLoggingListener el = rnr.addListener( new InMemoryEventLoggingListener());
+        BProgram sut = new StringBProgram(coreSource);
+        sut.prependSource(prependedCode);
+        sut.appendSource(appendedSource);
+        rnr.setBProgram(sut);
+
+        rnr.start();
+        
+        assertEquals( asList("1","2","2a","3"), 
+                      el.getEvents().stream().map(BEvent::getName).collect(toList()) );
+        
+        assertEquals( Optional.of(1.0), sut.getFromGlobalScope("o1", Number.class));
+        assertEquals( Optional.of(2.0), sut.getFromGlobalScope("o2", Number.class));
+        assertEquals( Optional.of(3.0), sut.getFromGlobalScope("o3", Number.class));
+
+        System.out.println("-- testPrependAndAppendSource DONE");
+    }
+    
+    @Test( expected=IllegalStateException.class )
+    public void testIllegalAppend() throws InterruptedException {
+        String coreSource = "bp.registerBThread(function() {\n" +
+                            "    bsync( {request: bp.Event(\"1\")} );\n" +
+                            "    bsync( {request: bp.Event(\"2\")} );\n" +
+                            "    bsync( {request: bp.Event(\"3\")} );\n" +
+                            "});" +
+                            "bp.log.info('Source code evaluated');";
+        
+        BProgram sut = new StringBProgram(coreSource);
+        BProgramRunner rnr = new BProgramRunner(sut);
+        rnr.start();
+        sut.appendSource("bp.log.info('grrr');");
+    }
+   
+    @Test( expected=IllegalStateException.class )
+    public void testIllegalPrepend() throws InterruptedException {
+        String coreSource = "bp.registerBThread(function() {\n" +
+                            "    bsync( {request: bp.Event(\"1\")} );\n" +
+                            "    bsync( {request: bp.Event(\"2\")} );\n" +
+                            "    bsync( {request: bp.Event(\"3\")} );\n" +
+                            "});" +
+                            "bp.log.info('Source code evaluated');";
+        
+        BProgram sut = new StringBProgram(coreSource);        
+        BProgramRunner rnr = new BProgramRunner(sut);
+        rnr.start();
+        sut.prependSource("bp.log.info('grrr');");
+    }
 }

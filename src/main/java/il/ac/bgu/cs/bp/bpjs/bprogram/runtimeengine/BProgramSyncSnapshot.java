@@ -1,12 +1,9 @@
 package il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.exceptions.BProgramException;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramListener;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.tasks.ResumeBThread;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.tasks.StartBThread;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import il.ac.bgu.cs.bp.bpjs.search.BProgramSyncSnapshotCloner;
-import il.ac.bgu.cs.bp.bpjs.search.BProgramSyncSnapshotIO;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -15,8 +12,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -25,6 +20,7 @@ import static java.util.stream.Collectors.toSet;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.Scriptable;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramRunnerListener;
 
 /**
  * The state of a {@link BProgram} when all its BThreads are at {@code bsync}.
@@ -34,14 +30,6 @@ import org.mozilla.javascript.Scriptable;
  * @author michael
  */
 public class BProgramSyncSnapshot {
-    
-    private static final ThreadLocal<ExecutorService> EXECUTORS = new ThreadLocal<ExecutorService>(){
-        @Override
-        protected ExecutorService initialValue() {
-            return new ForkJoinPool();
-        }
-    };
-    
     
     private final Set<BThreadSyncSnapshot> threadSnapshots;
     private final List<BEvent> externalEvents;
@@ -68,7 +56,7 @@ public class BProgramSyncSnapshot {
      */
     public BProgramSyncSnapshot start() throws InterruptedException {
         Set<BThreadSyncSnapshot> nextRound = new HashSet<>(threadSnapshots.size());
-        nextRound.addAll(EXECUTORS.get().invokeAll(threadSnapshots.stream()
+        nextRound.addAll(BProgramRunner.getExecutorService().invokeAll(threadSnapshots.stream()
                     .map(bt -> new StartBThread(bt))
                     .collect(toList())
                 ).stream().map(f -> safeGet(f) ).collect(toList())
@@ -97,7 +85,7 @@ public class BProgramSyncSnapshot {
      * @return A set of b-thread snapshots that should participate in the next cycle.
      * @throws InterruptedException 
      */
-    public BProgramSyncSnapshot triggerEvent(BEvent anEvent, Iterable<BProgramListener> listeners) throws InterruptedException {
+    public BProgramSyncSnapshot triggerEvent(BEvent anEvent, Iterable<BProgramRunnerListener> listeners) throws InterruptedException {
         if (anEvent == null) throw new IllegalArgumentException("Cannot trigger a null event.");
         
         Set<BThreadSyncSnapshot> resumingThisRound = new HashSet<>(threadSnapshots.size());
@@ -118,7 +106,7 @@ public class BProgramSyncSnapshot {
         }
         
         // add the run results of all those who advance this stage
-        nextRound.addAll(EXECUTORS.get().invokeAll(
+        nextRound.addAll(BProgramRunner.getExecutorService().invokeAll(
                             resumingThisRound.stream()
                                              .map(bt -> new ResumeBThread(bt, anEvent))
                                              .collect(toList())
@@ -139,7 +127,7 @@ public class BProgramSyncSnapshot {
         return new BProgramSyncSnapshot(bprog, nextRound, nextExternalEvents);
     }
 
-    private void handleInterrupts(BEvent anEvent, Iterable<BProgramListener> listeners, BProgram bprog, Context ctxt) {
+    private void handleInterrupts(BEvent anEvent, Iterable<BProgramRunnerListener> listeners, BProgram bprog, Context ctxt) {
         Set<BThreadSyncSnapshot> interrupted = threadSnapshots.stream()
                 .filter(bt -> bt.getBSyncStatement().getInterrupt().contains(anEvent))
                 .collect(toSet());
@@ -212,7 +200,7 @@ public class BProgramSyncSnapshot {
         // if any new bthreads are added, run and add their result
         Set<BThreadSyncSnapshot> added = bprog.drainRecentlyRegisteredBthreads();
         while ( ! added.isEmpty() ) {
-            nextRound.addAll(EXECUTORS.get().invokeAll(
+            nextRound.addAll(BProgramRunner.getExecutorService().invokeAll(
                     added.stream()
                             .map(bt -> new StartBThread(bt))
                             .collect(toList())
@@ -223,15 +211,23 @@ public class BProgramSyncSnapshot {
 
 	@Override
 	public int hashCode() {
-		BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(getBProgram());
-		return io.hashCode();
+		final int prime = 31;
+		int result = 1;
+		result = prime * result + ((threadSnapshots == null) ? 0 : threadSnapshots.hashCode());
+		return result;
 	}
 
 	@Override
 	public boolean equals(Object obj) {
-        
-		BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(((BProgramSyncSnapshot)obj).getBProgram());
-		return io.equals(getBProgram());
+		if (this == obj)
+			return true;
+		if (obj == null)
+			return false;
+		if (getClass() != obj.getClass())
+			return false;
+		BProgramSyncSnapshot other = (BProgramSyncSnapshot) obj;
+		return Objects.equals(threadSnapshots, other.threadSnapshots);
 	}
+
 
 }

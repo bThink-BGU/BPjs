@@ -11,8 +11,10 @@ import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.eventsets.EventSets;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import java.util.stream.Stream;
 import org.mozilla.javascript.Context;
@@ -36,11 +38,14 @@ import org.mozilla.javascript.NativeObject;
  */
 public class BThreadJsProxy implements java.io.Serializable {
     
-    private final BThreadSyncSnapshot bthread;
+    private BThreadSyncSnapshot bthread;
 
+    
     public BThreadJsProxy(BThreadSyncSnapshot bthread) {
         this.bthread = bthread;
     }
+    
+    public BThreadJsProxy() {}
     
     public void bsync( NativeObject jsRWB ) {
         bsync(jsRWB, null);
@@ -59,7 +64,7 @@ public class BThreadJsProxy implements java.io.Serializable {
                 stmt = stmt.request(
                         Arrays.asList( arr.getIndexIds() ).stream()
                               .map( i -> (BEvent)arr.get(i) )
-                              .collect( toSet() ));
+                              .collect( toList() ));
             } 
         }
         
@@ -108,4 +113,35 @@ public class BThreadJsProxy implements java.io.Serializable {
         throw capturedContinuation;
     }
 
+    public void setBThread(BThreadSyncSnapshot bthread) {
+        this.bthread = bthread;
+    }
+
+    public BThreadSyncSnapshot getBThread() {
+        return bthread;
+    }
+    
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 97 * hash + Objects.hashCode(this.bthread);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final BThreadJsProxy other = (BThreadJsProxy) obj;
+        return Objects.equals(this.bthread, other.bthread);
+    }
+    
+    
 }

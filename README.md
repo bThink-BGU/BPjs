@@ -24,7 +24,7 @@ a link to this page somewhere in the documentation/system about section.
     <dependency>
         <groupId>com.github.bthink-bgu</groupId>
         <artifactId>BPjs</artifactId>
-        <version>0.8.4</version>
+        <version>0.8.6</version>
     </dependency>
     ...
 </dependencies>
@@ -32,14 +32,80 @@ a link to this page somewhere in the documentation/system about section.
 
 * Clone, fork, or download the [starting project](https://github.com/bThink-BGU/SampleBPjsProject).
 * Download the `.jar` files directly from [Maven Central](https://repo.maven.apache.org/maven2/com/github/bthink-bgu/BPjs/).
+* The project's [Google group](https://groups.google.com/forum/#!forum/bpjs)
 
 ## Documentation
 
-* [Introductory Presentation](https://www.slideshare.net/MichaelBarSinai/introducing-bpjs-web)
+* Presentations: [Introduction](https://www.slideshare.net/MichaelBarSinai/introducing-bpjs-web)
+                 [Deeper dive](https://www.slideshare.net/MichaelBarSinai/deep-dive-into-bpjs)
 * [Tutorial and Reference](http://bpjs.readthedocs.io/en/develop/)
 * [API Javadocs](http://www.javadoc.io/doc/com.github.bthink-bgu/BPjs/)
 
 ## Change log for the BPjs library.
+
+## 2017-12-22
+* :bug: `BSyncStatement`s now retain information about the b-thread that created them.
+* :arrow_up: Now using a single `ExecutorService` for the entire JVM (OK, per class-loader). This makes runtime more efficient, resource-wise.
+* :arrows_counterclockwise: Using cached thread execution pool instead of the fork-join one (the former seems to make more sense in a BP context).
+* :arrow_up: The Java threads executing the b-threads now have specific names: `bpjs-executor-N` (where `N` is a number starting at 1).
+* :sparkles: New method: `bp.getJavaThreadName`: Returns the name of the Java thread executing the b-thread while this method was called. 
+* :tada: Some changes in this version were requested by actual users. :tada:
+* :sparkles: Documentation updated to mention verification (full-length text to be added post-paper).
+* :bug: `BThreadJSProxy.get/setBthread` updated to use capital `T`, like the resp fo the code.
+* :arrows_counterclockwise: Test clean-up
+* :arrows_counterclockwise: Documentation clean-up
+
+## 2017-11-24
+* :sparkles: `BProgram` allows appending and prepending source code programmatically, using `appendSource` and `prependSource`.
+              These can be used to add environment simulation without touching the simulated model. Or just to act as includes,
+              e.g. for common set-ups.
+* :sparkles: Added new class: `PathRequirements`, to hold path requirements that do not require state (e.g. "no deadlock").
+* :sparkles: `DfsBProgramVerifier` now has a "debug mode" (set/get via `get/isDebugMode`). On debug mode, it prints
+             verbose information to `System.out`.
+* :sparkles: Added new class: `BThreadStateVisitedNodeStore`, looks only into the states of the b-threads when deciding whether a 
+             search node was already visited or not.
+* :bug: `InMemoryEventLoggingListener` cleans its event log when a run begins, so it can be reused for multiple runs.
+* :arrows_counterclockwise: Reduced method accessibility in `BProgram`, so subclassers have harder time getting into trouble. 
+* :put_trash_in_its_place: `BProgramListener` renamed to `BProgramRunnerListener`, since that is the object it listens to.
+* :put_trash_in_its_place: `NoDeadlock` class deleted. Use `PathRequirements.NO_DEADLOCK` instead.
+* :sparkles: `PathRequirements.ACCEPT_ALL`, is a new requirement that's always true. Useful for scanning a program state space.
+
+## 2017-11-23
+* :arrow_up: `DfsProgramVerifier` uses `FullVisitedNodeStore` by default (preferring correctness over speed in the default case).
+* :arrow_up: Updated the Dining Philosopher example to use advanced features. Also added it as a unit test.
+* :put_litter_in_its_place: Removed `validation` package.
+* :sparkles: `ContinuationProgramState` correctly captures updated variable values. :tada:
+
+## 2017-11-02
+* :sparkles: the `DfsBProgramVerifier` is now accepting requirement objects over execution paths, instead of the hard-coded deadlock check.
+* :sparkles: new `PathRequirement` class. Requirements are passed to the verifiers for making sure the program conforms to them. Two implementation already present:
+    * `NoDeadlock` Breakes when there's a deadlock
+    * `EventNotPresent` Breaks when the last event in the ongoing path is a member of a given event set.
+* :sparkles: the `DfsBProgramVerifier` is now using listener architecture for reporting progress.
+* :sparkles: new event set from bp: `bp.allExcept(es)`.
+* :arrow_up: Efficient path stack implementation for `BfsBProgramVerifier` (no copying, reversal, etc.)
+* :arrow_up: `Mazes.java` Updates to fully use the new verifier features
+
+## 2017-10-30
+* :arrow_up: Re-created program state cloning based on code from @szegedi. Cloning is now faster, more efficient, and can handle storage of events.
+
+## 2017-10-16
+* :sparkles: New base class for implementing event selection strategies.
+* :sparkles: `OrderedEventSelectionStrategy` - A new event selection strategy that honors the order in which events are requested by a given b-thread.
+* :sparkles: `PrioritizedBThreadsEventSelectionStrategy` - A new event selection strategy that can assign priorities to b-threads.
+* :sparkles: `PrioritizedBSyncEventSelectionStrategy` - A new event selection strategy that allows b-threads to add priority to their `bsync`s.
+* :arrow_up: `LoggingEventSelectionStrategyDecorator` also logs selectable events
+* :arrow_up: `BProgram` acts nicer when it has a `null` event selection strategy. 
+
+## 2017-09-10
+* :sparkles: Updated to Rhino 1.7.7.2.
+
+## 2017-08-18
+* :sparkles: Initial verification added. `DfsBProgramVerifier` scans the states of
+  a `BProgram` using DFS, and can return traces where there are no selectable events.
+
+## 2017-08-06
+* :sparkles: Added a class to compare continuations (base for comparing snapshots).
 
 ## 2017-07-05
 * :sparkles: `bsync` now has an extra parameter, allowing b-threads to pass hinting data to custom `EventSelectionStrategy`s.
@@ -61,27 +127,23 @@ a link to this page somewhere in the documentation/system about section.
 * :sparkles: Cloning of `BProgramSyncSnapshot` ready. This is the basis for search.
 
 ### 2017-03-22
-
 * :sparkles: New architecture: Running logic moved from `BProgram` to `BProgramRunner` - ongoing.
 * :sparkles: `BProgramListener`s notified before BPrograms are started.
 * :bug: Fixed a bug where dynamically added b-threads that were added by other dynamically added b-threads would run one cycle too late.
 * :bug: Fixed a bug where external events enqueued from top-level JS code where ignored.
 
 ### 2017-03-21
-
 * :sparkles: New architecture: Running logic moved from `BProgram` to `BProgramRunner`. This will help implementing search.
 * :sparkles: `BProgramListener`s notified when a b-thread runs to completion.
 * :sparkles: `bp.getTime()` added.
 * :sparkles: Updated tutorial now includes the `bp` object.
 
 ### 2017-03-15
-
 * :put_litter_in_its_place: Simplified the `examples` test package.
 * :put_litter_in_its_place: `all` and `none` are now only available via `bp`.
 * :arrows_counterclockwise: cleaner scope structure..
 
 ### 2017-03-14
-
 * :arrows_counterclockwise: Internal method name clean-ups.
 * :put_litter_in_its_place: Removed unneeded initializations.
 * :bug: Program and bthread scopes are treated as scopes rather than prototypes.
@@ -89,19 +151,15 @@ a link to this page somewhere in the documentation/system about section.
 * :sparkles: More tests.
 
 ### 2017-03-02
-
 * :sparkles: `bp.random` added.
 * :arrows_counterclockwise: Documentation updates
 * :sparkles: Added java accessors for putting and getting variables in the JS program
 * :arrows_counterclockwise: `fat.jar` is now `uber.jar`.
 
 ### 2017-02-03
-
 * :sparkles: the standard `.jar` file now contains only BPjs, and no dependencies. Fat jar (the jar that includes dependencies) is available via the releases tab.
 
-
 ### 2017-02-02
-
 * :arrows_counterclockwise: `Events` class renamed to `EventSets`. Some cleanup.
 * :arrows_counterclockwise: `emptySet` is now `none`.
 * :arrows_counterclockwise: `all` and `emptySet` are now available to BPjs code via `bp.all` and `bp.none`. This is to prevent name collisions with client code.
@@ -133,10 +191,8 @@ a maven-central quality grade.
 * :sparkles: Preparations for Maven Central
 * :arrows_counterclockwise: More Javadocs and code cleanup.
 
-
 ### 2017-01-05
 * :sparkles: `RunFile` can now accept multiple BPjs files for input, and runs them as a single BProgram. It also has improved help text.
-
 
 ### 2017-01-03
 * :sparkles: Added continuous code coverage with [Coveralls.io](https://coveralls.io/github/bThink-BGU/BPjs?branch=develop) (Thanks guys!).
@@ -237,3 +293,5 @@ Legend:
 * :arrows_counterclockwise: Change
 * :sparkles:New feature
 * :put_litter_in_its_place: Deprecation
+* :arrow_up: Upgrade
+* :bug: Bug fix

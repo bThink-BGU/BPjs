@@ -51,4 +51,19 @@ public class BProgramJsProxyTest {
         assertEquals(500.0, floatCount, 100);
 
     }
+
+    @Test
+    public void logLevelProxyText() throws InterruptedException {
+        
+        BProgram sut = new SingleResourceBProgram("RandomProxy.js");
+        
+        new BProgramRunner(sut).start();
+        String logLevel1 = sut.getFromGlobalScope("logLevel1", String.class).get();
+        assertEquals(BProgramJsProxy.LogLevel.Off.name(), logLevel1);
+        
+        String logLevel2 = sut.getFromGlobalScope("logLevel2", String.class).get();
+        assertEquals(BProgramJsProxy.LogLevel.Warn.name(), logLevel2);
+        
+
+    }
 }

@@ -9,6 +9,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativeFunction;
 
 /**
  * An event set whose predicate is a Javascript function.
@@ -19,10 +20,16 @@ public class JsEventSet implements EventSet, java.io.Serializable {
 
     private final Function predicate;
     private final String name;
+    private final String encodedSource;
 
     public JsEventSet(String aName, Function aPredicate) {
         name = aName;
         predicate = aPredicate;
+        if ( aPredicate instanceof NativeFunction ) {
+            encodedSource = ((NativeFunction)aPredicate).getEncodedSource();
+        } else {
+            encodedSource = null;
+        }
     }
 
     @Override
@@ -54,5 +61,28 @@ public class JsEventSet implements EventSet, java.io.Serializable {
     @Override
     public String toString() {
         return "[JsEventSet: " + getName() +"]";
+    }
+    
+    @Override
+    public boolean equals( Object other ) {
+        if ( other == null ) return false;
+        if ( other == this ) return true;
+        
+        if ( other instanceof JsEventSet ) {
+            JsEventSet otherES = (JsEventSet) other;
+            if ( encodedSource == null ) {
+                return encodedSource.equals(otherES.encodedSource);
+            } else {
+                return predicate.equals(((JsEventSet) other).predicate);
+            }
+                
+        } else {
+            return false;
+        }
+    }
+    
+    @Override
+    public int hashCode() {
+        return (encodedSource!=null) ? encodedSource.hashCode() : predicate.hashCode();
     }
 }

@@ -26,7 +26,7 @@ package il.ac.bgu.cs.bp.bpjs.examples;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -44,7 +44,7 @@ public class DynamicBThreadAdditionTest {
     @Test
     public void test() throws InterruptedException {
         BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("dynamicBthreadAddition.js"));
-        sut.addListener( new StreamLoggerListener() );
+        sut.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
         sut.start();

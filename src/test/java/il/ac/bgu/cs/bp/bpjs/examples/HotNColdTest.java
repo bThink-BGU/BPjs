@@ -3,9 +3,9 @@ package il.ac.bgu.cs.bp.bpjs.examples;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.StreamLoggerListener;
+import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import il.ac.bgu.cs.bp.bpjs.validation.eventpattern.EventPattern;
+import il.ac.bgu.cs.bp.bpjs.verification.eventpattern.EventPattern;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
@@ -22,7 +22,7 @@ public class HotNColdTest {
     @Test
     public void superStepTest() throws InterruptedException {
         BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("HotNCold.js"));
-        sut.addListener( new StreamLoggerListener() );
+        sut.addListener( new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
         sut.start();

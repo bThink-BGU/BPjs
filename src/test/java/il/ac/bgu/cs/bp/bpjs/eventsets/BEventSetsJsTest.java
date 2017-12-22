@@ -15,10 +15,7 @@ import org.junit.Test;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
-/**
- *
- * @author michael
- */
+
 public class BEventSetsJsTest {
     
     BProgram prog;
