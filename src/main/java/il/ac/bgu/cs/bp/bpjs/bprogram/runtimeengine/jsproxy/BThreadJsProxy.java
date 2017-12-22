@@ -120,7 +120,7 @@ public class BThreadJsProxy implements java.io.Serializable {
     public BThreadSyncSnapshot getBthread() {
         return bthread;
     }
-
+    
     @Override
     public int hashCode() {
         int hash = 5;

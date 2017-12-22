@@ -43,6 +43,16 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+## 2017-12-22
+* :bug: `BSyncStatement`s now retain information about the b-thread that created them.
+* :arrow_up: Now using a single `ExecutorService` for the entire JVM (OK, per class-loader). This makes runtime more efficient, resource-wise.
+* :arrows_counterclockwise: Using cached thread execution pool instead of the fork-join one (the former seems to make more sense in a BP context).
+* :arrow_up: The Java threads executing the b-threads now have specific names: `bpjs-executor-N` (where `N` is a number starting at 1).
+* :sparkles: New method: `bp.getJavaThreadName`: Returns the name of the Java thread executing the b-thread while this method was called. 
+* :tada: Some changes in this version were requested by actual users. :tada:
+* :sparkles: Documentation updated to mention verification (full-length text to be added post-paper).
+* :arrows_counterclockwise: Test clean-up
+* :arrows_counterclockwise: Documentation clean-up
 
 ## 2017-11-24
 * :sparkles: `BProgram` allows appending and prepending source code programmatically, using `appendSource` and `prependSource`.

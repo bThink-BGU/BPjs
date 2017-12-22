@@ -1,4 +1,4 @@
-package il.ac.bgu.cs.bp.bpjs.diningphil;
+package il.ac.bgu.cs.bp.bpjs.verification.examples;
 
 import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.search.FullVisitedNodeStore;

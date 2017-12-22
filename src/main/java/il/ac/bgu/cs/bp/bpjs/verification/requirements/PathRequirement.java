@@ -30,6 +30,7 @@ import java.util.List;
  * A requirement for execution paths. The {@link #checkConformance(java.util.List)} method returns {@code true} 
  * when the execution path complies with the implemented requirement, and {@code false} otherwise.
  * 
+ * @see PathRequirements
  * @author michael
  */
 public interface PathRequirement {

@@ -175,6 +175,16 @@ public class BProgramJsProxy implements java.io.Serializable {
         return System.currentTimeMillis();
     }
 
+    /**
+     * Gets the name of the Java thread executing this b-thread at the moment. Useful for
+     * debugging Java runtime issues.
+     * 
+     * @return the name of the Java thread executing this b-thread at the moment.
+     */
+    public String getJavaThreadName() {
+        return Thread.currentThread().getName();
+    }
+    
     @Override
     public int hashCode() {
         int hash = 7;

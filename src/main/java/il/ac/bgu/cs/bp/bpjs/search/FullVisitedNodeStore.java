@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A {@link VisitedNodeStroage} that stores the entire {@link Node}. 
+ * A {@link VisitedNodeStore} that stores the entire {@link Node}. 
  * 
  * @author michael
  */

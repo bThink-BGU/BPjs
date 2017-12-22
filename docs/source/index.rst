@@ -30,6 +30,7 @@ Topics:
    BPjsTutorial/index
    execute-bpjs
    embed-bpjs
+   verification/index
    extendBPjs/index
    glossary
 

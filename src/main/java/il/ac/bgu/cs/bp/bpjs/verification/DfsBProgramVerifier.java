@@ -38,9 +38,8 @@ import java.util.Optional;
 
 /**
  * 
- * Takes a BProgram, and verifies it does not get into a deadlock (i.e there is
- * always a selectable state). If the verification fails, returns a trace that
- * serves as a counter example.
+ * Takes a {@link BProgram}, and verifies that it conforms to a given {@link PathRequirement}. Take care to use the
+ * appropriate {@link VisitedNodeStore} for the {@link BProgram} being verified.
  * 
  * States are scanned using a DFS.
  * 
@@ -48,7 +47,6 @@ import java.util.Optional;
  */
 public class DfsBProgramVerifier {
 
-    
     public final static long DEFAULT_MAX_TRACE = 100;
     
     /** 

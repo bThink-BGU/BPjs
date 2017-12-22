@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -32,14 +30,6 @@ import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramRunnerListe
  * @author michael
  */
 public class BProgramSyncSnapshot {
-    
-    private static final ThreadLocal<ExecutorService> EXECUTORS = new ThreadLocal<ExecutorService>(){
-        @Override
-        protected ExecutorService initialValue() {
-            return new ForkJoinPool();
-        }
-    };
-    
     
     private final Set<BThreadSyncSnapshot> threadSnapshots;
     private final List<BEvent> externalEvents;
@@ -66,7 +56,7 @@ public class BProgramSyncSnapshot {
      */
     public BProgramSyncSnapshot start() throws InterruptedException {
         Set<BThreadSyncSnapshot> nextRound = new HashSet<>(threadSnapshots.size());
-        nextRound.addAll(EXECUTORS.get().invokeAll(threadSnapshots.stream()
+        nextRound.addAll(BProgramRunner.getExecutorService().invokeAll(threadSnapshots.stream()
                     .map(bt -> new StartBThread(bt))
                     .collect(toList())
                 ).stream().map(f -> safeGet(f) ).collect(toList())
@@ -116,7 +106,7 @@ public class BProgramSyncSnapshot {
         }
         
         // add the run results of all those who advance this stage
-        nextRound.addAll(EXECUTORS.get().invokeAll(
+        nextRound.addAll(BProgramRunner.getExecutorService().invokeAll(
                             resumingThisRound.stream()
                                              .map(bt -> new ResumeBThread(bt, anEvent))
                                              .collect(toList())
@@ -210,7 +200,7 @@ public class BProgramSyncSnapshot {
         // if any new bthreads are added, run and add their result
         Set<BThreadSyncSnapshot> added = bprog.drainRecentlyRegisteredBthreads();
         while ( ! added.isEmpty() ) {
-            nextRound.addAll(EXECUTORS.get().invokeAll(
+            nextRound.addAll(BProgramRunner.getExecutorService().invokeAll(
                     added.stream()
                             .map(bt -> new StartBThread(bt))
                             .collect(toList())

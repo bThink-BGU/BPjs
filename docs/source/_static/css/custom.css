@@ -93,7 +93,7 @@ pre {
 }
 
 code.literal {
-  font-size: 11pt;
+  font-size: smaller;
   font-family: Menlo, Monaco, "Courier New", monospace;
   padding: inherit 4px;
 }
