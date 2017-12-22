@@ -82,7 +82,7 @@ var anyEntrance = bp.EventSet("AnyEntrance", function(evt){
    return evt.name.indexOf("Enter") === 0;
 });
 
-function surroundingCellEntries(col, row) {
+function adjacentCellEntries(col, row) {
     return [enterEvent(col + 1, row), enterEvent(col - 1, row),
         enterEvent(col, row + 1), enterEvent(col, row - 1)];
 
@@ -111,7 +111,7 @@ function parseMaze(mazeLines) {
         for ( var col=0; col<mazeLines[row].length; col++ ) {
             var currentPixel = mazeLines[row].substring(col,col+1);
             if ( currentPixel===" " || currentPixel==="t" || currentPixel==="s" ) {
-                addEnterableCell(col, row);
+                addSpaceCell(col, row);
                 if ( currentPixel==="t" ) {
                     addTargetCell(col, row);
                 }
@@ -131,11 +131,11 @@ function parseMaze(mazeLines) {
  * @param {type} row
  * @returns {undefined}
  */
-function addEnterableCell( col, row ) {
+function addSpaceCell( col, row ) {
     bp.registerBThread("cell(c:"+col+" r:"+row+")",
         function() {
             while ( true ) {
-                bsync({waitFor:surroundingCellEntries(col, row)});
+                bsync({waitFor:adjacentCellEntries(col, row)});
                 bsync({
                     request: enterEvent(col, row),
                     waitFor: anyEntrance

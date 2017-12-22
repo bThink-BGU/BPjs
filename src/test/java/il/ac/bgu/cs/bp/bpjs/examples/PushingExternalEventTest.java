@@ -40,7 +40,7 @@ public class PushingExternalEventTest {
         
         sut.start();
         
-        eventLogger.getEvents().forEach(e->System.out.println(e) );
+        eventLogger.getEvents().forEach( e->System.out.println(e) );
         EventPattern expected = new EventPattern()
                 .append(new BEvent("ext1"))
                 .append(new BEvent("ext2"))

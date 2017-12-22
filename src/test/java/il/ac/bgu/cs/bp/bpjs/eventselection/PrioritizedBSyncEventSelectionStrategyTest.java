@@ -29,7 +29,7 @@ public class PrioritizedBSyncEventSelectionStrategyTest {
 		stmts.add(BSyncStatement.make().request(Arrays.asList(evt2)).data(10));
 		stmts.add(BSyncStatement.make().request(Arrays.asList(evt3)).data(10));
 
-		assertEquals(new HashSet<>(Arrays.asList(evt2, evt3)), //
+		assertEquals(new HashSet<>(Arrays.asList(evt2, evt3)),
 				sut.selectableEvents(stmts, Collections.emptyList()));
 	}
 
@@ -43,7 +43,7 @@ public class PrioritizedBSyncEventSelectionStrategyTest {
 		stmts.add(BSyncStatement.make().request(Arrays.asList(evt2)).data(10));
 		stmts.add(BSyncStatement.make().request(Arrays.asList(evt3)).data(10).block(evt2));
 
-		assertEquals(new HashSet<>(Arrays.asList(evt3)), //
+		assertEquals(new HashSet<>(Arrays.asList(evt3)), 
 				sut.selectableEvents(stmts, Collections.emptyList()));
 	}
 

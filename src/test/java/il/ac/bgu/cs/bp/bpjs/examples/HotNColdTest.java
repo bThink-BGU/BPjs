@@ -22,7 +22,7 @@ public class HotNColdTest {
     @Test
     public void superStepTest() throws InterruptedException {
         BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("HotNCold.js"));
-        sut.addListener(new PrintBProgramRunnerListener() );
+        sut.addListener( new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
         sut.start();

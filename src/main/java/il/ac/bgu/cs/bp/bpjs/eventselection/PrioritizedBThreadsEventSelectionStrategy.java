@@ -18,6 +18,8 @@ import il.ac.bgu.cs.bp.bpjs.events.BEvent;
 import il.ac.bgu.cs.bp.bpjs.eventsets.ComposableEventSet;
 import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.eventsets.EventSets;
+import java.util.Collection;
+import java.util.stream.Stream;
 
 /**
  * An event selection strategy that prefers events from b-threads with higher priorities.
@@ -54,7 +56,7 @@ public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSele
         
         Set<Pair<BEvent,Integer>> requested = statements.stream()
                 .filter( stmt -> stmt!=null )
-                .flatMap( stmt -> stmt.getRequest().stream().map(e -> Pair.of(e, getPriority(stmt.getBthread().getName()))))
+                .flatMap(stmt -> eventsToPrioritizedPairs(stmt))
                 .collect( Collectors.toSet() );
         
         // Let's see what internal events are requested and not blocked (if any).
@@ -81,11 +83,18 @@ public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSele
         }
     }
 
+    private Stream<Pair<BEvent, Integer>> eventsToPrioritizedPairs(BSyncStatement stmt) {
+        final Collection<? extends BEvent> request = stmt.getRequest();
+        if ( request.isEmpty() ) return Stream.empty();
+        Integer priority = getPriority(stmt.getBthread().getName());
+        return request.stream().map( e -> Pair.of(e, priority));
+    }
+
     public void setPriority(String bThreadName, Integer priority) {
     	priorities.put(bThreadName, priority);
     }
     
-    public Integer getPriority(String bThreadName) {
+    public int getPriority(String bThreadName) {
     	return priorities.getOrDefault(bThreadName, DEFAULT_PRIORITY);
     }
     
@@ -96,9 +105,5 @@ public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSele
     public int getLowestPriority() {
         return priorities.values().stream().mapToInt( Integer::intValue ).min().orElse(DEFAULT_PRIORITY);
     }
-                    
-    @Override
-    public long getSeed() {
-        return seed;
-    }
+    
 }

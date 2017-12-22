@@ -59,18 +59,19 @@ public class BSyncStatement implements java.io.Serializable {
      * @return an empty statement
      */
     public static BSyncStatement make(BThreadSyncSnapshot creator) {
-        return new BSyncStatement(Collections.emptySet(), none, none, none, null).setBthread(creator);
+        return new BSyncStatement(creator, Collections.emptySet(), none, none, none, null);
     }
     public static BSyncStatement make() {
-        return new BSyncStatement(Collections.emptySet(), none, none, none, null);
+        return new BSyncStatement(null, Collections.emptySet(), none, none, none, null);
     }
     
-    public BSyncStatement(Collection<? extends BEvent> request, EventSet waitFor, EventSet block, EventSet except, Object data) {
+    public BSyncStatement(BThreadSyncSnapshot creator, Collection<? extends BEvent> request, EventSet waitFor, EventSet block, EventSet except, Object data) {
         this.request = new OrderedSet<>(request);
         this.waitFor = waitFor;
         this.block = block;
         this.interrupt = except;
         this.data = data;
+        this.bthread = creator;
     }
 
     public boolean shouldWakeFor( BEvent anEvent ) {
@@ -84,31 +85,31 @@ public class BSyncStatement implements java.io.Serializable {
      * @return a new statement
      */
     public BSyncStatement request( Collection<? extends BEvent> toRequest ) {
-        return new BSyncStatement(toRequest, getWaitFor(), getBlock(), getInterrupt(), getData());
+        return new BSyncStatement(getBthread(), toRequest, getWaitFor(), getBlock(), getInterrupt(), getData());
     }
     public BSyncStatement request( BEvent requestedEvent ) {
         Set<BEvent> toRequest = new HashSet<>();
         toRequest.add(requestedEvent);
-        return new BSyncStatement(toRequest, getWaitFor(), getBlock(), getInterrupt(), getData());
+        return new BSyncStatement(getBthread(), toRequest, getWaitFor(), getBlock(), getInterrupt(), getData());
     }
     public BSyncStatement request( ExplicitEventSet ees ) {
-        return new BSyncStatement(ees.getCollection(), getWaitFor(), getBlock(), getInterrupt(), getData());
+        return new BSyncStatement(getBthread(), ees.getCollection(), getWaitFor(), getBlock(), getInterrupt(), getData());
     }
     
     public BSyncStatement waitFor( EventSet events ) {
-        return new BSyncStatement(getRequest(), events, getBlock(), getInterrupt(), getData());
+        return new BSyncStatement(getBthread(), getRequest(), events, getBlock(), getInterrupt(), getData());
     }
 
     public BSyncStatement block( EventSet events ) {
-        return new BSyncStatement(getRequest(), getWaitFor(), events, getInterrupt(), getData());
+        return new BSyncStatement(getBthread(), getRequest(), getWaitFor(), events, getInterrupt(), getData());
     }
     
     public BSyncStatement interrupt( EventSet events ) {
-        return new BSyncStatement(getRequest(), getWaitFor(), getBlock(), events, getData());
+        return new BSyncStatement(getBthread(), getRequest(), getWaitFor(), getBlock(), events, getData());
     }
     
     public BSyncStatement data( Object someData ) { 
-        return new BSyncStatement(getRequest(), getWaitFor(), getBlock(), getInterrupt(), someData);
+        return new BSyncStatement(getBthread(), getRequest(), getWaitFor(), getBlock(), getInterrupt(), someData);
     }
     
     public Collection<? extends BEvent> getRequest() {

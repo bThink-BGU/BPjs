@@ -30,27 +30,24 @@ var trivial =
             "   ",
             "  t"];
 
-var trivialPlus =
-        ["s  ",
-            "## ",
-            "t  "];
+var trivialPlus = ["s  ",
+                   "## ",
+                   "t  "];
 
-var simple =
-        ["       t ",
-            "##  #####",
-            "         ",
-            "######## ",
-            "s        "];
+var simple = ["       t ",
+              "##  #####",
+              "         ",
+              "######## ",
+              "s        "];
 
-var complex =
-        ["    #  t ",
-            "## ## ###",
-            "         ",
-            "### #### ",
-            "   s#    "];
+var complex = ["    #  t ",
+               "## ## ###",
+               "         ",
+               "### #### ",
+               "   s#    "];
 
 var singleSolution =
-        ["  *     t",
+           ["  *     t",
             "*** *****",
             "  * *    ",
             "*** *****",
@@ -83,7 +80,7 @@ var anyEntrance = bp.EventSet("AnyEntrance", function(evt){
    return evt.name.indexOf("Enter") === 0;
 });
 
-function surroundingCellEntries(col, row) {
+function adjacentCellEntries(col, row) {
     return [enterEvent(col + 1, row), enterEvent(col - 1, row),
         enterEvent(col, row + 1), enterEvent(col, row - 1)];
 
@@ -109,7 +106,7 @@ var maze = mazes[MAZE_NAME];
 
 parseMaze(maze);
 
-bp.registerBThread("onlyOnce", function () {
+bp.registerBThread("onlyOnce", function(){
     var block = [];
     while (true) {
         var evt = bsync({waitFor: anyEntrance, block: block});
@@ -139,7 +136,7 @@ function parseMaze(mazeLines) {
 }
 
 function addWall(col, row) {
-    bp.registerBThread("wall(" + col + "," + row + ")", function () {
+    bp.registerBThread("wall(" + col + "," + row + ")", function(){
         bsync({block: enterEvent(col, row)});
     });
 }
@@ -189,7 +186,7 @@ function addWalker(col, row) {
         });
         while (true) {
             var evt = bsync({
-                request: surroundingCellEntries(curCol, curRow),
+                request: adjacentCellEntries(curCol, curRow),
                 interrupt: TARGET_FOUND_EVENT
             });
             var coords = evt2coord(evt);
