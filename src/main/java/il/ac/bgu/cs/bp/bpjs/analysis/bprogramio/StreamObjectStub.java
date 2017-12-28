@@ -21,40 +21,48 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs;
-
-import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.analysis.Node;
-import java.util.List;
-import java.util.Objects;
-import static java.util.stream.Collectors.joining;
+package il.ac.bgu.cs.bp.bpjs.analysis.bprogramio;
 
 /**
- * Just a static place for some repeated methods useful for testing.
+ * Placeholders to put in the application stream. Used to break connections from the
+ * javascript serialized context to the Java context.
+ * 
  * 
  * @author michael
  */
-public abstract class TestUtils {
+public class StreamObjectStub implements java.io.Serializable {
     
+    public static final StreamObjectStub BP_PROXY = new StreamObjectStub("bp-proxy");
+    public static final StreamObjectStub BT_PROXY = new StreamObjectStub("bt-proxy");
     
-    /**
-     * Preventing the instantiation of subclasses.
-     */
-    private TestUtils(){}
-    
-    
-    public static String traceEventNamesString( List<Node> trace, String delimiter ) {
-        
-        return trace.stream()
-                    .map(Node::getLastEvent)
-                    .filter(Objects::nonNull)
-                    .map(BEvent::getName)
-                    .collect(joining(delimiter));
+    private final String name;
+
+    public StreamObjectStub(String name) {
+        this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        return "[Stub: " + name + "]";
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if ( obj == null ) return false;
+        if ( obj == this ) return true;
+        if ( ! (obj instanceof StreamObjectStub) ) return false;
+        return ((StreamObjectStub)obj).name.equals(name);
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
     }
     
-    public static String eventNamesString( List<BEvent> trace, String delimiter ) {
-        return trace.stream()
-                    .map(BEvent::getName)
-                    .collect(joining(delimiter));
+    private Object readResolve() {
+        if ( name.equals(BP_PROXY.name) ) return BP_PROXY;
+        if ( name.equals(BT_PROXY.name) ) return BT_PROXY;
+        return this;
     }
+    
 }

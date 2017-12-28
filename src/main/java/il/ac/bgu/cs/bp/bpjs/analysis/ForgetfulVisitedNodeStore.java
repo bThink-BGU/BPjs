@@ -21,40 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs;
-
-import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.analysis.Node;
-import java.util.List;
-import java.util.Objects;
-import static java.util.stream.Collectors.joining;
+package il.ac.bgu.cs.bp.bpjs.analysis;
 
 /**
- * Just a static place for some repeated methods useful for testing.
+ * A VisitedNodeStore that does not remember any visited node. When the program 
+ * search graph is a tree, ensures that all the nodes are visited. When the program
+ * search graph contains even a single loop, pretty much ensures an infinite verification
+ * run. So use with caution.
  * 
  * @author michael
  */
-public abstract class TestUtils {
-    
-    
-    /**
-     * Preventing the instantiation of subclasses.
-     */
-    private TestUtils(){}
-    
-    
-    public static String traceEventNamesString( List<Node> trace, String delimiter ) {
-        
-        return trace.stream()
-                    .map(Node::getLastEvent)
-                    .filter(Objects::nonNull)
-                    .map(BEvent::getName)
-                    .collect(joining(delimiter));
+public class ForgetfulVisitedNodeStore implements VisitedNodeStore {
+
+    @Override
+    public void store(Node nd) {
+        // ignore.
+    }
+
+    @Override
+    public boolean isVisited(Node nd) {
+        return false;
     }
     
-    public static String eventNamesString( List<BEvent> trace, String delimiter ) {
-        return trace.stream()
-                    .map(BEvent::getName)
-                    .collect(joining(delimiter));
-    }
 }

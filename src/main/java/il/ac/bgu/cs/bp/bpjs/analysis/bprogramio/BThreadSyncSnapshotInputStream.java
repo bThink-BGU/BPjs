@@ -21,40 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs;
+package il.ac.bgu.cs.bp.bpjs.analysis.bprogramio;
 
-import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.analysis.Node;
-import java.util.List;
-import java.util.Objects;
-import static java.util.stream.Collectors.joining;
+import java.io.IOException;
+import java.io.InputStream;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.serialize.ScriptableInputStream;
 
 /**
- * Just a static place for some repeated methods useful for testing.
- * 
+ *
  * @author michael
  */
-public abstract class TestUtils {
+class BThreadSyncSnapshotInputStream extends ScriptableInputStream {
     
+    private final StubProvider stubProvider;
     
-    /**
-     * Preventing the instantiation of subclasses.
-     */
-    private TestUtils(){}
-    
-    
-    public static String traceEventNamesString( List<Node> trace, String delimiter ) {
-        
-        return trace.stream()
-                    .map(Node::getLastEvent)
-                    .filter(Objects::nonNull)
-                    .map(BEvent::getName)
-                    .collect(joining(delimiter));
+    public BThreadSyncSnapshotInputStream(InputStream in, Scriptable scope, StubProvider aProvider) throws IOException {
+        super(in, scope);
+        stubProvider = aProvider;
+    }
+
+    @Override
+    protected Object resolveObject(Object obj) throws IOException {
+        return ( obj instanceof StreamObjectStub )
+            ? stubProvider.get((StreamObjectStub) obj)
+            : obj;
+    }
+
+    @Override
+    protected Object readObjectOverride() throws IOException, ClassNotFoundException {
+        return super.readObjectOverride(); //To change body of generated methods, choose Tools | Templates.
     }
     
-    public static String eventNamesString( List<BEvent> trace, String delimiter ) {
-        return trace.stream()
-                    .map(BEvent::getName)
-                    .collect(joining(delimiter));
-    }
 }

@@ -10,7 +10,7 @@ import org.mozilla.javascript.NativeContinuation;
 import org.mozilla.javascript.Scriptable;
 
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BThreadJsProxy;
-import il.ac.bgu.cs.bp.bpjs.search.ContinuationProgramState;
+import il.ac.bgu.cs.bp.bpjs.analysis.ContinuationProgramState;
 import java.util.Objects;
 
 /**

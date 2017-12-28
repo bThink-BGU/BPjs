@@ -10,9 +10,9 @@ import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
-import il.ac.bgu.cs.bp.bpjs.search.FullVisitedNodeStore;
-import il.ac.bgu.cs.bp.bpjs.verification.DfsBProgramVerifier;
-import il.ac.bgu.cs.bp.bpjs.verification.VerificationResult;
+import il.ac.bgu.cs.bp.bpjs.analysis.FullVisitedNodeStore;
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
+import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 
 /**
  * For Gaming mode change UseSimulatedPlayer to false. For Model Checking mode

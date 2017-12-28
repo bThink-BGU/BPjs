@@ -21,40 +21,46 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs;
+package il.ac.bgu.cs.bp.bpjs.analysis.requirements;
 
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.analysis.Node;
+import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
-import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
+
+class TestingNode extends Node {
+    TestingNode( BEvent e ) {
+        super(null, null, e);
+    }
+}
 
 /**
- * Just a static place for some repeated methods useful for testing.
- * 
+ *
  * @author michael
  */
-public abstract class TestUtils {
+public class EventDetectorTest {
     
-    
+    private static final BEvent NOT_THIS = new BEvent("not-this");
+    private static final BEvent YES_THIS = new BEvent("YES-this");
+            
     /**
-     * Preventing the instantiation of subclasses.
+     * Test of checkConformance method, of class EventDetector.
      */
-    private TestUtils(){}
-    
-    
-    public static String traceEventNamesString( List<Node> trace, String delimiter ) {
+    @Test
+    public void testCheckConformance() {
+        EventNotPresent sut = new EventNotPresent(YES_THIS);
+        List<Node> trace = Arrays.asList( NOT_THIS, NOT_THIS, NOT_THIS, YES_THIS )
+                .stream().map(e ->  new TestingNode(e) ).collect( toList() );
         
-        return trace.stream()
-                    .map(Node::getLastEvent)
-                    .filter(Objects::nonNull)
-                    .map(BEvent::getName)
-                    .collect(joining(delimiter));
+        assertFalse( sut.checkConformance(trace) );
+        
+        trace.remove(trace.size()-1);
+        
+        assertTrue( sut.checkConformance(trace) );
     }
     
-    public static String eventNamesString( List<BEvent> trace, String delimiter ) {
-        return trace.stream()
-                    .map(BEvent::getName)
-                    .collect(joining(delimiter));
-    }
 }

@@ -38,35 +38,32 @@ import java.util.stream.Stream;
 
 /**
  * A set, where the iteration order is the order of addition.
+ *
  * @author michael
  * @param <T> Element type
  */
 public class OrderedSet<T> implements SortedSet<T>, java.io.Serializable {
-    
-   private final ArrayList<T> items; 
-   
-   public static <T> OrderedSet<T> of( T... ts ) {
-       OrderedSet<T> retVal = new OrderedSet<>();
-       Arrays.stream(ts).forEach(retVal::add);
-       return retVal;
-   }
-   
-   public OrderedSet(){
-       items = new ArrayList<>();
-   }
-   
-   public OrderedSet( Collection<T> someItems ) {
-       items = new ArrayList<>(someItems.size());
-       for ( T t : someItems ) {
-           if ( ! items.contains(t) ) {
-               items.add(t);
-           }
-       }
-   }
-   
-   private OrderedSet( ArrayList<T> someItems ) {
-       items = new ArrayList<>(someItems);
-   }
+
+    private final ArrayList<T> items;
+
+    public static <T> OrderedSet<T> of(T... ts) {
+        OrderedSet<T> retVal = new OrderedSet<>();
+        Arrays.stream(ts).forEach(retVal::add);
+        return retVal;
+    }
+
+    public OrderedSet() {
+        items = new ArrayList<>();
+    }
+
+    public OrderedSet(Collection<T> someItems) {
+        items = new ArrayList<>(someItems.size());
+        for (T t : someItems) {
+            if (!items.contains(t)) {
+                items.add(t);
+            }
+        }
+    }
 
     @Override
     public Comparator<? super T> comparator() {
@@ -83,15 +80,15 @@ public class OrderedSet<T> implements SortedSet<T>, java.io.Serializable {
     @Override
     public SortedSet<T> headSet(T toElement) {
         int idxTo = items.indexOf(toElement);
-        return ( idxTo == -1 ) ? Collections.emptySortedSet()
-                               : Collections.unmodifiableSortedSet(new OrderedSet<>(items.subList(0, idxTo)));
+        return (idxTo == -1) ? Collections.emptySortedSet()
+                : Collections.unmodifiableSortedSet(new OrderedSet<>(items.subList(0, idxTo)));
     }
 
     @Override
     public SortedSet<T> tailSet(T fromElement) {
         int idxFrom = items.indexOf(fromElement);
-        return ( idxFrom == -1 ) ? Collections.emptySortedSet()
-                               : Collections.unmodifiableSortedSet(new OrderedSet<>(items.subList(idxFrom, items.size())));
+        return (idxFrom == -1) ? Collections.emptySortedSet()
+                : Collections.unmodifiableSortedSet(new OrderedSet<>(items.subList(idxFrom, items.size())));
     }
 
     @Override
@@ -101,7 +98,7 @@ public class OrderedSet<T> implements SortedSet<T>, java.io.Serializable {
 
     @Override
     public T last() {
-        return items.get(items.size()-1);
+        return items.get(items.size() - 1);
     }
 
     @Override
@@ -136,7 +133,7 @@ public class OrderedSet<T> implements SortedSet<T>, java.io.Serializable {
 
     @Override
     public boolean add(T e) {
-        if ( ! items.contains(e) ) {
+        if (!items.contains(e)) {
             items.add(e);
             return true;
         }
@@ -146,7 +143,7 @@ public class OrderedSet<T> implements SortedSet<T>, java.io.Serializable {
     @Override
     @SuppressWarnings("element-type-mismatch")
     public boolean remove(Object o) {
-        if ( items.contains(o) ) {
+        if (items.contains(o)) {
             items.remove(o);
             return true;
         }
@@ -161,8 +158,8 @@ public class OrderedSet<T> implements SortedSet<T>, java.io.Serializable {
     @Override
     public boolean addAll(Collection<? extends T> c) {
         boolean added = false;
-        for ( T t : c ) {
-            if ( ! contains(t) ) {
+        for (T t : c) {
+            if (!contains(t)) {
                 added = true;
                 items.add(t);
             }
@@ -202,9 +199,9 @@ public class OrderedSet<T> implements SortedSet<T>, java.io.Serializable {
 
     @Override
     public void forEach(Consumer<? super T> action) {
-        SortedSet.super.forEach(action); 
+        SortedSet.super.forEach(action);
     }
-    
+
     @Override
     public String toString() {
         return "[OrderedSet " + items.toString() + "]";
@@ -225,21 +222,20 @@ public class OrderedSet<T> implements SortedSet<T>, java.io.Serializable {
         if (obj == null) {
             return false;
         }
-        if ( obj instanceof Set) {
+        if (obj instanceof Set) {
             Set otherSet = (Set) obj;
-            if ( obj instanceof OrderedSet ) {
+            if (obj instanceof OrderedSet) {
                 OrderedSet otherOrderedSet = (OrderedSet) otherSet;
                 return items.equals(otherOrderedSet.items);
-                
+
             } else {
                 // regular set equality
-                return containsAll(otherSet) && otherSet.contains(this);
+                return containsAll(otherSet) && otherSet.containsAll(this);
             }
-            
+
         } else {
             return false;
         }
     }
-   
-    
+
 }

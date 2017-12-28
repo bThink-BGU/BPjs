@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 michael.
+ * Copyright 2017 BPjs group BGU.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,40 +21,42 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs;
+package il.ac.bgu.cs.bp.bpjs.analysis.requirements;
 
-import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.analysis.Node;
 import java.util.List;
-import java.util.Objects;
-import static java.util.stream.Collectors.joining;
 
 /**
- * Just a static place for some repeated methods useful for testing.
+ * Convenience class for obtaining {@link PathRequirement}s.
  * 
  * @author michael
  */
-public abstract class TestUtils {
-    
+public class PathRequirements {
+   
+    /**
+     * A requirement that detects deadlocks (as in, no selectable events).
+     */
+    public static final PathRequirement NO_DEADLOCK = new AbstractPathRequirement("Deadlock Detector") {
+        @Override
+        public boolean checkConformance(List<Node> trace) {
+            Node last = trace.get(trace.size()-1);
+            return ! last.getSelectableEvents().isEmpty();
+        }
+    };
     
     /**
-     * Preventing the instantiation of subclasses.
+     * A requirement that accepts all paths (LTL: {@code true*}). Useful for going over all states 
+     * of a search graph.
      */
-    private TestUtils(){}
+    public static final PathRequirement ACCEPT_ALL = new AbstractPathRequirement("Accept All") {
+        @Override
+        public boolean checkConformance(List<Node> trace) {
+            return true;
+        }
+    };
     
-    
-    public static String traceEventNamesString( List<Node> trace, String delimiter ) {
-        
-        return trace.stream()
-                    .map(Node::getLastEvent)
-                    .filter(Objects::nonNull)
-                    .map(BEvent::getName)
-                    .collect(joining(delimiter));
+    private PathRequirements(){
+        // prevent instantiation.
     }
     
-    public static String eventNamesString( List<BEvent> trace, String delimiter ) {
-        return trace.stream()
-                    .map(BEvent::getName)
-                    .collect(joining(delimiter));
-    }
 }

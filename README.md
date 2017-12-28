@@ -44,7 +44,8 @@ a link to this page somewhere in the documentation/system about section.
 ## Change log for the BPjs library.
 
 ## 2017-12-28
-* :arrow_up: Re-arranged package structure, duplicate and ambiguous packages merged. We now have a clean `model`/`execution`/`verification` division. 
+* :arrow_up: Re-arranged package structure, duplicate and ambiguous packages merged. We now have a clean `model`/`execution`/`analysis` division. 
+* :bug: Fixed an equality bug in `OrderedSet`.
 
 
 ## 2017-12-22

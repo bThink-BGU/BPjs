@@ -55,7 +55,7 @@ public class OrderedSetTest {
         OrderedSet<String> sutB = OrderedSet.of();
         
         assertEquals(sutA, sutA);
-        assertNotEquals(null, sutA);
+        assertNotEquals(sutA, null);
         assertNotEquals("not a set", sutA);
         
         assertEquals(sutB, sutA);
@@ -77,6 +77,62 @@ public class OrderedSetTest {
         assertNotEquals(sutA, sutB);
         assertNotEquals(sutB, sutA);
     }
-
+    
+    @Test
+    public void testHeadTailFirstLastSets() {
+        OrderedSet<String> sut = OrderedSet.of("a","b","c","d");
+        assertEquals( OrderedSet.of("b","c","d"), sut.tailSet("b"));
+        assertTrue( sut.tailSet("d").size() == 1 );
+        
+        assertEquals( OrderedSet.of("a","b"), sut.headSet("c") );
+        assertTrue( sut.headSet("NOT-THERE").isEmpty() );
+        
+        assertEquals("a", sut.first());
+        assertEquals("d", sut.last());
+        
+    }
+    
+    @Test
+    public void testSubSet() {
+        OrderedSet<String> sut = OrderedSet.of("a","b","c","d","e","f");
+        assertEquals( OrderedSet.of("b","c","d"), sut.subSet("b", "e"));
+    }
+    
+    @Test
+    public void testToArrays() {
+        OrderedSet<String> sut = OrderedSet.of("a","b","c","d");
+        assertArrayEquals( new Object[]{"a","b","c","d"}, sut.toArray() );
+        assertArrayEquals( new String[]{"a","b","c","d"}, sut.toArray(new String[4]) );
+    }
+    
+    @Test
+    public void testRemove() {
+        OrderedSet<String> sut = OrderedSet.of("a","b","c","d");
+        assertTrue( sut.remove("c") );
+        assertEquals( OrderedSet.of("a","b","d"), sut );
+        assertFalse( sut.remove("c")  );
+        assertEquals( OrderedSet.of("a","b","d"), sut );
+        assertFalse( sut.remove("NOT_THERE") );
+        assertEquals( OrderedSet.of("a","b","d"), sut );
+    }
+    
+    @Test
+    public void testContainsAll() {
+        OrderedSet<String> sut = OrderedSet.of("a","b","c","d");
+        assertTrue( sut.containsAll(Arrays.asList("a","b")) );
+        assertFalse( sut.containsAll(Arrays.asList("a","NOT_THERE")) );
+    }
+    
+    @Test
+    public void testClear() {
+        OrderedSet<String> sut = OrderedSet.of("a","b","c","d");
+        assertEquals( 4, sut.size() );
+        assertFalse( sut.isEmpty() );
+        sut.clear();
+        assertTrue( sut.isEmpty() );
+        assertEquals( 0, sut.size() );
+    }
+    
+    
     
 }

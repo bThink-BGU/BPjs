@@ -5,7 +5,7 @@ import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
-import il.ac.bgu.cs.bp.bpjs.verification.eventpattern.EventPattern;
+import il.ac.bgu.cs.bp.bpjs.analysis.eventpattern.EventPattern;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;

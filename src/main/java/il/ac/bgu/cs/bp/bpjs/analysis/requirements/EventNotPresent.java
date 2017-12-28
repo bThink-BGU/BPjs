@@ -21,40 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs;
+package il.ac.bgu.cs.bp.bpjs.analysis.requirements;
 
-import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.analysis.Node;
 import java.util.List;
-import java.util.Objects;
-import static java.util.stream.Collectors.joining;
 
 /**
- * Just a static place for some repeated methods useful for testing.
+ * A requirement that's broken when a member of the passed event set is selected.
  * 
  * @author michael
  */
-public abstract class TestUtils {
+public class EventNotPresent extends AbstractPathRequirement {
     
+    private final EventSet forbiddenEvents;
     
-    /**
-     * Preventing the instantiation of subclasses.
-     */
-    private TestUtils(){}
-    
-    
-    public static String traceEventNamesString( List<Node> trace, String delimiter ) {
-        
-        return trace.stream()
-                    .map(Node::getLastEvent)
-                    .filter(Objects::nonNull)
-                    .map(BEvent::getName)
-                    .collect(joining(delimiter));
+    public EventNotPresent( EventSet anEventSet ) {
+        super( anEventSet.toString() );
+        forbiddenEvents = anEventSet;
+    }
+
+    @Override
+    public boolean checkConformance(List<Node> trace) {
+        return ! forbiddenEvents.contains(trace.get(trace.size()-1).getLastEvent());
     }
     
-    public static String eventNamesString( List<BEvent> trace, String delimiter ) {
-        return trace.stream()
-                    .map(BEvent::getName)
-                    .collect(joining(delimiter));
-    }
 }

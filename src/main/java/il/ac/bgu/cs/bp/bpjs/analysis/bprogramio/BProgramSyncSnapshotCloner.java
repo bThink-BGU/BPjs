@@ -21,40 +21,25 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs;
+package il.ac.bgu.cs.bp.bpjs.analysis.bprogramio;
 
-import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.analysis.Node;
-import java.util.List;
-import java.util.Objects;
-import static java.util.stream.Collectors.joining;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
+import java.io.IOException;
 
 /**
- * Just a static place for some repeated methods useful for testing.
+ * Clones a {@link BProgramSyncSnapshot}.
  * 
  * @author michael
  */
-public abstract class TestUtils {
-    
-    
-    /**
-     * Preventing the instantiation of subclasses.
-     */
-    private TestUtils(){}
-    
-    
-    public static String traceEventNamesString( List<Node> trace, String delimiter ) {
-        
-        return trace.stream()
-                    .map(Node::getLastEvent)
-                    .filter(Objects::nonNull)
-                    .map(BEvent::getName)
-                    .collect(joining(delimiter));
-    }
-    
-    public static String eventNamesString( List<BEvent> trace, String delimiter ) {
-        return trace.stream()
-                    .map(BEvent::getName)
-                    .collect(joining(delimiter));
-    }
+public class BProgramSyncSnapshotCloner {
+
+	public static BProgramSyncSnapshot clone(BProgramSyncSnapshot src) {
+		BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(src.getBProgram());
+		try {
+			BProgramSyncSnapshot result = io.deserialize(io.serialize(src));
+			return result;
+		} catch (IOException | ClassNotFoundException ex) {
+			throw new RuntimeException("Failed to clone snapshot: " + ex.getMessage(), ex);
+		}
+	}
 }

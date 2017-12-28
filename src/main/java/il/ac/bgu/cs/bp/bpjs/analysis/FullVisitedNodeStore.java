@@ -21,40 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs;
+package il.ac.bgu.cs.bp.bpjs.analysis;
 
-import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.analysis.Node;
-import java.util.List;
-import java.util.Objects;
-import static java.util.stream.Collectors.joining;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
- * Just a static place for some repeated methods useful for testing.
+ * A {@link VisitedNodeStore} that stores the entire {@link Node}. 
  * 
  * @author michael
  */
-public abstract class TestUtils {
+public class FullVisitedNodeStore  implements VisitedNodeStore {
+    private final Set<Node> visited = new HashSet<>();
     
-    
-    /**
-     * Preventing the instantiation of subclasses.
-     */
-    private TestUtils(){}
-    
-    
-    public static String traceEventNamesString( List<Node> trace, String delimiter ) {
-        
-        return trace.stream()
-                    .map(Node::getLastEvent)
-                    .filter(Objects::nonNull)
-                    .map(BEvent::getName)
-                    .collect(joining(delimiter));
+    @Override
+    public void store(Node nd) {
+        visited.add(nd);
     }
-    
-    public static String eventNamesString( List<BEvent> trace, String delimiter ) {
-        return trace.stream()
-                    .map(BEvent::getName)
-                    .collect(joining(delimiter));
-    }
+
+    @Override
+    public boolean isVisited(Node nd) {
+        return visited.contains(nd);
+    }   
 }

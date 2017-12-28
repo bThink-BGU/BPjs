@@ -21,40 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs;
+package il.ac.bgu.cs.bp.bpjs.analysis.requirements;
 
-import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.analysis.Node;
 import java.util.List;
-import java.util.Objects;
-import static java.util.stream.Collectors.joining;
 
 /**
- * Just a static place for some repeated methods useful for testing.
+ * A requirement for execution paths. The {@link #checkConformance(java.util.List)} method returns {@code true} 
+ * when the execution path complies with the implemented requirement, and {@code false} otherwise.
  * 
+ * @see PathRequirements
  * @author michael
  */
-public abstract class TestUtils {
+public interface PathRequirement {
     
+    String getName();
     
     /**
-     * Preventing the instantiation of subclasses.
+     * Test that {@code trace} conforms to the implemented requirement.
+     * @param trace the BProgram trace thus far. Immutable.
+     * @return {@code true} iff the trace conforms to the requirement {@code this} implements; {@code false} otherwise.
      */
-    private TestUtils(){}
+    boolean checkConformance( List<Node> trace );
     
-    
-    public static String traceEventNamesString( List<Node> trace, String delimiter ) {
-        
-        return trace.stream()
-                    .map(Node::getLastEvent)
-                    .filter(Objects::nonNull)
-                    .map(BEvent::getName)
-                    .collect(joining(delimiter));
-    }
-    
-    public static String eventNamesString( List<BEvent> trace, String delimiter ) {
-        return trace.stream()
-                    .map(BEvent::getName)
-                    .collect(joining(delimiter));
-    }
 }
