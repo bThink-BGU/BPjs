@@ -4,11 +4,11 @@ import static org.junit.Assert.*;
 
 import org.junit.Test;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.StringBProgram;
-import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
+import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 
 public class NodeEqualsTest {
 

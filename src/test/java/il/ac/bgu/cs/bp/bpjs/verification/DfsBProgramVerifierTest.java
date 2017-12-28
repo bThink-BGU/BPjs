@@ -24,19 +24,19 @@
 package il.ac.bgu.cs.bp.bpjs.verification;
 
 import static il.ac.bgu.cs.bp.bpjs.TestUtils.eventNamesString;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramRunnerListener;
-import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
+import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.search.ForgetfulVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.verification.requirements.EventNotPresent;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import static il.ac.bgu.cs.bp.bpjs.TestUtils.traceEventNamesString;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.StringBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.search.BThreadStateVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.verification.listeners.BriefPrintDfsVerifierListener;
 import il.ac.bgu.cs.bp.bpjs.verification.requirements.PathRequirements;

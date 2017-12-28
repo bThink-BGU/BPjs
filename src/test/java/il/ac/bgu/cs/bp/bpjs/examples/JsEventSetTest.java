@@ -3,14 +3,14 @@
  */
 package il.ac.bgu.cs.bp.bpjs.examples;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.StringBProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramRunnerListener;
-import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import il.ac.bgu.cs.bp.bpjs.eventsets.JsEventSet;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
+import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.eventsets.JsEventSet;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import java.net.URISyntaxException;
 import java.util.Arrays;

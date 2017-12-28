@@ -1,15 +1,14 @@
 package il.ac.bgu.cs.bp.bpjs.verification.eventpattern;
 
 
-import il.ac.bgu.cs.bp.bpjs.verification.eventpattern.EventPattern;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 
-import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import static il.ac.bgu.cs.bp.bpjs.eventsets.EventSets.all;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import static il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets.all;
 import static org.junit.Assert.*;
 
 public class EventPatternTest {

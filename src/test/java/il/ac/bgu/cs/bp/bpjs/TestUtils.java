@@ -23,7 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs;
 
-import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.search.Node;
 import java.util.List;
 import java.util.Objects;

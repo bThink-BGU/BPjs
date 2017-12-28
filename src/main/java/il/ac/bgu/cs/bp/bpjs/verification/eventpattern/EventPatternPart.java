@@ -1,7 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.verification.eventpattern;
 
-import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 
 /**
  * Part of an {@link EventPattern}.

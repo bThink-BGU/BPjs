@@ -12,12 +12,12 @@ import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.serialize.ScriptableInputStream;
 import org.mozilla.javascript.serialize.ScriptableOutputStream;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramSyncSnapshot;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.StringBProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.jsproxy.BProgramJsProxy;
-import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
+import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
+import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import java.util.HashMap;
 import java.util.Map;
 import org.mozilla.javascript.NativeContinuation;

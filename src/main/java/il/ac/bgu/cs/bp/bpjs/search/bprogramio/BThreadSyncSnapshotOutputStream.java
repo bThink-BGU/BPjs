@@ -23,9 +23,9 @@
  */
 package il.ac.bgu.cs.bp.bpjs.search.bprogramio;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.jsproxy.BProgramJsProxy;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.jsproxy.BThreadJsProxy;
+import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BThreadJsProxy;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;

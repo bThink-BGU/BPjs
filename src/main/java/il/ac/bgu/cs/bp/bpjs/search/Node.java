@@ -6,9 +6,9 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.Objects;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramSyncSnapshot;
-import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import java.util.Set;
 
 /**

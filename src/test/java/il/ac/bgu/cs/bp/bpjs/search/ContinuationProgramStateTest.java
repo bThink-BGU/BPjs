@@ -23,11 +23,11 @@
  */
 package il.ac.bgu.cs.bp.bpjs.search;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramSyncSnapshot;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.StringBProgram;
-import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
+import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
+import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.mozilla.javascript.NativeArray;

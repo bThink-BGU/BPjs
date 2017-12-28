@@ -23,9 +23,9 @@
  */
 package il.ac.bgu.cs.bp.bpjs.examples;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
+import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 

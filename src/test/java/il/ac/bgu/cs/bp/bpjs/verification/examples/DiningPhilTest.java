@@ -1,6 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.verification.examples;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.search.FullVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.search.Node;
 import il.ac.bgu.cs.bp.bpjs.verification.DfsBProgramVerifier;

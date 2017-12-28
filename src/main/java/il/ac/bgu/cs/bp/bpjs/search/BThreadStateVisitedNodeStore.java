@@ -23,7 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.search;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BThreadSyncSnapshot;
+import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import java.util.HashSet;
 import java.util.Set;
 import org.mozilla.javascript.NativeContinuation;

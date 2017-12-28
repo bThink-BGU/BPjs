@@ -1,6 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.TicTacToe.events;
 
-import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 
 @SuppressWarnings({ "serial" })
 public class StaticEvents {

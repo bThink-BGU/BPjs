@@ -27,8 +27,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
-import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.search.FullVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.search.Node;
 import il.ac.bgu.cs.bp.bpjs.search.VisitedNodeStore;

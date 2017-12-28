@@ -23,7 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.search.bprogramio;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramSyncSnapshot;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import java.io.IOException;
 
 /**

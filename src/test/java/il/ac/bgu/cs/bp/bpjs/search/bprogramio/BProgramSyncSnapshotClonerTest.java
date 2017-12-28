@@ -1,11 +1,11 @@
 package il.ac.bgu.cs.bp.bpjs.search.bprogramio;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramSyncSnapshot;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.InMemoryEventLoggingListener;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramRunnerListener;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
+import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.search.FullVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.verification.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.verification.VerificationResult;

@@ -23,7 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.verification.requirements;
 
-import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
+import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.search.Node;
 import java.util.List;
 

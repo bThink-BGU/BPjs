@@ -3,9 +3,9 @@ package il.ac.bgu.cs.bp.bpjs.verification.eventpattern;
 import java.util.ArrayList;
 import java.util.List;
 
-import il.ac.bgu.cs.bp.bpjs.events.BEvent;
-import il.ac.bgu.cs.bp.bpjs.eventsets.EventSet;
-import il.ac.bgu.cs.bp.bpjs.eventsets.ExplicitEventSet;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
+import il.ac.bgu.cs.bp.bpjs.model.eventsets.ExplicitEventSet;
 
 /**
  * Matches a list of events against a

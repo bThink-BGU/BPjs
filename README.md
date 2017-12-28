@@ -43,6 +43,10 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+## 2017-12-28
+* :arrow_up: Re-arranged package structure, duplicate and ambiguous packages merged. We now have a clean `model`/`execution`/`verification` division. 
+
+
 ## 2017-12-22
 * :bug: `BSyncStatement`s now retain information about the b-thread that created them.
 * :arrow_up: Now using a single `ExecutorService` for the entire JVM (OK, per class-loader). This makes runtime more efficient, resource-wise.
