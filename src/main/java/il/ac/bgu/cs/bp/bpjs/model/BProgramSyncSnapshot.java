@@ -6,7 +6,6 @@ import il.ac.bgu.cs.bp.bpjs.execution.tasks.ResumeBThread;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.StartBThread;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
@@ -21,6 +20,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.Scriptable;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
+import java.util.concurrent.ExecutorService;
 
 /**
  * The state of a {@link BProgram} when all its BThreads are at {@code bsync}.
@@ -34,8 +34,9 @@ public class BProgramSyncSnapshot {
     private final Set<BThreadSyncSnapshot> threadSnapshots;
     private final List<BEvent> externalEvents;
     private final BProgram bprog;
-
-	public boolean triggered=false;
+    
+    /** A flag to ensure the snapshot is only triggered once. */
+    private boolean triggered=false;
     
     public BProgramSyncSnapshot(BProgram aBProgram, Set<BThreadSyncSnapshot> threadSnapshots, List<BEvent> externalEvents) {
         this.threadSnapshots = threadSnapshots;
@@ -51,42 +52,38 @@ public class BProgramSyncSnapshot {
      * Starts the BProgram - runs all the registered b-threads to their first 
      * {@code bsync}. 
      * 
+     * @param exSvc the executor service that will advance the threads.
      * @return A snapshot of the program at the first {@code bsync}.
      * @throws java.lang.InterruptedException
      */
-    public BProgramSyncSnapshot start() throws InterruptedException {
+    public BProgramSyncSnapshot start( ExecutorService exSvc ) throws InterruptedException {
         Set<BThreadSyncSnapshot> nextRound = new HashSet<>(threadSnapshots.size());
-        nextRound.addAll(BProgramRunner.getExecutorService().invokeAll(threadSnapshots.stream()
-                    .map(bt -> new StartBThread(bt))
-                    .collect(toList())
+        nextRound.addAll(exSvc.invokeAll(threadSnapshots.stream()
+                                .map(bt -> new StartBThread(bt))
+                                .collect(toList())
                 ).stream().map(f -> safeGet(f) ).collect(toList())
         );
         
-        executeAllAddedBThreads(nextRound);
+        executeAllAddedBThreads(nextRound, exSvc);
         List<BEvent> nextExternalEvents = new ArrayList<>(getExternalEvents());
         nextExternalEvents.addAll( bprog.drainEnqueuedExternalEvents() );
         return new BProgramSyncSnapshot(bprog, nextRound, nextExternalEvents);
     }
 
-    public BProgramSyncSnapshot triggerEvent(BEvent anEvent) throws InterruptedException {
-    	if(triggered) {
-    		throw new IllegalStateException("A BProgramSyncSnapshot is not allowed to be triggered twice.");
-    	}
-    	
-    	triggered = true;
-    	
-        return triggerEvent(anEvent, Collections.emptySet());
-    }
-    
     /**
      * Runs the program from the snapshot, triggering the passed event.
+     * @param exSvc the executor service that will advance the threads.
      * @param anEvent the event selected.
      * @param listeners 
      * @return A set of b-thread snapshots that should participate in the next cycle.
      * @throws InterruptedException 
      */
-    public BProgramSyncSnapshot triggerEvent(BEvent anEvent, Iterable<BProgramRunnerListener> listeners) throws InterruptedException {
+    public BProgramSyncSnapshot triggerEvent(BEvent anEvent, ExecutorService exSvc, Iterable<BProgramRunnerListener> listeners) throws InterruptedException {
         if (anEvent == null) throw new IllegalArgumentException("Cannot trigger a null event.");
+        if(triggered) {
+            throw new IllegalStateException("A BProgramSyncSnapshot is not allowed to be triggered twice.");
+    	}
+    	triggered = true;
         
         Set<BThreadSyncSnapshot> resumingThisRound = new HashSet<>(threadSnapshots.size());
         Set<BThreadSyncSnapshot> sleepingThisRound = new HashSet<>(threadSnapshots.size());
@@ -106,7 +103,7 @@ public class BProgramSyncSnapshot {
         }
         
         // add the run results of all those who advance this stage
-        nextRound.addAll(BProgramRunner.getExecutorService().invokeAll(
+        nextRound.addAll(exSvc.invokeAll(
                             resumingThisRound.stream()
                                              .map(bt -> new ResumeBThread(bt, anEvent))
                                              .collect(toList())
@@ -115,10 +112,11 @@ public class BProgramSyncSnapshot {
         
         // inform listeners which b-threads completed
         Set<String> nextRoundIds = nextRound.stream().map(t->t.getName()).collect(toSet());
-        resumingThisRound.stream().filter(t->!nextRoundIds.contains(t.getName()))
+        resumingThisRound.stream()
+                .filter(t->!nextRoundIds.contains(t.getName()))
                 .forEach(t->listeners.forEach(l->l.bthreadDone(bprog, t)));
         
-        executeAllAddedBThreads(nextRound);
+        executeAllAddedBThreads(nextRound, exSvc);
         nextExternalEvents.addAll( bprog.drainEnqueuedExternalEvents() );
         
         // carry over BThreads that did not advance this round to next round.
@@ -196,11 +194,11 @@ public class BProgramSyncSnapshot {
      * @param nextRound the set of b-threads that will participate in the next round
      * @throws InterruptedException 
      */
-    private void executeAllAddedBThreads(Set<BThreadSyncSnapshot> nextRound) throws InterruptedException {
+    private void executeAllAddedBThreads(Set<BThreadSyncSnapshot> nextRound, ExecutorService exSvc) throws InterruptedException {
         // if any new bthreads are added, run and add their result
         Set<BThreadSyncSnapshot> added = bprog.drainRecentlyRegisteredBthreads();
         while ( ! added.isEmpty() ) {
-            nextRound.addAll(BProgramRunner.getExecutorService().invokeAll(
+            nextRound.addAll(exSvc.invokeAll(
                     added.stream()
                             .map(bt -> new StartBThread(bt))
                             .collect(toList())

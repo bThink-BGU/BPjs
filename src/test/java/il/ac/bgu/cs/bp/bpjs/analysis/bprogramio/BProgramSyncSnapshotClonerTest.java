@@ -9,6 +9,9 @@ import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.analysis.FullVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
+import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
+import static java.util.Collections.emptySet;
+import java.util.concurrent.ExecutorService;
 import org.junit.Test;
 
 /*
@@ -59,8 +62,12 @@ public class BProgramSyncSnapshotClonerTest {
         System.out.println("\nSTART Serialization test");
         BProgram bprog = new SingleResourceBProgram("BProgramSyncSnapshotClonerTest.js");
         BProgramSyncSnapshot cur = bprog.setup();
-        cur = cur.start();
-        cur.triggerEvent( cur.getStatements().stream().flatMap(s->s.getRequest().stream()).findFirst().get() );
+        ExecutorService exSvc = ExecutorServiceMaker.makeWithName("test");
+        cur = cur.start(exSvc);
+        cur.triggerEvent( 
+                cur.getStatements().stream().flatMap(s->s.getRequest().stream()).findFirst().get(),
+                exSvc,
+                emptySet());
         BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(bprog);
         byte[] out = io.serialize(cur);
         System.out.println("de-serializing\n");

@@ -34,9 +34,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
+import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -47,37 +46,9 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class BProgramRunner {
     
-    // Instance-holder pattern to ensure thread-safe, lazy evaluated, single executor service for this
-    // JVM (or, at least, ClassLoader).
-    public interface ExecutorProvider {
-        ExecutorService get();
-    }
-    
-    private static class ExecutorProviderImpl implements ExecutorProvider {
-        static final ExecutorProviderImpl INSTANCE = new ExecutorProviderImpl();
-        
-        private final ExecutorService prv;
-        private ExecutorProviderImpl(){
-            final ThreadFactory dtf = Executors.defaultThreadFactory();
-            final AtomicInteger threadCoutner = new AtomicInteger(0);
-            ThreadFactory tf = (Runnable r) -> {
-                Thread retVal = dtf.newThread(r);
-                retVal.setName("bpjs-executor-" + threadCoutner.incrementAndGet());
-                return retVal;
-            };
-            prv = Executors.newCachedThreadPool(tf);
-        }
-        
-        @Override
-        public ExecutorService get() {
-            return prv;
-        }
-    }
-    
-    public static ExecutorService getExecutorService() {
-        return ExecutorProviderImpl.INSTANCE.get();
-    }
-    
+    private static final AtomicInteger INSTANCE_COUNTER = new AtomicInteger(0);
+    private final int instanceNum = INSTANCE_COUNTER.incrementAndGet();
+    private ExecutorService execSvc = null;
     private BProgram bprog = null;
     private final List<BProgramRunnerListener> listeners = new ArrayList<>();
     
@@ -92,7 +63,8 @@ public class BProgramRunner {
     }
     
     public void start() throws InterruptedException {
-        // setup bprogram
+        // setup bprogram and runtime parts.
+        execSvc = ExecutorServiceMaker.makeWithName("BProgramRunner-" + instanceNum );
         listeners.forEach(l -> l.starting(bprog));
         BProgramSyncSnapshot cur = bprog.setup();
         
@@ -100,7 +72,7 @@ public class BProgramRunner {
         
         // start it
         listeners.forEach(l -> l.started(bprog));
-        cur = cur.start();
+        cur = cur.start(execSvc);
         
         // while snapshot not empty, select an event and get the next snapshot.
         boolean go=true;
@@ -141,7 +113,7 @@ public class BProgramRunner {
                     }
                     
                     listeners.forEach(l->l.eventSelected(bprog, esr.getEvent())); 
-                    cur = cur.triggerEvent(esr.getEvent(), listeners);
+                    cur = cur.triggerEvent(esr.getEvent(), execSvc, listeners);
                     
                 } else {
                     go = false;

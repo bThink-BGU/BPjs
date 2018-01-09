@@ -23,13 +23,17 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
+import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import static java.util.Collections.emptySet;
+import java.util.concurrent.ExecutorService;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import org.junit.Before;
 import org.mozilla.javascript.NativeContinuation;
 
 /**
@@ -87,13 +91,15 @@ public class ContinuationProgramStateTest {
                     + "   bsync({request: bp.Event(\"e\")});\n"
                     + "});";
     
+    ExecutorService exSvc;
+    
     @Test
     public void testCorrectExtraction() throws Exception {
          
         // Generate a continuation
         BProgram bprog = new StringBProgram(SRC);
         BProgramSyncSnapshot cur = bprog.setup();
-        cur = cur.start();
+        cur = cur.start(exSvc);
         final BThreadSyncSnapshot snapshot = cur.getBThreadSnapshots().iterator().next();
         
         // Read frame data
@@ -113,7 +119,7 @@ public class ContinuationProgramStateTest {
         // Generate a continuation
         BProgram bprog = new StringBProgram(SRC);
         BProgramSyncSnapshot cur = bprog.setup();
-        cur = cur.start();
+        cur = cur.start(exSvc);
         final BThreadSyncSnapshot snapshot = cur.getBThreadSnapshots().iterator().next();
         
         // Read frame data
@@ -130,7 +136,7 @@ public class ContinuationProgramStateTest {
         // Generate continuation 1
         BProgram bprog = new StringBProgram(SRC_WITH_COMPOUND_VARS);
         BProgramSyncSnapshot cur = bprog.setup();
-        cur = cur.start();
+        cur = cur.start(exSvc);
         BThreadSyncSnapshot snapshot = cur.getBThreadSnapshots().iterator().next();
         NativeContinuation nc = (NativeContinuation) snapshot.getContinuation();
         ContinuationProgramState sut1 = new ContinuationProgramState(nc);
@@ -138,7 +144,7 @@ public class ContinuationProgramStateTest {
         // Generate Continuation 2
         bprog = new StringBProgram(SRC_WITH_COMPOUND_VARS);
         cur = bprog.setup();
-        cur = cur.start();
+        cur = cur.start(exSvc);
         snapshot = cur.getBThreadSnapshots().iterator().next();
         
         // Read frame data
@@ -171,7 +177,7 @@ public class ContinuationProgramStateTest {
         // Generate snapshot 1
         BProgram bprog = new StringBProgram(SRC_LOOP_UPDATED_VAR);
         BProgramSyncSnapshot cur = bprog.setup();
-        cur = cur.start();
+        cur = cur.start(exSvc);
         BThreadSyncSnapshot snapshot = cur.getBThreadSnapshots().iterator().next();
         NativeContinuation nc = (NativeContinuation) snapshot.getContinuation();
         ContinuationProgramState sut1 = new ContinuationProgramState(nc);
@@ -180,7 +186,7 @@ public class ContinuationProgramStateTest {
         assertEquals( "a", sut1.getVisibleVariables().get("str"));
         
         // Generate snapshot 2, pre-loop
-        cur = cur.triggerEvent(new BEvent("e"));
+        cur = cur.triggerEvent(new BEvent("e"), exSvc, emptySet());
         snapshot = cur.getBThreadSnapshots().iterator().next();
         nc = (NativeContinuation) snapshot.getContinuation();
         ContinuationProgramState sut2 = new ContinuationProgramState(nc);
@@ -188,7 +194,7 @@ public class ContinuationProgramStateTest {
         assertEquals( 42.0, sut2.getVisibleVariables().get("dbl"));
         
         // Generate snapshot 3, first loop
-        cur = cur.triggerEvent(new BEvent("e"));
+        cur = cur.triggerEvent(new BEvent("e"), exSvc, emptySet());
         snapshot = cur.getBThreadSnapshots().iterator().next();
         nc = (NativeContinuation) snapshot.getContinuation();
         ContinuationProgramState sut3 = new ContinuationProgramState(nc);
@@ -196,7 +202,7 @@ public class ContinuationProgramStateTest {
         assertEquals( "ba", sut3.getVisibleVariables().get("str"));
         
         // Generate snapshot 4, second loop
-        cur = cur.triggerEvent(new BEvent("e"));
+        cur = cur.triggerEvent(new BEvent("e"), exSvc, emptySet());
         snapshot = cur.getBThreadSnapshots().iterator().next();
         nc = (NativeContinuation) snapshot.getContinuation();
         ContinuationProgramState sut4 = new ContinuationProgramState(nc);
@@ -230,19 +236,19 @@ public class ContinuationProgramStateTest {
         // Generate snapshot 1
         BProgram bprog = new StringBProgram(SRC_LOOP);
         BProgramSyncSnapshot cur = bprog.setup();
-        cur = cur.start();
+        cur = cur.start(exSvc);
         BThreadSyncSnapshot snapshot = cur.getBThreadSnapshots().iterator().next();
         NativeContinuation nc = (NativeContinuation) snapshot.getContinuation();
         ContinuationProgramState sutPre = new ContinuationProgramState(nc);
         
-        cur = cur.triggerEvent(new BEvent("e"));
+        cur = cur.triggerEvent(new BEvent("e"), exSvc, emptySet());
         snapshot = cur.getBThreadSnapshots().iterator().next();
         nc = (NativeContinuation) snapshot.getContinuation();
         ContinuationProgramState sutLoop1 = new ContinuationProgramState(nc);
         
         // Generate more snapshots
         for ( int i=0; i<10; i++ ) {
-            cur = cur.triggerEvent(new BEvent("e"));
+            cur = cur.triggerEvent(new BEvent("e"), exSvc, emptySet());
             snapshot = cur.getBThreadSnapshots().iterator().next();
             nc = (NativeContinuation) snapshot.getContinuation();
             ContinuationProgramState sutCurLoop = new ContinuationProgramState(nc);
@@ -259,7 +265,7 @@ public class ContinuationProgramStateTest {
         // Generate a continuation
         BProgram bprog = new StringBProgram(SRC);
         BProgramSyncSnapshot cur = bprog.setup();
-        cur = cur.start();
+        cur = cur.start(exSvc);
         final BThreadSyncSnapshot snapshot1 = cur.getBThreadSnapshots().iterator().next();
         
         // Read frame data of P1
@@ -268,7 +274,7 @@ public class ContinuationProgramStateTest {
         
         bprog = new StringBProgram(SRC_SHORT);
         cur = bprog.setup();
-        cur = cur.start();
+        cur = cur.start(exSvc);
         final BThreadSyncSnapshot snapshot2 = cur.getBThreadSnapshots().iterator().next();
         NativeContinuation nc2 = (NativeContinuation) snapshot2.getContinuation();
         ContinuationProgramState sut2 = new ContinuationProgramState(nc2);
@@ -283,7 +289,7 @@ public class ContinuationProgramStateTest {
         // Generate a continuation
         BProgram bprog = new StringBProgram(SRC_SHORT);
         BProgramSyncSnapshot cur = bprog.setup();
-        cur = cur.start();
+        cur = cur.start(exSvc);
         BThreadSyncSnapshot snapshot = cur.getBThreadSnapshots().iterator().next();
         
         // Read frame data of P1
@@ -294,7 +300,7 @@ public class ContinuationProgramStateTest {
         
         bprog = new StringBProgram(SRC_MORE_FUNC);
         cur = bprog.setup();
-        cur = cur.start();
+        cur = cur.start(exSvc);
         snapshot = cur.getBThreadSnapshots().iterator().next();
         
         // Read frame data of P1
@@ -302,5 +308,10 @@ public class ContinuationProgramStateTest {
         ContinuationProgramState sut2 = new ContinuationProgramState(nc);
         
         assertEquals(1, sut2.getFrameIndex());
+    }
+    
+    @Before
+    public void setup() {
+        exSvc = ExecutorServiceMaker.makeWithName("Test");
     }
 }

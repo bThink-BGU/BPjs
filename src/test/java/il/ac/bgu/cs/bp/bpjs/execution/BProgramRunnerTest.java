@@ -67,7 +67,7 @@ public class BProgramRunnerTest {
         new BProgramRunner(bprog).start();
         String exName = bprog.getFromGlobalScope("exName", String.class).get();
         assertTrue( "Java executor name is wrong (got:'" + exName + "')", 
-                exName.startsWith("bpjs-executor-"));
+                exName.startsWith("BProgramRunner-"));
     }
 
 }

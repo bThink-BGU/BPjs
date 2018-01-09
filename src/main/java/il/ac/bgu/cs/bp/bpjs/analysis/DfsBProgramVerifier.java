@@ -29,12 +29,12 @@ import java.util.List;
 
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.analysis.FullVisitedNodeStore;
-import il.ac.bgu.cs.bp.bpjs.analysis.Node;
-import il.ac.bgu.cs.bp.bpjs.analysis.VisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.requirements.PathRequirement;
 import il.ac.bgu.cs.bp.bpjs.analysis.requirements.PathRequirements;
+import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import java.util.Optional;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * 
@@ -46,7 +46,7 @@ import java.util.Optional;
  * @author michael
  */
 public class DfsBProgramVerifier {
-
+    private static final AtomicInteger INSTANCE_COUNTER = new AtomicInteger();
     public final static long DEFAULT_MAX_TRACE = 100;
     
     /** 
@@ -64,13 +64,14 @@ public class DfsBProgramVerifier {
         void done( DfsBProgramVerifier v );
     }
     
-	private long visitedStatesCount;
+    private long visitedStatesCount;
     private VisitedNodeStore visited = new FullVisitedNodeStore();
     private long maxTraceLength = DEFAULT_MAX_TRACE;
     private final ArrayList<Node> currentPath = new ArrayList<>();
     private Optional<ProgressListener> listenerOpt = Optional.empty();
     private long iterationCountGap = DEFAULT_ITERATION_COUNT_GAP;
     private BProgram currentBProgram;
+    private ExecutorService execSvc = ExecutorServiceMaker.makeWithName("DfsBProgramRunner-" + INSTANCE_COUNTER.incrementAndGet());
     private boolean debugMode = false;
     
     /**
@@ -84,7 +85,7 @@ public class DfsBProgramVerifier {
         currentPath.clear();
         long start = System.currentTimeMillis();
         listenerOpt.ifPresent(l->l.started(this));
-        List<Node> counterEx = dfsUsingStack(Node.getInitialNode(aBp));
+        List<Node> counterEx = dfsUsingStack(Node.getInitialNode(aBp, execSvc));
         long end = System.currentTimeMillis();
         listenerOpt.ifPresent(l->l.done(this));
         return new VerificationResult(counterEx, end-start, visitedStatesCount);
@@ -143,7 +144,7 @@ public class DfsBProgramVerifier {
     protected Node getUnvisitedNextNode(Node src) throws Exception {
         while ( src.getEventIterator().hasNext() ) {
             final BEvent nextEvent = src.getEventIterator().next();
-            Node possibleNextNode = src.getNextNode(nextEvent);
+            Node possibleNextNode = src.getNextNode(nextEvent, execSvc);
             if ( ! visited.isVisited(possibleNextNode) ) {
                 return possibleNextNode;
             }
