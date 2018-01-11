@@ -43,10 +43,14 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+## 2018-01-11
+* :sparkles: During forward execution, b-threads can halt execution using `bp.ASSERT(boolean, text)`.
+* :arrow_up: Refactored the engine tasks to support raising assertions. Reduced some code duplication in the way.
+* :arrow_up: Thread pools executing b-threads are now allocated per-executor/verifier (as opposed to using a single static pool). 
+
 ## 2017-12-28
 * :arrow_up: Re-arranged package structure, duplicate and ambiguous packages merged. We now have a clean `model`/`execution`/`analysis` division. 
 * :bug: Fixed an equality bug in `OrderedSet`.
-
 
 ## 2017-12-22
 * :bug: `BSyncStatement`s now retain information about the b-thread that created them.

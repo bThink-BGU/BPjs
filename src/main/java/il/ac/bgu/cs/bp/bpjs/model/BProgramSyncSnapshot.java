@@ -1,6 +1,5 @@
 package il.ac.bgu.cs.bp.bpjs.model;
 
-import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BProgramException;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.ResumeBThread;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.StartBThread;
@@ -20,7 +19,9 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.Scriptable;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
+import il.ac.bgu.cs.bp.bpjs.execution.tasks.BPEngineTask;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicReference;
 
 /**
  * The state of a {@link BProgram} when all its BThreads are at {@code bsync}.
@@ -34,18 +35,39 @@ public class BProgramSyncSnapshot {
     private final Set<BThreadSyncSnapshot> threadSnapshots;
     private final List<BEvent> externalEvents;
     private final BProgram bprog;
+    private final AtomicReference<FailedAssertion> violationRecord = new AtomicReference<>();
     
     /** A flag to ensure the snapshot is only triggered once. */
     private boolean triggered=false;
     
-    public BProgramSyncSnapshot(BProgram aBProgram, Set<BThreadSyncSnapshot> threadSnapshots, List<BEvent> externalEvents) {
-        this.threadSnapshots = threadSnapshots;
-        this.externalEvents = externalEvents;
+    /**
+     * A listener that populates the {@link #violationRecord} field, and 
+     * shuts down the {@link ExecutorService} running the tasks.
+     */
+    private class HaltOnAssertion implements BPEngineTask.Listener {
+        private final ExecutorService exSvc;
+
+        public HaltOnAssertion(ExecutorService exSvc) {
+            this.exSvc = exSvc;
+        }
+        
+        @Override
+        public void assertionFailed(FailedAssertion fa) {
+            violationRecord.compareAndSet(null, fa);
+            exSvc.shutdownNow();
+        }
+    }
+    
+    public BProgramSyncSnapshot(BProgram aBProgram, Set<BThreadSyncSnapshot> someThreadSnapshots,
+                                List<BEvent> someExternalEvents, FailedAssertion aViolationRecord ) {
+        threadSnapshots = someThreadSnapshots;
+        externalEvents = someExternalEvents;
         bprog = aBProgram;
+        violationRecord.set(aViolationRecord);
     }
     
     public BProgramSyncSnapshot copyWith( List<BEvent> updatedExternalEvents ) {
-        return new BProgramSyncSnapshot(bprog, threadSnapshots, updatedExternalEvents);
+        return new BProgramSyncSnapshot(bprog, threadSnapshots, updatedExternalEvents, violationRecord.get());
     }
 
     /**
@@ -58,16 +80,17 @@ public class BProgramSyncSnapshot {
      */
     public BProgramSyncSnapshot start( ExecutorService exSvc ) throws InterruptedException {
         Set<BThreadSyncSnapshot> nextRound = new HashSet<>(threadSnapshots.size());
+        BPEngineTask.Listener halter = new HaltOnAssertion(exSvc);
         nextRound.addAll(exSvc.invokeAll(threadSnapshots.stream()
-                                .map(bt -> new StartBThread(bt))
+                                .map(bt -> new StartBThread(bt, halter))
                                 .collect(toList())
                 ).stream().map(f -> safeGet(f) ).collect(toList())
         );
-        
-        executeAllAddedBThreads(nextRound, exSvc);
+        // FIXME test for assertion failures
+        executeAllAddedBThreads(nextRound, exSvc, halter);
         List<BEvent> nextExternalEvents = new ArrayList<>(getExternalEvents());
         nextExternalEvents.addAll( bprog.drainEnqueuedExternalEvents() );
-        return new BProgramSyncSnapshot(bprog, nextRound, nextExternalEvents);
+        return new BProgramSyncSnapshot(bprog, nextRound, nextExternalEvents, violationRecord.get());
     }
 
     /**
@@ -80,7 +103,7 @@ public class BProgramSyncSnapshot {
      */
     public BProgramSyncSnapshot triggerEvent(BEvent anEvent, ExecutorService exSvc, Iterable<BProgramRunnerListener> listeners) throws InterruptedException {
         if (anEvent == null) throw new IllegalArgumentException("Cannot trigger a null event.");
-        if(triggered) {
+        if ( triggered ) {
             throw new IllegalStateException("A BProgramSyncSnapshot is not allowed to be triggered twice.");
     	}
     	triggered = true;
@@ -102,10 +125,11 @@ public class BProgramSyncSnapshot {
             Context.exit();
         }
         
+        BPEngineTask.Listener halter = new HaltOnAssertion(exSvc);
         // add the run results of all those who advance this stage
         nextRound.addAll(exSvc.invokeAll(
                             resumingThisRound.stream()
-                                             .map(bt -> new ResumeBThread(bt, anEvent))
+                                             .map(bt -> new ResumeBThread(bt, anEvent, halter))
                                              .collect(toList())
                 ).stream().map(f -> safeGet(f) ).filter(Objects::nonNull).collect(toList())
         );
@@ -116,13 +140,14 @@ public class BProgramSyncSnapshot {
                 .filter(t->!nextRoundIds.contains(t.getName()))
                 .forEach(t->listeners.forEach(l->l.bthreadDone(bprog, t)));
         
-        executeAllAddedBThreads(nextRound, exSvc);
+        executeAllAddedBThreads(nextRound, exSvc, halter);
         nextExternalEvents.addAll( bprog.drainEnqueuedExternalEvents() );
         
         // carry over BThreads that did not advance this round to next round.
         nextRound.addAll(sleepingThisRound);
         
-        return new BProgramSyncSnapshot(bprog, nextRound, nextExternalEvents);
+        
+        return new BProgramSyncSnapshot(bprog, nextRound, nextExternalEvents, violationRecord.get());
     }
 
     private void handleInterrupts(BEvent anEvent, Iterable<BProgramRunnerListener> listeners, BProgram bprog, Context ctxt) {
@@ -140,7 +165,7 @@ public class BProgramSyncSnapshot {
                             try {
                                 ctxt.callFunctionWithContinuations(func, scope, new Object[]{anEvent});
                             } catch ( ContinuationPending ise ) {
-                                throw new BProgramException("Cannot call bsync from a break-upon handler. Consider pushing an external event.");
+                                throw new BProgramException("Cannot call bsync from a break-upon handler. Please consider pushing an external event.");
                             }
                         });
             });
@@ -178,6 +203,22 @@ public class BProgramSyncSnapshot {
         return bprog;
     }
     
+    /**
+     * If the b-program has violated some requirement while getting to {@code this}
+     * state, it is considered to be in <b>invalid</b> state. This happens when
+     * a b-thread makes an failed assertion.
+     * 
+     * @return {@code true} iff the program is in valid state.
+     * @see #getFailedAssertion() 
+     */
+    public boolean isStateValid() {
+        return violationRecord.get() == null;
+    }
+    
+    public FailedAssertion getFailedAssertion() {
+        return violationRecord.get();
+    }
+    
     private BThreadSyncSnapshot safeGet(Future<BThreadSyncSnapshot> fbss) {
         try {
             return fbss.get();
@@ -190,42 +231,41 @@ public class BProgramSyncSnapshot {
     /**
      * Executes and adds all newly registered b-threads, until no more new b-threads 
      * are registered.
-     * @param listeners
      * @param nextRound the set of b-threads that will participate in the next round
+     * @param exSvc The executor service to run the b-threads
+     * @param assertionListener handling assertion failures, if they happen.
      * @throws InterruptedException 
      */
-    private void executeAllAddedBThreads(Set<BThreadSyncSnapshot> nextRound, ExecutorService exSvc) throws InterruptedException {
+    private void executeAllAddedBThreads(Set<BThreadSyncSnapshot> nextRound, ExecutorService exSvc, BPEngineTask.Listener assertionListener) throws InterruptedException {
         // if any new bthreads are added, run and add their result
         Set<BThreadSyncSnapshot> added = bprog.drainRecentlyRegisteredBthreads();
         while ( ! added.isEmpty() ) {
             nextRound.addAll(exSvc.invokeAll(
                     added.stream()
-                            .map(bt -> new StartBThread(bt))
+                            .map(bt -> new StartBThread(bt, assertionListener))
                             .collect(toList())
             ).stream().map(f -> safeGet(f) ).filter(Objects::nonNull).collect(toList()));
             added = bprog.drainRecentlyRegisteredBthreads();
         }
     }
 
-	@Override
-	public int hashCode() {
-		final int prime = 31;
-		int result = 1;
-		result = prime * result + ((threadSnapshots == null) ? 0 : threadSnapshots.hashCode());
-		return result;
-	}
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime * result + ((threadSnapshots == null) ? 0 : threadSnapshots.hashCode());
+        return result;
+    }
 
-	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
-			return true;
-		if (obj == null)
-			return false;
-		if (getClass() != obj.getClass())
-			return false;
-		BProgramSyncSnapshot other = (BProgramSyncSnapshot) obj;
-		return Objects.equals(threadSnapshots, other.threadSnapshots);
-	}
-
-
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null)
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        BProgramSyncSnapshot other = (BProgramSyncSnapshot) obj;
+        return Objects.equals(threadSnapshots, other.threadSnapshots);
+    }
 }

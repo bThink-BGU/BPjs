@@ -1,10 +1,10 @@
 package il.ac.bgu.cs.bp.bpjs.execution.listeners;
 
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import java.util.ArrayList;
 import java.util.List;
+import static java.util.stream.Collectors.toList;
 
 /**
  * A BProgram listener that logs all events in an in-memory list.
@@ -12,7 +12,7 @@ import java.util.List;
  * 
  * @author michael
  */
-public class InMemoryEventLoggingListener implements BProgramRunnerListener {
+public class InMemoryEventLoggingListener extends BProgramRunnerListenerAdapter {
     
     private final List<BEvent> events = new ArrayList<>();
     
@@ -31,37 +31,21 @@ public class InMemoryEventLoggingListener implements BProgramRunnerListener {
         return events;
     }
     
+    /**
+     * Convenience method for getting only the names of the events.
+     * @return list of event names, by order of selection.
+     */
+    public List<String> eventNames() {
+        return events.stream().map(BEvent::getName).collect( toList() );
+    }
+    
     @Override
     public void starting(BProgram bp) {
         events.clear();
-    }
-    
-    @Override
-    public void started(BProgram bp) {
-    }
-
-    @Override
-    public void bthreadAdded(BProgram bp, BThreadSyncSnapshot theBThread) {
-    }
-
-    @Override
-    public void bthreadRemoved(BProgram bp, BThreadSyncSnapshot theBThread) {
-    }
-    
-    @Override
-    public void bthreadDone(BProgram bp, BThreadSyncSnapshot theBThread) {
     }
 
     @Override
     public void eventSelected(BProgram bp, BEvent theEvent) {
         events.add(theEvent);
-    }
-
-    @Override
-    public void superstepDone(BProgram bp) {
-    }
-
-    @Override
-    public void ended(BProgram bp) {}
-    
+    }    
 }

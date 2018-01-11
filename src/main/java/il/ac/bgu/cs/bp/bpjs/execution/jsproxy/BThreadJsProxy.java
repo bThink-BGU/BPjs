@@ -6,6 +6,7 @@ package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;

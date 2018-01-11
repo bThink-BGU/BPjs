@@ -9,6 +9,7 @@ import java.util.concurrent.*;
 
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsCodeEvaluationException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
+import il.ac.bgu.cs.bp.bpjs.execution.tasks.FailedAssertionException;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,6 +22,7 @@ import org.mozilla.javascript.Scriptable;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.EvaluatorException;
+import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.WrappedException;
 
 /**
@@ -263,7 +265,7 @@ public abstract class BProgram {
         if ( eventSelectionStrategy==null ) {
             eventSelectionStrategy = new SimpleEventSelectionStrategy();
         }
-        
+        FailedAssertion failedAssertion = null;
         try {
             Context cx = ContextFactory.getGlobal().enterContext();
             cx.setOptimizationLevel(-1); // must use interpreter mode
@@ -276,24 +278,33 @@ public abstract class BProgram {
             if ( appendedCode != null ) {
                 appendedCode.forEach( s -> evaluate(s, "appendedCode") );
             }
+            
+        } catch ( FailedAssertionException fae ) {
+            failedAssertion = new FailedAssertion(fae.getMessage(), "---init_code");
+            
         } finally {
             Context.exit();
         }
         
         started = true;
-        return new BProgramSyncSnapshot(this, bthreads, Collections.emptyList());
+        return new BProgramSyncSnapshot(this, bthreads, Collections.emptyList(), failedAssertion);
     }
 
     private void initProgramScope(Context cx) {
         // load and execute globalScopeInit.js
         ImporterTopLevel importer = new ImporterTopLevel(cx);
         programScope = cx.initStandardObjects(importer);
-
         BProgramJsProxy proxy = new BProgramJsProxy(this);
         programScope.put("bp", programScope,
                 Context.javaToJS(proxy, programScope));
+        
+        // Re-wire "testAssertion" to "assert". This is needed since "assert" is a Java keyword.
+//        ScriptableObject bpJsObject = (ScriptableObject) programScope.get("bp", programScope);
+//        Object assertionHandle = bpJsObject.get("testAssertion", programScope);
+//        bpJsObject.delete("testAssertion");
+//        bpJsObject.put("assert", bpJsObject, assertionHandle);
 
-//        evaluateResource("globalScopeInit.js"); <-- Currently not needed. Leaving in as we might need it soon.
+//        evaluateResource("globalScopeInit.js");// <-- Currently not needed. Leaving in as we might need it soon.
         initialScopeValues.entrySet().forEach(e->putInGlobalScope(e.getKey(), e.getValue()));
         initialScopeValues=null;
     }

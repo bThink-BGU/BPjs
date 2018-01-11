@@ -3,6 +3,7 @@ package il.ac.bgu.cs.bp.bpjs.execution.listeners;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
 import java.io.PrintStream;
 
 /**
@@ -35,6 +36,12 @@ public class PrintBProgramRunnerListener implements BProgramRunnerListener {
     @Override
     public void ended(BProgram bp) {
         out.println("---:" + bp.getName() + " Ended");
+    }
+
+    @Override
+    public void assertionFailed(BProgram bp, FailedAssertion theFailedAssertion) {
+        out.println("---:" + bp.getName() + " B-thread " + theFailedAssertion.getbThreadName()
+                           + " is in invalid state: " + theFailedAssertion.getMessage());
     }
 
     @Override

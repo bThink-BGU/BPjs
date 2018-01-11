@@ -30,6 +30,7 @@ import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BThreadJsProxy;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -52,127 +53,133 @@ import org.mozilla.javascript.serialize.ScriptableInputStream;
  */
 public class BProgramSyncSnapshotIO {
 
-	private static class Header implements java.io.Serializable {
+    private static class Header implements java.io.Serializable {
 
-		public Header(int bthreadCount, int externalEventCount) {
-			this.bthreadCount = bthreadCount;
-			this.externalEventCount = externalEventCount;
-		}
+        public Header(int bthreadCount, int externalEventCount, FailedAssertion fa) {
+            this.bthreadCount = bthreadCount;
+            this.externalEventCount = externalEventCount;
+            this.fa = fa;
+        }
 
-		final int bthreadCount;
-		final int externalEventCount;
-	}
+        final int bthreadCount;
+        final int externalEventCount;
+        final FailedAssertion fa;
+    }
 
-	private final BProgram bprogram;
+    private final BProgram bprogram;
 
-	public BProgramSyncSnapshotIO(BProgram bprogram) {
-		this.bprogram = bprogram;
-	}
+    public BProgramSyncSnapshotIO(BProgram bprogram) {
+        this.bprogram = bprogram;
+    }
 
-	public byte[] serialize(BProgramSyncSnapshot bpss) throws IOException {
-		try {
-			Context ctxt = Context.enter(); // need Javascript environment for
-											// this, even though we're not
-											// executing code per se.
+    public byte[] serialize(BProgramSyncSnapshot bpss) throws IOException {
+        try {
+            Context ctxt = Context.enter(); // need Javascript environment for
+            // this, even though we're not
+            // executing code per se.
 
-			final ScriptableObject globalScope = ctxt.initStandardObjects();
-            
-			try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                    ObjectOutputStream outs = new ObjectOutputStream(bytes)) {
-                
-				outs.writeObject(new Header(bpss.getBThreadSnapshots().size(), bpss.getExternalEvents().size()));
-				
-				for (BThreadSyncSnapshot bss : bpss.getBThreadSnapshots()) {
-					writeBThreadSnapshot(bss, outs, globalScope);
-				}
-				
-				for (BEvent ee : bpss.getExternalEvents()) {
-					outs.writeObject(ee);
-				}
-				outs.flush();
+            final ScriptableObject globalScope = ctxt.initStandardObjects();
 
-				return bytes.toByteArray();
-			}
+            try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                ObjectOutputStream outs = new ObjectOutputStream(bytes)) {
+
+                outs.writeObject(new Header(bpss.getBThreadSnapshots().size(), bpss.getExternalEvents().size(), bpss.getFailedAssertion()));
+
+                for (BThreadSyncSnapshot bss : bpss.getBThreadSnapshots()) {
+                    writeBThreadSnapshot(bss, outs, globalScope);
+                }
+
+                for (BEvent ee : bpss.getExternalEvents()) {
+                    outs.writeObject(ee);
+                }
+                outs.flush();
+
+                return bytes.toByteArray();
+            }
 
         } finally {
-			Context.exit();
-		}
-	}
+            Context.exit();
+        }
+    }
 
-	public BProgramSyncSnapshot deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
-		try {
-			Context ctxt = ContextFactory.getGlobal().enterContext();
+    public BProgramSyncSnapshot deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
+        try {
+            Context ctxt = ContextFactory.getGlobal().enterContext();
 
-			// must use interpreter mode
-			ctxt.setOptimizationLevel(-1);
-			final ScriptableObject globalScope = ctxt.initStandardObjects();
-            
-			try (ScriptableInputStream sis = 
-                    new ScriptableInputStream(new ByteArrayInputStream(bytes), globalScope)) {
-				Header header = (Header) sis.readObject();
-			
-				Set<BThreadSyncSnapshot> bthreads = new HashSet<>(header.bthreadCount);
+            // must use interpreter mode
+            ctxt.setOptimizationLevel(-1);
+            final ScriptableObject globalScope = ctxt.initStandardObjects();
 
-				for (int i = 0; i < header.bthreadCount; i++) {
-					bthreads.add(readBThreadSnapshot(sis, globalScope));
-				}
+            try (ScriptableInputStream sis
+                = new ScriptableInputStream(new ByteArrayInputStream(bytes), globalScope)) {
+                Header header = (Header) sis.readObject();
 
-				List<BEvent> events = new ArrayList<>(header.externalEventCount);
-				for (int i = 0; i < header.externalEventCount; i++) {
-					events.add((BEvent) sis.readObject());
-				}
+                Set<BThreadSyncSnapshot> bthreads = new HashSet<>(header.bthreadCount);
 
-				return new BProgramSyncSnapshot(bprogram, bthreads, events);
-			}
-		} finally {
-			Context.exit();
-		}
-	}
-    
-    private void writeBThreadSnapshot( BThreadSyncSnapshot bss, ObjectOutputStream outs, ScriptableObject scope ) throws IOException {
+                for (int i = 0; i < header.bthreadCount; i++) {
+                    bthreads.add(readBThreadSnapshot(sis, globalScope));
+                }
+
+                List<BEvent> events = new ArrayList<>(header.externalEventCount);
+                for (int i = 0; i < header.externalEventCount; i++) {
+                    events.add((BEvent) sis.readObject());
+                }
+
+                return new BProgramSyncSnapshot(bprogram, bthreads, events, header.fa);
+            }
+        } finally {
+            Context.exit();
+        }
+    }
+
+    private void writeBThreadSnapshot(BThreadSyncSnapshot bss, ObjectOutputStream outs, ScriptableObject scope) throws IOException {
         outs.writeObject(bss.getName());
-        
+
         ByteArrayOutputStream bthreadBytes = new ByteArrayOutputStream();
-        try( BThreadSyncSnapshotOutputStream btos = new BThreadSyncSnapshotOutputStream(bthreadBytes, scope) ) {
+        try (BThreadSyncSnapshotOutputStream btos = new BThreadSyncSnapshotOutputStream(bthreadBytes, scope)) {
             btos.writeObject(bss.getScope());
             btos.writeObject(bss.getEntryPoint());
-            btos.writeObject(bss.getInterrupt().orElseGet(()->null));
+            btos.writeObject(bss.getInterrupt().orElseGet(() -> null));
             btos.writeObject(bss.getBSyncStatement());
-            
+
             btos.writeObject(bss.getContinuation());
-            btos.flush();            
+            btos.flush();
         }
         bthreadBytes.flush();
         bthreadBytes.close();
         outs.writeObject(bthreadBytes.toByteArray());
     }
-    
-    private BThreadSyncSnapshot readBThreadSnapshot( ScriptableInputStream sis, ScriptableObject scope ) throws IOException, ClassNotFoundException {
+
+    private BThreadSyncSnapshot readBThreadSnapshot(ScriptableInputStream sis, ScriptableObject scope) throws IOException, ClassNotFoundException {
         String name = (String) sis.readObject();
         byte[] contBytes = (byte[]) sis.readObject();
-        
+
         final BThreadJsProxy btProxy = new BThreadJsProxy();
         final BProgramJsProxy bpProxy = new BProgramJsProxy(bprogram);
-        
+
         StubProvider stubPrv = (StreamObjectStub stub) -> {
-            if ( stub == StreamObjectStub.BP_PROXY ) return bpProxy;
-            if ( stub == StreamObjectStub.BT_PROXY ) return btProxy;
+            if (stub == StreamObjectStub.BP_PROXY) {
+                return bpProxy;
+            }
+            if (stub == StreamObjectStub.BT_PROXY) {
+                return btProxy;
+            }
             throw new IllegalArgumentException("Unknown stub " + stub);
         };
-        
-        try ( ByteArrayInputStream inBytes = new ByteArrayInputStream(contBytes);
-                BThreadSyncSnapshotInputStream bssis = new BThreadSyncSnapshotInputStream(inBytes, scope, stubPrv) ) {
-            Scriptable btScope        = (Scriptable) bssis.readObject();
-            Function entryPoint       = (Function)bssis.readObject();
-            Function interruptHandler = (Function)bssis.readObject();
-            BSyncStatement stmt       = (BSyncStatement) bssis.readObject();
-            Object cont               = bssis.readObject();
+
+        try (ByteArrayInputStream inBytes = new ByteArrayInputStream(contBytes);
+            BThreadSyncSnapshotInputStream bssis = new BThreadSyncSnapshotInputStream(inBytes, scope, stubPrv)) {
+            Scriptable btScope = (Scriptable) bssis.readObject();
+            Function entryPoint = (Function) bssis.readObject();
+            Function interruptHandler = (Function) bssis.readObject();
+            BSyncStatement stmt = (BSyncStatement) bssis.readObject();
+            Object cont = bssis.readObject();
             final BThreadSyncSnapshot bThreadSyncSnapshot = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, btScope, cont, stmt);
 
             btProxy.setBThread(bThreadSyncSnapshot);
             return bThreadSyncSnapshot;
         }
-        
+
     }
-    
+
 }

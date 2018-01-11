@@ -35,6 +35,7 @@ import java.util.Optional;
 import java.util.Set;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
+import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -51,6 +52,7 @@ public class BProgramRunner {
     private ExecutorService execSvc = null;
     private BProgram bprog = null;
     private final List<BProgramRunnerListener> listeners = new ArrayList<>();
+    private FailedAssertion failedAssertion;
     
     public BProgramRunner(){
         this(null);
@@ -65,17 +67,24 @@ public class BProgramRunner {
     public void start() throws InterruptedException {
         // setup bprogram and runtime parts.
         execSvc = ExecutorServiceMaker.makeWithName("BProgramRunner-" + instanceNum );
+        failedAssertion = null;
         listeners.forEach(l -> l.starting(bprog));
         BProgramSyncSnapshot cur = bprog.setup();
-        
         cur.getBThreadSnapshots().forEach(sn->listeners.forEach( l -> l.bthreadAdded(bprog, sn)) );
         
         // start it
         listeners.forEach(l -> l.started(bprog));
         cur = cur.start(execSvc);
         
-        // while snapshot not empty, select an event and get the next snapshot.
         boolean go=true;
+        
+        if ( ! cur.isStateValid() ) {
+            failedAssertion = cur.getFailedAssertion();
+            listeners.forEach( l->l.assertionFailed(bprog, failedAssertion));
+            go = false;
+        }
+        
+        // while snapshot not empty, select an event and get the next snapshot.
         while ( (!cur.noBThreadsLeft()) && go ) {
             
             // see which events are selectable
@@ -114,15 +123,33 @@ public class BProgramRunner {
                     
                     listeners.forEach(l->l.eventSelected(bprog, esr.getEvent())); 
                     cur = cur.triggerEvent(esr.getEvent(), execSvc, listeners);
-                    
+                    if ( ! cur.isStateValid() ) {
+                        failedAssertion = cur.getFailedAssertion();
+                        listeners.forEach( l->l.assertionFailed(bprog, failedAssertion));
+                        go = false;
+                    }
+
                 } else {
+                    // edge case: we can select events, but we didn't. Might be a bug in the EventSelectionStrategy.
                     go = false;
                 }
             }
         }
         listeners.forEach(l->l.ended(bprog)); 
     }
+    
+    /**
+     * @return {@code true} iff the program has terminated because of 
+     * a failed assertion, {@code false} otherwise. 
+     */
+    public boolean hasFailedAssertion() {
+        return failedAssertion!=null;
+    }
 
+    public FailedAssertion getFailedAssertion() {
+        return failedAssertion;
+    }
+    
     public BProgram getBProgram() {
         return bprog;
     }

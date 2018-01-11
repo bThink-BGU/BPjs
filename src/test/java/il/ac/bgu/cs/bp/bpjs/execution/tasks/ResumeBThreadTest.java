@@ -20,7 +20,7 @@ public class ResumeBThreadTest {
     @Test
     public void testToString() {
         BEvent evt = new BEvent("evtName");
-        ResumeBThread sut = new ResumeBThread(new BThreadSyncSnapshot("snap-name", null), evt);
+        ResumeBThread sut = new ResumeBThread(new BThreadSyncSnapshot("snap-name", null), evt, null);
         
         String toString = sut.toString();
         

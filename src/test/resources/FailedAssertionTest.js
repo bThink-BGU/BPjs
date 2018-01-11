@@ -1,7 +1,7 @@
-/*
+/* 
  * The MIT License
  *
- * Copyright 2017 michael.
+ * Copyright 2018 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,30 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.model;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
-import org.junit.Assert;
-import static org.junit.Assert.assertEquals;
-import org.junit.Test;
 
-/**
- *
- * @author michael
- */
-public class BProgramSyncSnapshotTest {
-    
-    public BProgramSyncSnapshotTest() {
-    }
+/* global bp, shouldFail */
 
-    @Test
-    public void testEqualsSanity() {
-        BProgram bp = new StringBProgram("");
-        BProgramSyncSnapshot bss = new BProgramSyncSnapshot(bp, emptySet(), emptyList(), null);
-        assertEquals( bss, bss );
-        Assert.assertNotEquals( bss, null );
-        Assert.assertNotEquals( bss, "I'm not even the same class" );
-    }
-    
+if ( shouldFail ) {
+    bp.registerBThread("assertor", function(){
+        bsync({waitFor:bp.Event("poof!")});
+        bp.ASSERT(false, "Poof has happened.");
+    });
 }
+bp.registerBThread("violator", function(){
+    bsync({request:bp.Event("piff")});
+    bsync({request:bp.Event("puff")});
+    bsync({request:bp.Event("poof!")});
+    
+    //we should not get here, since the former event caused an assertion failure.
+    bsync({request:bp.Event("peff")}); 
+   
+});

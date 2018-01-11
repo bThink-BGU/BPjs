@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 michael.
+ * Copyright 2018 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,30 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.model;
-
-import static java.util.Collections.emptyList;
-import static java.util.Collections.emptySet;
-import org.junit.Assert;
-import static org.junit.Assert.assertEquals;
-import org.junit.Test;
+package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
 /**
- *
+ * An exception class that signals a failed assertion. Translated later
+ * to a {@link FailedAssertion} instance by the task runner.
+ * 
  * @author michael
  */
-public class BProgramSyncSnapshotTest {
-    
-    public BProgramSyncSnapshotTest() {
-    }
+public class FailedAssertionException extends RuntimeException {
 
-    @Test
-    public void testEqualsSanity() {
-        BProgram bp = new StringBProgram("");
-        BProgramSyncSnapshot bss = new BProgramSyncSnapshot(bp, emptySet(), emptyList(), null);
-        assertEquals( bss, bss );
-        Assert.assertNotEquals( bss, null );
-        Assert.assertNotEquals( bss, "I'm not even the same class" );
+    public FailedAssertionException(String message) {
+        super(message);
     }
     
 }

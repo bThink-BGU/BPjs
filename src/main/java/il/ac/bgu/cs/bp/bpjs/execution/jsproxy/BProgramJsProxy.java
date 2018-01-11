@@ -7,6 +7,7 @@ import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.JsEventSet;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
+import il.ac.bgu.cs.bp.bpjs.execution.tasks.FailedAssertionException;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.mozilla.javascript.Function;
@@ -39,7 +40,7 @@ public class BProgramJsProxy implements java.io.Serializable {
         public void fine( String msg ) { log( LogLevel.Fine, msg ); }
         
         public void log( LogLevel lvl, String msg ) {
-            if ( level.compareTo(lvl) >= 0) {
+            if ( level.compareTo(lvl) >= 0 ) {
                 System.out.println("[BP][" + lvl.name() + "] " + msg );
             }
         }
@@ -132,6 +133,23 @@ public class BProgramJsProxy implements java.io.Serializable {
      */
     public void registerBThread(Function func) {
         registerBThread("autoadded-" + autoAddCounter.incrementAndGet(), func);
+    }
+    
+    /**
+     * If {@code value} is {@code false}, puts the entire program in an invalid
+     * state. This, in turn, would terminate it when it's being run, or discover 
+     * a specification violation when it's being verified.
+     * 
+     * note: I'd rather call it {@code assert} too, but that's a Java keyword, which complicates stuff.
+     * 
+     * @param value The value of the assertion. When {@code false}, the program is declared in invalid state.
+     * @param message Textual information about what caused the violation.
+     * @throws FailedAssertionException 
+     */
+    public void ASSERT( boolean value, String message ) throws FailedAssertionException {
+        if ( ! value ) {
+            throw new FailedAssertionException( message );
+        }
     }
     
     /**

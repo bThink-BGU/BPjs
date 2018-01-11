@@ -1,24 +1,27 @@
 package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
+import org.mozilla.javascript.Context;
 
 /**
  * A task to start a BThread, taking it from its entry point to its first {@code bsync}.
  */
-public class StartBThread implements BPEngineTask {
-    private final BThreadSyncSnapshot bthreadBss;
+public class StartBThread extends BPEngineTask {
+    private final BThreadSyncSnapshot bss;
 
-    public StartBThread(BThreadSyncSnapshot aBThread) {
-        bthreadBss = aBThread;
+    public StartBThread(BThreadSyncSnapshot aBThread, BPEngineTask.Listener l) {
+        super(aBThread, l);
+        bss = aBThread;
     }
 
     @Override
-    public BThreadSyncSnapshot call() {
-         return bthreadBss.startBThread();
+    BThreadSyncSnapshot callImpl( Context jsContext ) {
+        jsContext.callFunctionWithContinuations(bss.getEntryPoint(), bss.getScope(), new Object[0]);
+        return null;
     }
    
     @Override
     public String toString() {
-        return "[StartBThread " + bthreadBss.getName() + "]";
+        return "[StartBThread " + bss.getName() + "]";
     }
 }
