@@ -136,6 +136,7 @@ public class BProgramRunner {
             }
         }
         listeners.forEach(l->l.ended(bprog)); 
+        execSvc.shutdown();
     }
     
     /**

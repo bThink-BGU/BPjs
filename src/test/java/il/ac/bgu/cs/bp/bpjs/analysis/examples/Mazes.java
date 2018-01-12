@@ -84,6 +84,8 @@ public class Mazes {
 //            vfr.setVisitedNodeStore(new HashVisitedNodeStore());
             vfr.setVisitedNodeStore(new FullVisitedNodeStore());
 //            vfr.setVisitedNodeStore(new StateHashVisitedNodeStore());
+            
+            vfr.setDetectDeadlocks(false); // prevent from detecting cases where we ust hit a wall.
             final VerificationResult res = vfr.verify(bprog);
 
             char[][] maze = getMaze(bprog);

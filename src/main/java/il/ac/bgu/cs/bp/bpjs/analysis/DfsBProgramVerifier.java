@@ -89,6 +89,7 @@ public class DfsBProgramVerifier {
         VerificationResult vr = dfsUsingStack(Node.getInitialNode(aBp, execSvc));
         long end = System.currentTimeMillis();
         listenerOpt.ifPresent(l -> l.done(this));
+        execSvc.shutdown();
         return new VerificationResult(vr.getViolationType(), vr.getFailedAssertion(), vr.getCounterExampleTrace(), end-start, visitedStatesCount);
     }
 
