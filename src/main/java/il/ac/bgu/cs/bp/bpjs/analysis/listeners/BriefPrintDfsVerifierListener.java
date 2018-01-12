@@ -46,7 +46,7 @@ public class BriefPrintDfsVerifierListener implements DfsBProgramVerifier.Progre
 
     @Override
     public void started(DfsBProgramVerifier v) {
-        out.println("/v/ verification of '" + v.getCurrentBProgram().getName() + "', for requirement '" + v.getRequirement().getName() + "' started");
+        out.println("/v/ verification of '" + v.getCurrentBProgram().getName() + " started");
     }
 
     @Override

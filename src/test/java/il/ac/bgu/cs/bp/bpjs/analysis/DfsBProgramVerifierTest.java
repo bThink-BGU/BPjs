@@ -29,15 +29,12 @@ import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
-import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.analysis.requirements.EventNotPresent;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import static il.ac.bgu.cs.bp.bpjs.TestUtils.traceEventNamesString;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
-import il.ac.bgu.cs.bp.bpjs.analysis.requirements.PathRequirements;
 import static org.junit.Assert.assertFalse;
 
 /**
@@ -51,7 +48,7 @@ public class DfsBProgramVerifierTest {
         BProgram program = new SingleResourceBProgram("AAABTrace.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setProgressListener(new BriefPrintDfsVerifierListener());
-        sut.setRequirement(new EventNotPresent(new BEvent("B")) );
+        program.appendSource(Requirements.eventNotSelected("B"));
         sut.setVisitedNodeStore(new ForgetfulVisitedNodeStore());
         VerificationResult res = sut.verify(program);
         assertTrue( res.isCounterExampleFound() );
@@ -78,6 +75,7 @@ public class DfsBProgramVerifierTest {
         sut.setVisitedNodeStore(new ForgetfulVisitedNodeStore());
         VerificationResult res = sut.verify(program);
         assertTrue( res.isCounterExampleFound() );
+        assertEquals( VerificationResult.ViolationType.Deadlock, res.getViolationType() );
         assertEquals("A", traceEventNamesString(res.getCounterExampleTrace(),"") );
     }
     
@@ -92,6 +90,7 @@ public class DfsBProgramVerifierTest {
         
         eventLogger.getEvents().forEach( System.out::println );
         assertTrue(eventNamesString( eventLogger.getEvents(), "").matches("^A$"));
+        
     }
     
     @Test
@@ -103,13 +102,14 @@ public class DfsBProgramVerifierTest {
         );
         
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        sut.setRequirement( PathRequirements.ACCEPT_ALL );
         sut.setIterationCountGap(1);
         sut.setProgressListener( new BriefPrintDfsVerifierListener() );
+        sut.setDetectDeadlocks(false);
         VerificationResult res = sut.verify(bprog);
         
-        assertFalse( res.isCounterExampleFound() );
+        assertTrue( res.isVerifiedSuccessfully());
         assertEquals( 4, res.getScannedStatesCount() );
+        assertEquals( VerificationResult.ViolationType.None, res.getViolationType() );
     }
     
     @Test(timeout = 2000)
@@ -127,7 +127,6 @@ public class DfsBProgramVerifierTest {
         );
         
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        sut.setRequirement( PathRequirements.ACCEPT_ALL );
         sut.setIterationCountGap(1);
         sut.setProgressListener( new BriefPrintDfsVerifierListener() );
         sut.setDebugMode(true);

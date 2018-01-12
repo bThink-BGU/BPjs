@@ -40,7 +40,7 @@ public class PrintBProgramRunnerListener implements BProgramRunnerListener {
 
     @Override
     public void assertionFailed(BProgram bp, FailedAssertion theFailedAssertion) {
-        out.println("---:" + bp.getName() + " B-thread " + theFailedAssertion.getbThreadName()
+        out.println("---:" + bp.getName() + " B-thread " + theFailedAssertion.getBThreadName()
                            + " is in invalid state: " + theFailedAssertion.getMessage());
     }
 

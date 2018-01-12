@@ -54,7 +54,7 @@ public class FailedAssertionTest {
         assertEquals( Arrays.asList("piff", "puff", "poof!"), eventLogger.eventNames() );
         assertTrue( sut.hasFailedAssertion() );
         FailedAssertion fa = sut.getFailedAssertion();
-        assertEquals("assertor", fa.getbThreadName());
+        assertEquals("assertor", fa.getBThreadName());
         assertEquals("Poof has happened.", fa.getMessage());
         
     }

@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 michael.
+ * Copyright 2017 BPjs group BGU.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,27 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis.requirements;
-
-import il.ac.bgu.cs.bp.bpjs.analysis.Node;
-import java.util.List;
+package il.ac.bgu.cs.bp.bpjs.analysis;
 
 /**
- * A requirement for execution paths. The {@link #checkConformance(java.util.List)} method returns {@code true} 
- * when the execution path complies with the implemented requirement, and {@code false} otherwise.
+ * Convenience class for creating requirement b-threads for verification.
  * 
- * @see PathRequirements
  * @author michael
  */
-public interface PathRequirement {
-    
-    String getName();
-    
+public class Requirements {
+   
     /**
-     * Test that {@code trace} conforms to the implemented requirement.
-     * @param trace the BProgram trace thus far. Immutable.
-     * @return {@code true} iff the trace conforms to the requirement {@code this} implements; {@code false} otherwise.
+     * A requirement that detects deadlocks (as in, no selectable events).
      */
-    boolean checkConformance( List<Node> trace );
+    public static final String eventNotSelected( String eventName ) {
+        return "bp.registerBThread('eventNotSelected-" + eventName + "', function(){ "
+            + "\n bsync({waitFor:bp.Event('" + eventName + "')});"
+            + "\n bp.ASSERT(false, 'event \"" + eventName + "\" selected.');"
+            + "\n });";
+    }
+
+    private Requirements(){
+        // prevent instantiation.
+    }
     
 }

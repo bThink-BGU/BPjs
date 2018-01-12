@@ -44,7 +44,7 @@ public class FailedAssertion implements java.io.Serializable {
         return message;
     }
 
-    public String getbThreadName() {
+    public String getBThreadName() {
         return bThreadName;
     }
 

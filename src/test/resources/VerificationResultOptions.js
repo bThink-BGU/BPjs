@@ -1,7 +1,7 @@
-/*
+/* 
  * The MIT License
  *
- * Copyright 2017 michael.
+ * Copyright 2018 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,29 +21,27 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis.requirements;
 
-/**
- *
- * @author michael
- */
-public abstract class AbstractPathRequirement implements PathRequirement {
-    
-    private String name;
 
-    public AbstractPathRequirement(String name) {
-        this.name = name;
-    }
+/* global bp, createDeadlock, createFailedAssertion */
 
-    @Override
-    public String getName() {
-        return name;
-    }
+// This JS file can create all the results of verification session.
 
-    protected void setName(String name) {
-        this.name = name;
-    }
-    
-    
-    
+bp.registerBThread("forward", function(){
+    bsync({request:bp.Event("A")});
+    bsync({request:bp.Event("B")});
+    bsync({request:bp.Event("C")});
+});
+
+if ( createDeadlock ) {
+    bp.registerBThread("deadlocker", function() {
+       bsync({block:bp.Event("B")}) ;
+    });
+}
+
+if ( createFailedAssertion ) {
+    bp.registerBThread("assertor", function(){
+       bsync({waitFor:bp.Event("B")});
+       bp.ASSERT( false, "B happened" );
+    });
 }

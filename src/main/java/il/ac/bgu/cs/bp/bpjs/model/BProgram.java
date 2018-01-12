@@ -296,14 +296,8 @@ public abstract class BProgram {
         programScope = cx.initStandardObjects(importer);
         BProgramJsProxy proxy = new BProgramJsProxy(this);
         programScope.put("bp", programScope,
-                Context.javaToJS(proxy, programScope));
+        Context.javaToJS(proxy, programScope));
         
-        // Re-wire "testAssertion" to "assert". This is needed since "assert" is a Java keyword.
-//        ScriptableObject bpJsObject = (ScriptableObject) programScope.get("bp", programScope);
-//        Object assertionHandle = bpJsObject.get("testAssertion", programScope);
-//        bpJsObject.delete("testAssertion");
-//        bpJsObject.put("assert", bpJsObject, assertionHandle);
-
 //        evaluateResource("globalScopeInit.js");// <-- Currently not needed. Leaving in as we might need it soon.
         initialScopeValues.entrySet().forEach(e->putInGlobalScope(e.getKey(), e.getValue()));
         initialScopeValues=null;

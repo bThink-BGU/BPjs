@@ -43,6 +43,12 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+
+## 2018-01-12
+* :bug: :sparkles: Refactored analysis code, removing the invalid (easy to understand, but invalid) `PathRequirement` based analysis, and using only b-thread now.
+                   This design is much cleaner, as it uses less concepts. Also moves us towards "everything is a b-thread" world.
+* :sparkles: Added tests to demonstrate the various states a verification can end in.
+
 ## 2018-01-11
 * :sparkles: During forward execution, b-threads can halt execution using `bp.ASSERT(boolean, text)`.
 * :arrow_up: Refactored the engine tasks to support raising assertions. Reduced some code duplication in the way.
