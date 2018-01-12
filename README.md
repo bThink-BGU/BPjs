@@ -48,6 +48,7 @@ a link to this page somewhere in the documentation/system about section.
 * :bug: :sparkles: Refactored analysis code, removing the invalid (easy to understand, but invalid) `PathRequirement` based analysis, and using only b-thread now.
                    This design is much cleaner, as it uses less concepts. Also moves us towards "everything is a b-thread" world.
 * :sparkles: Added tests to demonstrate the various states a verification can end in.
+* :bug: Verifiers and runners terminate their threadpools when they are done using them.
 
 ## 2018-01-11
 * :sparkles: During forward execution, b-threads can halt execution using `bp.ASSERT(boolean, text)`.
