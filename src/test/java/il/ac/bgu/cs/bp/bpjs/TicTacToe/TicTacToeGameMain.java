@@ -61,14 +61,14 @@ class TicTacToeGameMain extends JFrame {
 		} else {
 			System.out.println("Creating SimulatedPlayer");
 
-			
-			String SimulatedPlayer = "	bp.registerBThread('STAM', function() {\n" +
-										"while (true) {\n" +
-											"bsync({ request:[ bp.Event('STAM') ]\n" +
-											//" , interrupt:[ StaticEvents.XWin]\n" +
-												"});\n" +
-											"}\n" +
-										"});\n" +			
+			String SimulatedPlayer = "	" +
+//										+ "bp.registerBThread('STAM', function() {\n" +
+//										"while (true) {\n" +
+//											"bsync({ request:[ bp.Event('STAM') ]\n" +
+//											//" , interrupt:[ StaticEvents.XWin]\n" +
+//												"});\n" +
+//											"}\n" +
+//										"});\n" +			
 										"bp.registerBThread('XMoves', function() {\n" +
 										"while (true) {\n" +
 											"bsync({ request:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), \n" +
@@ -81,25 +81,6 @@ class TicTacToeGameMain extends JFrame {
 			try {
 				DfsBProgramVerifier vfr = new DfsBProgramVerifier();
 				vfr.setVisitedNodeStore(new FullVisitedNodeStore());
-				
-//				vfr.setProgressListener(new DfsBProgramVerifier.ProgressListener() {
-//					
-//					public void started(DfsBProgramVerifier v) {
-//						System.out.println("started");
-//					}
-//					
-//					public void maxTraceLengthHit(List<Node> trace, DfsBProgramVerifier v) {
-//						System.out.println("maxTraceLengthHit " + trace);
-//					}
-//					
-//					public void iterationCount(long count, long statesHit, DfsBProgramVerifier v) {
-//						System.out.println("iterationCount " + count + "("+ statesHit +")");						
-//					}
-//					
-//					public void done(DfsBProgramVerifier v) {
-//						System.out.println("done");
-//					}
-//				});
 				
 				vfr.setMaxTraceLength(50);
 				vfr.setDebugMode(true);
