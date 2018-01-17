@@ -1,5 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.TicTacToe;
 
+import java.util.List;
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
@@ -13,6 +15,7 @@ import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.analysis.FullVisitedNodeStore;
+import il.ac.bgu.cs.bp.bpjs.analysis.Node;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 
@@ -48,40 +51,59 @@ class TicTacToeGameMain extends JFrame {
 		bprog.setDaemonMode(true);
 		JFrame f = new TicTacToeGameMain();
 
-		BProgramRunner rnr = new BProgramRunner(bprog);
 
 		if (!UseSimulatedPlayer()) {
+			BProgramRunner rnr = new BProgramRunner(bprog);
+
 			rnr.addListener(new PrintBProgramRunnerListener());
 			TTTdisplayGame = new TTTDisplayGame(bprog, rnr);
 			rnr.start();
 		} else {
-//			rnr.addListener(new PrintBProgramRunnerListener());
-//			InMemoryEventLoggingListener el = rnr.addListener( new InMemoryEventLoggingListener());
-//			System.out.println("Creating SimulatedPlayer");
-//			String SimulatedPlayer = "	bp.registerBThread('STAM', function() {" +
-//										"while (true) { " +
-//											"bsync({ request:[ bp.Event('STAM') ]" +
-//											"// , interrupt:[ StaticEvents.XWin]" +
-//												"});" +
-//											"}" +
-//										"});" +			
-//										"bp.registerBThread('XMoves', function() {" +
-//										"while (true) {" +
-//											"bsync({ request:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), " +
-//											"X(1, 1), X(1, 2), X(2, 0), X(2, 1), X(2, 2) ] }, 10);" +
-//											"}" +
-//										"});";
-//
-//	        bprog.appendSource(SimulatedPlayer);
-//	        rnr.setBProgram(bprog);
-//
-//	        rnr.start();
-//	        System.out.println("Running SimulatedPlayer");
+			System.out.println("Creating SimulatedPlayer");
+
+			
+			String SimulatedPlayer = "	bp.registerBThread('STAM', function() {\n" +
+										"while (true) {\n" +
+											"bsync({ request:[ bp.Event('STAM') ]\n" +
+											//" , interrupt:[ StaticEvents.XWin]\n" +
+												"});\n" +
+											"}\n" +
+										"});\n" +			
+										"bp.registerBThread('XMoves', function() {\n" +
+										"while (true) {\n" +
+											"bsync({ request:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), \n" +
+											"X(1, 1), X(1, 2), X(2, 0), X(2, 1), X(2, 2) ] }, 10); \n" +
+											"}\n" +
+										"});\n";
+
+	        bprog.appendSource(SimulatedPlayer);
+
 			try {
 				DfsBProgramVerifier vfr = new DfsBProgramVerifier();
 				vfr.setVisitedNodeStore(new FullVisitedNodeStore());
 				
+//				vfr.setProgressListener(new DfsBProgramVerifier.ProgressListener() {
+//					
+//					public void started(DfsBProgramVerifier v) {
+//						System.out.println("started");
+//					}
+//					
+//					public void maxTraceLengthHit(List<Node> trace, DfsBProgramVerifier v) {
+//						System.out.println("maxTraceLengthHit " + trace);
+//					}
+//					
+//					public void iterationCount(long count, long statesHit, DfsBProgramVerifier v) {
+//						System.out.println("iterationCount " + count + "("+ statesHit +")");						
+//					}
+//					
+//					public void done(DfsBProgramVerifier v) {
+//						System.out.println("done");
+//					}
+//				});
+				
 				vfr.setMaxTraceLength(50);
+				vfr.setDebugMode(true);
+				
 				final VerificationResult res = vfr.verify(bprog);
 				if (res.isCounterExampleFound()) {
 					System.out.println("Found a counterexample");
