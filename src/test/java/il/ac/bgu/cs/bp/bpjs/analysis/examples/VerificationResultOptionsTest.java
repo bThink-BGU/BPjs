@@ -42,6 +42,7 @@ public class VerificationResultOptionsTest {
     public void testOKProgram() throws Exception {
         final SingleResourceBProgram bprog = new SingleResourceBProgram("VerificationResultOptions.js");
         
+        bprog.putInGlobalScope("addWaiter", false);
         bprog.putInGlobalScope("createDeadlock", false);
         bprog.putInGlobalScope("createFailedAssertion", false);
 
@@ -57,6 +58,7 @@ public class VerificationResultOptionsTest {
     public void testDeadlockedProgram() throws Exception {
         final SingleResourceBProgram bprog = new SingleResourceBProgram("VerificationResultOptions.js");
         
+        bprog.putInGlobalScope("addWaiter", false);
         bprog.putInGlobalScope("createDeadlock", true);
         bprog.putInGlobalScope("createFailedAssertion", false);
 
@@ -72,6 +74,7 @@ public class VerificationResultOptionsTest {
     public void testViolatingProgram() throws Exception {
         final SingleResourceBProgram bprog = new SingleResourceBProgram("VerificationResultOptions.js");
         
+        bprog.putInGlobalScope("addWaiter", false);
         bprog.putInGlobalScope("createDeadlock", false);
         bprog.putInGlobalScope("createFailedAssertion", true);
 
@@ -83,5 +86,22 @@ public class VerificationResultOptionsTest {
         assertTrue( res.isCounterExampleFound() );
         assertEquals( "assertor", res.getFailedAssertion().getBThreadName() );
         assertEquals( "B happened", res.getFailedAssertion().getMessage());
+    }
+    
+    @Test
+    public void testWaitingIsNotDeadlock() throws Exception {
+        final SingleResourceBProgram bprog = new SingleResourceBProgram("VerificationResultOptions.js");
+        
+        bprog.putInGlobalScope("addWaiter", true);
+        bprog.putInGlobalScope("createDeadlock", false);
+        bprog.putInGlobalScope("createFailedAssertion", false);
+
+        DfsBProgramVerifier vfr = new DfsBProgramVerifier();
+        vfr.setVisitedNodeStore(new FullVisitedNodeStore());
+        final VerificationResult res = vfr.verify(bprog);
+        
+        assertEquals( VerificationResult.ViolationType.None, res.getViolationType() );
+        assertFalse( res.isCounterExampleFound() );
+        
     }
 }

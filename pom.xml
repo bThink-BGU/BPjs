@@ -137,7 +137,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>il.ac.bgu.cs.bp.bpjs.mains.RunFile</mainClass>
+                            <mainClass>il.ac.bgu.cs.bp.bpjs.mains.BPJsCliRunner</mainClass>
                         </manifest>
                     </archive>
                 </configuration>

@@ -30,6 +30,7 @@ import java.util.List;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -108,8 +109,9 @@ public class DfsBProgramVerifier {
             Node curNode = peek();
             if ( curNode != null ) {
                 if ( isDetectDeadlocks() && 
-                    (!curNode.getSystemState().noBThreadsLeft()) && 
-                    curNode.getSelectableEvents().isEmpty()) {
+                    hasRequestedEvents( curNode.getSystemState() ) && 
+                    curNode.getSelectableEvents().isEmpty()
+                   ) {
                     // detected deadlock
                     return new VerificationResult(VerificationResult.ViolationType.Deadlock, null, currentPath);
                 }
@@ -240,6 +242,10 @@ public class DfsBProgramVerifier {
 
     public void setDetectDeadlocks(boolean detectDeadlocks) {
         this.detectDeadlocks = detectDeadlocks;
+    }
+    
+    private boolean hasRequestedEvents( BProgramSyncSnapshot bpss ) {
+        return bpss.getBThreadSnapshots().stream().anyMatch(btss -> (!btss.getBSyncStatement().getRequest().isEmpty()) );
     }
     
 }

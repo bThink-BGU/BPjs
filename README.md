@@ -11,12 +11,12 @@ This repository contains a javascript-based [BP](http://www.b-prog.org) library.
 #### License
 * BPjs is open sourced under the [MIT license](http://www.opensource.org/licenses/mit-license.php). If you use it in a system, please provide
 a link to this page somewhere in the documentation/system about section.
-* BPjs uses the Mozilla Rhino Javascript engine. See [here](https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino) for project page and source code.
+* BPjs uses the Mozilla Rhino Javascript engine. Project page and source code can be found [here](https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino).
 
 ---
 
 ## Getting BPjs
-* For Maven projects: Add bpjs as dependency. Note that the version number changes.
+* For Maven projects: Add BPjs as dependency. Note that the version number changes.
 
 ````
 <dependencies>
@@ -43,6 +43,8 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+## 2018-01-17
+* :bug: Verifier now correctly identifies deadlock as a state where there are requested events, but they are all blocked (formerly it just looked for the existence of b-threads).
 
 ## 2018-01-12
 * :bug: :sparkles: Refactored analysis code, removing the invalid (easy to understand, but invalid) `PathRequirement` based analysis, and using only b-thread now.
