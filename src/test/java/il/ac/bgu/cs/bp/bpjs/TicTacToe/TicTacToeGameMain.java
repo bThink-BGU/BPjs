@@ -8,6 +8,8 @@ import org.mozilla.javascript.Scriptable;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.analysis.FullVisitedNodeStore;
@@ -26,7 +28,7 @@ class TicTacToeGameMain extends JFrame {
 	public static TTTDisplayGame TTTdisplayGame;
 
 	public static boolean UseSimulatedPlayer() {
-		return false;
+		return true;
 	}
 
 	public static void main(String[] args) throws InterruptedException {
@@ -53,6 +55,28 @@ class TicTacToeGameMain extends JFrame {
 			TTTdisplayGame = new TTTDisplayGame(bprog, rnr);
 			rnr.start();
 		} else {
+//			rnr.addListener(new PrintBProgramRunnerListener());
+//			InMemoryEventLoggingListener el = rnr.addListener( new InMemoryEventLoggingListener());
+//			System.out.println("Creating SimulatedPlayer");
+//			String SimulatedPlayer = "	bp.registerBThread('STAM', function() {" +
+//										"while (true) { " +
+//											"bsync({ request:[ bp.Event('STAM') ]" +
+//											"// , interrupt:[ StaticEvents.XWin]" +
+//												"});" +
+//											"}" +
+//										"});" +			
+//										"bp.registerBThread('XMoves', function() {" +
+//										"while (true) {" +
+//											"bsync({ request:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), " +
+//											"X(1, 1), X(1, 2), X(2, 0), X(2, 1), X(2, 2) ] }, 10);" +
+//											"}" +
+//										"});";
+//
+//	        bprog.appendSource(SimulatedPlayer);
+//	        rnr.setBProgram(bprog);
+//
+//	        rnr.start();
+//	        System.out.println("Running SimulatedPlayer");
 			try {
 				DfsBProgramVerifier vfr = new DfsBProgramVerifier();
 				vfr.setVisitedNodeStore(new FullVisitedNodeStore());
