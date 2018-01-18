@@ -43,6 +43,9 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+## 2018-01-18
+* :bug: Fixed a crash where program with failed assertions were intermittently crashing.
+
 ## 2018-01-17
 * :bug: Verifier now correctly identifies deadlock as a state where there are requested events, but they are all blocked (formerly it just looked for the existence of b-threads).
 
