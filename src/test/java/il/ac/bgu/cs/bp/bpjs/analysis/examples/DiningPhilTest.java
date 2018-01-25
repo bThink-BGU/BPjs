@@ -1,7 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.analysis.examples;
 
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
-import il.ac.bgu.cs.bp.bpjs.analysis.FullVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.Node;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
@@ -51,7 +50,6 @@ public class DiningPhilTest {
 
         try {
             DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-            vfr.setVisitedNodeStore(new FullVisitedNodeStore());
             vfr.setMaxTraceLength(50);
             final VerificationResult res = vfr.verify(bprog);
 

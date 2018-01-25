@@ -6,7 +6,6 @@ import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
-import il.ac.bgu.cs.bp.bpjs.analysis.FullVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
@@ -80,7 +79,6 @@ public class BProgramSyncSnapshotClonerTest {
     public void verifyProgram() throws Exception {
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         BProgram bprog = new SingleResourceBProgram("BProgramSyncSnapshotClonerTest.js");
-        vfr.setVisitedNodeStore(new FullVisitedNodeStore());
         final VerificationResult res = vfr.verify(bprog);
         System.out.println("res = " + res.getCounterExampleTrace());
     }

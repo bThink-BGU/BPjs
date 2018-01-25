@@ -23,14 +23,15 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis.examples;
 
+import il.ac.bgu.cs.bp.bpjs.analysis.BProgramStateVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.analysis.FullVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.Node;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
+import il.ac.bgu.cs.bp.bpjs.analysis.ForgetfulVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.Requirements;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
@@ -48,14 +49,18 @@ public class Mazes {
 //    String implementation = "MazesPositive.js"; 
     String implementation = "MazesNegative.js";
     final BEvent targetFoundEvent = BEvent.named("targetFound");
-
+    
     // change commented line below to solve a different maze.
-//    String mazeName = "trivial";
-//      String mazeName = "trivialPlus";
-//      String mazeName = "simple";
-    String mazeName = "complex";
-//      String mazeName = "cow";
-//      String mazeName = "singleSolution";
+    String mazeName = 
+//        "trivial"
+//        "trivialPlus"
+//        "simple"
+        "complex2"
+//        "complex"
+//        "multipleSolutions"
+//        "cow"
+//        "singleSolution"
+        ;
 
     public static void main(String[] args) throws InterruptedException {
         Mazes it = new Mazes();
@@ -81,9 +86,8 @@ public class Mazes {
 
             vfr.setProgressListener(new BriefPrintDfsVerifierListener());
             vfr.setIterationCountGap(10);
-//            vfr.setVisitedNodeStore(new HashVisitedNodeStore());
-            vfr.setVisitedNodeStore(new FullVisitedNodeStore());
-//            vfr.setVisitedNodeStore(new StateHashVisitedNodeStore());
+//            vfr.setVisitedNodeStore(new BProgramStateVisitedNodeStore(true));
+            vfr.setVisitedNodeStore(new ForgetfulVisitedStateStore());
             
             vfr.setDetectDeadlocks(false); // prevent from detecting cases where we ust hit a wall.
             final VerificationResult res = vfr.verify(bprog);

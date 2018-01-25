@@ -48,6 +48,30 @@ var complex =
    "         ",
    "### #### ",
    "   s#    "];
+   
+var complex2 = 
+   ["s%          %      ",
+    " %%%%%%%% %%%%% %%%",
+    "                   ",
+    " %%%%%%%%%%%%%% %%%",
+    " %           %  %  ",
+    " %%%%%%%%%%        ",
+    "        %    %%%% %",
+    " %%%%% %%%%  % t   "];
+
+var multipleSolutions = 
+   ["s                 ",
+    "XXXXX YYYY ZZZ ZZZ",
+    "  X    Y   Z Z  Z ",
+    "  X        Z    Z ",
+    "  XXXXX    ZZZZZZ ",
+    "                 t"];
+var noSolution =
+  ["    #  t ",
+   "## ######",
+   "         ",
+   "### #### ",
+   "   s#    "];
 
 var singleSolution = 
   ["  *     t",
@@ -55,24 +79,16 @@ var singleSolution =
    "  * *    ",
    "*** *****",
    "  *s*    "];
+   
 var cow = 
-        [" ______ ",
-         "< BPjs >       @@@@@@@@@   t",
-         " ------ ",
+        [" _______                      ",
+         "< BPjmoo >       @@@@@@@@@   t",
+         " -------                      ",
          "        \   ^__^    @@@@@@@@",
          "      @  \  (oo)\_______",
          "@@@@@@@     (__)\       )\\/\\",
          " s              ||----w |",
          "@@@@@@@         ||     ||"];
-
-var mazes = {
-     trivial:trivial,
-     trivialPlus:trivialPlus,
-     simple:simple,
-     cow:cow,
-     complex:complex,
-     singleSolution:singleSolution
- };
  
 function enterEvent(c,r) {
     return bp.Event("Enter (" + c + ","  + r + ")");//, {col:c, row:r});
@@ -92,7 +108,7 @@ if ( ! MAZE_NAME )  {
     MAZE_NAME = "trivial";
 }
 
-var maze = mazes[MAZE_NAME];
+var maze = eval(MAZE_NAME);
 
 parseMaze(maze);
 

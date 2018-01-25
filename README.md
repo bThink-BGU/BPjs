@@ -43,6 +43,15 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+## 2018-02-25
+* :bug: `DfsBProgramVerifier` instances can now be re-used.
+
+## 2018-01-24
+* :arrow_up: Improved hashing algorithm on `BThreadStateVisitedNodeStore`.
+* :sparkles: Transient caching of thread state in `BThreadSyncSnapshot`s. This improves verification performance, with low memory cost.
+* :bug: Removed visited state stores that took incoming state into consideration.
+* :arrows_counterclockwise: More mazes in the Mazes example.
+
 ## 2018-01-18
 * :bug: Fixed a crash where program with failed assertions were intermittently crashing.
 

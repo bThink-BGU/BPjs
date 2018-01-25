@@ -1,6 +1,5 @@
 package il.ac.bgu.cs.bp.bpjs.TicTacToe;
 
-import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -10,12 +9,8 @@ import org.mozilla.javascript.Scriptable;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
-import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
-import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
-import il.ac.bgu.cs.bp.bpjs.analysis.FullVisitedNodeStore;
-import il.ac.bgu.cs.bp.bpjs.analysis.Node;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 
@@ -80,7 +75,6 @@ class TicTacToeGameMain extends JFrame {
 
 			try {
 				DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-				vfr.setVisitedNodeStore(new FullVisitedNodeStore());
 				
 				vfr.setMaxTraceLength(50);
 				vfr.setDebugMode(true);

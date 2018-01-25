@@ -154,7 +154,6 @@ public class ContinuationProgramState {
         } else if ( jsValue instanceof NativeJavaObject ) {
             NativeJavaObject jsJavaObj = (NativeJavaObject) jsValue;
             Object obj = jsJavaObj.unwrap();
-            System.out.println("Got Java object: " + obj + " (" + obj.getClass() + ")");
             return obj;
             
         } else {

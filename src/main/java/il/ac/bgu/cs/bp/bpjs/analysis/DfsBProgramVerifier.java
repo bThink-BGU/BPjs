@@ -39,7 +39,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  *
  * Takes a {@link BProgram}, and verifies that it conforms to a given
  * {@link PathRequirement}. Take care to use the appropriate
- * {@link VisitedNodeStore} for the {@link BProgram} being verified.
+ * {@link VisitedStateStore} for the {@link BProgram} being verified.
  *
  * States are scanned using a DFS.
  *
@@ -71,13 +71,12 @@ public class DfsBProgramVerifier {
     }
 
     private long visitedStatesCount;
-    private VisitedNodeStore visited = new FullVisitedNodeStore();
+    private VisitedStateStore visited = new BProgramStateVisitedStateStore();
     private long maxTraceLength = DEFAULT_MAX_TRACE;
     private final ArrayList<Node> currentPath = new ArrayList<>();
     private Optional<ProgressListener> listenerOpt = Optional.empty();
     private long iterationCountGap = DEFAULT_ITERATION_COUNT_GAP;
     private BProgram currentBProgram;
-    private final ExecutorService execSvc = ExecutorServiceMaker.makeWithName("DfsBProgramRunner-" + INSTANCE_COUNTER.incrementAndGet());
     private boolean debugMode = false;
     private boolean detectDeadlocks = true;
     
@@ -85,16 +84,17 @@ public class DfsBProgramVerifier {
         currentBProgram = aBp;
         visitedStatesCount = 1;
         currentPath.clear();
+        ExecutorService execSvc = ExecutorServiceMaker.makeWithName("DfsBProgramRunner-" + INSTANCE_COUNTER.incrementAndGet());
         long start = System.currentTimeMillis();
         listenerOpt.ifPresent(l -> l.started(this));
-        VerificationResult vr = dfsUsingStack(Node.getInitialNode(aBp, execSvc));
+        VerificationResult vr = dfsUsingStack(Node.getInitialNode(aBp, execSvc), execSvc);
         long end = System.currentTimeMillis();
         listenerOpt.ifPresent(l -> l.done(this));
         execSvc.shutdown();
         return new VerificationResult(vr.getViolationType(), vr.getFailedAssertion(), vr.getCounterExampleTrace(), end-start, visitedStatesCount);
     }
 
-    protected VerificationResult dfsUsingStack(Node aStartNode) throws Exception {
+    protected VerificationResult dfsUsingStack(Node aStartNode, ExecutorService execSvc) throws Exception {
         long iterationCount = 0;
         visitedStatesCount = 0;
 
@@ -133,7 +133,7 @@ public class DfsBProgramVerifier {
                 pop();
 
             } else {
-                Node nextNode = getUnvisitedNextNode(curNode);
+                Node nextNode = getUnvisitedNextNode(curNode, execSvc);
                 if (nextNode == null) {
                     // fold stack, retry next iteration;
                     pop();
@@ -159,7 +159,7 @@ public class DfsBProgramVerifier {
         return new VerificationResult(VerificationResult.ViolationType.None, null, null);
     }
 
-    protected Node getUnvisitedNextNode(Node src) throws Exception {
+    protected Node getUnvisitedNextNode(Node src, ExecutorService execSvc) throws Exception {
         while (src.getEventIterator().hasNext()) {
             final BEvent nextEvent = src.getEventIterator().next();
             Node possibleNextNode = src.getNextNode(nextEvent, execSvc);
@@ -178,11 +178,11 @@ public class DfsBProgramVerifier {
         return maxTraceLength;
     }
 
-    public void setVisitedNodeStore(VisitedNodeStore aVisitedNodeStore) {
+    public void setVisitedNodeStore(VisitedStateStore aVisitedNodeStore) {
         visited = aVisitedNodeStore;
     }
 
-    public VisitedNodeStore getVisitedNodeStore() {
+    public VisitedStateStore getVisitedNodeStore() {
         return visited;
     }
 

@@ -49,7 +49,19 @@ public class DfsBProgramVerifierTest {
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setProgressListener(new BriefPrintDfsVerifierListener());
         program.appendSource(Requirements.eventNotSelected("B"));
-        sut.setVisitedNodeStore(new ForgetfulVisitedNodeStore());
+        sut.setVisitedNodeStore(new ForgetfulVisitedStateStore());
+        VerificationResult res = sut.verify(program);
+        assertTrue( res.isCounterExampleFound() );
+        assertEquals("AAAB", traceEventNamesString(res.getCounterExampleTrace(),"") );
+    }
+ 
+    @Test
+    public void simpleAAABTrace_hashedNodeStore() throws Exception {
+        BProgram program = new SingleResourceBProgram("AAABTrace.js");
+        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        sut.setProgressListener(new BriefPrintDfsVerifierListener());
+        program.appendSource(Requirements.eventNotSelected("B"));
+        sut.setVisitedNodeStore(new BProgramStateVisitedStateStore(true));
         VerificationResult res = sut.verify(program);
         assertTrue( res.isCounterExampleFound() );
         assertEquals("AAAB", traceEventNamesString(res.getCounterExampleTrace(),"") );
@@ -72,7 +84,7 @@ public class DfsBProgramVerifierTest {
     public void deadlockTrace() throws Exception {
         BProgram program = new SingleResourceBProgram("deadlocking.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        sut.setVisitedNodeStore(new ForgetfulVisitedNodeStore());
+        sut.setVisitedNodeStore(new ForgetfulVisitedStateStore());
         VerificationResult res = sut.verify(program);
         assertTrue( res.isCounterExampleFound() );
         assertEquals( VerificationResult.ViolationType.Deadlock, res.getViolationType() );
@@ -97,8 +109,7 @@ public class DfsBProgramVerifierTest {
     public void testTwoSimpleBThreads() throws Exception {
         BProgram bprog = new StringBProgram(
           "bp.registerBThread('bt1', function(){bsync({ request:[ bp.Event(\"STAM1\") ] });});" +
-          "bp.registerBThread('bt2', function(){bsync({ request:[ bp.Event(\"STAM2\") ] });});" +
-          ""
+          "bp.registerBThread('bt2', function(){bsync({ request:[ bp.Event(\"STAM2\") ] });});" 
         );
         
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
@@ -108,7 +119,7 @@ public class DfsBProgramVerifierTest {
         VerificationResult res = sut.verify(bprog);
         
         assertTrue( res.isVerifiedSuccessfully());
-        assertEquals( 4, res.getScannedStatesCount() );
+        assertEquals( 3, res.getScannedStatesCount() );
         assertEquals( VerificationResult.ViolationType.None, res.getViolationType() );
     }
     
@@ -130,7 +141,6 @@ public class DfsBProgramVerifierTest {
         sut.setIterationCountGap(1);
         sut.setProgressListener( new BriefPrintDfsVerifierListener() );
         sut.setDebugMode(true);
-        sut.setVisitedNodeStore(new BThreadStateVisitedNodeStore() );
         VerificationResult res = sut.verify(bprog);
         
         assertFalse( res.isCounterExampleFound() );

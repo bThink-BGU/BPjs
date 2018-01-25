@@ -50,7 +50,7 @@ class BThreadSyncSnapshotInputStream extends ScriptableInputStream {
 
     @Override
     protected Object readObjectOverride() throws IOException, ClassNotFoundException {
-        return super.readObjectOverride(); //To change body of generated methods, choose Tools | Templates.
+        return super.readObjectOverride();
     }
     
 }

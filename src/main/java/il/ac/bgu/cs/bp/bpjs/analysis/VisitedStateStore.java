@@ -24,23 +24,11 @@
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
 /**
- * A VisitedNodeStore that does not remember any visited node. When the program 
- * search graph is a tree, ensures that all the nodes are visited. When the program
- * search graph contains even a single loop, pretty much ensures an infinite verification
- * run. So use with caution.
+ * Objects that know which states were already visited.
  * 
  * @author michael
  */
-public class ForgetfulVisitedNodeStore implements VisitedNodeStore {
-
-    @Override
-    public void store(Node nd) {
-        // ignore.
-    }
-
-    @Override
-    public boolean isVisited(Node nd) {
-        return false;
-    }
-    
+public interface VisitedStateStore {
+    void store( Node nd );
+    boolean isVisited( Node nd );
 }

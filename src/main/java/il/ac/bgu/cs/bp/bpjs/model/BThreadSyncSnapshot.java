@@ -57,6 +57,8 @@ public class BThreadSyncSnapshot implements Serializable {
      * BSync statement of the BThread at the time of the snapshot.
      */
     private BSyncStatement bSyncStatement;
+    
+    private transient ContinuationProgramState programState;
 
     public BThreadSyncSnapshot(String aName, Function anEntryPoint) {
         name = aName;
@@ -171,7 +173,15 @@ public class BThreadSyncSnapshot implements Serializable {
     public Function getEntryPoint() {
         return entryPoint;
     }
-
+    
+    public ContinuationProgramState getContinuationProgramState() {
+        if ( programState == null ) {
+            programState = new ContinuationProgramState((NativeContinuation) continuation);
+        }
+        return programState;
+    }
+    
+    
     @Override
     public int hashCode() {
         final int prime = 31;
@@ -202,9 +212,7 @@ public class BThreadSyncSnapshot implements Serializable {
             return (other.continuation == null);
 
         } else {
-            NativeContinuation natCont = (NativeContinuation) continuation;
-            NativeContinuation natOtherCont = (NativeContinuation) other.continuation;
-            return new ContinuationProgramState(natCont).equals(new ContinuationProgramState(natOtherCont));
+            return getContinuationProgramState().equals(other.getContinuationProgramState());
         }
     }
 

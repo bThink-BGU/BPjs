@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.serialize.ScriptableOutputStream;
 
@@ -60,7 +59,6 @@ public class BThreadSyncSnapshotOutputStream extends ScriptableOutputStream {
             return StreamObjectStub.BP_PROXY;
             
         } else {
-//            System.out.println("Writing: " + Objects.toString(obj));
             return obj;
         }
     }

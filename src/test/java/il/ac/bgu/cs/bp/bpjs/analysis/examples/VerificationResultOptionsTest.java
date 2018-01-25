@@ -24,7 +24,6 @@
 package il.ac.bgu.cs.bp.bpjs.analysis.examples;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
-import il.ac.bgu.cs.bp.bpjs.analysis.FullVisitedNodeStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
 import static org.junit.Assert.assertEquals;
@@ -47,7 +46,6 @@ public class VerificationResultOptionsTest {
         bprog.putInGlobalScope("createFailedAssertion", false);
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-        vfr.setVisitedNodeStore(new FullVisitedNodeStore());
         final VerificationResult res = vfr.verify(bprog);
         
         assertEquals( VerificationResult.ViolationType.None, res.getViolationType() );
@@ -63,7 +61,6 @@ public class VerificationResultOptionsTest {
         bprog.putInGlobalScope("createFailedAssertion", false);
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-        vfr.setVisitedNodeStore(new FullVisitedNodeStore());
         final VerificationResult res = vfr.verify(bprog);
         
         assertEquals( VerificationResult.ViolationType.Deadlock, res.getViolationType() );
@@ -79,7 +76,6 @@ public class VerificationResultOptionsTest {
         bprog.putInGlobalScope("createFailedAssertion", true);
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-        vfr.setVisitedNodeStore(new FullVisitedNodeStore());
         final VerificationResult res = vfr.verify(bprog);
         
         assertEquals( VerificationResult.ViolationType.FailedAssertion, res.getViolationType() );
@@ -97,7 +93,6 @@ public class VerificationResultOptionsTest {
         bprog.putInGlobalScope("createFailedAssertion", false);
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-        vfr.setVisitedNodeStore(new FullVisitedNodeStore());
         final VerificationResult res = vfr.verify(bprog);
         
         assertEquals( VerificationResult.ViolationType.None, res.getViolationType() );

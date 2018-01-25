@@ -26,11 +26,10 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import java.util.HashSet;
 import java.util.Set;
-import org.mozilla.javascript.NativeContinuation;
 
 /**
  *
- * A {@link VisitedNodeStore} that stores the state of the {@code BThread}s in the node.
+ * A {@link VisitedStateStore} that stores the state of the {@code BThread}s in the node.
  * Ignores the last event that led to this node.
  * 
  * Client code can specify to use a hash of the state instead of the state itself. This 
@@ -39,16 +38,16 @@ import org.mozilla.javascript.NativeContinuation;
  * 
  * @author michael
  */
-public class BThreadStateVisitedNodeStore implements VisitedNodeStore {
+public class BProgramStateVisitedStateStore implements VisitedStateStore {
     private final Set<Object> visited = new HashSet<>();
     
     private boolean useHash;
     
-    public BThreadStateVisitedNodeStore() {
+    public BProgramStateVisitedStateStore() {
         this(false);
     }
     
-    public BThreadStateVisitedNodeStore(boolean useHash) {
+    public BProgramStateVisitedStateStore(boolean useHash) {
         this.useHash = useHash;
     }
     
@@ -68,9 +67,9 @@ public class BThreadStateVisitedNodeStore implements VisitedNodeStore {
     }
     
     private long hash( Set<BThreadSyncSnapshot> snapshots ) {
-        long hash = 7;
+        long hash = 0;
         for ( BThreadSyncSnapshot snp : snapshots ) {
-            hash = 31 * hash + snp.hashCode();
+            hash = hash ^ snp.getContinuationProgramState().hashCode();
         }
         return hash;
     }
@@ -83,4 +82,8 @@ public class BThreadStateVisitedNodeStore implements VisitedNodeStore {
         this.useHash = useHash;
     }
     
+    @Override
+    public String toString() {
+        return "[BProgramStateVisitedNodeStore usingHash:" + isUseHash() + ']';
+    }
 }

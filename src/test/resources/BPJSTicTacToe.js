@@ -282,7 +282,7 @@ bp.registerBThread("Sides", function() {
 //		}
 //	});
 //
-//	bp.registerBThread("XMoves", function() {
+//	bp.registerBThread("SimulatedX", function() {
 //		while (true) {
 //			bsync({ request:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), X(1, 1), X(1, 2), X(2, 0), X(2, 1), X(2, 2) ] }, 10);
 //		}

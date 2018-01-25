@@ -23,24 +23,24 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
-import java.util.HashSet;
-import java.util.Set;
-
 /**
- * A {@link VisitedNodeStore} that stores the entire {@link Node}. 
+ * A VisitedNodeStore that does not remember any visited node. When the program 
+ * search graph is a tree, ensures that all the nodes are visited. When the program
+ * search graph contains even a single loop, pretty much ensures an infinite verification
+ * run. So use with caution.
  * 
  * @author michael
  */
-public class FullVisitedNodeStore  implements VisitedNodeStore {
-    private final Set<Node> visited = new HashSet<>();
-    
+public class ForgetfulVisitedStateStore implements VisitedStateStore {
+
     @Override
     public void store(Node nd) {
-        visited.add(nd);
+        // ignore.
     }
 
     @Override
     public boolean isVisited(Node nd) {
-        return visited.contains(nd);
-    }   
+        return false;
+    }
+    
 }
