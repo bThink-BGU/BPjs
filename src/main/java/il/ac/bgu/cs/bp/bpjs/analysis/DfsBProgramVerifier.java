@@ -97,7 +97,7 @@ public class DfsBProgramVerifier {
     protected VerificationResult dfsUsingStack(Node aStartNode, ExecutorService execSvc) throws Exception {
         long iterationCount = 0;
         visitedStatesCount = 0;
-
+        
         visited.store(aStartNode);
         push(aStartNode);
 
