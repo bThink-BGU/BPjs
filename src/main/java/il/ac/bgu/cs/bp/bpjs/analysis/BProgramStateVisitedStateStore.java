@@ -83,6 +83,11 @@ public class BProgramStateVisitedStateStore implements VisitedStateStore {
     }
     
     @Override
+    public void clear() {
+        visited.clear();
+    }
+    
+    @Override
     public String toString() {
         return "[BProgramStateVisitedNodeStore usingHash:" + isUseHash() + ']';
     }

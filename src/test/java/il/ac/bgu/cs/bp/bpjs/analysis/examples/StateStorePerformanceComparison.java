@@ -38,25 +38,37 @@ import il.ac.bgu.cs.bp.bpjs.analysis.VisitedStateStore;
  * {@link VisitedStateStore} implementations, and prints the timing results 
  * to the console.
  * 
+ * Run this test as follows:
+ * <ul>
+ *  <li>Build the BPjs uber-jar: {@code mvn package -P uber-jar}</li> 
+ *  <li>Build the BPjs tests-jar: {@code mvn jar:test-jar}</li> 
+ *  <li>Run and collect output: {@code java -Xmx4G -cp [uber jar]:[tests jar] il.ac.bgu.cs.bp.bpjs.analysis.examples.StateStorePerformanceComparison}</li> 
+ * </ul>
+ * 
  * @author michael
  */
 public class StateStorePerformanceComparison {
     
-    private final static String MAZE_NAME = "complex";
+    private static String MAZE_NAME = "complex2";
     private final static String IMPLEMENTATION = "MazesNegative.js";
     private final static BEvent TARGET_FOUND_EVENT = BEvent.named("targetFound");
-    private static final int ITERATIONS = 10;
+    private static final int ITERATIONS = 100;
     private static final int HEAT_UP_ITERATIONS = 10;
     
     public static void main(String[] args) throws Exception {
+        
+        if ( args.length == 1 ) {
+            MAZE_NAME = args[0];
+        }
+        
         // prepare verifier
         DfsBProgramVerifier verifier = new DfsBProgramVerifier();
         verifier.setDetectDeadlocks( false );
         
         // test
-        verifier.setVisitedNodeStore(new BProgramStateVisitedStateStore(true) );
-        runVerifier(verifier);
         verifier.setVisitedNodeStore(new BProgramStateVisitedStateStore(false) );
+        runVerifier(verifier);
+        verifier.setVisitedNodeStore(new BProgramStateVisitedStateStore(true) );
         runVerifier(verifier);
         verifier.setVisitedNodeStore(new ForgetfulVisitedStateStore());
         runVerifier(verifier);

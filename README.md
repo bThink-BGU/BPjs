@@ -44,6 +44,7 @@ a link to this page somewhere in the documentation/system about section.
 ## Change log for the BPjs library.
 
 ## 2018-02-25
+* :arrow_up: `VisitedStateStore` Adds a `clear()` method.
 * :bug: `DfsBProgramVerifier` instances can now be re-used.
 
 ## 2018-01-24

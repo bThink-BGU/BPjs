@@ -31,4 +31,5 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
 public interface VisitedStateStore {
     void store( Node nd );
     boolean isVisited( Node nd );
+    void clear();
 }

@@ -42,5 +42,9 @@ public class ForgetfulVisitedStateStore implements VisitedStateStore {
     public boolean isVisited(Node nd) {
         return false;
     }
-    
+        
+    @Override
+    public void clear() {
+        // we're pretty much clearing all the time :-)
+    }
 }
