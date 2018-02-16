@@ -2,7 +2,7 @@ package il.ac.bgu.cs.bp.bpjs.TicTacToe.events;
 
 import org.apache.commons.lang3.NotImplementedException;
 
-import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 
 /**
  * A base class for moves (X or O) in the tic-tac-toe game.

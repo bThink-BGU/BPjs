@@ -1,18 +1,18 @@
 package il.ac.bgu.cs.bp.bpjs.TicTacToe;
 
+
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import org.mozilla.javascript.Scriptable;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.SingleResourceBProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.PrintBProgramRunnerListener;
-import il.ac.bgu.cs.bp.bpjs.eventselection.PrioritizedBSyncEventSelectionStrategy;
-import il.ac.bgu.cs.bp.bpjs.search.FullVisitedNodeStore;
-import il.ac.bgu.cs.bp.bpjs.verification.DfsBProgramVerifier;
-import il.ac.bgu.cs.bp.bpjs.verification.VerificationResult;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
+import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
+import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
+import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 
 /**
  * For Gaming mode change UseSimulatedPlayer to false. For Model Checking mode
@@ -26,7 +26,7 @@ class TicTacToeGameMain extends JFrame {
 	public static TTTDisplayGame TTTdisplayGame;
 
 	public static boolean UseSimulatedPlayer() {
-		return false;
+		return true;
 	}
 
 	public static void main(String[] args) throws InterruptedException {
@@ -46,18 +46,39 @@ class TicTacToeGameMain extends JFrame {
 		bprog.setDaemonMode(true);
 		JFrame f = new TicTacToeGameMain();
 
-		BProgramRunner rnr = new BProgramRunner(bprog);
 
 		if (!UseSimulatedPlayer()) {
+			BProgramRunner rnr = new BProgramRunner(bprog);
+
 			rnr.addListener(new PrintBProgramRunnerListener());
 			TTTdisplayGame = new TTTDisplayGame(bprog, rnr);
 			rnr.start();
 		} else {
+			System.out.println("Creating SimulatedPlayer");
+
+			String SimulatedPlayer = "	" +
+//										+ "bp.registerBThread('STAM', function() {\n" +
+//										"while (true) {\n" +
+//											"bsync({ request:[ bp.Event('STAM') ]\n" +
+//											//" , interrupt:[ StaticEvents.XWin]\n" +
+//												"});\n" +
+//											"}\n" +
+//										"});\n" +			
+										"bp.registerBThread('XMoves', function() {\n" +
+										"while (true) {\n" +
+											"bsync({ request:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), \n" +
+											"X(1, 1), X(1, 2), X(2, 0), X(2, 1), X(2, 2) ] }, 10); \n" +
+											"}\n" +
+										"});\n";
+
+	        bprog.appendSource(SimulatedPlayer);
+
 			try {
 				DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-				vfr.setVisitedNodeStore(new FullVisitedNodeStore());
 				
 				vfr.setMaxTraceLength(50);
+				vfr.setDebugMode(true);
+				
 				final VerificationResult res = vfr.verify(bprog);
 				if (res.isCounterExampleFound()) {
 					System.out.println("Found a counterexample");

@@ -11,7 +11,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 
 /**
  * Class that implements the display of the game

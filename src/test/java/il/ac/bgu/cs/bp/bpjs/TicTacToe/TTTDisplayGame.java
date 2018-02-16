@@ -18,10 +18,10 @@ import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.Click;
 import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.Move;
 import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.StaticEvents;
 import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.X;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgram;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.listeners.BProgramRunnerListenerAdapter;
-import il.ac.bgu.cs.bp.bpjs.events.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 
 /**
  * Class that implements the Graphical User Interface for the game

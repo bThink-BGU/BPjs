@@ -41,9 +41,15 @@ for (var r = 0; r < 3; r++) {
 // Represents Enforce Turns
 bp.registerBThread("EnforceTurns", function() {
 	while (true) {
-		bsync({ waitFor:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), X(1, 1), X(1, 2), X(2, 0), X(2, 1), X(2, 2) ], block:[ O(0, 0), O(0, 1), O(0, 2), O(1, 0), O(1, 1), O(1, 2), O(2, 0), O(2, 1), O(2, 2) ] });
+		bsync({ waitFor:[ X(0, 0), X(0, 1), X(0, 2), 
+                          X(1, 0), X(1, 1), X(1, 2), 
+                          X(2, 0), X(2, 1), X(2, 2) ],
+                block:[ O(0, 0), O(0, 1), O(0, 2),
+                        O(1, 0), O(1, 1), O(1, 2), 
+                        O(2, 0), O(2, 1), O(2, 2) ] });
 
-		bsync({ waitFor:[ O(0, 0), O(0, 1), O(0, 2), O(1, 0), O(1, 1), O(1, 2), O(2, 0), O(2, 1), O(2, 2) ], block:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), X(1, 1), X(1, 2), X(2, 0), X(2, 1), X(2, 2) ] });
+		bsync({ waitFor:[ O(0, 0), O(0, 1), O(0, 2), O(1, 0), O(1, 1), O(1, 2), O(2, 0), O(2, 1), O(2, 2) ], 
+                block:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), X(1, 1), X(1, 2), X(2, 0), X(2, 1), X(2, 2) ] });
 	}
 });
 
@@ -51,7 +57,12 @@ bp.registerBThread("EnforceTurns", function() {
 bp.registerBThread("EndOfGame", function() {
 	bsync({ waitFor:[ StaticEvents.OWin, StaticEvents.XWin, StaticEvents.draw ] });
 
-	bsync({ block:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), X(1, 1), X(1, 2), X(2, 0), X(2, 1), X(2, 2), O(0, 0), O(0, 1), O(0, 2), O(1, 0), O(1, 1), O(1, 2), O(2, 0), O(2, 1), O(2, 2) ] });
+	bsync({ block:[ X(0, 0), X(0, 1), X(0, 2), 
+                    X(1, 0), X(1, 1), X(1, 2), 
+                    X(2, 0), X(2, 1), X(2, 2), 
+                    O(0, 0), O(0, 1), O(0, 2), 
+                    O(1, 0), O(1, 1), O(1, 2), 
+                    O(2, 0), O(2, 1), O(2, 2) ] });
 });
 
 var move = bp.EventSet("Move events", function(e) {
@@ -134,8 +145,16 @@ function addLinePermutationBthreads(l, p) {
 
 // Player O strategy:
 
-var lines = [ [ { x:0, y:0 }, { x:0, y:1 }, { x:0, y:2 } ], [ { x:1, y:0 }, { x:1, y:1 }, { x:1, y:2 } ], [ { x:2, y:0 }, { x:2, y:1 }, { x:2, y:2 } ], [ { x:0, y:0 }, { x:1, y:0 }, { x:2, y:0 } ], [ { x:0, y:1 }, { x:1, y:1 }, { x:2, y:1 } ], [ { x:0, y:2 }, { x:1, y:2 }, { x:2, y:2 } ], [ { x:0, y:0 }, { x:1, y:1 }, { x:2, y:2 } ], [ { x:0, y:2 }, { x:1, y:1 }, { x:2, y:0 } ] ];
-var perms = [ [ 0, 1, 2 ], [ 0, 2, 1 ], [ 1, 0, 2 ], [ 1, 2, 0 ], [ 2, 0, 1 ], [ 2, 1, 0 ] ];
+var lines = [ [ { x:0, y:0 }, { x:0, y:1 }, { x:0, y:2 } ], 
+              [ { x:1, y:0 }, { x:1, y:1 }, { x:1, y:2 } ],
+              [ { x:2, y:0 }, { x:2, y:1 }, { x:2, y:2 } ],
+              [ { x:0, y:0 }, { x:1, y:0 }, { x:2, y:0 } ],
+              [ { x:0, y:1 }, { x:1, y:1 }, { x:2, y:1 } ], 
+              [ { x:0, y:2 }, { x:1, y:2 }, { x:2, y:2 } ], 
+              [ { x:0, y:0 }, { x:1, y:1 }, { x:2, y:2 } ], 
+              [ { x:0, y:2 }, { x:1, y:1 }, { x:2, y:0 } ] ];
+var perms = [ [ 0, 1, 2 ], [ 0, 2, 1 ], [ 1, 0, 2 ],
+              [ 1, 2, 0 ], [ 2, 0, 1 ], [ 2, 1, 0 ] ];
 
 lines.forEach(function(l) {
 	perms.forEach(function(p) {
@@ -273,18 +292,18 @@ bp.registerBThread("Sides", function() {
 	}
 });
 
-if (UseSimulatedPlayer) {
-	bp.registerBThread("STAM", function() {
-		while (true) {
-			bsync({ request:[ bp.Event("STAM") ]
-			// , interrupt:[ StaticEvents.XWin]
-			});
-		}
-	});
-
-	bp.registerBThread("XMoves", function() {
-		while (true) {
-			bsync({ request:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), X(1, 1), X(1, 2), X(2, 0), X(2, 1), X(2, 2) ] }, 10);
-		}
-	});
-}
+//if (UseSimulatedPlayer) {
+//	bp.registerBThread("STAM", function() {
+//		while (true) {
+//			bsync({ request:[ bp.Event("STAM") ]
+//			// , interrupt:[ StaticEvents.XWin]
+//			});
+//		}
+//	});
+//
+//	bp.registerBThread("SimulatedX", function() {
+//		while (true) {
+//			bsync({ request:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), X(1, 1), X(1, 2), X(2, 0), X(2, 1), X(2, 2) ] }, 10);
+//		}
+//	});
+//}

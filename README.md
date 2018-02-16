@@ -11,12 +11,12 @@ This repository contains a javascript-based [BP](http://www.b-prog.org) library.
 #### License
 * BPjs is open sourced under the [MIT license](http://www.opensource.org/licenses/mit-license.php). If you use it in a system, please provide
 a link to this page somewhere in the documentation/system about section.
-* BPjs uses the Mozilla Rhino Javascript engine. See [here](https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino) for project page and source code.
+* BPjs uses the Mozilla Rhino Javascript engine. Project page and source code can be found [here](https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino).
 
 ---
 
 ## Getting BPjs
-* For Maven projects: Add bpjs as dependency. Note that the version number changes.
+* For Maven projects: Add BPjs as dependency. Note that the version number changes.
 
 ````xml
 <dependencies>
@@ -42,6 +42,37 @@ a link to this page somewhere in the documentation/system about section.
 * [API Javadocs](http://www.javadoc.io/doc/com.github.bthink-bgu/BPjs/)
 
 ## Change log for the BPjs library.
+
+## 2018-02-25
+* :arrow_up: `VisitedStateStore` Adds a `clear()` method.
+* :bug: `DfsBProgramVerifier` instances can now be re-used.
+
+## 2018-01-24
+* :arrow_up: Improved hashing algorithm on `BThreadStateVisitedNodeStore`.
+* :sparkles: Transient caching of thread state in `BThreadSyncSnapshot`s. This improves verification performance, with low memory cost.
+* :bug: Removed visited state stores that took incoming state into consideration.
+* :arrows_counterclockwise: More mazes in the Mazes example.
+
+## 2018-01-18
+* :bug: Fixed a crash where program with failed assertions were intermittently crashing.
+
+## 2018-01-17
+* :bug: Verifier now correctly identifies deadlock as a state where there are requested events, but they are all blocked (formerly it just looked for the existence of b-threads).
+
+## 2018-01-12
+* :bug: :sparkles: Refactored analysis code, removing the invalid (easy to understand, but invalid) `PathRequirement` based analysis, and using only b-thread now.
+                   This design is much cleaner, as it uses less concepts. Also moves us towards "everything is a b-thread" world.
+* :sparkles: Added tests to demonstrate the various states a verification can end in.
+* :bug: Verifiers and runners terminate their threadpools when they are done using them.
+
+## 2018-01-11
+* :sparkles: During forward execution, b-threads can halt execution using `bp.ASSERT(boolean, text)`.
+* :arrow_up: Refactored the engine tasks to support raising assertions. Reduced some code duplication in the way.
+* :arrow_up: Thread pools executing b-threads are now allocated per-executor/verifier (as opposed to using a single static pool). 
+
+## 2017-12-28
+* :arrow_up: Re-arranged package structure, duplicate and ambiguous packages merged. We now have a clean `model`/`execution`/`analysis` division. 
+* :bug: Fixed an equality bug in `OrderedSet`.
 
 ## 2017-12-22
 * :bug: `BSyncStatement`s now retain information about the b-thread that created them.
