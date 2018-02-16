@@ -31,7 +31,6 @@ import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.analysis.Node;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
-import il.ac.bgu.cs.bp.bpjs.analysis.ForgetfulVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.Requirements;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
@@ -55,7 +54,8 @@ public class Mazes {
 //        "trivial"
 //        "trivialPlus"
 //        "simple"
-        "complex2"
+//        "complex2"
+        "complex1_5"
 //        "complex"
 //        "multipleSolutions"
 //        "cow"
@@ -86,8 +86,8 @@ public class Mazes {
 
             vfr.setProgressListener(new BriefPrintDfsVerifierListener());
             vfr.setIterationCountGap(10);
-//            vfr.setVisitedNodeStore(new BProgramStateVisitedNodeStore(true));
-            vfr.setVisitedNodeStore(new ForgetfulVisitedStateStore());
+            vfr.setVisitedNodeStore(new BProgramStateVisitedStateStore(false));
+//            vfr.setVisitedNodeStore(new ForgetfulVisitedStateStore());
             
             vfr.setDetectDeadlocks(false); // prevent from detecting cases where we ust hit a wall.
             final VerificationResult res = vfr.verify(bprog);

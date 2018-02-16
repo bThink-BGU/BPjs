@@ -107,3 +107,32 @@ code.literal {
 .code.bash.literal-block span.ln {
   color: #090;
 }
+
+footer {
+  padding: 1em 0.5em;
+  background-color: #5C5C5C;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.5) inset;
+  font-size: 9pt;
+}
+
+footer img {
+  vertical-align: middle;
+}
+
+footer a {
+  color: #DDD !important;
+  text-shadow: 0 0 4px black;
+  font-family: Monaco, Consolas, Courier, Monospace;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-shadow: 0 0 4px yellow;
+  text-decoration: none;
+}
+
+footer a:active {
+  text-decoration: none;
+  color: white;
+  text-shadow: 0 0 4px blue;
+}

@@ -36,7 +36,7 @@ BPjs is released using two .jar files, available at our `release page`_:
 Compile from Source
 --------------------
 
-BPjs is a built using `Apache Maven`_. Thus, you need to install Maven, or have an IDE that supports it. The BPjs team uses mostly `NetBeans`_, but Eclipse and IntelliJ IDEA should work too.
+BPjs is built using `Apache Maven`_. Thus, you need to install Maven, or have an IDE that supports it. The BPjs team uses mostly `NetBeans`_, but Eclipse and IntelliJ IDEA should work too.
 
 #. Download the sources from BPjs' `GitHub repo`_, either by cloning, or as a .zip file.
 
