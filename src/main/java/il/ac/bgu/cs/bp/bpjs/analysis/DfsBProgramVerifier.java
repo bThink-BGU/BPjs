@@ -37,9 +37,10 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  *
- * Takes a {@link BProgram}, and verifies that it conforms to a given
- * {@link PathRequirement}. Take care to use the appropriate
- * {@link VisitedStateStore} for the {@link BProgram} being verified.
+ * Takes a {@link BProgram}, and verifies that it does not run into false 
+ * assertions, given all possible event selections.
+ * Take care to use the appropriate {@link VisitedStateStore} for the 
+ * {@link BProgram} being verified.
  *
  * States are scanned using a DFS.
  *
