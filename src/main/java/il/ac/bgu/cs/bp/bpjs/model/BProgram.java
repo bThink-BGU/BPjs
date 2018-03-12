@@ -207,7 +207,9 @@ public abstract class BProgram {
      */
     protected Object evaluate(String script, String scriptName) {
         try {
-            return Context.getCurrentContext().evaluateString(programScope, script, scriptName, 1, null);
+            Context curCtx = Context.getCurrentContext();
+            curCtx.setLanguageVersion(170);
+            return curCtx.evaluateString(programScope, script, scriptName, 1, null);
         } catch (EcmaError rerr) {
             if ( rerr.getErrorMessage().trim().equals("\"bsync\" is not defined.") ) {
                 throw new BPjsCodeEvaluationException("'bsync' is only defined in BThreads. Did you forget to call 'bp.registerBThread()'?", rerr);
