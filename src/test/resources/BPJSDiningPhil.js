@@ -9,27 +9,26 @@ if (!PHILOSOPHER_COUNT) {
 bp.log.info('Dinning philosophers with ' + PHILOSOPHER_COUNT + ' philosophers');
 
 function addStick(i) {
-    var j = (i % PHILOSOPHER_COUNT) + 1;
+    let j = (i % PHILOSOPHER_COUNT) + 1;
 
     bp.registerBThread("Stick" + i, function () {
-        var pickMe = bp.EventSet("pick_" + i, function (e) {
-            return e.name === "Pick" + i + "R" || e.name === "Pick" + j + "L";
-        });
-        var releaseMe = [bp.Event("Rel" + i + "R"), bp.Event("Rel" + j + "L")];
+        let pickMe = [bp.Event("Pick" + i + "R"), bp.Event("Pick" + j + "L")];
+        let releaseMe = [bp.Event("Rel" + i + "R"), bp.Event("Rel" + j + "L")];
 
         while (true) {
-            var e = bsync({waitFor: pickMe,
+            let e = bsync({waitFor: pickMe,
                              block: releaseMe});
 
-            var wt = (e.name === "Pick" + i + "R") ? "Rel" + i + "R" : "Rel" + j + "L";
-            bsync({waitFor: bp.Event(wt),
-                     block: releaseMe});
+            let wt = (e.name === "Pick" + i + "R") ? bp.Event("Rel" + i + "R") : bp.Event("Rel" + j + "L");
+            bsync({waitFor: wt,
+                     block: pickMe});
         }
     });
 }
 
 function addPhil(philNum) {
-    bp.registerBThread("Phil" + philNum, function () {
+    let philname = String.fromCharCode(philNum+0x40);
+    bp.registerBThread("Phil" + philname, function () {
         while (true) {
             // Request to pick the right stick
             bsync({
@@ -55,7 +54,7 @@ function addPhil(philNum) {
 }
 ;
 
-for (var i = 1; i <= PHILOSOPHER_COUNT; i++) {
+for (let i = 1; i <= PHILOSOPHER_COUNT; i++) {
     addStick(i);
     addPhil(i);
 }
