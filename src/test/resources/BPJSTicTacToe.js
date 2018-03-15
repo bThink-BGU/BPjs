@@ -87,7 +87,6 @@ bp.registerBThread("DetectDraw", function() {
 	 * for (var i=0; i< 9; i++) { bsync({ waitFor:[ move ] }); }
 	 */
 	bsync({ request:[ StaticEvents.draw ] }, 90);
-    bp.ASSERT(false, "A draw has happened.");
 });
 
 function addLinePermutationBthreads(l, p) {
@@ -116,7 +115,6 @@ function addLinePermutationBthreads(l, p) {
 			bsync({ waitFor:[ O(l[p[2]].x, l[p[2]].y) ] });
 
 			bsync({ request:[ StaticEvents.OWin ] }, 100);
-            bp.ASSERT(false, "O has won");
 
         }
 	});

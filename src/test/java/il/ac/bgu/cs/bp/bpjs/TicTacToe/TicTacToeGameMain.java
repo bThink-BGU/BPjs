@@ -4,6 +4,7 @@ package il.ac.bgu.cs.bp.bpjs.TicTacToe;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import org.mozilla.javascript.Scriptable;
 
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
@@ -79,6 +80,10 @@ class TicTacToeGameMain extends JFrame {
 				vfr.setMaxTraceLength(50);
 				vfr.setDebugMode(true);
 				vfr.setDetectDeadlocks(false);
+				vfr.addInvalidEvent(BEvent.named("Draw"));
+				vfr.setDetectInvalidStates(true);
+				vfr.getInvalidEvents().forEach(System.out::println);
+
 				final VerificationResult res = vfr.verify(bprog);
 				if (res.isCounterExampleFound()) {
 					System.out.println("Found a counterexample");

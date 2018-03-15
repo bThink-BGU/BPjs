@@ -23,17 +23,16 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
-import java.util.Optional;
+
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -79,7 +78,11 @@ public class DfsBProgramVerifier {
     private BProgram currentBProgram;
     private boolean debugMode = false;
     private boolean detectDeadlocks = true;
-    
+
+    private final ArrayList<BEvent> invalidEvents = new ArrayList<>();
+    private boolean detectInvalidStates = false;
+
+
     public VerificationResult verify(BProgram aBp) throws Exception {
         currentBProgram = aBp;
         visitedStatesCount = 1;
@@ -115,6 +118,13 @@ public class DfsBProgramVerifier {
                     // detected deadlock
                     return new VerificationResult(VerificationResult.ViolationType.Deadlock, null, currentPath);
                 }
+                if (isDetectInvalidStates() &&
+                        hasInvalidEvent( curNode.getSystemState() )
+                        )
+                {
+                    //Detected possible bad state
+                    return new VerificationResult(VerificationResult.ViolationType.BadState, null, currentPath);
+                }
                 if ( ! curNode.getSystemState().isStateValid() ) {
                     // detected assertion failure.
                     return new VerificationResult(VerificationResult.ViolationType.FailedAssertion,
@@ -126,9 +136,7 @@ public class DfsBProgramVerifier {
             iterationCount++;
 
             if (pathLength() == maxTraceLength) {
-                if (listenerOpt.isPresent()) {
-                    listenerOpt.get().maxTraceLengthHit(currentPath, this);
-                }
+                listenerOpt.ifPresent(progressListener -> progressListener.maxTraceLengthHit(currentPath, this));
                 // fold stack;
                 pop();
 
@@ -151,7 +159,7 @@ public class DfsBProgramVerifier {
                 }
             }
 
-            if (iterationCount % iterationCountGap == 0 && listenerOpt.isPresent()) {
+            if ((iterationCount % iterationCountGap == 0) && (listenerOpt.isPresent())) {
                 listenerOpt.get().iterationCount(iterationCount, visitedStatesCount, this);
             }
         }
@@ -243,9 +251,27 @@ public class DfsBProgramVerifier {
     public void setDetectDeadlocks(boolean detectDeadlocks) {
         this.detectDeadlocks = detectDeadlocks;
     }
-    
+
+    public void addInvalidEvent(BEvent desiredEvent) { invalidEvents.add(desiredEvent);}
+    public ArrayList<BEvent> getInvalidEvents() { return invalidEvents;}
+
+    public boolean isDetectInvalidStates() {
+        return detectInvalidStates;
+    }
+
+    public void setDetectInvalidStates(boolean detectInvalidStates) {
+        this.detectInvalidStates = detectInvalidStates;
+    }
+
     private boolean hasRequestedEvents( BProgramSyncSnapshot bpss ) {
         return bpss.getBThreadSnapshots().stream().anyMatch(btss -> (!btss.getBSyncStatement().getRequest().isEmpty()) );
+    }
+
+    private boolean hasInvalidEvent( BProgramSyncSnapshot bpss ) {
+        Set<String> names = invalidEvents.stream().map(x->x.name).collect(Collectors.toSet());
+        Set<? extends BEvent> possibleEvents = bpss.getBThreadSnapshots().stream().map(btss ->btss.getBSyncStatement().getRequest()).flatMap(Collection::stream).collect(Collectors.toSet());
+
+        return possibleEvents.stream().anyMatch(x->names.contains(x.name));
     }
     
 }
