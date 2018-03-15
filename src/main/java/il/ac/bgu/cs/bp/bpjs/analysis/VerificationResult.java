@@ -42,6 +42,9 @@ public class VerificationResult {
         
         /** Program contains deadlocks while is shouldn't */
         Deadlock,
+
+        /** Program can reach a state we don't want to reach */
+        BadState,
         
         /** Program can generate an illegal event trace */
         FailedAssertion
