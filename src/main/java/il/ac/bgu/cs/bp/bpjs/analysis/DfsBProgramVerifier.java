@@ -50,7 +50,7 @@ public class DfsBProgramVerifier {
     public final static long DEFAULT_MAX_TRACE = 100;
 
     /**
-     * Default number of iterations between invocation of {@link ProgressListener#iterationCount(long, long, il.ac.bgu.cs.bp.bpjs.verification.DfsBProgramVerifier)
+     * Default number of iterations between invocation of {@link ProgressListener#iterationCount(long, long, il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier)
      * }.
      */
     public final static long DEFAULT_ITERATION_COUNT_GAP = 1000;
