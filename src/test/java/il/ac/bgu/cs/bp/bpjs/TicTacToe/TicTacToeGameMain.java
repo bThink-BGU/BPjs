@@ -78,12 +78,12 @@ class TicTacToeGameMain extends JFrame {
 				
 				vfr.setMaxTraceLength(50);
 				vfr.setDebugMode(true);
-				
+				vfr.setDetectDeadlocks(false);
 				final VerificationResult res = vfr.verify(bprog);
 				if (res.isCounterExampleFound()) {
 					System.out.println("Found a counterexample");
+					System.out.println("Counter example type is: " + res.getViolationType().name());
 					res.getCounterExampleTrace().forEach(nd -> System.out.println(" " + nd.getLastEvent()));
-
 				} else {
 					System.out.println("No counterexample found.");
 				}
