@@ -42,109 +42,154 @@ import static org.junit.Assert.assertFalse;
  * @author michael
  */
 public class DfsBProgramVerifierTest {
-    
-    @Test
-    public void simpleAAABTrace() throws Exception {
-        BProgram program = new SingleResourceBProgram("AAABTrace.js");
-        DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        sut.setProgressListener(new BriefPrintDfsVerifierListener());
-        program.appendSource(Requirements.eventNotSelected("B"));
-        sut.setVisitedNodeStore(new ForgetfulVisitedStateStore());
-        VerificationResult res = sut.verify(program);
-        assertTrue( res.isCounterExampleFound() );
-        assertEquals("AAAB", traceEventNamesString(res.getCounterExampleTrace(),"") );
-    }
- 
-    @Test
-    public void simpleAAABTrace_hashedNodeStore() throws Exception {
-        BProgram program = new SingleResourceBProgram("AAABTrace.js");
-        DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        sut.setProgressListener(new BriefPrintDfsVerifierListener());
-        program.appendSource(Requirements.eventNotSelected("B"));
-        sut.setVisitedNodeStore(new BProgramStateVisitedStateStore(true));
-        VerificationResult res = sut.verify(program);
-        assertTrue( res.isCounterExampleFound() );
-        assertEquals("AAAB", traceEventNamesString(res.getCounterExampleTrace(),"") );
-    }
-    
-    @Test 
-    public void testAAABRun() throws Exception {
-        BProgram program = new SingleResourceBProgram("AAABTrace.js");
-        BProgramRunner rnr = new BProgramRunner(program);
-        
-        rnr.addListener(new PrintBProgramRunnerListener() );
-        InMemoryEventLoggingListener eventLogger = rnr.addListener( new InMemoryEventLoggingListener() );
-        rnr.start();
-        
-        eventLogger.getEvents().forEach( System.out::println );
-        assertTrue(eventNamesString( eventLogger.getEvents(), "").matches("^(AAAB)+$"));
-    }
-    
-    @Test
-    public void deadlockTrace() throws Exception {
-        BProgram program = new SingleResourceBProgram("deadlocking.js");
-        DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        sut.setVisitedNodeStore(new ForgetfulVisitedStateStore());
-        VerificationResult res = sut.verify(program);
-        assertTrue( res.isCounterExampleFound() );
-        assertEquals( VerificationResult.ViolationType.Deadlock, res.getViolationType() );
-        assertEquals("A", traceEventNamesString(res.getCounterExampleTrace(),"") );
-    }
-    
-    @Test 
-    public void deadlockRun() throws Exception {
-        BProgram program = new SingleResourceBProgram("deadlocking.js");
-        BProgramRunner rnr = new BProgramRunner(program);
-        
-        rnr.addListener(new PrintBProgramRunnerListener() );
-        InMemoryEventLoggingListener eventLogger = rnr.addListener( new InMemoryEventLoggingListener() );
-        rnr.start();
-        
-        eventLogger.getEvents().forEach( System.out::println );
-        assertTrue(eventNamesString( eventLogger.getEvents(), "").matches("^A$"));
-        
-    }
-    
-    @Test
-    public void testTwoSimpleBThreads() throws Exception {
-        BProgram bprog = new StringBProgram(
-          "bp.registerBThread('bt1', function(){bsync({ request:[ bp.Event(\"STAM1\") ] });});" +
-          "bp.registerBThread('bt2', function(){bsync({ request:[ bp.Event(\"STAM2\") ] });});" 
-        );
-        
-        DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        sut.setIterationCountGap(1);
-        sut.setProgressListener( new BriefPrintDfsVerifierListener() );
-        sut.setDetectDeadlocks(false);
-        VerificationResult res = sut.verify(bprog);
-        
-        assertTrue( res.isVerifiedSuccessfully());
-        assertEquals( 3, res.getScannedStatesCount() );
-        assertEquals( VerificationResult.ViolationType.None, res.getViolationType() );
-    }
-    
-    @Test(timeout = 2000)
-    public void testTwoLoopingBThreads() throws Exception {
-        BProgram bprog = new StringBProgram(
-          "bp.registerBThread('bt1', function(){" +
-          "    while(true){\n" + 
-          "       bsync({ request:[ bp.Event(\"STAM1\") ] });\n" +
-          "}});\n" +
-          "bp.registerBThread('bt2', function(){" +
-          "    while(true){\n" + 
-          "       bsync({ request:[ bp.Event(\"STAM2\") ] });\n" +
-          "}});\n" +
-          ""
-        );
-        
-        DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        sut.setIterationCountGap(1);
-        sut.setProgressListener( new BriefPrintDfsVerifierListener() );
-        sut.setDebugMode(true);
-        VerificationResult res = sut.verify(bprog);
-        
-        assertFalse( res.isCounterExampleFound() );
-        assertEquals( 1, res.getScannedStatesCount() );
-    }
-    
+
+	@Test
+	public void simpleAAABTrace() throws Exception {
+		BProgram program = new SingleResourceBProgram("AAABTrace.js");
+		DfsBProgramVerifier sut = new DfsBProgramVerifier();
+		sut.setProgressListener(new BriefPrintDfsVerifierListener());
+		program.appendSource(Requirements.eventNotSelected("B"));
+		sut.setVisitedNodeStore(new ForgetfulVisitedStateStore());
+		VerificationResult res = sut.verify(program);
+		assertTrue(res.isCounterExampleFound());
+		assertEquals("AAAB", traceEventNamesString(res.getCounterExampleTrace(), ""));
+	}
+
+	@Test
+	public void simpleAAABTrace_hashedNodeStore() throws Exception {
+		BProgram program = new SingleResourceBProgram("AAABTrace.js");
+		DfsBProgramVerifier sut = new DfsBProgramVerifier();
+		sut.setProgressListener(new BriefPrintDfsVerifierListener());
+		program.appendSource(Requirements.eventNotSelected("B"));
+		sut.setVisitedNodeStore(new BProgramStateVisitedStateStore(true));
+		VerificationResult res = sut.verify(program);
+		assertTrue(res.isCounterExampleFound());
+		assertEquals("AAAB", traceEventNamesString(res.getCounterExampleTrace(), ""));
+	}
+
+	@Test
+	public void testAAABRun() throws Exception {
+		BProgram program = new SingleResourceBProgram("AAABTrace.js");
+		BProgramRunner rnr = new BProgramRunner(program);
+
+		rnr.addListener(new PrintBProgramRunnerListener());
+		InMemoryEventLoggingListener eventLogger = rnr.addListener(new InMemoryEventLoggingListener());
+		rnr.start();
+
+		eventLogger.getEvents().forEach(System.out::println);
+		assertTrue(eventNamesString(eventLogger.getEvents(), "").matches("^(AAAB)+$"));
+	}
+
+	@Test
+	public void deadlockTrace() throws Exception {
+		BProgram program = new SingleResourceBProgram("deadlocking.js");
+		DfsBProgramVerifier sut = new DfsBProgramVerifier();
+		sut.setVisitedNodeStore(new ForgetfulVisitedStateStore());
+		VerificationResult res = sut.verify(program);
+		assertTrue(res.isCounterExampleFound());
+		assertEquals(VerificationResult.ViolationType.Deadlock, res.getViolationType());
+		assertEquals("A", traceEventNamesString(res.getCounterExampleTrace(), ""));
+	}
+
+	@Test
+	public void deadlockRun() throws Exception {
+		BProgram program = new SingleResourceBProgram("deadlocking.js");
+		BProgramRunner rnr = new BProgramRunner(program);
+
+		rnr.addListener(new PrintBProgramRunnerListener());
+		InMemoryEventLoggingListener eventLogger = rnr.addListener(new InMemoryEventLoggingListener());
+		rnr.start();
+
+		eventLogger.getEvents().forEach(System.out::println);
+		assertTrue(eventNamesString(eventLogger.getEvents(), "").matches("^A$"));
+
+	}
+
+	@Test
+	public void testTwoSimpleBThreads() throws Exception {
+		BProgram bprog = new StringBProgram(
+				"bp.registerBThread('bt1', function(){bsync({ request:[ bp.Event(\"STAM1\") ] });});"
+						+ "bp.registerBThread('bt2', function(){bsync({ request:[ bp.Event(\"STAM2\") ] });});");
+
+		DfsBProgramVerifier sut = new DfsBProgramVerifier();
+		sut.setIterationCountGap(1);
+		sut.setProgressListener(new BriefPrintDfsVerifierListener());
+		sut.setDetectDeadlocks(false);
+		VerificationResult res = sut.verify(bprog);
+
+		assertTrue(res.isVerifiedSuccessfully());
+		assertEquals(3, res.getScannedStatesCount());
+		assertEquals(VerificationResult.ViolationType.None, res.getViolationType());
+	}
+
+	@Test(timeout = 2000)
+	public void testTwoLoopingBThreads() throws Exception {
+		BProgram bprog = new StringBProgram("bp.registerBThread('bt1', function(){" + "    while(true){\n"
+				+ "       bsync({ request:[ bp.Event(\"STAM1\") ] });\n" + "}});\n"
+				+ "bp.registerBThread('bt2', function(){" + "    while(true){\n"
+				+ "       bsync({ request:[ bp.Event(\"STAM2\") ] });\n" + "}});\n" + "");
+
+		DfsBProgramVerifier sut = new DfsBProgramVerifier();
+		sut.setIterationCountGap(1);
+		sut.setProgressListener(new BriefPrintDfsVerifierListener());
+		sut.setDebugMode(true);
+		VerificationResult res = sut.verify(bprog);
+
+		assertFalse(res.isCounterExampleFound());
+		assertEquals(1, res.getScannedStatesCount());
+	}
+
+	@Test(timeout = 2000)
+	public void testVariablesInBT() throws Exception {
+		BProgram bprog = new StringBProgram("bp.registerBThread('bt1', function(){" + //
+				"    for(var i=0; i<10; i++){\n" + //
+				"       bsync({ waitFor:[ bp.Event(\"X\") ] });\n" + //
+				"    }\n" + //
+				"    bsync({ block:[ bp.Event(\"X\") ] });\n" + //
+				"});\n" + //
+
+				"bp.registerBThread('bt2', function(){" + //
+				"    while(true){\n" + //
+				"       bsync({ request:[ bp.Event(\"X\") ] });\n" + //
+				"}});\n" + //
+				"" //
+		);
+
+		DfsBProgramVerifier sut = new DfsBProgramVerifier();
+		sut.setIterationCountGap(1);
+		sut.setProgressListener(new BriefPrintDfsVerifierListener());
+		sut.setDebugMode(true);
+		VerificationResult res = sut.verify(bprog);
+
+		assertTrue(res.isCounterExampleFound());
+		assertEquals(res.getViolationType(), VerificationResult.ViolationType.Deadlock);
+		assertEquals(10, res.getScannedStatesCount());
+	}
+
+	@Test(timeout = 2000)
+	public void testVariablesEquailtyInBT() throws Exception {
+		BProgram bprog = new StringBProgram( //
+				"bp.registerBThread('bt1', function(){" + //
+				"    while(true) \n" + //
+				"      for(var i=0; i<10; i++){\n" + //
+				"         bsync({ waitFor:[ bp.Event(\"X\") ] });\n" + //
+				"      }\n" + //
+				"});\n" +
+				"bp.registerBThread('bt2', function(){" + //
+				"    while(true){\n" + //
+				"       bsync({ request:[ bp.Event(\"X\") ] });\n" + //
+				"}});\n" 
+		);
+
+		DfsBProgramVerifier sut = new DfsBProgramVerifier();
+		sut.setIterationCountGap(1);
+		sut.setProgressListener(new BriefPrintDfsVerifierListener());
+		sut.setDebugMode(true);
+		VerificationResult res = sut.verify(bprog);
+
+		assertFalse(res.isCounterExampleFound());
+		assertEquals(res.getViolationType(), VerificationResult.ViolationType.None);
+		assertEquals(10, res.getScannedStatesCount());
+	}
+
 }
