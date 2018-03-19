@@ -80,7 +80,6 @@ public class DfsBProgramVerifier {
     private boolean detectDeadlocks = true;
 
     private final ArrayList<BEvent> invalidEvents = new ArrayList<>();
-    private boolean detectInvalidStates = false;
 
 
     public VerificationResult verify(BProgram aBp) throws Exception {
@@ -118,7 +117,7 @@ public class DfsBProgramVerifier {
                     // detected deadlock
                     return new VerificationResult(VerificationResult.ViolationType.Deadlock, null, currentPath);
                 }
-                if (isDetectInvalidStates() &&
+                if ((!this.invalidEvents.isEmpty()) &&
                         hasInvalidEvent( curNode.getSystemState() )
                         )
                 {
@@ -252,17 +251,8 @@ public class DfsBProgramVerifier {
         this.detectDeadlocks = detectDeadlocks;
     }
 
-    public void addInvalidEvent(BEvent desiredEvent) { invalidEvents.add(desiredEvent);}
+    public void addInvalidEvent(BEvent desiredEvent) { invalidEvents.add(desiredEvent); }
     public ArrayList<BEvent> getInvalidEvents() { return invalidEvents;}
-
-    public boolean isDetectInvalidStates() {
-        return detectInvalidStates;
-    }
-
-    public void setDetectInvalidStates(boolean detectInvalidStates) {
-        this.detectInvalidStates = detectInvalidStates;
-    }
-
     private boolean hasRequestedEvents( BProgramSyncSnapshot bpss ) {
         return bpss.getBThreadSnapshots().stream().anyMatch(btss -> (!btss.getBSyncStatement().getRequest().isEmpty()) );
     }

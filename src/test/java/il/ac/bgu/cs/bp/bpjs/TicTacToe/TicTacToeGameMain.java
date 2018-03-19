@@ -78,11 +78,9 @@ class TicTacToeGameMain extends JFrame {
 				DfsBProgramVerifier vfr = new DfsBProgramVerifier();
 				
 				vfr.setMaxTraceLength(50);
-				vfr.setDebugMode(true);
+				vfr.setDebugMode(false);
 				vfr.setDetectDeadlocks(false);
 				vfr.addInvalidEvent(BEvent.named("Draw"));
-				vfr.setDetectInvalidStates(true);
-				vfr.getInvalidEvents().forEach(System.out::println);
 
 				final VerificationResult res = vfr.verify(bprog);
 				if (res.isCounterExampleFound()) {
