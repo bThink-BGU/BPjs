@@ -170,16 +170,14 @@ public class DfsBProgramVerifierTest {
 	public void testVariablesEquailtyInBT() throws Exception {
 		BProgram bprog = new StringBProgram( //
 				"bp.registerBThread('bt1', function(){" + //
-				"    while(true) \n" + //
-				"      for(var i=0; i<10; i++){\n" + //
-				"         bsync({ waitFor:[ bp.Event(\"X\") ] });\n" + //
-				"      }\n" + //
-				"});\n" +
-				"bp.registerBThread('bt2', function(){" + //
-				"    while(true){\n" + //
-				"       bsync({ request:[ bp.Event(\"X\") ] });\n" + //
-				"}});\n" 
-		);
+						"    while(true) \n" + //
+						"      for(var i=0; i<10; i++){\n" + //
+						"         bsync({ waitFor:[ bp.Event(\"X\") ] });\n" + //
+						"      }\n" + //
+						"});\n" + "bp.registerBThread('bt2', function(){" + //
+						"    while(true){\n" + //
+						"       bsync({ request:[ bp.Event(\"X\") ] });\n" + //
+						"}});\n");
 
 		DfsBProgramVerifier sut = new DfsBProgramVerifier();
 		sut.setIterationCountGap(1);
@@ -190,6 +188,40 @@ public class DfsBProgramVerifierTest {
 		assertFalse(res.isCounterExampleFound());
 		assertEquals(res.getViolationType(), VerificationResult.ViolationType.None);
 		assertEquals(10, res.getScannedStatesCount());
+	}
+
+	@Test(timeout = 2000)
+	public void tesJavaVariablesInBT() throws Exception {
+		BProgram bprog = new StringBProgram( //
+				"bp.registerBThread('bt1', function(){" + //
+				"    while(true) \n" + //
+				"      for(var i=0; i<10; i++){\n" + //
+				"         bsync({ request:[ bp.Event(\"X\"+i) ] });\n" + //
+				"         if (i == 5) {bsync({ request:[ bp.Event(\"X\"+i) ] });}\n" + //
+				"      }\n" + //
+				"});\n" +
+				"var x = bp.EventSet( \"X\", function(e){\r\n" + 
+				"    return e.getName().startsWith(\"X\");\r\n" + 
+				"} );\r\n" + 
+				"" +
+				"bp.registerBThread('bt2', function(){" + //
+				"	 var lastE = {name:\"what\"};" + //
+				"    while(true) {\n" + //
+				"       var e = bsync({ waitFor: x});\n" + //
+				"		lastE = e;" + //
+				"       if( e.name == lastE.name) { bp.ASSERT(false,\"Poof\");} " + //
+				"}});\n" 
+		);
+
+		DfsBProgramVerifier sut = new DfsBProgramVerifier();
+		sut.setIterationCountGap(1);
+		sut.setProgressListener(new BriefPrintDfsVerifierListener());
+		sut.setDebugMode(true);
+		VerificationResult res = sut.verify(bprog);
+
+		assertFalse(res.isCounterExampleFound());
+		assertEquals(res.getViolationType(), VerificationResult.ViolationType.FailedAssertion);
+		assertEquals(6, res.getScannedStatesCount());
 	}
 
 }
