@@ -8,12 +8,10 @@ import org.mozilla.javascript.Context;
  * A task that resumes a BThread from a BSync operation.
  */
 public class ResumeBThread extends BPEngineTask {
-    private final BThreadSyncSnapshot bss;
     private final BEvent event;
 
     public ResumeBThread(BThreadSyncSnapshot aBThread, BEvent selectedEvent, BPEngineTask.Listener l) {
         super(aBThread, l);
-        bss = aBThread;
         event = selectedEvent;
     }
 

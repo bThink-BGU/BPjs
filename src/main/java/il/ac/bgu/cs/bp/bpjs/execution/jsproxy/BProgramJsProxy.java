@@ -8,9 +8,22 @@ import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.JsEventSet;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.FailedAssertionException;
+import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
+import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import static java.util.stream.Collectors.toList;
+import static java.util.stream.Collectors.toSet;
+import java.util.stream.Stream;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativeArray;
+import org.mozilla.javascript.NativeObject;
 
 /**
  * An object representing the {@link BProgram} context for Javascript code.
@@ -151,6 +164,73 @@ public class BProgramJsProxy implements java.io.Serializable {
             throw new FailedAssertionException( message );
         }
     }
+    
+    
+    ////////////////////////
+    // sync ("bsync") related code
+    
+    public void sync( NativeObject jsRWB ) {
+        sync(jsRWB, null);
+    }
+    
+    public void sync( NativeObject jsRWB, Object data ) {
+        Map<String, Object> jRWB = (Map)Context.jsToJava(jsRWB, Map.class);
+        
+        BSyncStatement stmt = BSyncStatement.make();
+        Object req = jRWB.get("request");
+        if ( req != null ) {
+            if ( req instanceof BEvent ) {
+                stmt = stmt.request((BEvent)req);
+            } else if ( req instanceof NativeArray ) {
+                NativeArray arr = (NativeArray) req;
+                stmt = stmt.request(
+                        Arrays.asList( arr.getIndexIds() ).stream()
+                              .map( i -> (BEvent)arr.get(i) )
+                              .collect( toList() ));
+            } 
+        }
+        
+        stmt = stmt.waitFor( convertToEventSet(jRWB.get("waitFor")) )
+                     .block( convertToEventSet(jRWB.get("block")) )
+                 .interrupt( convertToEventSet(jRWB.get("interrupt")) )
+                      .data( data );
+        
+        captureBThreadState(stmt);
+        
+    }
+
+    private EventSet convertToEventSet( Object jsObject ) {
+        if ( jsObject == null ) return EventSets.none;
+        
+        // This covers event sets AND events.
+        if ( jsObject instanceof EventSet ) {
+            return (EventSet)jsObject;
+        
+        } else if ( jsObject instanceof NativeArray ) {
+            NativeArray arr = (NativeArray) jsObject;
+            if ( Stream.of(arr.getIds()).anyMatch( id -> arr.get(id)==null) ) {
+                throw new RuntimeException("EventSet Array contains null sets.");
+            }
+            return ComposableEventSet.anyOf(
+              Arrays.asList(arr.getIndexIds()).stream()
+                    .map( i ->(EventSet)arr.get(i) )
+                    .collect( toSet() ) );
+        } else {
+            final String errorMessage = "Cannot convert " + jsObject + " of class " + jsObject.getClass() + " to an event set";
+            Logger.getLogger(BThreadSyncSnapshot.class.getName()).log(Level.SEVERE, errorMessage);
+            throw new IllegalArgumentException( errorMessage);
+        }
+    }
+    
+    private void captureBThreadState(BSyncStatement stmt) throws ContinuationPending {
+        ContinuationPending capturedContinuation = Context.getCurrentContext().captureContinuation();
+        capturedContinuation.setApplicationState(stmt);
+        throw capturedContinuation;
+    }
+    
+    // /sync
+    /////////////////////////
+    
     
     /**
      * Push a new event to the external event queue. 

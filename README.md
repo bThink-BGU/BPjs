@@ -43,6 +43,10 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+## NEXT
+* :sparkles: `bsync` is *depredated*, in favor of `bp.sync`. The latter can be called from any function, not just the immediate b-thread function.
+* :arrows_counterclockwise: Cleanup.
+
 ## 2018-02-25
 * :arrow_up: `VisitedStateStore` Adds a `clear()` method.
 * :bug: `DfsBProgramVerifier` instances can now be re-used.

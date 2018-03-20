@@ -31,6 +31,8 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
         bss = aBss;
     }
     
+    abstract BThreadSyncSnapshot callImpl(Context jsContext);
+    
     @Override
     public BThreadSyncSnapshot call() {
         try {
@@ -38,7 +40,9 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
             return callImpl( jsContext );
 
         } catch (ContinuationPending cbs) {
-            return bss.copyWith(cbs.getContinuation(), (BSyncStatement) cbs.getApplicationState());
+            final BSyncStatement capturedStatement = (BSyncStatement) cbs.getApplicationState();
+            capturedStatement.setBthread(bss);
+            return bss.copyWith(cbs.getContinuation(), capturedStatement);
            
         } catch ( WrappedException wfae ) {
             if ( wfae.getCause() instanceof FailedAssertionException ) {
@@ -57,5 +61,4 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
         }
     }
     
-    abstract BThreadSyncSnapshot callImpl(Context jsContext);
 }

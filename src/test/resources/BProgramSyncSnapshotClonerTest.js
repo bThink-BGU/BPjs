@@ -28,18 +28,18 @@
  */
 
 bp.registerBThread("EventStore", function() {
-    var evt = bsync({waitFor:bp.Event("e")});
-    bsync({waitFor:bp.Event("e")});
+    var evt = bp.sync({waitFor:bp.Event("e")});
+    bp.sync({waitFor:bp.Event("e")});
     bp.log.info("got me event " + evt.name);
-    bsync( {request:evt} );
+    bp.sync( {request:evt} );
 });
 
 //bp.registerBThread("EventNoStore", function() {
-//    bsync({waitFor:bp.Event("e")});
+//    bp.sync({waitFor:bp.Event("e")});
 //    bp.log.info("got me event called 'e'");
-//    bsync( {request:bp.Event("e")} );
+//    bp.sync( {request:bp.Event("e")} );
 //});
 
 bp.registerBThread("requestor", function() {
-    bsync({request:bp.Event("e")});
+    bp.sync({request:bp.Event("e")});
 });

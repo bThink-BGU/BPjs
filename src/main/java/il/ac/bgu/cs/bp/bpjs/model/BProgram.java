@@ -22,7 +22,6 @@ import org.mozilla.javascript.Scriptable;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.EvaluatorException;
-import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.WrappedException;
 
 /**

@@ -29,9 +29,9 @@
 
 bp.registerBThread(function(){
     for ( var i=0; i<10; i++ ) {
-        bsync({request:bp.Event("A")});
-        bsync({request:bp.Event("A")});
-        bsync({request:bp.Event("A")});
-        bsync({request:bp.Event("B")});
+        bp.sync({request:bp.Event("A")});
+        bp.sync({request:bp.Event("A")});
+        bp.sync({request:bp.Event("A")});
+        bp.sync({request:bp.Event("B")});
     }
 });

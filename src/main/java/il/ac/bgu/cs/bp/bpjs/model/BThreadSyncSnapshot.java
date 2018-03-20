@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Optional;
 
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeContinuation;
 import org.mozilla.javascript.Scriptable;
@@ -44,7 +43,7 @@ public class BThreadSyncSnapshot implements Serializable {
     private final BThreadJsProxy proxy = new BThreadJsProxy(this);
 
     /**
-     * Scope for the Javascript code execution.
+     * Scope for the JavaScript code execution.
      */
     private Scriptable scope;
 
@@ -115,6 +114,8 @@ public class BThreadSyncSnapshot implements Serializable {
     void setupScope(Scriptable programScope) {
         scope = (Scriptable) Context.javaToJS(proxy, programScope);
         scope.delete("equals");
+        scope.delete("hashCode");
+        scope.delete("toString");
         scope.setParentScope(programScope);
 
         Scriptable curScope = entryPoint.getParentScope();
@@ -180,7 +181,6 @@ public class BThreadSyncSnapshot implements Serializable {
         }
         return programState;
     }
-    
     
     @Override
     public int hashCode() {

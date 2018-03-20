@@ -6,7 +6,6 @@ package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
@@ -39,11 +38,12 @@ import org.mozilla.javascript.NativeObject;
  */
 public class BThreadJsProxy implements java.io.Serializable {
     
+    private static volatile boolean deprecationWarningPrinted = false;
+    
     private BThreadSyncSnapshot bthread;
 
-    
-    public BThreadJsProxy(BThreadSyncSnapshot bthread) {
-        this.bthread = bthread;
+    public BThreadJsProxy(BThreadSyncSnapshot aBthread) {
+        bthread = aBthread;
     }
     
     public BThreadJsProxy() {}
@@ -53,6 +53,10 @@ public class BThreadJsProxy implements java.io.Serializable {
     }
     
     public void bsync( NativeObject jsRWB, Object data ) {
+        if ( ! deprecationWarningPrinted ) {
+            deprecationWarningPrinted = true;
+            System.err.println("Warning: bsync is deprecated and will be removed shortly. Please use bp.sync instead.");
+        }
         Map<String, Object> jRWB = (Map)Context.jsToJava(jsRWB, Map.class);
         
         BSyncStatement stmt = BSyncStatement.make();
@@ -101,11 +105,6 @@ public class BThreadJsProxy implements java.io.Serializable {
         }
     }
     
-    public void setInterruptHandler( Object aPossibleHandler ) {
-        bthread.setInterruptHandler(
-                (aPossibleHandler instanceof Function) ? (Function) aPossibleHandler: null );
-    }
-    
     private void captureBThreadState(BSyncStatement stmt) throws ContinuationPending {
         bthread.setBSyncStatement(stmt);
         stmt.setBthread(bthread);
@@ -114,6 +113,11 @@ public class BThreadJsProxy implements java.io.Serializable {
         throw capturedContinuation;
     }
 
+    public void setInterruptHandler( Object aPossibleHandler ) {
+        bthread.setInterruptHandler(
+                (aPossibleHandler instanceof Function) ? (Function) aPossibleHandler: null );
+    }
+    
     public void setBThread(BThreadSyncSnapshot bthread) {
         this.bthread = bthread;
     }

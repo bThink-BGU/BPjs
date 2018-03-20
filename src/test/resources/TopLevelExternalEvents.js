@@ -27,9 +27,9 @@
 bp.enqueueExternalEvent( bp.Event("ext1") );
 bp.enqueueExternalEvent( bp.Event("ext2") );
 bp.registerBThread( function(){
-    bsync({waitFor:bp.Event("ext1")});
-    bsync({waitFor:bp.Event("ext2")});
-    bsync({waitFor:bp.Event("ext3")});
-    bsync({request:bp.Event("internal")});
+    bp.sync({waitFor:bp.Event("ext1")});
+    bp.sync({waitFor:bp.Event("ext2")});
+    bp.sync({waitFor:bp.Event("ext3")});
+    bp.sync({request:bp.Event("internal")});
 });
 bp.enqueueExternalEvent( bp.Event("ext3") );

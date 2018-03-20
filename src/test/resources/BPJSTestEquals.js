@@ -5,8 +5,8 @@ bp.log.info('BPJSTestEquals');
 
 bp.registerBThread("BThread 1", function() {
 	while (true) {
-		bsync({wait : bp.Event("X")});
-		bsync({wait : bp.Event("X")});
+		bp.sync({wait : bp.Event("X")});
+		bp.sync({wait : bp.Event("X")});
 	}
 });
 
