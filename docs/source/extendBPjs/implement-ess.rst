@@ -11,23 +11,23 @@ Each b-program has an event selection strategy, implementing the `EventSelection
 
 The event selection strategy is used during both program execution and verification. During verification, the strategy is used to generate the possible selectable events; during execution, the strategy both generates the selectable eventset and selects a single event.
 
-Both of ``EventSelectionStrategy``\'s methods accept the program's state at the synchronization point. This state is composed of all the b-sync statements of participating b-threads, and the external event queue. ``selectableEvents`` returns a plain-old Java ``Set``, that can also possibly be empty. During execution, ``select`` recieves the program's state as well as the selectable event set obtained from the call to ``selectableEvents``. It does not return an ``Event``, though -- it returns a richer  ``Optional<EventSelectionResult>`` object.
+Both of ``EventSelectionStrategy``\'s methods accept the program's state at the synchronization point. This state is composed of all the b-sync statements of participating b-threads, and the external event queue. ``selectableEvents`` returns a plain-old Java ``Set``, that can also possibly be empty. During execution, ``select`` receives the program's state as well as the selectable event set obtained from the call to ``selectableEvents``. It does not return an ``Event``, though -- it returns a richer  ``Optional<EventSelectionResult>`` object.
 
 The `EventSelectionResult`_ object holds a selected event, and a set of indices to events in the external event queue. When receiving an `EventSelectionResult`, the b-program will remove the external events at those indices. This allows an event selection strategy a considerable degree of freedom for dealing with external event sets. For example, it can make the event list act like a set, by passing all the indices of events that are equal to the selected event.
 
 
-Hinted ``bsync``\s
-------------------
+Hinted ``bp.sync``\s
+--------------------
 
 Some event selection strategies may depend on internal b-thread state. For example, a b-thread may define a HOT/COLD modality, as defined by Live Sequence Charts. A b-thread in a "HOT" state must advance, whereas a b-thread in a "COLD" state can forever stay in its current position without violating the system's specification.
 
-To this end, the ``bsync`` statement in BPjs has an optional second parameter. BPjs makes no assumptions about the type of this parameter - it just stores it in the b-thread's `synchronization statement`_, where is it made available to the event selection strategy through the ``getData()`` method.
+To this end, the ``bp.sync`` statement in BPjs has an optional second parameter. BPjs makes no assumptions about the type of this parameter - it just stores it in the b-thread's `synchronization statement`_, where is it made available to the event selection strategy through the ``getData()`` method.
 
 
 Sample Strategy: Priority-Based Selection
 -----------------------------------------
 
-Let's look at a sample event selection strategy, based on priority. Under this strategy, the b-threads may add to their ``bsync`` statements a "priority" integer. The strategy finds a b-thread with the lowest priority, and selects an event that it requested, and was not blocked. Here's the code, followed by a short discussion.
+Let's look at a sample event selection strategy, based on priority. Under this strategy, the b-threads may add to their ``bp.sync`` statements a "priority" integer. The strategy finds a b-thread with the lowest priority, and selects an event that it requested, and was not blocked. Here's the code, followed by a short discussion.
 
 .. literalinclude:: code/ess.java
   :linenos:
@@ -48,7 +48,7 @@ The b-program using this event selection strategy is shown below. Note that b-th
   :linenos:
   :language: javascript
 
-.. warning:: The above strategy is intended for explenatory purposes, and is probabaly too simplistic for real-world use. It ignores external events, assumes priorities are unique, and if all the events requested by the b-thread with the lowest priority are blocked, it claims there are no selectable events.
+.. warning:: The above strategy is intended for explanatory purposes, and is probably too simplistic for real-world use. It ignores external events, assumes priorities are unique, and if all the events requested by the b-thread with the lowest priority are blocked, it claims there are no selectable events.
 
 .. tip:: The above strategy and b-program are part of BPjs' `unit tests`_.
 

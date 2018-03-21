@@ -1,7 +1,7 @@
 bp.registerBThread("bt-hi", function(){
-  bsync({request:bp.Event("hello")});
+  bp.sync({request:bp.Event("hello")});
 })
 
 bp.registerBThread("bt-world",function(){
-  bsync({request:bp.Event("world")});
+  bp.sync({request:bp.Event("world")});
 })

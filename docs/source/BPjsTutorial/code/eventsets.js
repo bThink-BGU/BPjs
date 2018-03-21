@@ -4,7 +4,7 @@ bp.registerBThread("orders", function(){
   // order 100 drinks
   for (var i = 0; i < 100; i++) {
     var idx = Math.floor(Math.random()*drinks.length);
-    bsync({request:bp.Event(drinks[idx])});
+    bp.sync({request:bp.Event(drinks[idx])});
   }
 });
 
@@ -15,9 +15,9 @@ bp.registerBThread("coffee supply", function() {
   });
   while ( true ) {
     for ( var i=0; i<10; i++ ) {
-      bsync({waitFor:coffeeOrderES});
+      bp.sync({waitFor:coffeeOrderES});
     }
-    bsync({request:bp.Event("Grind more coffee!"),
+    bp.sync({request:bp.Event("Grind more coffee!"),
            block:coffeeOrderES});
   }
 });

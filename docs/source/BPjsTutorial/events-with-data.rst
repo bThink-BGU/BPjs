@@ -26,7 +26,7 @@ The next b-thread is responsible for increasing the counter. Note the event set 
   :start-after: // Increasing the counter
   :end-before: // Capping
 
-Finally, a third b-thread prevents the counter from reaching 10. Apart from the event set detecting counter events with ``value`` of ``10``, the body of the "Capper" b-thread consists of a single ``bsync`` which blocks these events. This is a common idiom in BP, in order to prevent something that "should never happen".
+Finally, a third b-thread prevents the counter from reaching 10. Apart from the event set detecting counter events with ``value`` of ``10``, the body of the "Capper" b-thread consists of a single ``bp.sync`` which blocks these events. This is a common idiom in BP, in order to prevent something that "should never happen".
 
 .. literalinclude:: code/count-to-ten1.js
   :linenos:

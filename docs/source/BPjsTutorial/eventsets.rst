@@ -2,7 +2,7 @@
 Event Sets
 ==========
 
-When a b-thread requests an event, it has to be specific. That is, the b-thread has to provide an event instance as a parameter to ``bsync``. This is not the case for waited-for and blocked events: there are specified by an **event set**. An event set can be specified in the following ways:
+When a b-thread requests an event, it has to be specific. That is, the b-thread has to provide an event instance as a parameter to ``bp.sync``. This is not the case for waited-for and blocked events: there are specified by an **event set**. An event set can be specified in the following ways:
 
 *  If the set contains a single event, the event itself serves as an event set. We used this in the :ref:`hello_world` example.
 
@@ -10,7 +10,7 @@ When a b-thread requests an event, it has to be specific. That is, the b-thread 
 
   .. code:: javascript
 
-    bsync({waitFor:[evt1, evt2, evt3], block:[evt500]});
+    bp.sync({waitFor:[evt1, evt2, evt3], block:[evt500]});
 
 *  By an ``EventSet`` object. These have name and a predicate that takes an event and returns a boolean result: ``true`` if the event is a member of the set, and ``false`` otherwise:
 
@@ -42,7 +42,7 @@ The "orders" b-thread generates one hundred random orders. We now need to detect
   :start-after: grind more coffee
 
 
-After defining the event set for coffee orders, the "coffee supply" b-thread loops forever, waiting for coffee order events (line 7). After ten orders, when it's time to grind more coffee, it blocks coffee orders from happening, and requests a coffee grinding event (the ``bsync`` at lines 10-11). Until the coffee grinding event is selected, no coffee order can be selected.
+After defining the event set for coffee orders, the "coffee supply" b-thread loops forever, waiting for coffee order events (line 7). After ten orders, when it's time to grind more coffee, it blocks coffee orders from happening, and requests a coffee grinding event (the ``bp.sync`` at lines 10-11). Until the coffee grinding event is selected, no coffee order can be selected.
 
 .. note:: Rather than counting how many coffees were made using some variable, the "coffee supply" b-thread loops for 10 times, waiting for coffee to be ordered. This is an example for the classic scenario style: X has to happen Y times, and then we do Z.
 

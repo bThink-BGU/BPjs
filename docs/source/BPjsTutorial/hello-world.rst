@@ -25,8 +25,8 @@ The "Hello, World" version below (:download:`source <code/hello-world-seq.js>`) 
 
 This is not a very complicated example, but it does show a few basics worth mentioning. First, b-threads are normal javascript functions that take no parameters. They are added to the b-program using ``bp.registerBThread``. Note that the b-program is never explicitly started by the client code. Starting the b-program is done by BPjs for you.
 
-Lines 2 and 3 contains a very simple ``bsync`` statement, requesting an event. The events are created using the event factory ``bp.Event(...)``. This code uses the simple version of ``bp.Event``, passing the event name onely.
-We'll see more of ``bp.XXX`` and ``bsync`` soon, but first let's run this program and see what happens.
+Lines 2 and 3 contains a very simple ``bp.sync`` statement, requesting an event. The events are created using the event factory ``bp.Event(...)``. This code uses the simple version of ``bp.Event``, passing the event name onely.
+We'll see more of ``bp.XXX`` and ``bp.sync`` soon, but first let's run this program and see what happens.
 
 
 Running this example
@@ -94,7 +94,7 @@ Each b-thread is responsible for requesting its event only, so the code is very 
    --:BPjs Event [BEvent name:hello]
   ...
 
-To prevent the wrong order of events, we can add this additional b-thread (:download:`source <code/hello-world-decoupled-patch.js>`). It solves the "world before hello" issue by blocking the ``world`` event from being selecting, until the ``hello`` event is. This is done by passing ``bp.Event("world")`` as the ``block`` parameter of ``bsync``.
+To prevent the wrong order of events, we can add this additional b-thread (:download:`source <code/hello-world-decoupled-patch.js>`). It solves the "world before hello" issue by blocking the ``world`` event from being selecting, until the ``hello`` event is. This is done by passing ``bp.Event("world")`` as the ``block`` parameter of ``bp.sync``.
 
 .. literalinclude:: code/hello-world-decoupled-patch.js
   :linenos:

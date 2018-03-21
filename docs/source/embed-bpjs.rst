@@ -37,11 +37,11 @@ the default one it not good enough.
   :alt: Class diagram for running a BProgram
   :align: center
 
-  Class diagram describing the strucutre of an embedded b-program. The client code
+  Class diagram describing the structure of an embedded b-program. The client code
   generates a BProgram and a BProgramRunner. The runner object consults the b-program's
   event selection strategy when selecting events for the b-program it runs. A list of
   listener objects are informed whenever an event of interest, such as b-thread
-  addition or b-event selection, occures.
+  addition or b-event selection, occurs.
   *Some methods and properties have been omitted for brevity.*
 
 
@@ -66,7 +66,7 @@ Add BPjs to your classpath.
 
 Decide which ``BProgram`` subclass you need.
 
-  `BProgram`_ is an abstract class. Its concrete sub-classes differ on how they obtain their source code. `SingleResourceBProgram`_ reads the code from a resource included with the code (typlically, a .js file bundled in the project's .jars). `StringBProgram`_, on the other hand, takes a Java String as source. Of course, ``BProgram`` can be directly extended as needed.
+  `BProgram`_ is an abstract class. Its concrete sub-classes differ on how they obtain their source code. `SingleResourceBProgram`_ reads the code from a resource included with the code (typically, a .js file bundled in the project's .jars). `StringBProgram`_, on the other hand, takes a Java String as source. Of course, ``BProgram`` can be directly extended as needed.
 
 Write the BPjs code.
 
@@ -83,7 +83,7 @@ At Runtime
 * In the common case when the program needs to wait for external events (such as GUI interactions), set the ``isDaemon`` property of the ``BProgram`` to ``true``.
 * Call ``BProgramRunner::start()``.
 
-The BProgram will start running. Lifecycle and behavioral events will be passed to the listener objects. In case the host application would like to push an external event to the embedded b-program (e.g. because of a network request, or a user click), it should use the ``BProgram``'s `enqueueExternalEvent`_ method.
+The BProgram will start running. Life-cycle and behavioral events will be passed to the listener objects. In case the host application would like to push an external event to the embedded b-program (e.g. because of a network request, or a user click), it should use the ``BProgram``'s `enqueueExternalEvent`_ method.
 
 .. tip::
   BPjs' source code contains many examples of embedded BPjs programs - most of the unit tests that involve a b-program. For a more complete example, refer to the `RunFile`_ class, which implements the command-line tool for running BPjs code.
