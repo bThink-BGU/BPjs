@@ -74,7 +74,7 @@ public class DfsBProgramVerifierTest {
         
         rnr.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = rnr.addListener( new InMemoryEventLoggingListener() );
-        rnr.start();
+        rnr.run();
         
         eventLogger.getEvents().forEach( System.out::println );
         assertTrue(eventNamesString( eventLogger.getEvents(), "").matches("^(AAAB)+$"));
@@ -98,7 +98,7 @@ public class DfsBProgramVerifierTest {
         
         rnr.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = rnr.addListener( new InMemoryEventLoggingListener() );
-        rnr.start();
+        rnr.run();
         
         eventLogger.getEvents().forEach( System.out::println );
         assertTrue(eventNamesString( eventLogger.getEvents(), "").matches("^A$"));

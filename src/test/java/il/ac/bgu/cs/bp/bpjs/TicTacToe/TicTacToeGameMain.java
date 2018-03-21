@@ -52,7 +52,7 @@ class TicTacToeGameMain extends JFrame {
 
 			rnr.addListener(new PrintBProgramRunnerListener());
 			TTTdisplayGame = new TTTDisplayGame(bprog, rnr);
-			rnr.start();
+			rnr.run();
 		} else {
 			System.out.println("Creating SimulatedPlayer");
 

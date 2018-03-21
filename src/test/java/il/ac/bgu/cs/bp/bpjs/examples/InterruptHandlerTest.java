@@ -22,7 +22,7 @@ public class InterruptHandlerTest {
         sut.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
-        sut.start();
+        sut.run();
         
         eventLogger.getEvents().forEach(e->System.out.println(e) );
         EventPattern expected = new EventPattern()
@@ -38,7 +38,7 @@ public class InterruptHandlerTest {
         BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("InterruptHandler_illegal.js") );
         sut.addListener(new PrintBProgramRunnerListener() );
         
-        sut.start();
+        sut.run();
         
         fail("Program should have terminated in error.");
     }

@@ -21,7 +21,7 @@ public class PushingExternalEventTest {
         sut.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
-        sut.start();
+        sut.run();
         
         eventLogger.getEvents().forEach(e->System.out.println(e) );
         EventPattern expected = new EventPattern()
@@ -38,7 +38,7 @@ public class PushingExternalEventTest {
         sut.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
-        sut.start();
+        sut.run();
         
         eventLogger.getEvents().forEach( e->System.out.println(e) );
         EventPattern expected = new EventPattern()

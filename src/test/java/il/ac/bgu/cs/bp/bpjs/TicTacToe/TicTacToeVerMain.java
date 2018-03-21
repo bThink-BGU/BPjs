@@ -24,7 +24,7 @@ public class TicTacToeVerMain {
 
         BProgramRunner rnr = new BProgramRunner(bprog);
         rnr.addListener(new PrintBProgramRunnerListener());
-        rnr.start();
+        rnr.run();
 
         try {
             DfsBProgramVerifier vfr = new DfsBProgramVerifier();

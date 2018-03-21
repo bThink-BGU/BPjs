@@ -36,7 +36,7 @@ public class LoggingEventSelectionStrategyDecoratorTest {
             runner.addListener(new PrintBProgramRunnerListener() );
             InMemoryEventLoggingListener eventLogger = runner.addListener( new InMemoryEventLoggingListener() );
             
-            runner.start();
+            runner.run();
             
             EventPattern expected = new EventPattern()
                     .append(coldEvent).append(hotEvent)

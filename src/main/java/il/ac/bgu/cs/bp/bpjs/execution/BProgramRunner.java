@@ -45,7 +45,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * 
  * @author michael
  */
-public class BProgramRunner {
+public class BProgramRunner implements Runnable {
     
     private static final AtomicInteger INSTANCE_COUNTER = new AtomicInteger(0);
     private final int instanceNum = INSTANCE_COUNTER.incrementAndGet();
@@ -64,79 +64,88 @@ public class BProgramRunner {
         }
     }
     
-    public void start() throws InterruptedException {
-        // setup bprogram and runtime parts.
-        execSvc = ExecutorServiceMaker.makeWithName("BProgramRunner-" + instanceNum );
-        failedAssertion = null;
-        listeners.forEach(l -> l.starting(bprog));
-        BProgramSyncSnapshot cur = bprog.setup();
-        cur.getBThreadSnapshots().forEach(sn->listeners.forEach( l -> l.bthreadAdded(bprog, sn)) );
-        
-        // start it
-        listeners.forEach(l -> l.started(bprog));
-        cur = cur.start(execSvc);
-        
-        boolean go=true;
-        
-        if ( ! cur.isStateValid() ) {
-            failedAssertion = cur.getFailedAssertion();
-            listeners.forEach( l->l.assertionFailed(bprog, failedAssertion));
-            go = false;
-        }
-        
-        // while snapshot not empty, select an event and get the next snapshot.
-        while ( (!cur.noBThreadsLeft()) && go ) {
-            
-            // see which events are selectable
-            Set<BEvent> possibleEvents = bprog.getEventSelectionStrategy().selectableEvents(cur.getStatements(), cur.getExternalEvents());
-            if ( possibleEvents.isEmpty() ) {
-                // No events available or selection. Terminate or wait for external one (in daemon mode).
-                if ( bprog.isDaemonMode() ) {
-                    listeners.forEach( l->l.superstepDone(bprog) );
-                    BEvent next = bprog.takeExternalEvent(); // and now we wait.
-                    if ( next == null ) {
-                        go=false; // program is not a daemon anymore.
-                    } else {
-                        cur.getExternalEvents().add(next);
-                    }
-                    
-                } else {
-                    // Ending the program - no selectable event.
-                    listeners.forEach(l->l.superstepDone(bprog));
-                    go = false;
-                }
-                
-            } else {
-                // we can select some events - select one and advance.
-                Optional<EventSelectionResult> res = bprog.getEventSelectionStrategy().select(cur.getStatements(), cur.getExternalEvents(), possibleEvents);
+    @Override
+    public void run() {
+        try {
+            // setup bprogram and runtime parts.
+            execSvc = ExecutorServiceMaker.makeWithName("BProgramRunner-" + instanceNum );
+            failedAssertion = null;
+            listeners.forEach(l -> l.starting(bprog));
+            BProgramSyncSnapshot cur = bprog.setup();
+            cur.getBThreadSnapshots().forEach(sn->listeners.forEach( l -> l.bthreadAdded(bprog, sn)) );
 
-                if ( res.isPresent() ) {
-                    EventSelectionResult esr = res.get();
-                    
-                    if ( ! esr.getIndicesToRemove().isEmpty() ) {
-                        // the event selection affcted the external event queue.
-                        List<BEvent> updatedExternals = new ArrayList<>(cur.getExternalEvents());
-                        esr.getIndicesToRemove().stream().sorted(reverseOrder())
-                            .forEach( idxObj -> updatedExternals.remove(idxObj.intValue()) );
-                        cur = cur.copyWith(updatedExternals);
-                    }
-                    
-                    listeners.forEach(l->l.eventSelected(bprog, esr.getEvent())); 
-                    cur = cur.triggerEvent(esr.getEvent(), execSvc, listeners);
-                    if ( ! cur.isStateValid() ) {
-                        failedAssertion = cur.getFailedAssertion();
-                        listeners.forEach( l->l.assertionFailed(bprog, failedAssertion));
+            // start it
+            listeners.forEach(l -> l.started(bprog));
+            cur = cur.start(execSvc);
+
+            boolean go=true;
+
+            if ( ! cur.isStateValid() ) {
+                failedAssertion = cur.getFailedAssertion();
+                listeners.forEach( l->l.assertionFailed(bprog, failedAssertion));
+                go = false;
+            }
+
+            // while snapshot not empty, select an event and get the next snapshot.
+            while ( (!cur.noBThreadsLeft()) && go ) {
+
+                // see which events are selectable
+                Set<BEvent> possibleEvents = bprog.getEventSelectionStrategy().selectableEvents(cur.getStatements(), cur.getExternalEvents());
+                if ( possibleEvents.isEmpty() ) {
+                    // No events available or selection. Terminate or wait for external one (in daemon mode).
+                    if ( bprog.isDaemonMode() ) {
+                        listeners.forEach( l->l.superstepDone(bprog) );
+                        BEvent next = bprog.takeExternalEvent(); // and now we wait.
+                        if ( next == null ) {
+                            go=false; // program is not a daemon anymore.
+                        } else {
+                            cur.getExternalEvents().add(next);
+                        }
+
+                    } else {
+                        // Ending the program - no selectable event.
+                        listeners.forEach(l->l.superstepDone(bprog));
                         go = false;
                     }
 
                 } else {
-                    // edge case: we can select events, but we didn't. Might be a bug in the EventSelectionStrategy.
-                    go = false;
+                    // we can select some events - select one and advance.
+                    Optional<EventSelectionResult> res = bprog.getEventSelectionStrategy().select(cur.getStatements(), cur.getExternalEvents(), possibleEvents);
+
+                    if ( res.isPresent() ) {
+                        EventSelectionResult esr = res.get();
+
+                        if ( ! esr.getIndicesToRemove().isEmpty() ) {
+                            // the event selection affcted the external event queue.
+                            List<BEvent> updatedExternals = new ArrayList<>(cur.getExternalEvents());
+                            esr.getIndicesToRemove().stream().sorted(reverseOrder())
+                                .forEach( idxObj -> updatedExternals.remove(idxObj.intValue()) );
+                            cur = cur.copyWith(updatedExternals);
+                        }
+
+                        listeners.forEach(l->l.eventSelected(bprog, esr.getEvent())); 
+                        cur = cur.triggerEvent(esr.getEvent(), execSvc, listeners);
+                        if ( ! cur.isStateValid() ) {
+                            failedAssertion = cur.getFailedAssertion();
+                            listeners.forEach( l->l.assertionFailed(bprog, failedAssertion));
+                            go = false;
+                        }
+
+                    } else {
+                        // edge case: we can select events, but we didn't. Might be a bug in the EventSelectionStrategy.
+                        go = false;
+                    }
                 }
             }
+            listeners.forEach(l->l.ended(bprog)); 
+            
+        } catch (InterruptedException itr) {
+            System.err.println("BProgramRunner interrupted: " + itr.getMessage() );
+            itr.printStackTrace( System.err );
+            
+        } finally {
+            execSvc.shutdown();
         }
-        listeners.forEach(l->l.ended(bprog)); 
-        execSvc.shutdown();
     }
     
     /**

@@ -34,7 +34,7 @@ public class ExternalEventsDaemonTest {
             }
         } ).start();
         
-        sut.start();
+        sut.run();
         
         assertTrue( sut.getBProgram().getFromGlobalScope("internalDaemonMode", Boolean.class).get() );
         

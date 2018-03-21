@@ -43,7 +43,7 @@ public class BProgramTest {
     public void testGlobalScopeAccessors() throws InterruptedException {
         BProgram sut = new SingleResourceBProgram("RandomProxy.js");
         
-        new BProgramRunner(sut).start();
+        new BProgramRunner(sut).run();
         
         assertEquals( 1000.0, sut.getFromGlobalScope("TOTAL_COUNT", Double.class).get(), 3 );
         assertFalse( sut.getFromGlobalScope("does-not-exist", Double.class).isPresent() );
@@ -71,7 +71,7 @@ public class BProgramTest {
         rnr.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener el = rnr.addListener( new InMemoryEventLoggingListener());
         System.out.println("Sanity run");
-        rnr.start();
+        rnr.run();
         System.out.println("/Sanity run");
         System.out.println("");
         
@@ -83,7 +83,7 @@ public class BProgramTest {
         sut.appendSource(additionalSource);
         rnr.setBProgram(sut);
 
-        rnr.start();
+        rnr.run();
         
         assertEquals( asList("1","2","2a", "3"), 
                       el.getEvents().stream().map(BEvent::getName).collect(toList()) );
@@ -111,7 +111,7 @@ public class BProgramTest {
         sut.prependSource(prependedCode);
         rnr.setBProgram(sut);
 
-        rnr.start();
+        rnr.run();
         
         assertEquals( asList("1", "2", "3"), 
                       el.getEvents().stream().map(BEvent::getName).collect(toList()) );
@@ -151,7 +151,7 @@ public class BProgramTest {
         sut.appendSource(appendedSource);
         rnr.setBProgram(sut);
 
-        rnr.start();
+        rnr.run();
         
         assertEquals( asList("1","2","2a","3"), 
                       el.getEvents().stream().map(BEvent::getName).collect(toList()) );
@@ -174,7 +174,7 @@ public class BProgramTest {
         
         BProgram sut = new StringBProgram(coreSource);
         BProgramRunner rnr = new BProgramRunner(sut);
-        rnr.start();
+        rnr.run();
         sut.appendSource("bp.log.info('grrr');");
     }
    
@@ -189,7 +189,7 @@ public class BProgramTest {
         
         BProgram sut = new StringBProgram(coreSource);        
         BProgramRunner rnr = new BProgramRunner(sut);
-        rnr.start();
+        rnr.run();
         sut.prependSource("bp.log.info('grrr');");
     }
 }

@@ -25,7 +25,7 @@ public class HotNColdTest {
         sut.addListener( new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
-        sut.start();
+        sut.run();
         
         eventLogger.getEvents().forEach(e->System.out.println(e) );
         

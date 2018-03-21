@@ -47,7 +47,7 @@ public class DynamicBThreadAdditionTest {
         sut.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
-        sut.start();
+        sut.run();
         Set<String> expected = new HashSet<>(Arrays.asList("e0","e1","e2","e3"));
         assertEquals( expected, eventLogger.getEvents().stream().map(BEvent::getName).collect(toSet()));
     }
