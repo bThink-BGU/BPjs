@@ -42,4 +42,4 @@ The "event generator" creates four events, one for each logging level. The "even
 
 .. _logback: https://logback.qos.ch
 .. _log4j2: http://logging.apache.org/log4j/2.x/index.html
-.. _BProgramListener: http://static.javadoc.io/com.github.bthink-bgu/BPjs/0.8.3/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/listeners/BProgramListener.html
+.. _BProgramListener: javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/listeners/BProgramListener.html

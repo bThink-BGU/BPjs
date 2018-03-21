@@ -53,7 +53,7 @@ The b-program using this event selection strategy is shown below. Note that b-th
 .. tip:: The above strategy and b-program are part of BPjs' `unit tests`_.
 
 
-.. _EventSelectionStrategy: http://static.javadoc.io/com.github.bthink-bgu/BPjs/0.8.5/il/ac/bgu/cs/bp/bpjs/eventselection/EventSelectionStrategy.html
-.. _EventSelectionResult: http://static.javadoc.io/com.github.bthink-bgu/BPjs/0.8.5/il/ac/bgu/cs/bp/bpjs/eventselection/EventSelectionResult.html
-.. _synchronization statement: http://static.javadoc.io/com.github.bthink-bgu/BPjs/0.8.5/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/BSyncStatement.html
+.. _EventSelectionStrategy: http://javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/eventselection/EventSelectionStrategy.html
+.. _EventSelectionResult: http://javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/eventselection/EventSelectionResult.html
+.. _synchronization statement: http://javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/BSyncStatement.html
 .. _unit tests: https://github.com/bThink-BGU/BPjs/blob/develop/src/test/java/il/ac/bgu/cs/bp/bpjs/examples/StatementsWithDataTest.java
