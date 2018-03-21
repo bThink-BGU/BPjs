@@ -37,6 +37,7 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
     public BThreadSyncSnapshot call() {
         try {
             Context jsContext = Context.enter();
+            
             return callImpl( jsContext );
 
         } catch (ContinuationPending cbs) {

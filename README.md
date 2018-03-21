@@ -24,7 +24,7 @@ a link to this page somewhere in the documentation/system about section.
     <dependency>
         <groupId>com.github.bthink-bgu</groupId>
         <artifactId>BPjs</artifactId>
-        <version>0.8.6</version>
+        <version>0.8.7</version>
     </dependency>
     ...
 </dependencies>
@@ -43,42 +43,44 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
-## NEXT
+### NEXT
 * :sparkles: `bsync` is *depredated*, in favor of `bp.sync`. The latter can be called from any function, not just the immediate b-thread function.
+* :arrow_up: Simplified b-thread scope processing. This means scopes behave closer to what a JavaScript programmer would expect.
+* :arrow_up: Javadoc references use latest version (rather than a fixed one).
 * :arrows_counterclockwise: Cleanup.
 
-## 2018-02-25
+### 2018-02-25
 * :arrow_up: `VisitedStateStore` Adds a `clear()` method.
 * :bug: `DfsBProgramVerifier` instances can now be re-used.
 
-## 2018-01-24
+### 2018-01-24
 * :arrow_up: Improved hashing algorithm on `BThreadStateVisitedNodeStore`.
 * :sparkles: Transient caching of thread state in `BThreadSyncSnapshot`s. This improves verification performance, with low memory cost.
 * :bug: Removed visited state stores that took incoming state into consideration.
 * :arrows_counterclockwise: More mazes in the Mazes example.
 
-## 2018-01-18
+### 2018-01-18
 * :bug: Fixed a crash where program with failed assertions were intermittently crashing.
 
-## 2018-01-17
+### 2018-01-17
 * :bug: Verifier now correctly identifies deadlock as a state where there are requested events, but they are all blocked (formerly it just looked for the existence of b-threads).
 
-## 2018-01-12
+### 2018-01-12
 * :bug: :sparkles: Refactored analysis code, removing the invalid (easy to understand, but invalid) `PathRequirement` based analysis, and using only b-thread now.
                    This design is much cleaner, as it uses less concepts. Also moves us towards "everything is a b-thread" world.
 * :sparkles: Added tests to demonstrate the various states a verification can end in.
 * :bug: Verifiers and runners terminate their threadpools when they are done using them.
 
-## 2018-01-11
+### 2018-01-11
 * :sparkles: During forward execution, b-threads can halt execution using `bp.ASSERT(boolean, text)`.
 * :arrow_up: Refactored the engine tasks to support raising assertions. Reduced some code duplication in the way.
 * :arrow_up: Thread pools executing b-threads are now allocated per-executor/verifier (as opposed to using a single static pool). 
 
-## 2017-12-28
+### 2017-12-28
 * :arrow_up: Re-arranged package structure, duplicate and ambiguous packages merged. We now have a clean `model`/`execution`/`analysis` division. 
 * :bug: Fixed an equality bug in `OrderedSet`.
 
-## 2017-12-22
+### 2017-12-22
 * :bug: `BSyncStatement`s now retain information about the b-thread that created them.
 * :arrow_up: Now using a single `ExecutorService` for the entire JVM (OK, per class-loader). This makes runtime more efficient, resource-wise.
 * :arrows_counterclockwise: Using cached thread execution pool instead of the fork-join one (the former seems to make more sense in a BP context).
@@ -90,7 +92,7 @@ a link to this page somewhere in the documentation/system about section.
 * :arrows_counterclockwise: Test clean-up
 * :arrows_counterclockwise: Documentation clean-up
 
-## 2017-11-24
+### 2017-11-24
 * :sparkles: `BProgram` allows appending and prepending source code programmatically, using `appendSource` and `prependSource`.
               These can be used to add environment simulation without touching the simulated model. Or just to act as includes,
               e.g. for common set-ups.
@@ -105,13 +107,13 @@ a link to this page somewhere in the documentation/system about section.
 * :put_trash_in_its_place: `NoDeadlock` class deleted. Use `PathRequirements.NO_DEADLOCK` instead.
 * :sparkles: `PathRequirements.ACCEPT_ALL`, is a new requirement that's always true. Useful for scanning a program state space.
 
-## 2017-11-23
+### 2017-11-23
 * :arrow_up: `DfsProgramVerifier` uses `FullVisitedNodeStore` by default (preferring correctness over speed in the default case).
 * :arrow_up: Updated the Dining Philosopher example to use advanced features. Also added it as a unit test.
 * :put_litter_in_its_place: Removed `validation` package.
 * :sparkles: `ContinuationProgramState` correctly captures updated variable values. :tada:
 
-## 2017-11-02
+### 2017-11-02
 * :sparkles: the `DfsBProgramVerifier` is now accepting requirement objects over execution paths, instead of the hard-coded deadlock check.
 * :sparkles: new `PathRequirement` class. Requirements are passed to the verifiers for making sure the program conforms to them. Two implementation already present:
     * `NoDeadlock` Breakes when there's a deadlock
@@ -121,10 +123,10 @@ a link to this page somewhere in the documentation/system about section.
 * :arrow_up: Efficient path stack implementation for `BfsBProgramVerifier` (no copying, reversal, etc.)
 * :arrow_up: `Mazes.java` Updates to fully use the new verifier features
 
-## 2017-10-30
+### 2017-10-30
 * :arrow_up: Re-created program state cloning based on code from @szegedi. Cloning is now faster, more efficient, and can handle storage of events.
 
-## 2017-10-16
+### 2017-10-16
 * :sparkles: New base class for implementing event selection strategies.
 * :sparkles: `OrderedEventSelectionStrategy` - A new event selection strategy that honors the order in which events are requested by a given b-thread.
 * :sparkles: `PrioritizedBThreadsEventSelectionStrategy` - A new event selection strategy that can assign priorities to b-threads.
@@ -132,32 +134,32 @@ a link to this page somewhere in the documentation/system about section.
 * :arrow_up: `LoggingEventSelectionStrategyDecorator` also logs selectable events
 * :arrow_up: `BProgram` acts nicer when it has a `null` event selection strategy. 
 
-## 2017-09-10
+### 2017-09-10
 * :sparkles: Updated to Rhino 1.7.7.2.
 
-## 2017-08-18
+### 2017-08-18
 * :sparkles: Initial verification added. `DfsBProgramVerifier` scans the states of
   a `BProgram` using DFS, and can return traces where there are no selectable events.
 
-## 2017-08-06
+### 2017-08-06
 * :sparkles: Added a class to compare continuations (base for comparing snapshots).
 
-## 2017-07-05
+### 2017-07-05
 * :sparkles: `bsync` now has an extra parameter, allowing b-threads to pass hinting data to custom `EventSelectionStrategy`s.
 * :arrows_counterclockwise: Moved event selection strategy to `BProgram`.
 * :sparkles: Added a mechanism to log the `BProgramState` at sync points.
 
-## 2017-06-08
+### 2017-06-08
 * :sparkles: Added documentation for embedding BPjs programs in larger Java apps.
 
-## 2017-05-16
+### 2017-05-16
 * :sparkles: README includes a more prominent reference to the documentation.
 
-## 2017-05-10
+### 2017-05-10
 * :sparkles: Added an adapter class for `BProgramListener`.
 * :bug: Fixed issues with adding objects to the program's scope.
 
-## 2017-04-08
+### 2017-04-08
 * :put_litter_in_its_place: Cleaned up the `BProgramRunner`-`BProgram`-`BProgramSyncSnapshot` trio such that listeners don't have to be passed around between them.
 * :sparkles: Cloning of `BProgramSyncSnapshot` ready. This is the basis for search.
 

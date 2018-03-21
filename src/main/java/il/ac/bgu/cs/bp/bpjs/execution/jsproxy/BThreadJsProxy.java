@@ -48,10 +48,12 @@ public class BThreadJsProxy implements java.io.Serializable {
     
     public BThreadJsProxy() {}
     
+    @Deprecated
     public void bsync( NativeObject jsRWB ) {
         bsync(jsRWB, null);
     }
     
+    @Deprecated
     public void bsync( NativeObject jsRWB, Object data ) {
         if ( ! deprecationWarningPrinted ) {
             deprecationWarningPrinted = true;

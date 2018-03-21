@@ -117,18 +117,19 @@ public class BThreadSyncSnapshot implements Serializable {
         scope.delete("hashCode");
         scope.delete("toString");
         scope.setParentScope(programScope);
-
+        
+        // setup entryPoint's scope s.t. it knows our proxy
         Scriptable curScope = entryPoint.getParentScope();
-        if (curScope.getParentScope() == null) {
-            entryPoint.setParentScope(scope);
-            scope.setParentScope(curScope);
-        } else {
-            while (curScope.getParentScope().getParentScope() != null) {
-                curScope = curScope.getParentScope();
-            }
-            scope.setParentScope(curScope.getParentScope());
-            curScope.setParentScope(scope);
-        }
+        entryPoint.setParentScope(scope);
+        scope.setParentScope(curScope);
+        
+//        if (curScope.getParentScope() != null) {
+//            while (curScope.getParentScope().getParentScope() != null) {
+//                curScope = curScope.getParentScope();
+//            }
+//            scope.setParentScope(curScope.getParentScope());
+//            curScope.setParentScope(scope);
+//        }
     }
 
     public BSyncStatement getBSyncStatement() {
