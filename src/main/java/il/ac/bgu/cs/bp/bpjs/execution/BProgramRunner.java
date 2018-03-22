@@ -141,7 +141,6 @@ public class BProgramRunner implements Runnable {
             
         } catch (InterruptedException itr) {
             System.err.println("BProgramRunner interrupted: " + itr.getMessage() );
-            itr.printStackTrace( System.err );
             
         } finally {
             execSvc.shutdown();

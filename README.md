@@ -43,7 +43,10 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
-### NEXT
+### Next
+* :put_litter_in_its_place: Removed extra logging.
+
+### 2018-03-21
 * :sparkles: `bsync` is *depredated*, in favor of `bp.sync`. The latter can be called from any function, not just the immediate b-thread function.
 * :sparkles: `BProgramRunner` now implements Java's `Runnable`.
 * :arrow_up: Simplified b-thread scope processing. This means scopes behave closer to what a JavaScript programmer would expect.
