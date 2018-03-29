@@ -1,4 +1,4 @@
-/* global bp, bsync, TicTacToeGameMain, Packages, UseSimulatedPlayer */
+/* global bp, bsync, TicTacToeGameMain, Packages */
 
 importPackage(Packages.il.ac.bgu.cs.bp.bpjs.TicTacToe.events);
 
@@ -9,19 +9,15 @@ bp.log.info('Tic-Tac-Toe - Let the game begin!');
 // This BThreads are on each square of the grid
 function addSquareBThreads(row, col) {
 
-//	if (!UseSimulatedPlayer) {
-		// Detects mouse click
-		bp.registerBThread("ClickHandler(" + row + "," + col + ")", function() {
-			while (true) {
+	// Detects mouse click
+	bp.registerBThread("ClickHandler(" + row + "," + col + ")", function() {
+		while (true) {
 
-//				if (!UseSimulatedPlayer) {
-					bsync({ waitFor:[ Click(row, col) ] });
-//				}
+			bsync({ waitFor:[ Click(row, col) ] });
 
-				bsync({ request:[ X(row, col) ] });
-			}
-		});
-//	}
+			bsync({ request:[ X(row, col) ] });
+		}
+	});
 
 	// Blocks further marking of a square already marked by X or O.
 	bp.registerBThread("SquareTaken(" + row + "," + col + ")", function() {
@@ -291,19 +287,3 @@ bp.registerBThread("Sides", function() {
 		bsync({ request:[ O(0, 1), O(1, 0), O(1, 2), O(2, 1) ] }, 10);
 	}
 });
-
-//if (UseSimulatedPlayer) {
-//	bp.registerBThread("STAM", function() {
-//		while (true) {
-//			bsync({ request:[ bp.Event("STAM") ]
-//			// , interrupt:[ StaticEvents.XWin]
-//			});
-//		}
-//	});
-//
-//	bp.registerBThread("SimulatedX", function() {
-//		while (true) {
-//			bsync({ request:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), X(1, 1), X(1, 2), X(2, 0), X(2, 1), X(2, 2) ] }, 10);
-//		}
-//	});
-//}
