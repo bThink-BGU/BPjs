@@ -9,19 +9,19 @@ bp.log.info('Tic-Tac-Toe - Let the game begin!');
 // This BThreads are on each square of the grid
 function addSquareBThreads(row, col) {
 
-	if (!UseSimulatedPlayer) {
+//	if (!UseSimulatedPlayer) {
 		// Detects mouse click
 		bp.registerBThread("ClickHandler(" + row + "," + col + ")", function() {
 			while (true) {
 
-				if (!UseSimulatedPlayer) {
+//				if (!UseSimulatedPlayer) {
 					bsync({ waitFor:[ Click(row, col) ] });
-				}
+//				}
 
 				bsync({ request:[ X(row, col) ] });
 			}
 		});
-	}
+//	}
 
 	// Blocks further marking of a square already marked by X or O.
 	bp.registerBThread("SquareTaken(" + row + "," + col + ")", function() {
