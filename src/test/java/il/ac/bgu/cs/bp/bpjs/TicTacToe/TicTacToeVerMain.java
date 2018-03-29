@@ -47,7 +47,7 @@ public class TicTacToeVerMain  {
 //			});
 //		}
 //	});
-		
+			
 		String SimulatedPlayer =   "bp.registerBThread('XMoves', function() {\n" +
 									"while (true) {\n" +
 										"bsync({ request:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), \n" +
@@ -55,14 +55,24 @@ public class TicTacToeVerMain  {
 										"}\n" +
 									"});\n";
 		
+		String infiBThread =    "bp.registerBThread('STAM', function() {\n" +
+								"while (true) {\n" +
+									"bsync({ request:[ bp.Event('STAM') ]\n" +
+									// , interrupt:[ StaticEvents.XWin]
+										"});\n" +
+									"}\n" +
+								"});\n";
+		
 		BProgramRunner rnr = new BProgramRunner(bprog);
 		rnr.addListener(new PrintBProgramRunnerListener());
 		bprog.appendSource(SimulatedPlayer);
+		bprog.appendSource(infiBThread);
 		rnr.setBProgram(bprog);
 //		TTTdisplayGame = new TTTDisplayGame(bprog, rnr);	//For watching the game
 		rnr.run();	
 			try {
 				DfsBProgramVerifier vfr = new DfsBProgramVerifier();
+//				vfr.setDetectDeadlocks(false);
 				
 				vfr.setMaxTraceLength(50);
 				vfr.setDebugMode(true);
