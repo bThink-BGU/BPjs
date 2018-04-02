@@ -1,17 +1,19 @@
 /* global bp, block30 */
 
-
+function req( priority ) {
+  bp.sync({request:bp.Event("p"+priority)}, priority);
+}
 
 bp.registerBThread(function(){
-  bp.sync({request: bp.Event("p1")}, 1);
+  req(1);
 });
 
 bp.registerBThread(function(){
-  bp.sync({request: bp.Event("p2")}, 2);
+  req(2);
 });
 
 bp.registerBThread(function(){
-  bp.sync({request: bp.Event("p3")}, 3);
+  req(3);
 });
 
 bp.registerBThread(function(){

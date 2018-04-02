@@ -63,7 +63,7 @@ public class BSyncDataPassingTest {
         BProgram bp = new SingleResourceBProgram("BSyncDataPassingTest.js");
         bp.putInGlobalScope("block30", true);
         
-        bp.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());
+        bp.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy(17));
         BProgramRunner rnr = new BProgramRunner(bp);
         InMemoryEventLoggingListener eventsLogger = rnr.addListener(new InMemoryEventLoggingListener());
         rnr.addListener( new PrintBProgramRunnerListener() );
