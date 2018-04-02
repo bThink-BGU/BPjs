@@ -1,21 +1,13 @@
 package il.ac.bgu.cs.bp.bpjs.TicTacToe;
 
-import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
-import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 
-import static java.util.Arrays.asList;
-import static java.util.stream.Collectors.toList;
-import static org.junit.Assert.assertEquals;
-
-import javax.swing.JButton;
 import javax.swing.JFrame;
 
 import org.mozilla.javascript.Scriptable;
@@ -39,7 +31,7 @@ public class TicTacToeVerMain  {
 		bprog.setDaemonMode(true);
 		JFrame f = new TicTacToeGameMain();
 		
-		//It is possible to ass this B-Thread too if needed
+		//It is possible to add this B-Thread too if needed
 //		bp.registerBThread("STAM", function() {
 //		while (true) {
 //			bsync({ request:[ bp.Event("STAM") ]
