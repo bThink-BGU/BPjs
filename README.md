@@ -45,6 +45,8 @@ a link to this page somewhere in the documentation/system about section.
 
 ### Next
 * :put_litter_in_its_place: Removed extra logging.
+* :arrow_up: More tests.
+* :arrow_up: Fixed TicTacToe example: now split into two executing classes (interactive GUI and verification). Same core TTT code is used in both.
 
 ### 2018-03-21
 * :sparkles: `bsync` is *depredated*, in favor of `bp.sync`. The latter can be called from any function, not just the immediate b-thread function.
