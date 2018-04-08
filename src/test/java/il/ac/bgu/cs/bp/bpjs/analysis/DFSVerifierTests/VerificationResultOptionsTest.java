@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis.examples;
+package il.ac.bgu.cs.bp.bpjs.analysis.DFSVerifierTests;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
@@ -39,7 +39,7 @@ public class VerificationResultOptionsTest {
     
     @Test
     public void testOKProgram() throws Exception {
-        final SingleResourceBProgram bprog = new SingleResourceBProgram("VerificationResultOptions.js");
+        final SingleResourceBProgram bprog = new SingleResourceBProgram("DFSVerifierTests/VerificationResultOptions.js");
         
         bprog.putInGlobalScope("addWaiter", false);
         bprog.putInGlobalScope("createDeadlock", false);
@@ -54,7 +54,7 @@ public class VerificationResultOptionsTest {
     
     @Test
     public void testDeadlockedProgram() throws Exception {
-        final SingleResourceBProgram bprog = new SingleResourceBProgram("VerificationResultOptions.js");
+        final SingleResourceBProgram bprog = new SingleResourceBProgram("DFSVerifierTests/VerificationResultOptions.js");
         
         bprog.putInGlobalScope("addWaiter", false);
         bprog.putInGlobalScope("createDeadlock", true);
@@ -69,7 +69,7 @@ public class VerificationResultOptionsTest {
    
     @Test
     public void testViolatingProgram() throws Exception {
-        final SingleResourceBProgram bprog = new SingleResourceBProgram("VerificationResultOptions.js");
+        final SingleResourceBProgram bprog = new SingleResourceBProgram("DFSVerifierTests/VerificationResultOptions.js");
         
         bprog.putInGlobalScope("addWaiter", false);
         bprog.putInGlobalScope("createDeadlock", false);
@@ -86,7 +86,7 @@ public class VerificationResultOptionsTest {
     
     @Test
     public void testWaitingIsNotDeadlock() throws Exception {
-        final SingleResourceBProgram bprog = new SingleResourceBProgram("VerificationResultOptions.js");
+        final SingleResourceBProgram bprog = new SingleResourceBProgram("DFSVerifierTests/VerificationResultOptions.js");
         
         bprog.putInGlobalScope("addWaiter", true);
         bprog.putInGlobalScope("createDeadlock", false);
