@@ -21,9 +21,11 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis;
+package il.ac.bgu.cs.bp.bpjs.analysis.DFSVerifierTests;
 
 import static il.ac.bgu.cs.bp.bpjs.TestUtils.eventNamesString;
+
+import il.ac.bgu.cs.bp.bpjs.analysis.*;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
@@ -45,7 +47,7 @@ public class DfsBProgramVerifierTest {
 
 	@Test
 	public void simpleAAABTrace() throws Exception {
-		BProgram program = new SingleResourceBProgram("AAABTrace.js");
+		BProgram program = new SingleResourceBProgram("DFSVerifierTests/AAABTrace.js");
 		DfsBProgramVerifier sut = new DfsBProgramVerifier();
 		sut.setProgressListener(new BriefPrintDfsVerifierListener());
 		program.appendSource(Requirements.eventNotSelected("B"));
@@ -57,7 +59,7 @@ public class DfsBProgramVerifierTest {
 
 	@Test
 	public void simpleAAABTrace_hashedNodeStore() throws Exception {
-		BProgram program = new SingleResourceBProgram("AAABTrace.js");
+		BProgram program = new SingleResourceBProgram("DFSVerifierTests/AAABTrace.js");
 		DfsBProgramVerifier sut = new DfsBProgramVerifier();
 		sut.setProgressListener(new BriefPrintDfsVerifierListener());
 		program.appendSource(Requirements.eventNotSelected("B"));
@@ -69,7 +71,7 @@ public class DfsBProgramVerifierTest {
 
 	@Test
 	public void testAAABRun() throws Exception {
-		BProgram program = new SingleResourceBProgram("AAABTrace.js");
+		BProgram program = new SingleResourceBProgram("DFSVerifierTests/AAABTrace.js");
 		BProgramRunner rnr = new BProgramRunner(program);
 
 		rnr.addListener(new PrintBProgramRunnerListener());
@@ -82,7 +84,7 @@ public class DfsBProgramVerifierTest {
 
 	@Test
 	public void deadlockTrace() throws Exception {
-		BProgram program = new SingleResourceBProgram("deadlocking.js");
+		BProgram program = new SingleResourceBProgram("DFSVerifierTests/deadlocking.js");
 		DfsBProgramVerifier sut = new DfsBProgramVerifier();
 		sut.setVisitedNodeStore(new ForgetfulVisitedStateStore());
 		VerificationResult res = sut.verify(program);
@@ -93,7 +95,7 @@ public class DfsBProgramVerifierTest {
 
 	@Test
 	public void deadlockRun() throws Exception {
-		BProgram program = new SingleResourceBProgram("deadlocking.js");
+		BProgram program = new SingleResourceBProgram("DFSVerifierTests/deadlocking.js");
 		BProgramRunner rnr = new BProgramRunner(program);
 
 		rnr.addListener(new PrintBProgramRunnerListener());
