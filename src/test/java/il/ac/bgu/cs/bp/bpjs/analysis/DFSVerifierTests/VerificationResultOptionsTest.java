@@ -25,10 +25,14 @@ package il.ac.bgu.cs.bp.bpjs.analysis.DFSVerifierTests;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import org.junit.Test;
 
 /**
@@ -44,6 +48,8 @@ public class VerificationResultOptionsTest {
         bprog.putInGlobalScope("addWaiter", false);
         bprog.putInGlobalScope("createDeadlock", false);
         bprog.putInGlobalScope("createFailedAssertion", false);
+        bprog.putInGlobalScope("createBadState", false);
+
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         final VerificationResult res = vfr.verify(bprog);
@@ -59,6 +65,8 @@ public class VerificationResultOptionsTest {
         bprog.putInGlobalScope("addWaiter", false);
         bprog.putInGlobalScope("createDeadlock", true);
         bprog.putInGlobalScope("createFailedAssertion", false);
+        bprog.putInGlobalScope("createBadState", false);
+
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         final VerificationResult res = vfr.verify(bprog);
@@ -74,6 +82,8 @@ public class VerificationResultOptionsTest {
         bprog.putInGlobalScope("addWaiter", false);
         bprog.putInGlobalScope("createDeadlock", false);
         bprog.putInGlobalScope("createFailedAssertion", true);
+        bprog.putInGlobalScope("createBadState", false);
+
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         final VerificationResult res = vfr.verify(bprog);
@@ -91,12 +101,62 @@ public class VerificationResultOptionsTest {
         bprog.putInGlobalScope("addWaiter", true);
         bprog.putInGlobalScope("createDeadlock", false);
         bprog.putInGlobalScope("createFailedAssertion", false);
+        bprog.putInGlobalScope("createBadState", false);
+
+
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         final VerificationResult res = vfr.verify(bprog);
         
         assertEquals( VerificationResult.ViolationType.None, res.getViolationType() );
         assertFalse( res.isCounterExampleFound() );
-        
     }
+
+    @Test
+    public void testInvalidStateProgram() throws Exception {
+        final SingleResourceBProgram bprog = new SingleResourceBProgram("DFSVerifierTests/VerificationResultOptions.js");
+
+        bprog.putInGlobalScope("addWaiter", false);
+        bprog.putInGlobalScope("createDeadlock", false);
+        bprog.putInGlobalScope("createFailedAssertion", false);
+
+        bprog.putInGlobalScope("createBadState", true);
+
+        DfsBProgramVerifier vfr = new DfsBProgramVerifier();
+        vfr.addInvalidEvent(BEvent.named("BAD"));
+        final VerificationResult res = vfr.verify(bprog);
+
+        assertEquals( VerificationResult.ViolationType.BadState, res.getViolationType() );
+        assertTrue( res.isCounterExampleFound() );
+        assertEquals( "BAD", res.getInvalidEvent().name );
+    }
+
+
+    @Test
+    public void testAssertWithJSvars() throws Exception {
+        BProgram bprog = new StringBProgram( //
+                "// This b-thread goes forward until it's done.\n" +
+                        "bp.registerBThread(\"forward\", function () {\n" +
+                        "    bsync({request: bp.Event(\"A\")});\n" +
+                        "    bsync({request: bp.Event(\"B\")});\n" +
+                        "    bsync({request: bp.Event(\"C\")});\n" +
+                        "});\n" +
+                        "\n" +
+                        "bp.registerBThread(\"assertor\", function () {\n" +
+                        "    let e = bsync({waitFor: bp.Event(\"B\")});\n" +
+                        "    if (e.name == \"B\") {\n" +
+                        "        bp.ASSERT(false, \"B happened\");\n" +
+                        "    }\n" +
+                        "});\n");
+        DfsBProgramVerifier vfr = new DfsBProgramVerifier();
+        final VerificationResult res = vfr.verify(bprog);
+
+        assertEquals( VerificationResult.ViolationType.FailedAssertion, res.getViolationType() );
+        assertTrue( res.isCounterExampleFound() );
+        assertEquals( "assertor", res.getFailedAssertion().getBThreadName() );
+        assertEquals( "B happened", res.getFailedAssertion().getMessage());
+    }
+
+
+
 }

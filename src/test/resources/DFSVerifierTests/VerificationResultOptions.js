@@ -23,7 +23,7 @@
  */
 
 
-/* global bp, addWaiter, createDeadlock, createFailedAssertion */
+/* global bp, addWaiter, createDeadlock, createFailedAssertion, createBadState */
 
 // This JS file can create all the results of verification session.
 
@@ -54,3 +54,8 @@ if ( createFailedAssertion ) {
     });
 }
 
+if ( createBadState ) {
+    bp.registerBThread("badState", function() {
+        bsync({request:bp.Event("BAD")});
+    });
+}
