@@ -221,9 +221,9 @@ public class DfsBProgramVerifierTest {
 		sut.setDebugMode(true);
 		VerificationResult res = sut.verify(bprog);
 
-		assertFalse(res.isCounterExampleFound());
 		assertEquals(res.getViolationType(), VerificationResult.ViolationType.FailedAssertion);
-		assertEquals(6, res.getScannedStatesCount());
+		assertTrue(res.isCounterExampleFound());
+		assertEquals(1, res.getScannedStatesCount());
 	}
 
 }
