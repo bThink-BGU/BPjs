@@ -92,7 +92,7 @@ public class DfsBProgramVerifier {
         long end = System.currentTimeMillis();
         listenerOpt.ifPresent(l -> l.done(this));
         execSvc.shutdown();
-        return new VerificationResult(vr.getViolationType(), vr.getFailedAssertion(), vr.getCounterExampleTrace(), end - start, visitedStatesCount);
+        return new VerificationResult(vr.getViolationType(), vr.getFailedAssertion(),vr.getInvalidEvent(), vr.getCounterExampleTrace(), end - start, visitedStatesCount);
     }
 
     protected VerificationResult dfsUsingStack(Node aStartNode, ExecutorService execSvc) throws Exception {
@@ -114,13 +114,15 @@ public class DfsBProgramVerifier {
                         curNode.getSelectableEvents().isEmpty()
                         ) {
                     // detected deadlock
-                    return new VerificationResult(VerificationResult.ViolationType.Deadlock, null, currentPath);
+                    return new VerificationResult(VerificationResult.ViolationType.Deadlock, currentPath);
                 }
                 if ((!this.invalidEvents.isEmpty()) &&
                         hasInvalidEvent(curNode.getSystemState())
                         ) {
                     //Detected possible bad state
-                    return new VerificationResult(VerificationResult.ViolationType.BadState, null, currentPath);
+                    return new VerificationResult(VerificationResult.ViolationType.BadState,
+                            getInvalidEvent(curNode.getSystemState()),
+                            currentPath);
                 }
                 if (!curNode.getSystemState().isStateValid()) {
                     // detected assertion failure.
@@ -161,7 +163,7 @@ public class DfsBProgramVerifier {
             }
         }
 
-        return new VerificationResult(VerificationResult.ViolationType.None, null, null);
+        return new VerificationResult(VerificationResult.ViolationType.None, null);
     }
 
     protected Node getUnvisitedNextNode(Node src, ExecutorService execSvc) throws Exception {
@@ -268,4 +270,15 @@ public class DfsBProgramVerifier {
         return possibleEvents.stream().anyMatch(x -> names.contains(x.name));
     }
 
+    /**
+     * Returns the invalid event, must be called only after hasInvalidEvent returns true.
+     * @param bpss
+     * @return
+     */
+    private BEvent getInvalidEvent(BProgramSyncSnapshot bpss) {
+        Set<String> names = invalidEvents.stream().map(x -> x.name).collect(Collectors.toSet());
+        Set<? extends BEvent> possibleEvents = bpss.getBThreadSnapshots().stream().map(btss -> btss.getBSyncStatement().getRequest()).flatMap(Collection::stream).collect(Collectors.toSet());
+
+        return possibleEvents.stream().filter(x -> names.contains(x.name)).collect(Collectors.toList()).get(0);
+    }
 }

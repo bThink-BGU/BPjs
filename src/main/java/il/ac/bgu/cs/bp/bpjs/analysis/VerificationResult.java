@@ -23,8 +23,10 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Result of a program verification.
@@ -32,7 +34,11 @@ import java.util.List;
  * @author michael
  */
 public class VerificationResult {
-    
+
+    public BEvent getInvalidEvent() {
+        return invalidEvent;
+    }
+
     /**
      * The reason a b-program failed verification.
      */
@@ -55,17 +61,26 @@ public class VerificationResult {
     private final List<Node> counterExampleTrace;
     private final ViolationType violationType;
     private final FailedAssertion failedAssertion;
+    private final BEvent invalidEvent;
 
-    public VerificationResult( ViolationType aViolationType, FailedAssertion aFailedAssertion, List<Node> counterExampleTrace, long timeMillies, long statesScanned ) {
+    public VerificationResult( ViolationType aViolationType, FailedAssertion aFailedAssertion, BEvent aInvalidEvent, List<Node> counterExampleTrace, long timeMillies, long statesScanned ) {
         failedAssertion = aFailedAssertion;
         violationType = aViolationType;
         this.timeMillies = timeMillies;
         this.statesScanned = statesScanned;
         this.counterExampleTrace = counterExampleTrace;
+        this.invalidEvent = aInvalidEvent;
     }
     
     VerificationResult( ViolationType vt, FailedAssertion fa, List<Node> trace ) {
-        this(vt, fa, trace, 0,0);
+        this(vt, fa, null, trace, 0,0);
+    }
+
+    VerificationResult( ViolationType vt, BEvent ie, List<Node> trace ) {
+        this(vt, null, ie, trace, 0,0);
+    }
+    VerificationResult( ViolationType vt, List<Node> trace ) {
+        this(vt, null, null, trace, 0,0);
     }
     
     public long getTimeMillies() {
