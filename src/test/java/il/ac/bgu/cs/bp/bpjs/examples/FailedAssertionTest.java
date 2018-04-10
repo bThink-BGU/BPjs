@@ -49,7 +49,7 @@ public class FailedAssertionTest {
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         System.out.println("About to start program");
         bprog.putInGlobalScope("shouldFail", true);
-        sut.start();
+        sut.run();
         
         assertEquals( Arrays.asList("piff", "puff", "poof!"), eventLogger.eventNames() );
         assertTrue( sut.hasFailedAssertion() );
@@ -67,7 +67,7 @@ public class FailedAssertionTest {
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         System.out.println("About to start program");
         bprog.putInGlobalScope("shouldFail", false);
-        sut.start();
+        sut.run();
         
         assertEquals( Arrays.asList("piff", "puff", "poof!", "peff"), eventLogger.eventNames() );
         assertFalse( sut.hasFailedAssertion() );

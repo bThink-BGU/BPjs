@@ -28,7 +28,7 @@ public class AddingBthreadsTest {
         sut.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
-        sut.start();
+        sut.run();
         EventSet kiddies = il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet.anyOf(kidADone, kidBDone);
         EventPattern expected = new EventPattern()
                 .append(kiddies)

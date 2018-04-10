@@ -25,7 +25,7 @@ public class EventsArraysTest {
         bpr.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener events = bpr.addListener( new InMemoryEventLoggingListener() );
         
-        bpr.start();
+        bpr.run();
         
         assertEquals( Arrays.asList("e11", "e21"),
                       events.getEvents().stream().map( BEvent::getName).collect(toList()));

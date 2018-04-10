@@ -7,18 +7,25 @@ BPjs is an environment for running Behavioral Programming programs written in Ja
 What is Behavioral Programming?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Behavioral Programming, or *BP* for short, is based on scenarios. BP programs are composed of threads of behavior, called *b-threads*. B-threads run in parallel to coordinate a sequence of events via a synchronized protocol. During program execution, when a b-thread wants to synchronize with its peers, it submits a statement to the central event arbiter using the ``bsync`` statement.
+Behavioral Programming, or *BP* for short, is based on scenarios. BP programs are composed of threads of behavior, called *b-threads*. B-threads run in parallel to coordinate a sequence of events via a synchronized protocol. During program execution, when a b-thread wants to synchronize with its peers, it submits a statement to the central event arbiter using the ``bp.sync`` statement.
 
-A ``bsync`` statement declares which events the b-thread requests, which events it waits for (but does not request), and which events it would like to block (that is, prevent from being selected). Blocked and waited-for events can be described using a predicate or a list. Requested events have to be specified explicitly.
+A ``bp.sync`` statement declares which events the b-thread requests, which events it waits for (but does not request), and which events it would like to block (that is, prevent from being selected). Blocked and waited-for events can be described using a predicate or a list. Requested events have to be specified explicitly.
 
-After calling ``bsync``, the b-thread is blocked, waiting for the rest of the b-threads to synchronize (call ``bsync``) as well. When all b-threads have submitted their statements, the arbiter selects an event that was requested but not blocked. It then wakes up the b-threads that requested or waited for that event. The rest of the b-threads remain blocked, until an event they requested or waited for is selected.
+After calling ``bp.sync``, the b-thread is blocked, waiting for the rest of the b-threads to synchronize (call ``bp.sync``) as well. When all b-threads have submitted their statements, the arbiter selects an event that was requested but not blocked. It then wakes up the b-threads that requested or waited for that event. The rest of the b-threads remain blocked, until an event they requested or waited for is selected.
 
 Behavioral Programming was introduced by Harel, Marron and Weiss in 2012 in a `paper`_ published at the *Communications of the ACM*.
 
-.. note:: The ``bsync`` in BPjs expands on the "classic" ``bsync`` defined in the ACM paper: it contains an :doc:`interrupt <interrupts>` event set, and may contain a hint to the :doc:`event selection strategy <../extendBPjs/implement-ess>`.
+.. note:: The ``bp.sync`` in BPjs expands on the "classic" ``bsync`` defined in the ACM paper: it contains an :doc:`interrupt <interrupts>` event set, and may contain a hint to the :doc:`event selection strategy <../extendBPjs/implement-ess>`.
 
 .. _paper: http://cacm.acm.org/magazines/2012/7/151241-behavioral-programming/fulltext
 .. _ACM Transactions on Computer Science: http://todo/fill/this
+
+
+.. topic:: How come BPjs does not use ``bsync``?
+  
+  BPjs used to have a ``bsync`` pseudo-keyword. It still works, but is deprecated in favor of ``bp.sync``. This change packs almost everything BP under the ``bp`` object, and also makes it easier to synchronize from any code executed by the b-thread (including called functions).
+
+  ``bsync`` is deprecated in BPjs. It will be removed in a not-to-distant future version. On the first use of ``bsync`` in code, BPjs will print a warning to standated error.
 
 Tutorial
 ~~~~~~~~

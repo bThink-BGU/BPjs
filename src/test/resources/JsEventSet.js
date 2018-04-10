@@ -11,7 +11,7 @@ var firstEvent = bp.Event("1stEvent");
 var secondEvent = bp.Event("2ndEvent");
 
 bp.registerBThread("first", function() {
-    bsync({request:firstEvent});
+    bp.sync({request:firstEvent});
 });
 
 /**
@@ -19,6 +19,6 @@ bp.registerBThread("first", function() {
  * {@code eventSet}, and then will request the second event.
  */
 bp.registerBThread("second", function() {
-    bsync({waitFor:firsts});
-    bsync({request:secondEvent});
+    bp.sync({waitFor:firsts});
+    bp.sync({request:secondEvent});
 });

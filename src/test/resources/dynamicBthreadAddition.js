@@ -29,7 +29,7 @@ for ( var i=0; i<COUNT; i++ ) {
     (function(j){
         bp.registerBThread("requestor-" + j, function(){
            bp.log.info("I'll request e" + j + "!" );
-           bsync({request:bp.Event("e"+j)});
+           bp.sync({request:bp.Event("e"+j)});
         });        
     })(i);
 };

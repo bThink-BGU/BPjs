@@ -28,7 +28,7 @@ public class StatementsWithDataTest {
         sut.setBProgram(bprog);
         sut.getBProgram().setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());
         sut.addListener(new BProgramRunnerListenerAdapter() {} );
-        sut.start();
+        sut.run();
         
         eventLogger.getEvents().forEach(e->System.out.println(e) );
 

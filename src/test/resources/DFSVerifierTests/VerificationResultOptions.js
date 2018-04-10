@@ -29,27 +29,27 @@
 
 // This b-thread goes forward until it's done.
 bp.registerBThread("forward", function(){
-    bsync({request:bp.Event("A")});
-    bsync({request:bp.Event("B")});
-    bsync({request:bp.Event("C")});
+    bp.sync({request:bp.Event("A")});
+    bp.sync({request:bp.Event("B")});
+    bp.sync({request:bp.Event("C")});
 });
 
 // This b-thread will wait forever, so we can verify that the verifier does not
 //   consider waiting as part of a deadlock.
 if ( addWaiter ) {
     bp.registerBThread("waitingForever", function() {
-        bsync({waitFor:bp.Event("Z")});
+        bp.sync({waitFor:bp.Event("Z")});
     });
 }
 if ( createDeadlock ) {
     bp.registerBThread("deadlocker", function() {
-       bsync({block:bp.Event("B")}) ;
+       bp.sync({block:bp.Event("B")}) ;
     });
 }
 
 if ( createFailedAssertion ) {
     bp.registerBThread("assertor", function(){
-       bsync({waitFor:bp.Event("B")});
+       bp.sync({waitFor:bp.Event("B")});
        bp.ASSERT( false, "B happened" );
     });
 }

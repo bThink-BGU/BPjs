@@ -43,7 +43,7 @@ public class LoggingTest {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (PrintStream myOut = new PrintStream(baos)) {
             System.setOut(myOut);
-            new BProgramRunner( new SingleResourceBProgram("loggingTest.js")).start();
+            new BProgramRunner( new SingleResourceBProgram("loggingTest.js")).run();
             myOut.flush();
         }
         String result = baos.toString(StandardCharsets.UTF_8.name());

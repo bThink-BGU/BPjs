@@ -43,7 +43,7 @@ public class BThreadSyncSnapshot implements Serializable {
     private final BThreadJsProxy proxy = new BThreadJsProxy(this);
 
     /**
-     * Scope for the Javascript code execution.
+     * Scope for the JavaScript code execution.
      */
     private Scriptable scope;
 
@@ -114,19 +114,22 @@ public class BThreadSyncSnapshot implements Serializable {
     void setupScope(Scriptable programScope) {
         scope = (Scriptable) Context.javaToJS(proxy, programScope);
         scope.delete("equals");
+        scope.delete("hashCode");
+        scope.delete("toString");
         scope.setParentScope(programScope);
-
+        
+        // setup entryPoint's scope s.t. it knows our proxy
         Scriptable curScope = entryPoint.getParentScope();
-        if (curScope.getParentScope() == null) {
-            entryPoint.setParentScope(scope);
-            scope.setParentScope(curScope);
-        } else {
-            while (curScope.getParentScope().getParentScope() != null) {
-                curScope = curScope.getParentScope();
-            }
-            scope.setParentScope(curScope.getParentScope());
-            curScope.setParentScope(scope);
-        }
+        entryPoint.setParentScope(scope);
+        scope.setParentScope(curScope);
+        
+//        if (curScope.getParentScope() != null) {
+//            while (curScope.getParentScope().getParentScope() != null) {
+//                curScope = curScope.getParentScope();
+//            }
+//            scope.setParentScope(curScope.getParentScope());
+//            curScope.setParentScope(scope);
+//        }
     }
 
     public BSyncStatement getBSyncStatement() {
@@ -179,7 +182,6 @@ public class BThreadSyncSnapshot implements Serializable {
         }
         return programState;
     }
-    
     
     @Override
     public int hashCode() {

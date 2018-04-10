@@ -39,7 +39,7 @@ public class PutInContextTest {
         BProgram sut = new StringBProgram("bp.log.info(obj);var len=obj.length;");
         String outsideObject = "I'm an outside object";
         sut.putInGlobalScope("obj", outsideObject);
-        new BProgramRunner(sut).start();
+        new BProgramRunner(sut).run();
         assertEquals( sut.getFromGlobalScope("len", Long.class).get().longValue(), outsideObject.length() );
     }
     
@@ -69,6 +69,6 @@ public class PutInContextTest {
                 counter++;
             }
         } );
-        runner.start();
+        runner.run();
     }
 }

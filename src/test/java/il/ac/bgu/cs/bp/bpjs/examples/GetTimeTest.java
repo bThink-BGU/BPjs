@@ -39,7 +39,7 @@ public class GetTimeTest {
     public void test() throws InterruptedException {
         BProgram sut = new SingleResourceBProgram("getTimeTest.js");
         long timePre = System.currentTimeMillis();
-        new BProgramRunner(sut).start();
+        new BProgramRunner(sut).run();
         long timePost = System.currentTimeMillis();
         Long actual = sut.getFromGlobalScope("theTime", Long.class).get();
         assertTrue( (actual>=timePre) && (actual<=timePost) );

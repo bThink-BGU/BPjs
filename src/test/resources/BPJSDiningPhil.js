@@ -1,4 +1,4 @@
-/* global bp, bsync, PHILOSOPHER_COUNT */
+/* global bp, PHILOSOPHER_COUNT */
 //PHILOSOPHER_COUNT = 9; // for convenience, this is now set up from the Java environment.
 
 // for convenience, PHILOSOPHER_COUNT is now set up from the Java environment.
@@ -16,11 +16,11 @@ function addStick(i) {
         let releaseMe = [bp.Event("Rel" + i + "R"), bp.Event("Rel" + j + "L")];
 
         while (true) {
-            let e = bsync({waitFor: pickMe,
+            let e = bp.sync({waitFor: pickMe,
                              block: releaseMe});
 
             let wt = (e.name === "Pick" + i + "R") ? bp.Event("Rel" + i + "R") : bp.Event("Rel" + j + "L");
-            bsync({waitFor: wt,
+            bp.sync({waitFor: wt,
                      block: pickMe});
         }
     });
@@ -31,22 +31,22 @@ function addPhil(philNum) {
     bp.registerBThread("Phil" + philname, function () {
         while (true) {
             // Request to pick the right stick
-            bsync({
+            bp.sync({
                 request: bp.Event("Pick" + philNum + "R")
             });
 
             // Request to pick the left stick
-            bsync({
+            bp.sync({
                 request: bp.Event("Pick" + philNum + "L")
             });
 
             // Request to release the left stick
-            bsync({
+            bp.sync({
                 request: bp.Event("Rel" + philNum + "L")
             });
 
             // Request to release the right stick
-            bsync({
+            bp.sync({
                 request: bp.Event("Rel" + philNum + "R")
             });
         }

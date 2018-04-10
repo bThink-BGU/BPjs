@@ -50,7 +50,7 @@ public class BProgramSyncSnapshotClonerTest {
         bpr.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener events = bpr.addListener( new InMemoryEventLoggingListener() );
         
-        bpr.start();
+        bpr.run();
         
         events.getEvents().forEach( e -> System.out.println(e.toString()) );
         

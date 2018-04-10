@@ -2,17 +2,17 @@ var CAKE_REQUEST = bp.Event("Cake Please");
 var CAKE_READY   = bp.Event("Cake Served");
 
 bp.registerBThread("Customer", function(){
-  bsync({request:CAKE_REQUEST});
-  bsync({waitFor:CAKE_READY});
+  bp.sync({request:CAKE_REQUEST});
+  bp.sync({waitFor:CAKE_READY});
 });
 
 // Burn the cake half of the times.
 bp.registerBThread("Oven", function(){
-  bsync({waitFor:bp.Event("Bake Start")});
+  bp.sync({waitFor:bp.Event("Bake Start")});
   if ( bp.random.nextBoolean() ) {
-    bsync({request:bp.Event("Cake Burnt"), block:bp.Event("Bake End")});
+    bp.sync({request:bp.Event("Cake Burnt"), block:bp.Event("Bake End")});
   } else {
-    bsync({request:bp.Event("Cake Ready"), block:bp.Event("Bake End")});
+    bp.sync({request:bp.Event("Cake Ready"), block:bp.Event("Bake End")});
   }
 });
 
@@ -23,12 +23,12 @@ bp.registerBThread("Baker", function() {
     bp.enqueueExternalEvent(bp.Event("No cake for you!"));
     bp.enqueueExternalEvent(bp.Event("Come back - 1 month!"));
   });
-  bsync({waitFor:CAKE_REQUEST});
-  bsync({request:bp.Event("Buy Ingredients")});
-  bsync({request:bp.Event("Mix Ingredients")});
-  bsync({request:bp.Event("Bake Start")});
-  bsync({waitFor:bp.Event("Cake Ready"),
+  bp.sync({waitFor:CAKE_REQUEST});
+  bp.sync({request:bp.Event("Buy Ingredients")});
+  bp.sync({request:bp.Event("Mix Ingredients")});
+  bp.sync({request:bp.Event("Bake Start")});
+  bp.sync({waitFor:bp.Event("Cake Ready"),
        interrupt:bp.Event("Cake Burnt")});
-  bsync({request:bp.Event("Decorate")});
-  bsync({request:CAKE_READY});
+  bp.sync({request:bp.Event("Decorate")});
+  bp.sync({request:CAKE_READY});
 });

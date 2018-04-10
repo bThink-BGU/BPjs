@@ -40,7 +40,7 @@ public class PrioritizedBSyncEventSelectionStrategyTest {
 		Set<BSyncStatement> stmts = new HashSet<>();
 		stmts.add(BSyncStatement.make().request(Arrays.asList(evt4)));
 		stmts.add(BSyncStatement.make().request(Arrays.asList(evt1)).data(5));
-		stmts.add(BSyncStatement.make().request(Arrays.asList(evt2)).data(10));
+		stmts.add(BSyncStatement.make().request(Arrays.asList(evt2)).data(1));
 		stmts.add(BSyncStatement.make().request(Arrays.asList(evt3)).data(10).block(evt2));
 
 		assertEquals(new HashSet<>(Arrays.asList(evt3)), 

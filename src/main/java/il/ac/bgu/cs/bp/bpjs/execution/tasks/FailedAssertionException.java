@@ -24,8 +24,7 @@
 package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
 /**
- * An exception class that signals a failed assertion. Translated later
- * to a {@link FailedAssertion} instance by the task runner.
+ * An exception class that signals a failed assertion
  * 
  * @author michael
  */

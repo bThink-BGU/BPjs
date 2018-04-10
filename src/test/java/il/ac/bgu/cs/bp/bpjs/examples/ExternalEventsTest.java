@@ -29,7 +29,7 @@ public class ExternalEventsTest {
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
         sut.getBProgram().enqueueExternalEvent(ext1);
-        sut.start();
+        sut.run();
         
         eventLogger.getEvents().forEach( e->System.out.println(e) );
         

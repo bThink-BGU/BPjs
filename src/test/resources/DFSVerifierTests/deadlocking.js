@@ -24,12 +24,12 @@
 
 
 bp.registerBThread("Requester", function(){
-    bsync({request:bp.Event("A")});
-    bsync({request:bp.Event("A")});
-    bsync({request:bp.Event("A")});
+    bp.sync({request:bp.Event("A")});
+    bp.sync({request:bp.Event("A")});
+    bp.sync({request:bp.Event("A")});
 });
 
 bp.registerBThread("Deadlocker", function(){
-    bsync({waitFor:bp.Event("A")});
-    bsync({block:bp.Event("A")});
+    bp.sync({waitFor:bp.Event("A")});
+    bp.sync({block:bp.Event("A")});
 });

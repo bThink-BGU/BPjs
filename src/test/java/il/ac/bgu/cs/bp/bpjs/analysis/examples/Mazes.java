@@ -72,7 +72,7 @@ public class Mazes {
         SingleResourceBProgram bprog = prepareProgram();
         BProgramRunner rnr = new BProgramRunner(bprog);
         rnr.addListener(new PrintBProgramRunnerListener());
-        rnr.start();
+        rnr.run();
         printMaze(getMaze(bprog));
 
     }

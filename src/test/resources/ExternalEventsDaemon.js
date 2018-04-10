@@ -10,9 +10,9 @@ var ext1 = bp.Event("ext1");
 
 bp.registerBThread("handler", function() {
     for ( var i=0; i<3; i++ ){
-        bsync( {waitFor:ext1} );
-        bsync( {request:in1a} );
-        bsync( {request:in1b} );
+        bp.sync( {waitFor:ext1} );
+        bp.sync( {request:in1a} );
+        bp.sync( {request:in1b} );
     }
     bp.setDaemonMode( false );
 });

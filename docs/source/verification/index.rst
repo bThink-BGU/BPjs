@@ -6,4 +6,4 @@ BPjs programs can be verified to conform to a formal requirement. For example, i
 
 Sample verification code can be found in the test code, in package ``il.ac.bgu.cs.bp.bpjs.verification.examples``.
 
-.. note:: This description is a stub. Longer, more detailed description will be added once the first BPjs paper is out.
+.. note:: This description is a stub. Longer, more detailed description will be added once the first BPjs paper is out (already submitted, BTW).

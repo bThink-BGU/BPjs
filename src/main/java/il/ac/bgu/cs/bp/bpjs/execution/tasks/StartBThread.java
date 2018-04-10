@@ -7,11 +7,9 @@ import org.mozilla.javascript.Context;
  * A task to start a BThread, taking it from its entry point to its first {@code bsync}.
  */
 public class StartBThread extends BPEngineTask {
-    private final BThreadSyncSnapshot bss;
 
     public StartBThread(BThreadSyncSnapshot aBThread, BPEngineTask.Listener l) {
         super(aBThread, l);
-        bss = aBThread;
     }
 
     @Override

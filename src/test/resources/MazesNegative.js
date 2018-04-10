@@ -167,8 +167,8 @@ function addSpaceCell( col, row ) {
     bp.registerBThread("cell(c:"+col+" r:"+row+")",
         function() {
             while ( true ) {
-                bsync({waitFor:adjacentCellEntries(col, row)});
-                bsync({
+                bp.sync({waitFor:adjacentCellEntries(col, row)});
+                bp.sync({
                     request: enterEvent(col, row),
                     waitFor: anyEntrance
                 });
@@ -186,11 +186,11 @@ function addSpaceCell( col, row ) {
  */
 function addTargetCell(col, row) {
     bp.registerBThread("Target(c:"+col+" r:"+row+")", function(){
-       bsync({
+       bp.sync({
            waitFor: enterEvent(col, row)
        }); 
        
-       bsync({
+       bp.sync({
            request: TARGET_FOUND_EVENT,
            block: bp.allExcept( TARGET_FOUND_EVENT )
        });
@@ -199,7 +199,7 @@ function addTargetCell(col, row) {
 
 function addStartCell(col, row) {
     bp.registerBThread("starter(c:"+col+" r:"+row+")", function() {
-       bsync({
+       bp.sync({
           request:enterEvent(col,row) 
        });
     });
