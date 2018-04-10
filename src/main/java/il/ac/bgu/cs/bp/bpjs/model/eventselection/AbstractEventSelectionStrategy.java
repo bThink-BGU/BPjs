@@ -26,12 +26,11 @@ package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
-import java.util.ArrayList;
+
+import java.util.*;
+
 import static java.util.Collections.singleton;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
-import java.util.Set;
+
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toSet;
 import org.mozilla.javascript.Context;
@@ -77,7 +76,7 @@ public abstract class AbstractEventSelectionStrategy implements EventSelectionSt
         }
         BEvent chosen = new ArrayList<>(selectableEvents).get(rnd.nextInt(selectableEvents.size()));
         Set<BEvent> requested = statements.stream()
-                                          .filter((BSyncStatement stmt) -> stmt != null)
+                                          .filter(Objects::nonNull)
                                           .flatMap((BSyncStatement stmt) -> stmt.getRequest().stream())
                                           .collect(Collectors.toSet());
         

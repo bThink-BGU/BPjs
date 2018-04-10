@@ -29,7 +29,7 @@ public class ExplicitEventSet implements EventSet {
     
     @Override
     public boolean contains(BEvent event) {
-        return ( (event != null) &&  collection.contains((BEvent)event ) );
+        return ( (event != null) &&  collection.contains(event) );
     }
     
     public void add( BEvent be ) {

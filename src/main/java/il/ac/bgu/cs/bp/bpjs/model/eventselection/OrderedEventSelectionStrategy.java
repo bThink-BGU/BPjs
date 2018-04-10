@@ -30,7 +30,10 @@ import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
+
+import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import static java.util.stream.Collectors.toSet;
 import org.mozilla.javascript.Context;
@@ -57,17 +60,17 @@ public class OrderedEventSelectionStrategy extends AbstractEventSelectionStrateg
         }
         
         EventSet blocked = ComposableEventSet.anyOf(statements.stream()
-                .filter( stmt -> stmt!=null )
+                .filter(Objects::nonNull)
                 .map(BSyncStatement::getBlock )
                 .filter(r -> r != EventSets.none )
                 .collect( toSet() ) );
         
         Set<BEvent> requested = statements.stream()
-                .filter( stmt -> stmt!=null )
+                .filter(Objects::nonNull)
                 .map( stmt -> stmt.getRequest().stream()
                                                .filter(e -> !blocked.contains(e))
                                                .findFirst().orElse( null ))
-                .filter( e -> e != null)
+                .filter(Objects::nonNull)
                 .collect( toSet() );
         
         // Let's see what internal events are requested and not blocked (if any).
@@ -79,7 +82,7 @@ public class OrderedEventSelectionStrategy extends AbstractEventSelectionStrateg
 
             return requestedAndNotBlocked.isEmpty() ?
                     externalEvents.stream().filter( e->!blocked.contains(e) ) // No internal events requested, defer to externals.
-                                  .findFirst().map( e->singleton(e) ).orElse(emptySet())
+                                  .findFirst().map(Collections::singleton).orElse(emptySet())
                     : requestedAndNotBlocked;
         } finally {
             Context.exit();

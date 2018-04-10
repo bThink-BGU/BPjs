@@ -168,7 +168,7 @@ public class BEvent implements Comparable<BEvent>, EventSet, java.io.Serializabl
         }
 
         // established: o1 and o2 are non-null and of the same class.
-        return (o1 instanceof ScriptableObject)
+        return (o1 instanceof ScriptableObject) && (o2 instanceof ScriptableObject)
                 ? jsScriptableObjectEqual((ScriptableObject) o1, (ScriptableObject) o2)
                 : o1.equals(o2);
     }

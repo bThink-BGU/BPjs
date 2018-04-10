@@ -86,7 +86,7 @@ public class BProgramSyncSnapshot {
         nextRound.addAll(exSvc.invokeAll(threadSnapshots.stream()
                                 .map(bt -> new StartBThread(bt, halter))
                                 .collect(toList())
-                ).stream().map(f -> safeGet(f) ).collect(toList())
+                ).stream().map(this::safeGet).collect(toList())
         );
         // FIXME test for assertion failures
         executeAllAddedBThreads(nextRound, exSvc, halter);
@@ -135,11 +135,11 @@ public class BProgramSyncSnapshot {
                                 resumingThisRound.stream()
                                                  .map(bt -> new ResumeBThread(bt, anEvent, halter))
                                                  .collect(toList())
-                    ).stream().map(f -> safeGet(f) ).filter(Objects::nonNull).collect(toList())
+                    ).stream().map(this::safeGet).filter(Objects::nonNull).collect(toList())
             );
 
             // inform listeners which b-threads completed
-            Set<String> nextRoundIds = nextRound.stream().map(t->t.getName()).collect(toSet());
+            Set<String> nextRoundIds = nextRound.stream().map(BThreadSyncSnapshot::getName).collect(toSet());
             resumingThisRound.stream()
                     .filter(t->!nextRoundIds.contains(t.getName()))
                     .forEach(t->listeners.forEach(l->l.bthreadDone(bprog, t)));
@@ -254,7 +254,7 @@ public class BProgramSyncSnapshot {
                     added.stream()
                             .map(bt -> new StartBThread(bt, assertionListener))
                             .collect(toList())
-            ).stream().map(f -> safeGet(f) ).filter(Objects::nonNull).collect(toList()));
+            ).stream().map(this::safeGet).filter(Objects::nonNull).collect(toList()));
             added = bprog.drainRecentlyRegisteredBthreads();
         }
     }
