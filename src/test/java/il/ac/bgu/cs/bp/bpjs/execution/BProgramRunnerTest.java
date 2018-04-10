@@ -23,10 +23,17 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution;
 
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
+import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
+
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
@@ -54,6 +61,34 @@ public class BProgramRunnerTest {
         sut.start();
         
     }
+
+    @Test
+    public void testImmediateAssert() throws Exception {
+        BProgram bprog = new StringBProgram( //
+                "// This b-thread goes forward until it's done.\n" +
+                        "bp.registerBThread(\"forward\", function () {\n" +
+                        "bp.ASSERT(false, \"failRightAWay!\");\n" +
+                        "    bsync({request: bp.Event(\"A\")});\n" +
+                        "});\n" +
+                        "\n" +
+                        "bp.registerBThread(\"assertor\", function () {\n" +
+                        "    let e = bsync({waitFor: bp.Event(\"B\")});\n" +
+                        "    if (e.name == \"B\") {\n" +
+                        "        bp.ASSERT(false, \"B happened\");\n" +
+                        "    }\n" +
+                        "});\n");
+        BProgramRunner runner = new BProgramRunner(bprog);
+        runner.start();
+        InMemoryEventLoggingListener listener =new InMemoryEventLoggingListener();
+        runner.addListener( listener );
+        FailedAssertion expected = new FailedAssertion("failRightAWay!","forward");
+        assertEquals( expected , runner.getFailedAssertion());
+        assertEquals(0,listener.getEvents().size());
+
+
+    }
+
+
     
     @Test
     public void testExecutorName() throws InterruptedException {
@@ -69,5 +104,7 @@ public class BProgramRunnerTest {
         assertTrue( "Java executor name is wrong (got:'" + exName + "')", 
                 exName.startsWith("BProgramRunner-"));
     }
+
+
 
 }

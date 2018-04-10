@@ -25,15 +25,15 @@ package il.ac.bgu.cs.bp.bpjs.analysis.DFSVerifierTests;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
-import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.*;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
-import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import org.junit.Test;
+
+import javax.security.auth.login.FailedLoginException;
 
 /**
  *, 
@@ -90,8 +90,8 @@ public class VerificationResultOptionsTest {
         
         assertEquals( VerificationResult.ViolationType.FailedAssertion, res.getViolationType() );
         assertTrue( res.isCounterExampleFound() );
-        assertEquals( "assertor", res.getFailedAssertion().getBThreadName() );
-        assertEquals( "B happened", res.getFailedAssertion().getMessage());
+        FailedAssertion expectedAssert = new FailedAssertion("B happened","assertor");
+        assertEquals( expectedAssert,res.getFailedAssertion());
     }
     
     @Test
@@ -155,6 +155,31 @@ public class VerificationResultOptionsTest {
         assertTrue( res.isCounterExampleFound() );
         assertEquals( "assertor", res.getFailedAssertion().getBThreadName() );
         assertEquals( "B happened", res.getFailedAssertion().getMessage());
+    }
+
+    @Test
+    public void testImmediateAssert() throws Exception {
+        BProgram bprog = new StringBProgram( //
+                "// This b-thread goes forward until it's done.\n" +
+                        "bp.registerBThread(\"forward\", function () {\n" +
+                            "bp.ASSERT(false, \"failRightAWay!\");\n" +
+                        "    bsync({request: bp.Event(\"A\")});\n" +
+                        "});\n" +
+                        "\n" +
+                        "bp.registerBThread(\"assertor\", function () {\n" +
+                        "    let e = bsync({waitFor: bp.Event(\"B\")});\n" +
+                        "    if (e.name == \"B\") {\n" +
+                        "        bp.ASSERT(false, \"B happened\");\n" +
+                        "    }\n" +
+                        "});\n");
+        DfsBProgramVerifier vfr = new DfsBProgramVerifier();
+        final VerificationResult res = vfr.verify(bprog);
+
+        assertEquals( VerificationResult.ViolationType.FailedAssertion, res.getViolationType() );
+        assertTrue( res.isCounterExampleFound() );
+        FailedAssertion expected = new FailedAssertion("failRightAWay!","forward");
+        assertEquals( expected , res.getFailedAssertion());
+        assertEquals(0,res.getScannedStatesCount());
     }
 
 
