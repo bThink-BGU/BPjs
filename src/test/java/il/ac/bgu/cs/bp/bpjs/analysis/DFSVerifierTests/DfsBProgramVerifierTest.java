@@ -68,10 +68,14 @@ public class DfsBProgramVerifierTest {
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setProgressListener(new BriefPrintDfsVerifierListener());
         program.appendSource(Requirements.eventNotSelected("B"));
-        sut.setVisitedNodeStore(new BProgramStateVisitedStateStore(true));
+        VisitedStateStore stateStore = new BProgramStateVisitedStateStore(true);
+        sut.setVisitedNodeStore(stateStore );
         VerificationResult res = sut.verify(program);
         assertTrue(res.isCounterExampleFound());
         assertEquals("AAAB", traceEventNamesString(res.getCounterExampleTrace(), ""));
+        //Add trivial getter check
+        VisitedStateStore retStore = sut.getVisitedNodeStore();
+        assertTrue(retStore == stateStore);
     }
 
 
@@ -97,7 +101,15 @@ public class DfsBProgramVerifierTest {
         assertTrue(res.isCounterExampleFound());
         assertEquals(VerificationResult.ViolationType.BadState, res.getViolationType());
         assertEquals("B", res.getInvalidEvent().name);
+    }
 
+    @Test
+    public void testAAABRun_invalidEventsSettings() throws Exception {
+        BProgram program = new SingleResourceBProgram("DFSVerifierTests/AAABTrace.js");
+        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        BEvent invalidE = BEvent.named("B");
+        sut.addInvalidEvent(invalidE);
+        assertTrue(sut.getInvalidEvents().contains(invalidE));
 
     }
 
