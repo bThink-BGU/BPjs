@@ -99,7 +99,7 @@ public class BProgramSyncSnapshot {
      * Runs the program from the snapshot, triggering the passed event.
      * @param exSvc the executor service that will advance the threads.
      * @param anEvent the event selected.
-     * @param listeners 
+     * @param listeners BProgramRunnerListeners
      * @return A set of b-thread snapshots that should participate in the next cycle.
      * @throws InterruptedException 
      */

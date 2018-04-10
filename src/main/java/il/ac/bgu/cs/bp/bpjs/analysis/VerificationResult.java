@@ -26,7 +26,6 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Result of a program verification.

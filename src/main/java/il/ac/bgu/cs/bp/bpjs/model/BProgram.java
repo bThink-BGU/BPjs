@@ -143,7 +143,7 @@ public abstract class BProgram {
      * parts for model-checking.
      * 
      * @throws IllegalStateException if the code is appended after the bprogram started.
-     * @param source 
+     * @param source Valid JS source code
      */
     public void appendSource( String source ) {
         if ( started ) {
@@ -162,7 +162,7 @@ public abstract class BProgram {
      * parts for model-checking.
      * 
      * @throws IllegalStateException if the code is appended after the bprogram started.
-     * @param source 
+     * @param source Valid JS source code
      */
     public void prependSource( String source ) {
         if ( started ) {
@@ -301,7 +301,7 @@ public abstract class BProgram {
         Context.javaToJS(proxy, programScope));
         
 //        evaluateResource("globalScopeInit.js");// <-- Currently not needed. Leaving in as we might need it soon.
-        initialScopeValues.entrySet().forEach(e->putInGlobalScope(e.getKey(), e.getValue()));
+        initialScopeValues.forEach((key, value) -> putInGlobalScope(key, value));
         initialScopeValues=null;
     }
 

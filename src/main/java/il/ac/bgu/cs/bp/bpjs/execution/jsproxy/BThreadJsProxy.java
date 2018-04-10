@@ -6,7 +6,6 @@ package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
@@ -53,7 +52,7 @@ public class BThreadJsProxy implements java.io.Serializable {
     }
     
     public void bsync( NativeObject jsRWB, Object data ) {
-        Map<String, Object> jRWB = (Map)Context.jsToJava(jsRWB, Map.class);
+        Map<String, Object> jRWB = (Map<String, Object>)Context.jsToJava(jsRWB, Map.class);
         
         BSyncStatement stmt = BSyncStatement.make();
         Object req = jRWB.get("request");

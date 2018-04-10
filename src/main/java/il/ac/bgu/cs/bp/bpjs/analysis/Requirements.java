@@ -33,7 +33,7 @@ public class Requirements {
     /**
      * A requirement that detects deadlocks (as in, no selectable events).
      */
-    public static final String eventNotSelected( String eventName ) {
+    public static String eventNotSelected( String eventName ) {
         return "bp.registerBThread('eventNotSelected-" + eventName + "', function(){ "
             + "\n bsync({waitFor:bp.Event('" + eventName + "')});"
             + "\n bp.ASSERT(false, 'event \"" + eventName + "\" selected.');"

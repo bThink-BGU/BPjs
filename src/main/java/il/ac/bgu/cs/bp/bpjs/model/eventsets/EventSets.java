@@ -44,7 +44,7 @@ public final class EventSets {
         }
     };
     
-    public final static EventSet allExcept( EventSet es ) {
+    public static EventSet allExcept( EventSet es ) {
         return new EventSet(){
             @Override
             public boolean contains(BEvent event) {

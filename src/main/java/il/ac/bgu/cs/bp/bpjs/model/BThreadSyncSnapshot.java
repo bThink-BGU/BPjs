@@ -4,7 +4,6 @@ import java.io.Serializable;
 import java.util.Optional;
 
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeContinuation;
 import org.mozilla.javascript.Scriptable;

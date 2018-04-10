@@ -54,7 +54,7 @@ public class Node {
             Collections.shuffle(eventOrdered);
             iterator = eventOrdered.iterator();
         } else {
-            selectableEvents = Collections.<BEvent>emptySet();
+            selectableEvents = Collections.emptySet();
             iterator = selectableEvents.iterator();
         }
 
@@ -78,7 +78,7 @@ public class Node {
      * Get a Node object for each possible state of the system after triggering
      * the given event.
      *
-     * @param e
+     * @param e Event to provide the system
      * @param exSvc The executor service that will run the threads
      * @return State of the BProgram after event {@code e} was selected while
      * the program was at {@code this} node's state.

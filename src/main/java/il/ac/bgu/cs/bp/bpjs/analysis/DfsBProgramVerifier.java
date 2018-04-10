@@ -57,7 +57,7 @@ public class DfsBProgramVerifier {
     /**
      * A listener to the progress of the DFS state scanning.
      */
-    public static interface ProgressListener {
+    public interface ProgressListener {
 
         void started(DfsBProgramVerifier v);
 
