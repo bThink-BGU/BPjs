@@ -142,7 +142,7 @@ public abstract class BProgram {
      * parts for model-checking.
      * 
      * @throws IllegalStateException if the code is appended after the bprogram started.
-     * @param source 
+     * @param source Valid JS source code
      */
     public void appendSource( String source ) {
         if ( started ) {
@@ -161,7 +161,7 @@ public abstract class BProgram {
      * parts for model-checking.
      * 
      * @throws IllegalStateException if the code is appended after the bprogram started.
-     * @param source 
+     * @param source Valid JS source code
      */
     public void prependSource( String source ) {
         if ( started ) {
@@ -206,7 +206,9 @@ public abstract class BProgram {
      */
     protected Object evaluate(String script, String scriptName) {
         try {
-            return Context.getCurrentContext().evaluateString(programScope, script, scriptName, 1, null);
+            Context curCtx = Context.getCurrentContext();
+            curCtx.setLanguageVersion(170);
+            return curCtx.evaluateString(programScope, script, scriptName, 1, null);
         } catch (EcmaError rerr) {
             if ( rerr.getErrorMessage().trim().equals("\"bsync\" is not defined.") ) {
                 throw new BPjsCodeEvaluationException("'bsync' is only defined in BThreads. Did you forget to call 'bp.registerBThread()'?", rerr);
@@ -298,7 +300,7 @@ public abstract class BProgram {
         Context.javaToJS(proxy, programScope));
         
 //        evaluateResource("globalScopeInit.js");// <-- Currently not needed. Leaving in as we might need it soon.
-        initialScopeValues.entrySet().forEach(e->putInGlobalScope(e.getKey(), e.getValue()));
+        initialScopeValues.forEach((key, value) -> putInGlobalScope(key, value));
         initialScopeValues=null;
     }
 

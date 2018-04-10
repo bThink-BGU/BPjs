@@ -30,9 +30,8 @@ import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
-import java.util.List;
-import java.util.OptionalInt;
-import java.util.Set;
+
+import java.util.*;
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toSet;
 
@@ -59,7 +58,7 @@ public class PrioritizedBSyncEventSelectionStrategy extends AbstractEventSelecti
     public Set<BEvent> selectableEvents(Set<BSyncStatement> statements, List<BEvent> externalEvents) {
         
         EventSet blocked = ComposableEventSet.anyOf(statements.stream()
-                .filter( stmt -> stmt!=null )
+                .filter(Objects::nonNull)
                 .map( BSyncStatement::getBlock )
                 .filter( r -> r != EventSets.none )
                 .collect( Collectors.toSet() ) );
@@ -77,7 +76,7 @@ public class PrioritizedBSyncEventSelectionStrategy extends AbstractEventSelecti
         } else {
             // Can't select any internal event, defer to the external, non-blocked ones.
             return externalEvents.stream().filter( e->!blocked.contains(e) ) // No internal events requested, defer to externals.
-                                  .findFirst().map( e->singleton(e) ).orElse(emptySet());
+                                  .findFirst().map(Collections::singleton).orElse(emptySet());
         }
        
     }

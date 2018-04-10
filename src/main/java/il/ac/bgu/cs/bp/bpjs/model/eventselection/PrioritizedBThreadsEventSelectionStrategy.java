@@ -4,10 +4,7 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toSet;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.tuple.Pair;
@@ -18,7 +15,7 @@ import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
-import java.util.Collection;
+
 import java.util.stream.Stream;
 
 /**
@@ -49,14 +46,14 @@ public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSele
         }
         
         final EventSet blocked = ComposableEventSet.anyOf(statements.stream()
-                .filter( stmt -> stmt!=null )
+                .filter(Objects::nonNull)
                 .map( BSyncStatement::getBlock )
                 .filter( r -> r != EventSets.none )
                 .collect( toSet() ) );
         
         Set<Pair<BEvent,Integer>> requested = statements.stream()
-                .filter( stmt -> stmt!=null )
-                .flatMap(stmt -> eventsToPrioritizedPairs(stmt))
+                .filter(Objects::nonNull)
+                .flatMap(this::eventsToPrioritizedPairs)
                 .collect( Collectors.toSet() );
         
         // Let's see what internal events are requested and not blocked (if any).
@@ -67,16 +64,16 @@ public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSele
                     .filter( req -> !blocked.contains(req.getLeft()) )
                     .collect( toSet() );
             
-            Integer highestPriority = requestedAndNotBlockedWithPriorities.stream().map(p -> p.getRight()).max(Integer::max).get();
+            Integer highestPriority = requestedAndNotBlockedWithPriorities.stream().map(Pair::getRight).max(Integer::max).get();
             
             Set<BEvent> requestedAndNotBlocked = requestedAndNotBlockedWithPriorities.stream()
             	.filter(p -> p.getRight().intValue() == highestPriority.intValue())
-            	.map(p->p.getLeft())
+            	.map(Pair::getLeft)
             	.collect(toSet());
 
             return requestedAndNotBlocked.isEmpty() ?
                     externalEvents.stream().filter( e->!blocked.contains(e) ) // No internal events requested, defer to externals.
-                                  .findFirst().map( e->singleton(e) ).orElse(emptySet())
+                                  .findFirst().map(Collections::singleton).orElse(emptySet())
                     : requestedAndNotBlocked;
         } finally {
             Context.exit();

@@ -55,12 +55,11 @@ public class BThreadJsProxy implements java.io.Serializable {
     
     @Deprecated
     public void bsync( NativeObject jsRWB, Object data ) {
+        Map<String, Object> jRWB = (Map<String, Object>)Context.jsToJava(jsRWB, Map.class);
         if ( ! deprecationWarningPrinted ) {
             deprecationWarningPrinted = true;
             System.err.println("Warning: bsync is deprecated and will be removed shortly. Please use bp.sync instead.");
         }
-        Map<String, Object> jRWB = (Map)Context.jsToJava(jsRWB, Map.class);
-        
         BSyncStatement stmt = BSyncStatement.make();
         Object req = jRWB.get("request");
         if ( req != null ) {

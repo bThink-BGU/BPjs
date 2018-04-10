@@ -70,7 +70,7 @@ public class JsEventSet implements EventSet, java.io.Serializable {
         
         if ( other instanceof JsEventSet ) {
             JsEventSet otherES = (JsEventSet) other;
-            if ( encodedSource == null ) {
+            if ( encodedSource != null ) {
                 return encodedSource.equals(otherES.encodedSource);
             } else {
                 return predicate.equals(((JsEventSet) other).predicate);

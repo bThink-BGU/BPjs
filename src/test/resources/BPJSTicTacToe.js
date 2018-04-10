@@ -80,7 +80,6 @@ bp.registerBThread("DetectDraw", function() {
 	/*
 	 * for (var i=0; i< 9; i++) { bp.sync({ waitFor:[ move ] }); }
 	 */
-
 	bp.sync({ request:[ StaticEvents.draw ] }, 90);
 });
 
@@ -111,7 +110,7 @@ function addLinePermutationBthreads(l, p) {
 
 			bp.sync({ request:[ StaticEvents.OWin ] }, 100);
 
-		}
+        }
 	});
 
 	// Player O strategy to add a the third O to win

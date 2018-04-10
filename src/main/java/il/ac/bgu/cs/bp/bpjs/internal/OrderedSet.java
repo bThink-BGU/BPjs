@@ -48,7 +48,7 @@ public class OrderedSet<T> implements SortedSet<T>, java.io.Serializable {
 
     public static <T> OrderedSet<T> of(T... ts) {
         OrderedSet<T> retVal = new OrderedSet<>();
-        Arrays.stream(ts).forEach(retVal::add);
+        retVal.addAll(Arrays.asList(ts));
         return retVal;
     }
 
@@ -143,11 +143,7 @@ public class OrderedSet<T> implements SortedSet<T>, java.io.Serializable {
     @Override
     @SuppressWarnings("element-type-mismatch")
     public boolean remove(Object o) {
-        if (items.contains(o)) {
-            items.remove(o);
-            return true;
-        }
-        return false;
+        return items.remove(o);
     }
 
     @Override

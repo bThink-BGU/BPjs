@@ -44,7 +44,6 @@ public class TicTacToeVerMain  {
             vfr.setDetectDeadlocks(false);
 
             vfr.setMaxTraceLength(70);
-//            vfr.setDebugMode(true);
             vfr.setVisitedNodeStore(new BProgramStateVisitedStateStore(false));
             vfr.setProgressListener( new BriefPrintDfsVerifierListener() );
 
