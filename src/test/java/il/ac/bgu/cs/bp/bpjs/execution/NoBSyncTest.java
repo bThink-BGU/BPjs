@@ -38,7 +38,7 @@ public class NoBSyncTest {
     public void test() throws InterruptedException {
         BProgram sut = new SingleResourceBProgram("noBSyncs.js", "noBSyncs");
         
-        new BProgramRunner(sut).start();
+        new BProgramRunner(sut).run();
         final Long actualValue = sut.getFromGlobalScope("shouldBe7", Long.class).get();
         assertEquals(new Long(7), actualValue);
                 

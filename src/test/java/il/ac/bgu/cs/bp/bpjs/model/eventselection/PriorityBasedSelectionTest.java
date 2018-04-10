@@ -43,7 +43,7 @@ public class PriorityBasedSelectionTest {
 			bProgram.setEventSelectionStrategy(eventSelectionStrategy);
 
 			BProgramRunner bpr = new BProgramRunner(bProgram);
-			bpr.start();
+			bpr.run();
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}

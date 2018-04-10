@@ -54,7 +54,7 @@ public class BEventSetsJsTest {
                         "inline script" );
             }
         };
-        new BProgramRunner(prog).start();
+        new BProgramRunner(prog).run();
     }
     
 

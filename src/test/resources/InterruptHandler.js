@@ -6,11 +6,11 @@ bp.registerBThread("interrupted", function () {
        bp.enqueueExternalEvent(evt); 
        bp.enqueueExternalEvent(bp.Event(testValue)); 
     });
-    bsync({interrupt:bp.Event("boom")});
+    bp.sync({interrupt:bp.Event("boom")});
 });
 
 bp.registerBThread("request-and-wait",function(){
-   bsync({request:bp.Event("boom")});
-   bsync({waitFor:bp.all});
-   bsync({waitFor:bp.all});
+   bp.sync({request:bp.Event("boom")});
+   bp.sync({waitFor:bp.all});
+   bp.sync({waitFor:bp.all});
 });

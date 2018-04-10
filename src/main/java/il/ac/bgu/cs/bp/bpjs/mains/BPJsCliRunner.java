@@ -52,81 +52,75 @@ import org.mozilla.javascript.Scriptable;
  */
 public class BPJsCliRunner {
 
-    public static void main( String[] args ) {
+    public static void main(String[] args) {
         if (args.length == 0) {
             printUsageAndExit();
         }
 
-        try {
-            BProgram bpp = new BProgram("BPjs") {
-                @Override
-                protected void setupProgramScope(Scriptable scope) {
-                    for (String arg : args) {
-                        if (arg.equals("-")) {
-                            println(" [READ] stdin");
-                            try {
-                                evaluate(System.in, "stdin");
+        BProgram bpp = new BProgram("BPjs") {
+            @Override
+            protected void setupProgramScope(Scriptable scope) {
+                for (String arg : args) {
+                    if (arg.equals("-")) {
+                        println(" [READ] stdin");
+                        try {
+                            evaluate(System.in, "stdin");
+                        } catch (EvaluatorException ee) {
+                            logScriptExceptionAndQuit(ee, arg);
+                        }
+                    } else {
+                        if (!arg.startsWith("-")) {
+                            Path inFile = Paths.get(arg);
+                            println(" [READ] %s", inFile.toAbsolutePath().toString());
+                            if (!Files.exists(inFile)) {
+                                println("File %s does not exit", inFile.toAbsolutePath().toString());
+                                System.exit(-2);
+                            }
+                            try (InputStream in = Files.newInputStream(inFile)) {
+                                evaluate(in, arg);
                             } catch (EvaluatorException ee) {
                                 logScriptExceptionAndQuit(ee, arg);
-                            }
-                        } else {
-                            if ( !arg.startsWith("-") ) {
-                                Path inFile = Paths.get(arg);
-                                println(" [READ] %s", inFile.toAbsolutePath().toString());
-                                if ( !Files.exists(inFile) ) {
-                                    println("File %s does not exit", inFile.toAbsolutePath().toString());
-                                    System.exit(-2);
-                                }
-                                try (InputStream in = Files.newInputStream(inFile)) {
-                                    evaluate(in, arg);
-                                } catch (EvaluatorException ee) {
-                                    logScriptExceptionAndQuit(ee, arg);
-                                } catch (IOException ex) {
-                                    println("Exception while processing " + arg + ": " + ex.getMessage());
-                                    Logger.getLogger(BPJsCliRunner.class.getName()).log(Level.SEVERE, null, ex);
-                                }
+                            } catch (IOException ex) {
+                                println("Exception while processing " + arg + ": " + ex.getMessage());
+                                Logger.getLogger(BPJsCliRunner.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
-                        println(" [ OK ] %s", arg);
                     }
+                    println(" [ OK ] %s", arg);
                 }
-
-                private void logScriptExceptionAndQuit(EvaluatorException ee, String arg) {
-                    println("Error in source %s:", arg);
-                    println(ee.details());
-                    println("line: " + ee.lineNumber() + ":" + ee.columnNumber());
-                    println("source: " + ee.lineSource());
-                    System.exit(-3);
-                }
-            };
-            
-            
-            SimpleEventSelectionStrategy sess = new SimpleEventSelectionStrategy();
-            EventSelectionStrategy ess = switchPresent("-v", args) ? new LoggingEventSelectionStrategyDecorator(sess) : sess;
-
-            bpp.setEventSelectionStrategy(ess);
-            
-            BProgramRunner bpr = new BProgramRunner(bpp);
-            if ( ! switchPresent("-v", args) ) {
-                bpr.addListener(new PrintBProgramRunnerListener());
             }
-            
-            bpr.start();
 
-        } catch (InterruptedException ex) {
-            Logger.getLogger(BPJsCliRunner.class.getName()).log(Level.SEVERE, null, ex);
+            private void logScriptExceptionAndQuit(EvaluatorException ee, String arg) {
+                println("Error in source %s:", arg);
+                println(ee.details());
+                println("line: " + ee.lineNumber() + ":" + ee.columnNumber());
+                println("source: " + ee.lineSource());
+                System.exit(-3);
+            }
+        };
+
+        SimpleEventSelectionStrategy sess = new SimpleEventSelectionStrategy();
+        EventSelectionStrategy ess = switchPresent("-v", args) ? new LoggingEventSelectionStrategyDecorator(sess) : sess;
+
+        bpp.setEventSelectionStrategy(ess);
+
+        BProgramRunner bpr = new BProgramRunner(bpp);
+        if (!switchPresent("-v", args)) {
+            bpr.addListener(new PrintBProgramRunnerListener());
         }
 
+        bpr.run();
+
     }
-    
+
     /**
      * @return {@code true} iff the passed switch is present in args.
      */
-    private static boolean switchPresent( String aSwitch, String[] args ) {
-        return Arrays.stream(args).anyMatch( s->s.trim().equals(aSwitch) );
+    private static boolean switchPresent(String aSwitch, String[] args) {
+        return Arrays.stream(args).anyMatch(s -> s.trim().equals(aSwitch));
     }
-    
-    private static void println( String template, String... params) {
+
+    private static void println(String template, String... params) {
         print(template + "\n", params);
     }
 

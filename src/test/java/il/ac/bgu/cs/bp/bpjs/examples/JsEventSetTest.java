@@ -32,14 +32,14 @@ public class JsEventSetTest {
         BProgramRunner bpr = new BProgramRunner(new SingleResourceBProgram("JsEventSet.js"));
         bpr.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = bpr.addListener( new InMemoryEventLoggingListener() );
-        bpr.start();
+        bpr.run();
         
         assertEquals(Arrays.asList(new BEvent("1stEvent"), new BEvent("2ndEvent")), eventLogger.getEvents() );
     }
     
     @Test(expected=BPjsRuntimeException.class)
     public void testNullPredicate() throws InterruptedException, URISyntaxException {
-        new BProgramRunner(new StringBProgram("var es=bp.EventSet('bad',null);")).start();
+        new BProgramRunner(new StringBProgram("var es=bp.EventSet('bad',null);")).run();
     }
     
     
@@ -53,7 +53,7 @@ public class JsEventSetTest {
                 + "bp.registerBThread('b',function(){\n"
                 + "  bsync({waitFor:es});\n"
                 + "});"
-        )).start();
+        )).run();
     }
     
     @Test
@@ -63,7 +63,7 @@ public class JsEventSetTest {
             BProgram bpr = new StringBProgram( "Eventset",
                       "var es=bp.EventSet('a',function(e){return e.name=='a';});\n"
             );
-            new BProgramRunner(bpr).start();
+            new BProgramRunner(bpr).run();
             NativeJavaObject sut = (NativeJavaObject) bpr.getGlobalScope().get("es", bpr.getGlobalScope());
             JsEventSet jsSut = (JsEventSet) Context.jsToJava(sut, JsEventSet.class);
             assertEquals("a", jsSut.getName());

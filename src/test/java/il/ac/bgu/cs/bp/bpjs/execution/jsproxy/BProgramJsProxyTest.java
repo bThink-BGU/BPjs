@@ -40,7 +40,7 @@ public class BProgramJsProxyTest {
         
         BProgram sut = new SingleResourceBProgram("RandomProxy.js");
         
-        new BProgramRunner(sut).start();
+        new BProgramRunner(sut).run();
         Double boolCount = sut.getFromGlobalScope("boolCount", Double.class).get();
         assertEquals(500.0, boolCount, 100);
         
@@ -57,7 +57,7 @@ public class BProgramJsProxyTest {
         
         BProgram sut = new SingleResourceBProgram("RandomProxy.js");
         
-        new BProgramRunner(sut).start();
+        new BProgramRunner(sut).run();
         String logLevel1 = sut.getFromGlobalScope("logLevel1", String.class).get();
         assertEquals(BProgramJsProxy.LogLevel.Off.name(), logLevel1);
         

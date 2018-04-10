@@ -37,11 +37,11 @@ the default one it not good enough.
   :alt: Class diagram for running a BProgram
   :align: center
 
-  Class diagram describing the strucutre of an embedded b-program. The client code
+  Class diagram describing the structure of an embedded b-program. The client code
   generates a BProgram and a BProgramRunner. The runner object consults the b-program's
   event selection strategy when selecting events for the b-program it runs. A list of
   listener objects are informed whenever an event of interest, such as b-thread
-  addition or b-event selection, occures.
+  addition or b-event selection, occurs.
   *Some methods and properties have been omitted for brevity.*
 
 
@@ -66,7 +66,7 @@ Add BPjs to your classpath.
 
 Decide which ``BProgram`` subclass you need.
 
-  `BProgram`_ is an abstract class. Its concrete sub-classes differ on how they obtain their source code. `SingleResourceBProgram`_ reads the code from a resource included with the code (typlically, a .js file bundled in the project's .jars). `StringBProgram`_, on the other hand, takes a Java String as source. Of course, ``BProgram`` can be directly extended as needed.
+  `BProgram`_ is an abstract class. Its concrete sub-classes differ on how they obtain their source code. `SingleResourceBProgram`_ reads the code from a resource included with the code (typically, a .js file bundled in the project's .jars). `StringBProgram`_, on the other hand, takes a Java String as source. Of course, ``BProgram`` can be directly extended as needed.
 
 Write the BPjs code.
 
@@ -83,7 +83,7 @@ At Runtime
 * In the common case when the program needs to wait for external events (such as GUI interactions), set the ``isDaemon`` property of the ``BProgram`` to ``true``.
 * Call ``BProgramRunner::start()``.
 
-The BProgram will start running. Lifecycle and behavioral events will be passed to the listener objects. In case the host application would like to push an external event to the embedded b-program (e.g. because of a network request, or a user click), it should use the ``BProgram``'s `enqueueExternalEvent`_ method.
+The BProgram will start running. Life-cycle and behavioral events will be passed to the listener objects. In case the host application would like to push an external event to the embedded b-program (e.g. because of a network request, or a user click), it should use the ``BProgram``'s `enqueueExternalEvent`_ method.
 
 .. tip::
   BPjs' source code contains many examples of embedded BPjs programs - most of the unit tests that involve a b-program. For a more complete example, refer to the `RunFile`_ class, which implements the command-line tool for running BPjs code.
@@ -91,12 +91,22 @@ The BProgram will start running. Lifecycle and behavioral events will be passed 
 .. tip::
   SampleBPjsProject_ can serve as a template project for embedding BPjs in a Java application. You can fork it on GitHub and start building your application from there.
 
+
+External Events vs. Internal Events
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+There is no difference between external and internal events -- both are instances of the Java ``BEvent`` class, or a subclass of it. However, there may be a difference in how these events are treated by the event selection strategy. External events are made available to the strategy using an "external event queue". An event selection strategy may choose to ignore this queue whenever it can choose an event requested by a b-thread. But a strategy can also decide to choose an event from the queue even when there are internal events that are requested and not blocked.
+
+All event selection strategies currently included with BPjs ignore external events when there are choosable internal ones. This choice makes the system easier to reason about, as it gets to complete its reaction to one external event before it starts reacting to a new one. But this does not *have* to be the case.
+
+
+
 .. _import directives: https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino/Scripting_Java
-.. _BProgram: http://static.javadoc.io/com.github.bthink-bgu/BPjs/0.8.4/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/BProgram.html
-.. _SingleResourceBProgram: http://static.javadoc.io/com.github.bthink-bgu/BPjs/0.8.4/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/SingleResourceBProgram.html
-.. _StringBProgram: http://static.javadoc.io/com.github.bthink-bgu/BPjs/0.8.4/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/StringBProgram.html
-.. _putInGlobalScope: http://static.javadoc.io/com.github.bthink-bgu/BPjs/0.8.4/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/BProgram.html#putInGlobalScope-java.lang.String-java.lang.Object-
-.. _enqueueExternalEvent: http://static.javadoc.io/com.github.bthink-bgu/BPjs/0.8.4/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/BProgram.html#enqueueExternalEvent-il.ac.bgu.cs.bp.bpjs.events.BEvent-
+.. _BProgram: javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/BProgram.html
+.. _SingleResourceBProgram: javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/SingleResourceBProgram.html
+.. _StringBProgram: javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/StringBProgram.html
+.. _putInGlobalScope: javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/BProgram.html#putInGlobalScope-java.lang.String-java.lang.Object-
+.. _enqueueExternalEvent: javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/BProgram.html#enqueueExternalEvent-il.ac.bgu.cs.bp.bpjs.events.BEvent-
 .. _RunFile: https://github.com/bThink-BGU/BPjs/blob/develop/src/main/java/il/ac/bgu/cs/bp/bpjs/mains/RunFile.java
-.. _SimpleEventSelectionStrategy: http://static.javadoc.io/com.github.bthink-bgu/BPjs/0.8.4/il/ac/bgu/cs/bp/bpjs/eventselection/SimpleEventSelectionStrategy.html
+.. _SimpleEventSelectionStrategy: javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/eventselection/SimpleEventSelectionStrategy.html
 .. _SampleBPjsProject: https://github.com/bThink-BGU/SampleBPjsProject

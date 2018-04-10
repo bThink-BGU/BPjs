@@ -109,7 +109,7 @@ parseMaze(maze);
 bp.registerBThread("onlyOnce", function(){
     var block = [];
     while (true) {
-        var evt = bsync({waitFor: anyEntrance, block: block});
+        var evt = bp.sync({waitFor: anyEntrance, block: block});
         block.push(evt);
     }
 });
@@ -137,7 +137,7 @@ function parseMaze(mazeLines) {
 
 function addWall(col, row) {
     bp.registerBThread("wall(" + col + "," + row + ")", function(){
-        bsync({block: enterEvent(col, row)});
+        bp.sync({block: enterEvent(col, row)});
     });
 }
 
@@ -153,7 +153,7 @@ function addEnclosingWalls(cols, rows) {
         return false;
     });
     bp.registerBThread("externalWallsBt", function () {
-        bsync({block: topWall});
+        bp.sync({block: topWall});
     });
 }
 
@@ -166,11 +166,11 @@ function addEnclosingWalls(cols, rows) {
  */
 function addTargetCell(col, row) {
     bp.registerBThread("Target(c:" + col + " r:" + row + ")", function () {
-        bsync({
+        bp.sync({
             waitFor: enterEvent(col, row)
         });
 
-        bsync({
+        bp.sync({
             request: TARGET_FOUND_EVENT,
             block: bp.allExcept(TARGET_FOUND_EVENT)
         });
@@ -181,11 +181,11 @@ function addWalker(col, row) {
     bp.registerBThread("starter(c:" + col + " r:" + row + ")", function () {
         var curCol = col;
         var curRow = row;
-        bsync({
+        bp.sync({
             request: enterEvent(col, row)
         });
         while (true) {
-            var evt = bsync({
+            var evt = bp.sync({
                 request: adjacentCellEntries(curCol, curRow),
                 interrupt: TARGET_FOUND_EVENT
             });

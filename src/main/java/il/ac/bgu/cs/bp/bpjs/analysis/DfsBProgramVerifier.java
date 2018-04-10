@@ -35,10 +35,12 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 /**
- * Takes a {@link BProgram}, and verifies that it conforms to a given
- * {@link PathRequirement}. Take care to use the appropriate
- * {@link VisitedStateStore} for the {@link BProgram} being verified.
- * <p>
+ *
+ * Takes a {@link BProgram}, and verifies that it does not run into false 
+ * assertions, given all possible event selections.
+ * Take care to use the appropriate {@link VisitedStateStore} for the 
+ * {@link BProgram} being verified.
+ *
  * States are scanned using a DFS.
  *
  * @author michael

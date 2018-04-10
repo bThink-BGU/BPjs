@@ -1,34 +1,52 @@
 package il.ac.bgu.cs.bp.bpjs.TicTacToe;
 
+import il.ac.bgu.cs.bp.bpjs.analysis.BProgramStateVisitedStateStore;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
-import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
+import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
 
-import javax.swing.JFrame;
+/**
+ * Verification of the TicTacToe strategy.
+ * 
+ * @author reututy
+ */
+public class TicTacToeVerMain  {
 
-public class TicTacToeVerMain {
+	public static void main(String[] args) throws InterruptedException {
 
-    // Add GUI for watching the model-checking run. 
-    public static TTTDisplayMC TTTdisplayMC;
+		// Create a program
+		BProgram bprog = new SingleResourceBProgram("BPJSTicTacToe.js");
 
-    public static void main(String[] args) throws InterruptedException {
-        // Create a program
-        final SingleResourceBProgram bprog = new SingleResourceBProgram("BPJSTicTacToe.js");
-
-        JFrame f = new TicTacToeGameMain();
-        //f.setVisible(true);
-
-        TTTdisplayMC = new TTTDisplayMC(bprog); //for model checker
-
-        BProgramRunner rnr = new BProgramRunner(bprog);
-        rnr.addListener(new PrintBProgramRunnerListener());
-        rnr.start();
-
+		bprog.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());
+		bprog.setDaemonMode(true);
+		
+		String simulatedPlayer =   "bp.registerBThread('XMoves', function() {\n" +
+									"while (true) {\n" +
+										"bsync({ request:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), \n" +
+										"X(1, 1), X(1, 2), X(2, 0), X(2, 1), X(2, 2) ] }, 10); \n" +
+										"}\n" +
+									"});\n";
+		
+		// This bthread models the requirement that X never wins.
+         String xCantWinRequirementBThread = "bp.registerBThread( \"req:NoXWin\", function(){\n" +
+                                            "	bp.sync({waitFor:StaticEvents.XWin});\n" +
+                                            "	bp.ASSERT(false, \"Found a trace where X wins.\");\n" +
+                                            "});";
+        
+		bprog.appendSource(simulatedPlayer);
+		bprog.appendSource(xCantWinRequirementBThread);
+//		bprog.appendSource(infiBThread);
         try {
             DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-            vfr.setMaxTraceLength(50);
+            vfr.setDetectDeadlocks(false);
+
+            vfr.setMaxTraceLength(70);
+            vfr.setVisitedNodeStore(new BProgramStateVisitedStateStore(false));
+            vfr.setProgressListener( new BriefPrintDfsVerifierListener() );
+
             final VerificationResult res = vfr.verify(bprog);
             if (res.isCounterExampleFound()) {
                 System.out.println("Found a counterexample");
@@ -44,6 +62,7 @@ public class TicTacToeVerMain {
             ex.printStackTrace(System.out);
         }
 
-    }
+		System.out.println("end of run");
+	}
 
 }

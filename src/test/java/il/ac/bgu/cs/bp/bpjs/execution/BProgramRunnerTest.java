@@ -55,7 +55,7 @@ public class BProgramRunnerTest {
         
         sut.addListener(new PrintBProgramRunnerListener() );
         
-        sut.start();
+        sut.run();
         
     }
 
@@ -75,7 +75,7 @@ public class BProgramRunnerTest {
                         "    }\n" +
                         "});\n");
         BProgramRunner runner = new BProgramRunner(bprog);
-        runner.start();
+        runner.run();
         InMemoryEventLoggingListener listener =new InMemoryEventLoggingListener();
         runner.addListener( listener );
         FailedAssertion expected = new FailedAssertion("failRightAWay!","forward");
@@ -96,7 +96,7 @@ public class BProgramRunnerTest {
                + "});"
         );
         
-        new BProgramRunner(bprog).start();
+        new BProgramRunner(bprog).run();
         String exName = bprog.getFromGlobalScope("exName", String.class).get();
         assertTrue( "Java executor name is wrong (got:'" + exName + "')", 
                 exName.startsWith("BProgramRunner-"));

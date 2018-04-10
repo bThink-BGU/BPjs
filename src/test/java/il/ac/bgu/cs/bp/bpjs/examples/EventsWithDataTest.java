@@ -28,7 +28,7 @@ public class EventsWithDataTest {
         rnr.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener events = rnr.addListener( new InMemoryEventLoggingListener() );
         
-        rnr.start();
+        rnr.run();
         
         assertEquals( Arrays.asList("e1", "e2", "e1e2"),
                       events.getEvents().stream().map( BEvent::getName).collect(toList()) );

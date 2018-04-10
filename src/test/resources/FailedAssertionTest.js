@@ -27,16 +27,16 @@
 
 if ( shouldFail ) {
     bp.registerBThread("assertor", function(){
-        bsync({waitFor:bp.Event("poof!")});
+        bp.sync({waitFor:bp.Event("poof!")});
         bp.ASSERT(false, "Poof has happened.");
     });
 }
 bp.registerBThread("violator", function(){
-    bsync({request:bp.Event("piff")});
-    bsync({request:bp.Event("puff")});
-    bsync({request:bp.Event("poof!")});
+    bp.sync({request:bp.Event("piff")});
+    bp.sync({request:bp.Event("puff")});
+    bp.sync({request:bp.Event("poof!")});
     
     //we should not get here, since the former event caused an assertion failure.
-    bsync({request:bp.Event("peff")}); 
+    bp.sync({request:bp.Event("peff")}); 
    
 });

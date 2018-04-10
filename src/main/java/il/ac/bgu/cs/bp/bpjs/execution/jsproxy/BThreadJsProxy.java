@@ -38,22 +38,28 @@ import org.mozilla.javascript.NativeObject;
  */
 public class BThreadJsProxy implements java.io.Serializable {
     
+    private static volatile boolean deprecationWarningPrinted = false;
+    
     private BThreadSyncSnapshot bthread;
 
-    
-    public BThreadJsProxy(BThreadSyncSnapshot bthread) {
-        this.bthread = bthread;
+    public BThreadJsProxy(BThreadSyncSnapshot aBthread) {
+        bthread = aBthread;
     }
     
     public BThreadJsProxy() {}
     
+    @Deprecated
     public void bsync( NativeObject jsRWB ) {
         bsync(jsRWB, null);
     }
     
+    @Deprecated
     public void bsync( NativeObject jsRWB, Object data ) {
         Map<String, Object> jRWB = (Map<String, Object>)Context.jsToJava(jsRWB, Map.class);
-        
+        if ( ! deprecationWarningPrinted ) {
+            deprecationWarningPrinted = true;
+            System.err.println("Warning: bsync is deprecated and will be removed shortly. Please use bp.sync instead.");
+        }
         BSyncStatement stmt = BSyncStatement.make();
         Object req = jRWB.get("request");
         if ( req != null ) {
@@ -100,11 +106,6 @@ public class BThreadJsProxy implements java.io.Serializable {
         }
     }
     
-    public void setInterruptHandler( Object aPossibleHandler ) {
-        bthread.setInterruptHandler(
-                (aPossibleHandler instanceof Function) ? (Function) aPossibleHandler: null );
-    }
-    
     private void captureBThreadState(BSyncStatement stmt) throws ContinuationPending {
         bthread.setBSyncStatement(stmt);
         stmt.setBthread(bthread);
@@ -113,6 +114,11 @@ public class BThreadJsProxy implements java.io.Serializable {
         throw capturedContinuation;
     }
 
+    public void setInterruptHandler( Object aPossibleHandler ) {
+        bthread.setInterruptHandler(
+                (aPossibleHandler instanceof Function) ? (Function) aPossibleHandler: null );
+    }
+    
     public void setBThread(BThreadSyncSnapshot bthread) {
         this.bthread = bthread;
     }

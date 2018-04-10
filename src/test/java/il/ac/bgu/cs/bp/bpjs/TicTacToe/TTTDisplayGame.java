@@ -12,12 +12,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import org.hamcrest.core.IsInstanceOf;
-
 import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.Click;
 import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.Move;
 import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.StaticEvents;
-import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.X;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
@@ -27,18 +24,12 @@ import il.ac.bgu.cs.bp.bpjs.model.BEvent;
  * Class that implements the Graphical User Interface for the game
  */
 public class TTTDisplayGame implements ActionListener {
-	private BProgram bp;
-	private BProgramRunner rnr;
+	private final BProgram bp;
+	private final BProgramRunner rnr;
 
-	private JFrame window = new JFrame("Tic-Tac-Toe");
+	private final JFrame window = new JFrame("Tic-Tac-Toe");
 	public JButton buttons[][] = new JButton[3][];
 	public JLabel message = new JLabel();
-
-	/**
-	 * Constructor.
-	 * 
-	 * @param rnr
-	 */
 
 	public TTTDisplayGame(BProgram bp, BProgramRunner rnr) {
 
