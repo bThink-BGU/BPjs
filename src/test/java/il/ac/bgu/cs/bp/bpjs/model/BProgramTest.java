@@ -31,7 +31,10 @@ import java.util.Optional;
 import static java.util.stream.Collectors.toList;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
  *
@@ -47,6 +50,23 @@ public class BProgramTest {
         
         assertEquals( 1000.0, sut.getFromGlobalScope("TOTAL_COUNT", Double.class).get(), 3 );
         assertFalse( sut.getFromGlobalScope("does-not-exist", Double.class).isPresent() );
+    }
+
+
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
+
+    @Test
+    public void testDuplicateSetup() throws InterruptedException {
+        String coreSource = "bp.registerBThread(function() {\n" +
+                "    bsync( {request: bp.Event(\"1\")} );\n" +
+                "});";
+        BProgram sanitySut = new StringBProgram(coreSource);
+
+        sanitySut.setup();
+        exception.expect(IllegalStateException.class);
+        sanitySut.setup();
+
     }
     
     
