@@ -83,7 +83,28 @@ public class BThreadSyncSnapshotTest {
         assertNotEquals(snapshots.get(1).getBThreadSnapshots(),snapshots.get(2).getBThreadSnapshots());
     }
 
+    @Test
+    public void testJavaVarState() throws InterruptedException {
+        BProgram bprog = new StringBProgram("bp.registerBThread(function(){\n" +
+                "        let a = new java.lang.Integer(7);\n" +
+                "        while (true) {" +
+                "        bp.sync({request:bp.Event(\"A\")});\n" +
+                "        a = java.lang.Integer.reverse(a);\n" +
+                "        }\n" +
+                "});");
+        Integer a = new java.lang.Integer(7);
+        a = java.lang.Integer.reverse(a);
+        BProgramSyncSnapshot setup = bprog.setup();
+        ExecutorService execSvcA = ExecutorServiceMaker.makeWithName("BProgramSnapshotTriggerTest");
+        BProgramSyncSnapshot stepa = setup.start(execSvcA);
+        Set<BEvent> possibleEvents_a = bprog.getEventSelectionStrategy().selectableEvents(stepa.getStatements(), stepa.getExternalEvents());
+        EventSelectionResult event_a = bprog.getEventSelectionStrategy().select(stepa.getStatements(), stepa.getExternalEvents(), possibleEvents_a).get();
+        BProgramSyncSnapshot stepb = stepa.triggerEvent(event_a.getEvent(), execSvcA, listeners);
+        assertNotEquals(stepa.getBThreadSnapshots(),stepb.getBThreadSnapshots());
 
-    
+    }
+
+
+
 }
 
