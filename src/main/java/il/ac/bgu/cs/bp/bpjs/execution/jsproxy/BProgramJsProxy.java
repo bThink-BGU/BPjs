@@ -189,12 +189,18 @@ public class BProgramJsProxy implements java.io.Serializable {
                               .collect( toList() ));
             } 
         }
-        
-        stmt = stmt.waitFor( convertToEventSet(jRWB.get("waitFor")) )
-                     .block( convertToEventSet(jRWB.get("block")) )
-                 .interrupt( convertToEventSet(jRWB.get("interrupt")) )
+
+        EventSet waitForSet = convertToEventSet(jRWB.get("waitFor"));
+        EventSet blockSet = convertToEventSet(jRWB.get("block"));
+        EventSet interruptSet = convertToEventSet(jRWB.get("interrupt"));
+        stmt = stmt.waitFor( waitForSet )
+                     .block( blockSet )
+                 .interrupt( interruptSet )
                       .data( data );
-        
+        boolean hasCollision = stmt.getRequest().stream().anyMatch(blockSet::contains);
+        if (hasCollision) {
+            System.err.println("Warning: BThread is blocking an event it is also requesting, this may lead to a deadlock.");
+        }
         captureBThreadState(stmt);
         
     }
