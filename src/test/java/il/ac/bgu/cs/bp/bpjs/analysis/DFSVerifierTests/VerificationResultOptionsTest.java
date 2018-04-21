@@ -45,8 +45,6 @@ public class VerificationResultOptionsTest {
         bprog.putInGlobalScope("addWaiter", false);
         bprog.putInGlobalScope("createDeadlock", false);
         bprog.putInGlobalScope("createFailedAssertion", false);
-        bprog.putInGlobalScope("createBadState", false);
-
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         final VerificationResult res = vfr.verify(bprog);
@@ -62,8 +60,6 @@ public class VerificationResultOptionsTest {
         bprog.putInGlobalScope("addWaiter", false);
         bprog.putInGlobalScope("createDeadlock", true);
         bprog.putInGlobalScope("createFailedAssertion", false);
-        bprog.putInGlobalScope("createBadState", false);
-
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         final VerificationResult res = vfr.verify(bprog);
