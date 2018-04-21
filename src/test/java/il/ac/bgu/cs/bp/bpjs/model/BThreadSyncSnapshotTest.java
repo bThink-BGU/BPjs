@@ -26,6 +26,7 @@ package il.ac.bgu.cs.bp.bpjs.model;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.EventSelectionResult;
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -58,6 +59,7 @@ public class BThreadSyncSnapshotTest {
     private final List<BProgramRunnerListener> listeners = new ArrayList<>();
 
     @Test
+    @Ignore("Shared state exists between different snapshots")
     public void testJSVarState() throws InterruptedException {
         BProgram bprog = new SingleResourceBProgram("SnapshotTests/ABCDTrace.js");
         BProgramSyncSnapshot setup = bprog.setup();
@@ -84,16 +86,15 @@ public class BThreadSyncSnapshotTest {
     }
 
     @Test
+    @Ignore("Shared state exists between different snapshots")
     public void testJavaVarState() throws InterruptedException {
         BProgram bprog = new StringBProgram("bp.registerBThread(function(){\n" +
-                "        let a = new java.lang.Integer(7);\n" +
+                "        var a = new java.lang.Integer(7);\n" +
                 "        while (true) {" +
                 "        bp.sync({request:bp.Event(\"A\")});\n" +
                 "        a = java.lang.Integer.reverse(a);\n" +
                 "        }\n" +
                 "});");
-        Integer a = new java.lang.Integer(7);
-        a = java.lang.Integer.reverse(a);
         BProgramSyncSnapshot setup = bprog.setup();
         ExecutorService execSvcA = ExecutorServiceMaker.makeWithName("BProgramSnapshotTriggerTest");
         BProgramSyncSnapshot stepa = setup.start(execSvcA);
