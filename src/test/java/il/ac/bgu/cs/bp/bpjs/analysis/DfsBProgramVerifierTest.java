@@ -104,6 +104,17 @@ public class DfsBProgramVerifierTest {
         assertTrue(eventNamesString( eventLogger.getEvents(), "").matches("^A$"));
         
     }
+
+    @Test
+    public void DeadlockSameThread() throws Exception{
+        BProgram bpr = new SingleResourceBProgram("bpsync-blockrequest.js");
+        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        sut.setVisitedNodeStore(new ForgetfulVisitedStateStore());
+        VerificationResult res = sut.verify(bpr);
+        assertTrue(res.isCounterExampleFound());
+        assertEquals(VerificationResult.ViolationType.Deadlock, res.getViolationType());
+        assertEquals("sampleEvent", traceEventNamesString(res.getCounterExampleTrace(), ""));
+    }
     
     @Test
     public void testTwoSimpleBThreads() throws Exception {
