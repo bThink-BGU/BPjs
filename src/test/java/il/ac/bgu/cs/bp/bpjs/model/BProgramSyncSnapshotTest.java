@@ -34,6 +34,7 @@ import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
@@ -150,6 +151,7 @@ public class BProgramSyncSnapshotTest {
 
      */
     @Test
+    @Ignore("Highlight shared state in snapshot")
     public void testEqualsSingleStepAssert() throws InterruptedException {
         List<BProgramRunnerListener> listeners = new ArrayList<>();
         BProgram bprog = new StringBProgram("bp.registerBThread(function(){\n" +
@@ -194,7 +196,9 @@ public class BProgramSyncSnapshotTest {
         event_a = bprog.getEventSelectionStrategy().select(step2a.getStatements(), step2a.getExternalEvents(), possibleEvents_a).get();
         event_b = bprog2.getEventSelectionStrategy().select(step2b.getStatements(), step2b.getExternalEvents(), possibleEvents_b).get();
         BProgramSyncSnapshot step3a = step2a.triggerEvent(event_a.getEvent(), execSvcA, listeners);
-        assertNotEquals(step3a,step2b);
+        assertNotEquals(step3a,step2a);
+        assertTrue(step2a.isStateValid());
+        assertTrue(!step3a.isStateValid());
         BProgramSyncSnapshot step3b = step2b.triggerEvent(event_b.getEvent(), execSvcB, listeners);
         assertNotEquals(step3a,step3b);
         assertNotEquals(step3a,step2a);
