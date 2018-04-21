@@ -23,11 +23,17 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 
+import il.ac.bgu.cs.bp.bpjs.analysis.BProgramStateVisitedStateStore;
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
+import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
 import org.junit.Test;
+
+import static il.ac.bgu.cs.bp.bpjs.TestUtils.traceEventNamesString;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 /**
  *
@@ -65,5 +71,21 @@ public class BProgramJsProxyTest {
         assertEquals(BProgramJsProxy.LogLevel.Warn.name(), logLevel2);
         
 
+    }
+
+    @Test
+    public void DeadlockSameThread() throws Exception{
+        BProgram bpr = new SingleResourceBProgram("bpsync-blockrequest.js");
+        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        sut.setVisitedNodeStore(new BProgramStateVisitedStateStore());
+        VerificationResult res = sut.verify(bpr);
+        assertTrue(res.isCounterExampleFound());
+        assertEquals(VerificationResult.ViolationType.Deadlock, res.getViolationType());
+        assertEquals("sampleEvent", traceEventNamesString(res.getCounterExampleTrace(), ""));
+        BProgram bprPred = new SingleResourceBProgram("bpsync-blockrequestPredicate.js");
+        res = sut.verify(bprPred);
+        assertTrue(res.isCounterExampleFound());
+        assertEquals(VerificationResult.ViolationType.Deadlock, res.getViolationType());
+        assertEquals("sampleEvent", traceEventNamesString(res.getCounterExampleTrace(), ""));
     }
 }
