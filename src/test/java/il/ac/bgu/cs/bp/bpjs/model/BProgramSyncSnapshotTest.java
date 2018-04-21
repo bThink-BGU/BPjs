@@ -31,6 +31,7 @@ import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.EventSelectionResult;
 import org.junit.Assert;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
@@ -49,6 +50,10 @@ import java.util.concurrent.ExecutorService;
  */
 public class BProgramSyncSnapshotTest {
 
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
+    private final List<BProgramRunnerListener> listeners = new ArrayList<>();
+
     public BProgramSyncSnapshotTest() {
     }
 
@@ -60,11 +65,6 @@ public class BProgramSyncSnapshotTest {
         Assert.assertNotEquals(bss, null);
         Assert.assertNotEquals(bss, "I'm not even the same class");
     }
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
-
-    private final List<BProgramRunnerListener> listeners = new ArrayList<>();
-
 
     @Test
     public void testDoubleTriggerEvent() throws InterruptedException {
@@ -139,9 +139,9 @@ public class BProgramSyncSnapshotTest {
         assertEquals(step3a, step3b);
         assertNotEquals(step3a, step2a);
         assertNotEquals(step3b, step2a);
-        assertEquals(step3a,step3b);
-        assertNotEquals(step3a,step2a);
-        assertNotEquals(step3b,step2a);
+        assertEquals(step3a, step3b);
+        assertNotEquals(step3a, step2a);
+        assertNotEquals(step3b, step2a);
         assertTrue(step3a.noBThreadsLeft());
     }
 
@@ -173,9 +173,9 @@ public class BProgramSyncSnapshotTest {
         ExecutorService execSvcB = ExecutorServiceMaker.makeWithName("BProgramSnapshotEqualityTest");
         BProgramSyncSnapshot stepa = setup.start(execSvcA);
         BProgramSyncSnapshot stepb = setup2.start(execSvcB);
-        assertEquals(stepa,stepb);
-        assertNotEquals(setup,stepa);
-        assertNotEquals(setup2,stepb);
+        assertEquals(stepa, stepb);
+        assertNotEquals(setup, stepa);
+        assertNotEquals(setup2, stepb);
         //these should be equivalent but they're not...
         //BProgramSyncSnapshot tempStep = setup.start(execSvc);
         //assertEquals(stepa,tempStep);
@@ -187,21 +187,21 @@ public class BProgramSyncSnapshotTest {
         EventSelectionResult event_b = bprog2.getEventSelectionStrategy().select(stepa.getStatements(), stepb.getExternalEvents(), possibleEvents_b).get();
         BProgramSyncSnapshot step2a = stepa.triggerEvent(event_a.getEvent(), execSvcA, listeners);
         BProgramSyncSnapshot step2b = stepb.triggerEvent(event_b.getEvent(), execSvcB, listeners);
-        assertEquals(step2a,step2b);
-        assertNotEquals(stepa,step2a);
-        assertNotEquals(stepb,step2b);
+        assertEquals(step2a, step2b);
+        assertNotEquals(stepa, step2a);
+        assertNotEquals(stepb, step2b);
 
         possibleEvents_a = bprog.getEventSelectionStrategy().selectableEvents(step2a.getStatements(), step2a.getExternalEvents());
         possibleEvents_b = bprog2.getEventSelectionStrategy().selectableEvents(step2b.getStatements(), step2b.getExternalEvents());
         event_a = bprog.getEventSelectionStrategy().select(step2a.getStatements(), step2a.getExternalEvents(), possibleEvents_a).get();
         event_b = bprog2.getEventSelectionStrategy().select(step2b.getStatements(), step2b.getExternalEvents(), possibleEvents_b).get();
         BProgramSyncSnapshot step3a = step2a.triggerEvent(event_a.getEvent(), execSvcA, listeners);
-        assertNotEquals(step3a,step2a);
+        assertNotEquals(step3a, step2a);
         assertTrue(step2a.isStateValid());
         assertTrue(!step3a.isStateValid());
         BProgramSyncSnapshot step3b = step2b.triggerEvent(event_b.getEvent(), execSvcB, listeners);
-        assertNotEquals(step3a,step3b);
-        assertNotEquals(step3a,step2a);
-        assertNotEquals(step3b,step2a);
+        assertNotEquals(step3a, step3b);
+        assertNotEquals(step3a, step2a);
+        assertNotEquals(step3b, step2a);
     }
 }

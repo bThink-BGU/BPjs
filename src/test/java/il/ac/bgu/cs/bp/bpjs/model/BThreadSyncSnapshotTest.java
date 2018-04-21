@@ -39,24 +39,22 @@ import java.util.concurrent.ExecutorService;
 import static org.junit.Assert.*;
 
 /**
- *
  * @author michael
  */
 public class BThreadSyncSnapshotTest {
-    
+
+    @Rule
+    public final ExpectedException exception = ExpectedException.none();
+    private final List<BProgramRunnerListener> listeners = new ArrayList<>();
+
     /**
      * Test default naming.
      */
     @Test
     public void testDefaultNaming() {
         BThreadSyncSnapshot sut = new BThreadSyncSnapshot();
-        assertEquals( BThreadSyncSnapshot.class.getName(), sut.getName() );
+        assertEquals(BThreadSyncSnapshot.class.getName(), sut.getName());
     }
-
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
-
-    private final List<BProgramRunnerListener> listeners = new ArrayList<>();
 
     @Test
     @Ignore("Shared state exists between different snapshots")
@@ -69,20 +67,20 @@ public class BThreadSyncSnapshotTest {
         BProgramSyncSnapshot step = setup.start(execSvc);
         snapshots.add(step);
         //Iteration 1,starts already at request state A
-        for (int i =0; i< 4; i++) {
+        for (int i = 0; i < 4; i++) {
             Set<BEvent> possibleEvents_a = bprog.getEventSelectionStrategy().selectableEvents(step.getStatements(), step.getExternalEvents());
             EventSelectionResult event_a = bprog.getEventSelectionStrategy().select(step.getStatements(), step.getExternalEvents(), possibleEvents_a).get();
             step = step.triggerEvent(event_a.getEvent(), execSvc, listeners);
         }
         snapshots.add(step);
-        for (int i =0; i< 4; i++) {
+        for (int i = 0; i < 4; i++) {
             Set<BEvent> possibleEvents_a = bprog.getEventSelectionStrategy().selectableEvents(step.getStatements(), step.getExternalEvents());
             EventSelectionResult event_a = bprog.getEventSelectionStrategy().select(step.getStatements(), step.getExternalEvents(), possibleEvents_a).get();
             step = step.triggerEvent(event_a.getEvent(), execSvc, listeners);
         }
         snapshots.add(step);
         //these two objects (by debugging) share program counter and frame index and should differ on variables only
-        assertNotEquals(snapshots.get(1).getBThreadSnapshots(),snapshots.get(2).getBThreadSnapshots());
+        assertNotEquals(snapshots.get(1).getBThreadSnapshots(), snapshots.get(2).getBThreadSnapshots());
     }
 
     @Test
@@ -101,10 +99,9 @@ public class BThreadSyncSnapshotTest {
         Set<BEvent> possibleEvents_a = bprog.getEventSelectionStrategy().selectableEvents(stepa.getStatements(), stepa.getExternalEvents());
         EventSelectionResult event_a = bprog.getEventSelectionStrategy().select(stepa.getStatements(), stepa.getExternalEvents(), possibleEvents_a).get();
         BProgramSyncSnapshot stepb = stepa.triggerEvent(event_a.getEvent(), execSvcA, listeners);
-        assertNotEquals(stepa.getBThreadSnapshots(),stepb.getBThreadSnapshots());
+        assertNotEquals(stepa.getBThreadSnapshots(), stepb.getBThreadSnapshots());
 
     }
-
 
 
 }

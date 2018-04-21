@@ -30,90 +30,91 @@ import il.ac.bgu.cs.bp.bpjs.model.*;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
 /**
- *, 
+ * ,
+ *
  * @author michael
  */
 public class VerificationResultOptionsTest {
-    
+
     @Test
     public void testOKProgram() throws Exception {
         final SingleResourceBProgram bprog = new SingleResourceBProgram("DFSVerifierTests/VerificationResultOptions.js");
-        
+
         bprog.putInGlobalScope("addWaiter", false);
         bprog.putInGlobalScope("createDeadlock", false);
         bprog.putInGlobalScope("createFailedAssertion", false);
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         final VerificationResult res = vfr.verify(bprog);
-        
-        assertEquals( VerificationResult.ViolationType.None, res.getViolationType() );
-        assertFalse( res.isCounterExampleFound() );
+
+        assertEquals(VerificationResult.ViolationType.None, res.getViolationType());
+        assertFalse(res.isCounterExampleFound());
     }
-    
+
     @Test
     public void testDeadlockedProgram() throws Exception {
         final SingleResourceBProgram bprog = new SingleResourceBProgram("DFSVerifierTests/VerificationResultOptions.js");
-        
+
         bprog.putInGlobalScope("addWaiter", false);
         bprog.putInGlobalScope("createDeadlock", true);
         bprog.putInGlobalScope("createFailedAssertion", false);
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         final VerificationResult res = vfr.verify(bprog);
-        
-        assertEquals( VerificationResult.ViolationType.Deadlock, res.getViolationType() );
-        assertTrue( res.isCounterExampleFound() );
+
+        assertEquals(VerificationResult.ViolationType.Deadlock, res.getViolationType());
+        assertTrue(res.isCounterExampleFound());
     }
-   
+
     @Test
     public void testViolatingProgram() throws Exception {
         final SingleResourceBProgram bprog = new SingleResourceBProgram("DFSVerifierTests/VerificationResultOptions.js");
-        
+
         bprog.putInGlobalScope("addWaiter", false);
         bprog.putInGlobalScope("createDeadlock", false);
         bprog.putInGlobalScope("createFailedAssertion", true);
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         final VerificationResult res = vfr.verify(bprog);
-        
-        assertEquals( VerificationResult.ViolationType.FailedAssertion, res.getViolationType() );
-        assertTrue( res.isCounterExampleFound() );
-        FailedAssertion expectedAssert = new FailedAssertion("B happened","assertor");
-        assertEquals( expectedAssert,res.getFailedAssertion());
+
+        assertEquals(VerificationResult.ViolationType.FailedAssertion, res.getViolationType());
+        assertTrue(res.isCounterExampleFound());
+        FailedAssertion expectedAssert = new FailedAssertion("B happened", "assertor");
+        assertEquals(expectedAssert, res.getFailedAssertion());
     }
-    
+
     @Test
     public void testWaitingIsNotDeadlock() throws Exception {
         final SingleResourceBProgram bprog = new SingleResourceBProgram("DFSVerifierTests/VerificationResultOptions.js");
-        
+
         bprog.putInGlobalScope("addWaiter", true);
         bprog.putInGlobalScope("createDeadlock", false);
         bprog.putInGlobalScope("createFailedAssertion", false);
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         final VerificationResult res = vfr.verify(bprog);
-        
-        assertEquals( VerificationResult.ViolationType.None, res.getViolationType() );
-        assertFalse( res.isCounterExampleFound() );
+
+        assertEquals(VerificationResult.ViolationType.None, res.getViolationType());
+        assertFalse(res.isCounterExampleFound());
 
     }
 
     @Test
     public void testImmediateAssert() throws Exception {
-        BProgram bprog = new SingleResourceBProgram( "ImmediateAssert.js");
+        BProgram bprog = new SingleResourceBProgram("ImmediateAssert.js");
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         final VerificationResult res = vfr.verify(bprog);
 
-        assertEquals( VerificationResult.ViolationType.FailedAssertion, res.getViolationType() );
-        assertTrue( res.isCounterExampleFound() );
-        FailedAssertion expected = new FailedAssertion("failRightAWay!","forward");
-        assertEquals( expected , res.getFailedAssertion());
-        assertEquals(0,res.getScannedStatesCount());
+        assertEquals(VerificationResult.ViolationType.FailedAssertion, res.getViolationType());
+        assertTrue(res.isCounterExampleFound());
+        FailedAssertion expected = new FailedAssertion("failRightAWay!", "forward");
+        assertEquals(expected, res.getFailedAssertion());
+        assertEquals(0, res.getScannedStatesCount());
     }
-
 
 
 }

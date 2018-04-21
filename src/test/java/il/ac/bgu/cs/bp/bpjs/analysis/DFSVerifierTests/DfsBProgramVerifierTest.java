@@ -31,13 +31,14 @@ import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
+
 import static il.ac.bgu.cs.bp.bpjs.TestUtils.traceEventNamesString;
+import static org.junit.Assert.*;
+
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
-import static org.junit.Assert.assertFalse;
 
 /**
  * @author michael
@@ -62,38 +63,39 @@ public class DfsBProgramVerifierTest {
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setProgressListener(new BriefPrintDfsVerifierListener());
         program.appendSource(Requirements.eventNotSelected("B"));
-        VisitedStateStore stateStore =new BProgramStateVisitedStateStore(true);
+        VisitedStateStore stateStore = new BProgramStateVisitedStateStore(true);
         sut.setVisitedNodeStore(stateStore);
         VerificationResult res = sut.verify(program);
         assertTrue(res.isCounterExampleFound());
         assertEquals("AAAB", traceEventNamesString(res.getCounterExampleTrace(), ""));
-    //Add trivial getter check
+        //Add trivial getter check
         VisitedStateStore retStore = sut.getVisitedNodeStore();
-        assertTrue(retStore == stateStore);}
+        assertSame(retStore, stateStore);
+    }
 
-	@Test
-	public void testAAABRun() throws Exception {
-		BProgram program = new SingleResourceBProgram("DFSVerifierTests/AAABTrace.js");
-		BProgramRunner rnr = new BProgramRunner(program);
+    @Test
+    public void testAAABRun() {
+        BProgram program = new SingleResourceBProgram("DFSVerifierTests/AAABTrace.js");
+        BProgramRunner rnr = new BProgramRunner(program);
 
-		rnr.addListener(new PrintBProgramRunnerListener());
-		InMemoryEventLoggingListener eventLogger = rnr.addListener(new InMemoryEventLoggingListener());
-		rnr.run();
+        rnr.addListener(new PrintBProgramRunnerListener());
+        InMemoryEventLoggingListener eventLogger = rnr.addListener(new InMemoryEventLoggingListener());
+        rnr.run();
 
-		eventLogger.getEvents().forEach(System.out::println);
-		assertTrue(eventNamesString(eventLogger.getEvents(), "").matches("^(AAAB)+$"));
-	}
+        eventLogger.getEvents().forEach(System.out::println);
+        assertTrue(eventNamesString(eventLogger.getEvents(), "").matches("^(AAAB)+$"));
+    }
 
-	@Test
-	public void deadlockTrace() throws Exception {
-		BProgram program = new SingleResourceBProgram("DFSVerifierTests/deadlocking.js");
-		DfsBProgramVerifier sut = new DfsBProgramVerifier();
-		sut.setVisitedNodeStore(new ForgetfulVisitedStateStore());
-		VerificationResult res = sut.verify(program);
-		assertTrue(res.isCounterExampleFound());
-		assertEquals(VerificationResult.ViolationType.Deadlock, res.getViolationType());
-		assertEquals("A", traceEventNamesString(res.getCounterExampleTrace(), ""));
-	}
+    @Test
+    public void deadlockTrace() throws Exception {
+        BProgram program = new SingleResourceBProgram("DFSVerifierTests/deadlocking.js");
+        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        sut.setVisitedNodeStore(new ForgetfulVisitedStateStore());
+        VerificationResult res = sut.verify(program);
+        assertTrue(res.isCounterExampleFound());
+        assertEquals(VerificationResult.ViolationType.Deadlock, res.getViolationType());
+        assertEquals("A", traceEventNamesString(res.getCounterExampleTrace(), ""));
+    }
 
     @Test
     public void testDeadlockSetting() throws Exception {
@@ -107,18 +109,18 @@ public class DfsBProgramVerifierTest {
 
 
     @Test
-    public void deadlockRun() throws Exception {
+    public void deadlockRun() {
         BProgram program = new SingleResourceBProgram("DFSVerifierTests/deadlocking.js");
         BProgramRunner rnr = new BProgramRunner(program);
 
-		rnr.addListener(new PrintBProgramRunnerListener());
-		InMemoryEventLoggingListener eventLogger = rnr.addListener(new InMemoryEventLoggingListener());
-		rnr.run();
+        rnr.addListener(new PrintBProgramRunnerListener());
+        InMemoryEventLoggingListener eventLogger = rnr.addListener(new InMemoryEventLoggingListener());
+        rnr.run();
 
-		eventLogger.getEvents().forEach(System.out::println);
-		assertTrue(eventNamesString(eventLogger.getEvents(), "").matches("^A$"));
+        eventLogger.getEvents().forEach(System.out::println);
+        assertTrue(eventNamesString(eventLogger.getEvents(), "").matches("^A$"));
 
-	}
+    }
 
     @Test
     public void testTwoSimpleBThreads() throws Exception {
