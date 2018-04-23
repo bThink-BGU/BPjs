@@ -72,7 +72,7 @@ public class DfsBProgramVerifier {
     }
 
     private long visitedStatesCount;
-    private VisitedStateStore visited = new BProgramStateVisitedStateStore();
+    private VisitedStateStore visited = new BThreadSnapshotVisitedStateStore();
     private long maxTraceLength = DEFAULT_MAX_TRACE;
     private final ArrayList<Node> currentPath = new ArrayList<>();
     private Optional<ProgressListener> listenerOpt = Optional.empty();

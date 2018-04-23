@@ -7,6 +7,7 @@ import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContinuationPending;
+import org.mozilla.javascript.NativeContinuation;
 import org.mozilla.javascript.WrappedException;
 
 /**
@@ -43,7 +44,7 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
         } catch (ContinuationPending cbs) {
             final BSyncStatement capturedStatement = (BSyncStatement) cbs.getApplicationState();
             capturedStatement.setBthread(bss);
-            return bss.copyWith(cbs.getContinuation(), capturedStatement);
+            return bss.copyWith((NativeContinuation) cbs.getContinuation(), capturedStatement);
            
         } catch ( WrappedException wfae ) {
             if ( wfae.getCause() instanceof FailedAssertionException ) {

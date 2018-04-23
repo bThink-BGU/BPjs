@@ -50,7 +50,7 @@ public class BThreadSyncSnapshot implements Serializable {
     /**
      * Continuation of the code.
      */
-    private Object continuation;
+    private NativeContinuation continuation;
 
     /**
      * BSync statement of the BThread at the time of the snapshot.
@@ -83,7 +83,7 @@ public class BThreadSyncSnapshot implements Serializable {
      * @param bSyncStatement
      */
     public BThreadSyncSnapshot(String name, Function entryPoint, Function interruptHandler, Scriptable scope,
-            Object continuation, BSyncStatement bSyncStatement) {
+            NativeContinuation continuation, BSyncStatement bSyncStatement) {
         this.name = name;
         this.entryPoint = entryPoint;
         this.interruptHandler = interruptHandler;
@@ -99,7 +99,7 @@ public class BThreadSyncSnapshot implements Serializable {
      * @param aStatement The BThread's statement for the next sync.
      * @return a copy of {@code this} with updated continuation and statement.
      */
-    public BThreadSyncSnapshot copyWith(Object aContinuation, BSyncStatement aStatement) {
+    public BThreadSyncSnapshot copyWith(NativeContinuation aContinuation, BSyncStatement aStatement) {
         BThreadSyncSnapshot retVal = new BThreadSyncSnapshot(name, entryPoint);
         retVal.continuation = aContinuation;
         retVal.setInterruptHandler(interruptHandler);
@@ -185,10 +185,8 @@ public class BThreadSyncSnapshot implements Serializable {
     
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + Objects.hashCode(name.hashCode());
-        return result;
+        return (31 * Objects.hashCode(getName())) ^ 
+                    ((continuation != null ) ? continuation.getImplementation().hashCode() : 0);
     }
 
     @Override
@@ -207,14 +205,10 @@ public class BThreadSyncSnapshot implements Serializable {
         BThreadSyncSnapshot other = (BThreadSyncSnapshot) obj;
         if (!Objects.equals(getName(), other.getName())) {
             return false;
+            
         }
-
-        if (continuation == null) {
-            return (other.continuation == null);
-
-        } else {
-            return getContinuationProgramState().equals(other.getContinuationProgramState());
-        }
+        return NativeContinuation.equalImplementations(continuation, other.continuation);
+        
     }
 
 }

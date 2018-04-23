@@ -26,61 +26,33 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import java.util.HashSet;
 import java.util.Set;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
 
 /**
  *
  * A {@link VisitedStateStore} that stores the state of the {@code BThread}s in the node.
  * Ignores the last event that led to this node.
  * 
- * Client code can specify to use a hash of the state instead of the state itself. This 
- * may create false positives on hash collisions, but would make the dearch run faster and 
- * consume less memory.
- * 
  * @author michael
  */
-public class BProgramStateVisitedStateStore implements VisitedStateStore {
-    private final Set<Object> visited = new HashSet<>();
-    
-    private boolean useHash;
-    
-    public BProgramStateVisitedStateStore() {
-        this(false);
-    }
-    
-    public BProgramStateVisitedStateStore(boolean useHash) {
-        this.useHash = useHash;
-    }
+public class BThreadSnapshotVisitedStateStore implements VisitedStateStore {
+    private final Set<Set<BThreadSyncSnapshot>> visited = new HashSet<>();
     
     @Override
     public void store(Node nd) {
-        visited.add( extractStatus(nd) );
+        ContextFactory.getGlobal().call( 
+            (_cx)->visited.add( nd.getSystemState().getBThreadSnapshots() )
+        );
     }
 
     @Override
     public boolean isVisited(Node nd) {
-        return visited.contains( extractStatus(nd) );
+        return (Boolean)(ContextFactory.getGlobal().call( 
+            (_cx)-> visited.contains( nd.getSystemState().getBThreadSnapshots() )
+        ));
+        
     }   
-    
-    private Object extractStatus( Node nd ) {
-        final Set<BThreadSyncSnapshot> bThreadSnapshots = nd.getSystemState().getBThreadSnapshots();
-        return useHash ? hash(bThreadSnapshots) : bThreadSnapshots;
-    }
-    
-    private long hash( Set<BThreadSyncSnapshot> snapshots ) {
-        long hash = 0;
-        for ( BThreadSyncSnapshot snp : snapshots ) {
-            hash = hash ^ snp.getContinuationProgramState().hashCode();
-        }
-        return hash;
-    }
-    
-    public boolean isUseHash() {
-        return useHash;
-    }
-
-    public void setUseHash(boolean useHash) {
-        this.useHash = useHash;
-    }
     
     @Override
     public void clear() {
@@ -89,6 +61,6 @@ public class BProgramStateVisitedStateStore implements VisitedStateStore {
     
     @Override
     public String toString() {
-        return "[BProgramStateVisitedNodeStore usingHash:" + isUseHash() + ']';
+        return "[BThreadSnapshotVisitedStateStore visited:" + visited.size()+ ']';
     }
 }

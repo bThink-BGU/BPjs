@@ -54,6 +54,7 @@ import org.mozilla.javascript.UniqueTag;
  * 
  * @author michael
  */
+@Deprecated
 public class ContinuationProgramState {
     private final Map<Object, Object> variables = new HashMap<>();
     private int programCounter = -1;

@@ -11,6 +11,7 @@ import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import java.util.concurrent.ExecutorService;
+import net.sourceforge.htmlunit.corejs.javascript.Context;
 import org.junit.Before;
 
 public class NodeEqualsTest {
@@ -27,27 +28,32 @@ public class NodeEqualsTest {
 
     @Test
     public void test1() throws Exception {
-        // Create a program
-        final BProgram bprog = new StringBProgram(P1);
-        Node[] nodes = new Node[10];
+        try {
+            Context.enter();
+            // Create a program
+            final BProgram bprog = new StringBProgram(P1);
+            Node[] nodes = new Node[10];
 
-        BEvent eventX = new BEvent("X");
-        // Discard initial node, as it has no event, and so can't
-        // be used in the even/odd equalities later.
-        nodes[0] = Node.getInitialNode(bprog, exSvc).getNextNode(eventX, exSvc);
+            BEvent eventX = new BEvent("X");
+            // Discard initial node, as it has no event, and so can't
+            // be used in the even/odd equalities later.
+            nodes[0] = Node.getInitialNode(bprog, exSvc).getNextNode(eventX, exSvc);
 
-        for (int i = 1; i < 10; i++) {
-            nodes[i] = nodes[i - 1].getNextNode(eventX, exSvc);
-        }
+            for (int i = 1; i < 10; i++) {
+                nodes[i] = nodes[i - 1].getNextNode(eventX, exSvc);
+            }
 
-        for (int i = 1; i < 10; i += 2) {
-            final BThreadSyncSnapshot sysState0 = nodes[0].getSystemState().getBThreadSnapshots().iterator().next();
-            final BThreadSyncSnapshot sysStatei_1 = nodes[i - 1].getSystemState().getBThreadSnapshots().iterator().next();
+            for (int i = 1; i < 10; i += 2) {
+                System.out.println("i = " + i);
+                final BThreadSyncSnapshot sysState0 = nodes[0].getSystemState().getBThreadSnapshots().iterator().next();
+                final BThreadSyncSnapshot sysStatei_1 = nodes[i - 1].getSystemState().getBThreadSnapshots().iterator().next();
 
-            assertTrue(sysState0.equals(sysStatei_1));
-
-            assertEquals(nodes[0], nodes[i - 1]);
-            assertEquals(nodes[1], nodes[i]);
+                assertTrue(sysState0.equals(sysStatei_1));
+                assertEquals(nodes[0], nodes[i - 1]);
+                assertEquals(nodes[1], nodes[i]);
+            }
+        } finally {
+            Context.exit();
         }
     }
 

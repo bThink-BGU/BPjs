@@ -45,6 +45,7 @@ a link to this page somewhere in the documentation/system about section.
 
 ### 2018-04-44
 * :sparkles: Starting to test the new Rhino, with continuation comparisons.
+* :sparkles: Split the stateful visited state store to hash-based and full-state-based.
 
 ### 2018-03-22
 * :put_litter_in_its_place: Removed extra logging.

@@ -61,7 +61,7 @@ public class DfsBProgramVerifierTest {
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setProgressListener(new BriefPrintDfsVerifierListener());
         program.appendSource(Requirements.eventNotSelected("B"));
-        sut.setVisitedNodeStore(new BProgramStateVisitedStateStore(true));
+        sut.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
         VerificationResult res = sut.verify(program);
         assertTrue( res.isCounterExampleFound() );
         assertEquals("AAAB", traceEventNamesString(res.getCounterExampleTrace(),"") );
@@ -141,8 +141,8 @@ public class DfsBProgramVerifierTest {
         sut.setIterationCountGap(1);
         sut.setProgressListener( new BriefPrintDfsVerifierListener() );
         sut.setDebugMode(true);
-        VerificationResult res = sut.verify(bprog);
         
+        VerificationResult res = sut.verify(bprog);
         assertFalse( res.isCounterExampleFound() );
         assertEquals( 1, res.getScannedStatesCount() );
     }

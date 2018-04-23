@@ -42,6 +42,7 @@ import java.util.Set;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Function;
+import org.mozilla.javascript.NativeContinuation;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.serialize.ScriptableInputStream;
@@ -174,7 +175,7 @@ public class BProgramSyncSnapshotIO {
             Function interruptHandler = (Function) bssis.readObject();
             BSyncStatement stmt = (BSyncStatement) bssis.readObject();
             Object cont = bssis.readObject();
-            final BThreadSyncSnapshot bThreadSyncSnapshot = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, btScope, cont, stmt);
+            final BThreadSyncSnapshot bThreadSyncSnapshot = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, btScope, (NativeContinuation) cont, stmt);
 
             btProxy.setBThread(bThreadSyncSnapshot);
             return bThreadSyncSnapshot;
