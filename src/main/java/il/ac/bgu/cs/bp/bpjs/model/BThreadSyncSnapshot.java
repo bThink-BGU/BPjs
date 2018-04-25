@@ -116,20 +116,16 @@ public class BThreadSyncSnapshot implements Serializable {
         scope.delete("equals");
         scope.delete("hashCode");
         scope.delete("toString");
-        scope.setParentScope(programScope);
+        scope.delete("notify");
+        scope.delete("notifyAll");
+        scope.delete("wait");
         
+        scope.setParentScope(programScope);
         // setup entryPoint's scope s.t. it knows our proxy
         Scriptable curScope = entryPoint.getParentScope();
         entryPoint.setParentScope(scope);
         scope.setParentScope(curScope);
         
-//        if (curScope.getParentScope() != null) {
-//            while (curScope.getParentScope().getParentScope() != null) {
-//                curScope = curScope.getParentScope();
-//            }
-//            scope.setParentScope(curScope.getParentScope());
-//            curScope.setParentScope(scope);
-//        }
     }
 
     public BSyncStatement getBSyncStatement() {
@@ -176,6 +172,7 @@ public class BThreadSyncSnapshot implements Serializable {
         return entryPoint;
     }
     
+    @Deprecated
     public ContinuationProgramState getContinuationProgramState() {
         if ( programState == null ) {
             programState = new ContinuationProgramState((NativeContinuation) continuation);

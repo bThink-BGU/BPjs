@@ -257,7 +257,7 @@ public abstract class BProgram {
      */
     public BProgramSyncSnapshot setup() {
         if ( started ) { 
-            throw new IllegalStateException("Program already set up.");
+            throw new IllegalStateException("Program was already set up.");
         }
         Set<BThreadSyncSnapshot> bthreads = drainRecentlyRegisteredBthreads();
         
@@ -291,11 +291,11 @@ public abstract class BProgram {
 
     private void initProgramScope(Context cx) {
         // load and execute globalScopeInit.js
-        ImporterTopLevel importer = new ImporterTopLevel(cx);
-        programScope = cx.initStandardObjects(importer);
+//        ImporterTopLevel importer = new ImporterTopLevel(cx);
+//        programScope = cx.initStandardObjects(importer);
+        programScope = cx.initStandardObjects();
         BProgramJsProxy proxy = new BProgramJsProxy(this);
-        programScope.put("bp", programScope,
-        Context.javaToJS(proxy, programScope));
+        programScope.put("bp", programScope, Context.javaToJS(proxy, programScope));
         
 //        evaluateResource("globalScopeInit.js");// <-- Currently not needed. Leaving in as we might need it soon.
         initialScopeValues.entrySet().forEach(e->putInGlobalScope(e.getKey(), e.getValue()));

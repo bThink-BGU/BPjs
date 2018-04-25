@@ -58,7 +58,7 @@ public class BProgramSyncSnapshotClonerTest {
     
     @Test
     public void testSerialization() throws Exception {
-        System.out.println("\nSTART Serialization test");
+        System.out.println("START Serialization test");
         BProgram bprog = new SingleResourceBProgram("BProgramSyncSnapshotClonerTest.js");
         BProgramSyncSnapshot cur = bprog.setup();
         ExecutorService exSvc = ExecutorServiceMaker.makeWithName("test");

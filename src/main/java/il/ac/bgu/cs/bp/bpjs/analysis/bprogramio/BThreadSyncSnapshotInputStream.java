@@ -45,12 +45,7 @@ class BThreadSyncSnapshotInputStream extends ScriptableInputStream {
     protected Object resolveObject(Object obj) throws IOException {
         return ( obj instanceof StreamObjectStub )
             ? stubProvider.get((StreamObjectStub) obj)
-            : obj;
-    }
-
-    @Override
-    protected Object readObjectOverride() throws IOException, ClassNotFoundException {
-        return super.readObjectOverride();
+            : super.resolveObject(obj);
     }
     
 }
