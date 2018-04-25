@@ -43,7 +43,8 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
-### Next
+### 2018-04-26
+* :sparkles: `bp.sync` prints a warning when a b-thread blocks an event it requests (#10)[https://github.com/bThink-BGU/BPjs/issues/10].
 * :put_litter_in_its_place: Removed extra logging.
 * :arrow_up: More tests.
 * :arrow_up: Fixed TicTacToe example: now split into two executing classes (interactive GUI and verification). Same core TTT code is used in both.
