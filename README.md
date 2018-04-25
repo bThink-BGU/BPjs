@@ -43,7 +43,10 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
-### 2018-04-44
+### 2018-04-25
+* :bug: Fixed serialization and de-serialization of b-threads. Global JS objects are now handled properly.
+
+### 2018-04-24
 * :sparkles: Starting to test the new Rhino, with continuation comparisons.
 * :sparkles: Split the stateful visited state store to hash-based and full-state-based.
 

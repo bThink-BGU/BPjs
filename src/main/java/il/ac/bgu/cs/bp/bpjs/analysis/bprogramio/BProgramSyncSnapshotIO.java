@@ -136,13 +136,7 @@ public class BProgramSyncSnapshotIO {
     private void writeBThreadSnapshot(BThreadSyncSnapshot bss, ObjectOutputStream outs, ScriptableObject scope) throws IOException {
         outs.writeObject(bss.getName());
         
-//        Scriptable bssGlobalScope = scope;
-//        Scriptable bssGlobalScope = scope; // works
-//        Scriptable bssGlobalScope = ScriptableObject.getTopLevelScope((Scriptable) bss.getContinuation());
-//        Scriptable bssGlobalScope = ScriptableObject.getTopLevelScope(bss.getScope());
-//        Scriptable bssGlobalScope = ScriptableObject.getTopLevelScope(bss.getScope()).getPrototype();
         Scriptable bssGlobalScope = ScriptableObject.getTopLevelScope((Scriptable) bss.getContinuation());
-//        Scriptable bssGlobalScope = ScriptableObject.getTopLevelScope((Scriptable) bss.getContinuation()).getPrototype();
         ByteArrayOutputStream bthreadBytes = new ByteArrayOutputStream();
         try (BThreadSyncSnapshotOutputStream btos = new BThreadSyncSnapshotOutputStream(bthreadBytes, bssGlobalScope)) {
             btos.writeObject(bss.getScope());
