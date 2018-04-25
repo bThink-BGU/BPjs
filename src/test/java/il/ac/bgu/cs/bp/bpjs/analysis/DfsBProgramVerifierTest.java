@@ -104,6 +104,8 @@ public class DfsBProgramVerifierTest {
         assertTrue(eventNamesString( eventLogger.getEvents(), "").matches("^A$"));
         
     }
+
+
     
     @Test
     public void testTwoSimpleBThreads() throws Exception {
