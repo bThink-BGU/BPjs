@@ -85,6 +85,7 @@ public class DfsBProgramVerifier {
         currentBProgram = aBp;
         visitedStatesCount = 1;
         currentPath.clear();
+        visited.clear();
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("DfsBProgramRunner-" + INSTANCE_COUNTER.incrementAndGet());
         long start = System.currentTimeMillis();
         listenerOpt.ifPresent(l -> l.started(this));
