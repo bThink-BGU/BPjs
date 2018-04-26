@@ -276,6 +276,14 @@ public class BProgramSyncSnapshot {
         if (getClass() != obj.getClass())
             return false;
         BProgramSyncSnapshot other = (BProgramSyncSnapshot) obj;
+        if (isStateValid() != other.isStateValid()) {
+            return false;
+        }
+        if (!isStateValid()) {
+            if (!getFailedAssertion().equals(other.getFailedAssertion()) ) {
+                return false;
+            }
+        }
         return Objects.equals(threadSnapshots, other.threadSnapshots);
     }
 }

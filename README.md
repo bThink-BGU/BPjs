@@ -43,14 +43,16 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+
 ### 2018-04-26
 * :bug: Verifiers can be re-used.
 * :sparkles: Support for modern JS features, such as let expressions and generators.
 * :sparkles: `bp.sync` prints a warning when a b-thread blocks an event it requests (#10)[https://github.com/bThink-BGU/BPjs/issues/10].
 * :put_litter_in_its_place: Removed extra logging.
 * :arrow_up: More tests.
-* :arrow_up: Fixed TicTacToe example: now split into two executing classes (interactive GUI and verification). Same core TTT code is used in both.
+* :arrow_up: Fixed TicTacToe example: now split into two executing classes (interactive GUI and verification). Same core TTT code is used in both, which proves the point that BPjs can be used for smooth transition from verified model to a full application. :tada:
 * :sparkles: Added a [file with useful tips](docs/bpjs-tips.md).
+* :sparkles: MOAR UNIT TESTSTSSSTTTSTSS!!!!!!! 
 
 ### 2018-03-21
 * :sparkles: `bsync` is *depredated*, in favor of `bp.sync`. The latter can be called from any function, not just the immediate b-thread function.
