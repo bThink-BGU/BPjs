@@ -46,7 +46,7 @@ public class BProgramSyncSnapshotClonerTest {
     
     @Test
     public void testProgramIsOk() throws InterruptedException {
-        BProgramRunner bpr = new BProgramRunner(new SingleResourceBProgram("BProgramSyncSnapshotClonerTest.js"));
+        BProgramRunner bpr = new BProgramRunner(new SingleResourceBProgram("SnapshotTests/BProgramSyncSnapshotClonerTest.js"));
         bpr.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener events = bpr.addListener( new InMemoryEventLoggingListener() );
         
@@ -59,7 +59,7 @@ public class BProgramSyncSnapshotClonerTest {
     @Test
     public void testSerialization() throws Exception {
         System.out.println("\nSTART Serialization test");
-        BProgram bprog = new SingleResourceBProgram("BProgramSyncSnapshotClonerTest.js");
+        BProgram bprog = new SingleResourceBProgram("SnapshotTests/BProgramSyncSnapshotClonerTest.js");
         BProgramSyncSnapshot cur = bprog.setup();
         ExecutorService exSvc = ExecutorServiceMaker.makeWithName("test");
         cur = cur.start(exSvc);
@@ -78,7 +78,7 @@ public class BProgramSyncSnapshotClonerTest {
     @Test
     public void verifyProgram() throws Exception {
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-        BProgram bprog = new SingleResourceBProgram("BProgramSyncSnapshotClonerTest.js");
+        BProgram bprog = new SingleResourceBProgram("SnapshotTests/BProgramSyncSnapshotClonerTest.js");
         final VerificationResult res = vfr.verify(bprog);
         System.out.println("res = " + res.getCounterExampleTrace());
     }
