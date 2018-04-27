@@ -17,7 +17,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
-import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Scriptable;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.mozilla.javascript.EcmaError;
@@ -207,7 +206,7 @@ public abstract class BProgram {
     protected Object evaluate(String script, String scriptName) {
         try {
             Context curCtx = Context.getCurrentContext();
-            curCtx.setLanguageVersion(170);
+            curCtx.setLanguageVersion(Context.VERSION_1_8);
             return curCtx.evaluateString(programScope, script, scriptName, 1, null);
         } catch (EcmaError rerr) {
             if ( rerr.getErrorMessage().trim().equals("\"bsync\" is not defined.") ) {

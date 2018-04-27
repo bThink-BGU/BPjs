@@ -32,76 +32,60 @@ import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
 /**
- *
  * @author michael
  */
 public class BProgramRunnerTest {
-    
+
     public BProgramRunnerTest() {
     }
 
     /**
      * Test of start method, of class BProgramRunner.
-     * @throws java.lang.Exception
      */
     @Test
-    public void testRun() throws Exception {
-        
+    public void testRun() {
+
         BProgram bprog = new SingleResourceBProgram("HotNCold.js");
         BProgramRunner sut = new BProgramRunner(bprog);
-        
-        sut.addListener(new PrintBProgramRunnerListener() );
-        
+
+        sut.addListener(new PrintBProgramRunnerListener());
+
         sut.run();
-        
+
     }
 
     @Test
-    public void testImmediateAssert() throws Exception {
-        BProgram bprog = new StringBProgram( //
-                "// This b-thread goes forward until it's done.\n" +
-                        "bp.registerBThread(\"forward\", function () {\n" +
-                        "bp.ASSERT(false, \"failRightAWay!\");\n" +
-                        "    bsync({request: bp.Event(\"A\")});\n" +
-                        "});\n" +
-                        "\n" +
-                        "bp.registerBThread(\"assertor\", function () {\n" +
-                        "    let e = bsync({waitFor: bp.Event(\"B\")});\n" +
-                        "    if (e.name == \"B\") {\n" +
-                        "        bp.ASSERT(false, \"B happened\");\n" +
-                        "    }\n" +
-                        "});\n");
+    public void testImmediateAssert() {
+        BProgram bprog = new SingleResourceBProgram( "ImmediateAssert.js");
         BProgramRunner runner = new BProgramRunner(bprog);
         runner.run();
-        InMemoryEventLoggingListener listener =new InMemoryEventLoggingListener();
-        runner.addListener( listener );
-        FailedAssertion expected = new FailedAssertion("failRightAWay!","forward");
-        assertEquals( expected , runner.getFailedAssertion());
-        assertEquals(0,listener.getEvents().size());
+        InMemoryEventLoggingListener listener = new InMemoryEventLoggingListener();
+        runner.addListener(listener);
+        FailedAssertion expected = new FailedAssertion("failRightAWay!", "forward");
+        assertEquals(expected, runner.getFailedAssertion());
+        assertEquals(0, listener.getEvents().size());
 
 
     }
 
 
-    
     @Test
-    public void testExecutorName() throws InterruptedException {
+    public void testExecutorName() {
         BProgram bprog = new StringBProgram(
                 "var exName = 'initial value'\n"
-               + "bp.registerBThread( function(){\n"
-               + "  exName = bp.getJavaThreadName();\n"
-               + "});"
+                        + "bp.registerBThread( function(){\n"
+                        + "  exName = bp.getJavaThreadName();\n"
+                        + "});"
         );
-        
+
         new BProgramRunner(bprog).run();
         String exName = bprog.getFromGlobalScope("exName", String.class).get();
-        assertTrue( "Java executor name is wrong (got:'" + exName + "')", 
+        assertTrue("Java executor name is wrong (got:'" + exName + "')",
                 exName.startsWith("BProgramRunner-"));
     }
-
-
 
 }
