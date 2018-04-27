@@ -25,6 +25,8 @@ package il.ac.bgu.cs.bp.bpjs.model;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+
+import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import org.junit.Assert;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
@@ -45,6 +47,16 @@ public class BProgramSyncSnapshotTest {
         assertEquals( bss, bss );
         Assert.assertNotEquals( bss, null );
         Assert.assertNotEquals( bss, "I'm not even the same class" );
+    }
+
+    @Test
+    public void complicatedScopeTests() throws InterruptedException {
+        BProgram program = new SingleResourceBProgram("nestedCalls.js");
+        program.putInGlobalScope("taskA", true);
+        program.putInGlobalScope("taskB", true);
+        program.putInGlobalScope("taskC", true);
+        BProgramRunner rnr = new BProgramRunner(program);
+        rnr.run();
     }
     
 }
