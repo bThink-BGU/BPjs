@@ -12,7 +12,7 @@ import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionS
 
 /**
  * Runs the TicTacToe game in interactive mode, with GUI.
- * 
+ *
  * @author reututy
  */
 class TicTacToeGameMain extends JFrame {

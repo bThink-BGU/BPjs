@@ -20,8 +20,8 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
     /**
      * Callback interface for when assertions fail.
      */
-    public static interface Listener {
-        public void assertionFailed( FailedAssertion fa );
+    public interface Listener {
+        void assertionFailed( FailedAssertion fa );
     }
     
     protected final BThreadSyncSnapshot bss;

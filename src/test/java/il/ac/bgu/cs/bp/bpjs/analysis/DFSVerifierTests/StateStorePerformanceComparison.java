@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis.examples;
+package il.ac.bgu.cs.bp.bpjs.analysis.DFSVerifierTests;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.BThreadSnapshotVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
@@ -43,7 +43,7 @@ import il.ac.bgu.cs.bp.bpjs.analysis.VisitedStateStore;
  * <ul>
  *  <li>Build the BPjs uber-jar: {@code mvn package -P uber-jar}</li> 
  *  <li>Build the BPjs tests-jar: {@code mvn jar:test-jar}</li> 
- *  <li>Run and collect output: {@code java -Xmx4G -cp [uber jar]:[tests jar] il.ac.bgu.cs.bp.bpjs.analysis.examples.StateStorePerformanceComparison}</li> 
+ *  <li>Run and collect output: {@code java -Xmx4G -cp [uber jar]:[tests jar] il.ac.bgu.cs.bp.bpjs.analysis.DFSVerifierTests.StateStorePerformanceComparison}</li>
  * </ul>
  * 
  * @author michael

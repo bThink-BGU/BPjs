@@ -45,7 +45,7 @@ public class DfsBProgramVerifierTest {
     
     @Test
     public void simpleAAABTrace() throws Exception {
-        BProgram program = new SingleResourceBProgram("AAABTrace.js");
+        BProgram program = new SingleResourceBProgram("DFSVerifierTests/AAABTrace.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setProgressListener(new BriefPrintDfsVerifierListener());
         program.appendSource(Requirements.eventNotSelected("B"));
@@ -57,7 +57,7 @@ public class DfsBProgramVerifierTest {
  
     @Test
     public void simpleAAABTrace_hashedNodeStore() throws Exception {
-        BProgram program = new SingleResourceBProgram("AAABTrace.js");
+        BProgram program = new SingleResourceBProgram("DFSVerifierTests/AAABTrace.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setProgressListener(new BriefPrintDfsVerifierListener());
         program.appendSource(Requirements.eventNotSelected("B"));
@@ -69,7 +69,7 @@ public class DfsBProgramVerifierTest {
     
     @Test 
     public void testAAABRun() throws Exception {
-        BProgram program = new SingleResourceBProgram("AAABTrace.js");
+        BProgram program = new SingleResourceBProgram("DFSVerifierTests/AAABTrace.js");
         BProgramRunner rnr = new BProgramRunner(program);
         
         rnr.addListener(new PrintBProgramRunnerListener() );
@@ -82,7 +82,7 @@ public class DfsBProgramVerifierTest {
     
     @Test
     public void deadlockTrace() throws Exception {
-        BProgram program = new SingleResourceBProgram("deadlocking.js");
+        BProgram program = new SingleResourceBProgram("DFSVerifierTests/deadlocking.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setVisitedNodeStore(new ForgetfulVisitedStateStore());
         VerificationResult res = sut.verify(program);
@@ -93,7 +93,7 @@ public class DfsBProgramVerifierTest {
     
     @Test 
     public void deadlockRun() throws Exception {
-        BProgram program = new SingleResourceBProgram("deadlocking.js");
+        BProgram program = new SingleResourceBProgram("DFSVerifierTests/deadlocking.js");
         BProgramRunner rnr = new BProgramRunner(program);
         
         rnr.addListener(new PrintBProgramRunnerListener() );
