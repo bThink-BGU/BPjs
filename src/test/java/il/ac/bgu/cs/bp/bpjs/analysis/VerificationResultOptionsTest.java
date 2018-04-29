@@ -107,13 +107,13 @@ public class VerificationResultOptionsTest {
         BProgram bprog = new StringBProgram( //
                 "// This b-thread goes forward until it's done.\n" +
                         "bp.registerBThread(\"forward\", function () {\n" +
-                        "    bsync({request: bp.Event(\"A\")});\n" +
-                        "    bsync({request: bp.Event(\"B\")});\n" +
-                        "    bsync({request: bp.Event(\"C\")});\n" +
+                        "    bp.sync({request: bp.Event(\"A\")});\n" +
+                        "    bp.sync({request: bp.Event(\"B\")});\n" +
+                        "    bp.sync({request: bp.Event(\"C\")});\n" +
                         "});\n" +
                         "\n" +
                         "bp.registerBThread(\"assertor\", function () {\n" +
-                        "    let e = bsync({waitFor: bp.Event(\"B\")});\n" +
+                        "    let e = bp.sync({waitFor: bp.Event(\"B\")});\n" +
                         "    if (e.name == \"B\") {\n" +
                         "        bp.ASSERT(false, \"B happened\");\n" +
                         "    }\n" +
@@ -133,11 +133,11 @@ public class VerificationResultOptionsTest {
                 "// This b-thread goes forward until it's done.\n" +
                         "bp.registerBThread(\"forward\", function () {\n" +
                             "bp.ASSERT(false, \"failRightAWay!\");\n" +
-                        "    bsync({request: bp.Event(\"A\")});\n" +
+                        "    bp.sync({request: bp.Event(\"A\")});\n" +
                         "});\n" +
                         "\n" +
                         "bp.registerBThread(\"assertor\", function () {\n" +
-                        "    let e = bsync({waitFor: bp.Event(\"B\")});\n" +
+                        "    let e = bp.sync({waitFor: bp.Event(\"B\")});\n" +
                         "    if (e.name == \"B\") {\n" +
                         "        bp.ASSERT(false, \"B happened\");\n" +
                         "    }\n" +

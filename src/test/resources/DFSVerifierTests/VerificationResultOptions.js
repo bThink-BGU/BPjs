@@ -53,9 +53,3 @@ if ( createFailedAssertion ) {
        bp.ASSERT( false, "B happened" );
     });
 }
-
-if ( createBadState ) {
-    bp.registerBThread("badState", function() {
-        bsync({request:bp.Event("BAD")});
-    });
-}
