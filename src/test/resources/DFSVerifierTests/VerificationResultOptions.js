@@ -1,7 +1,7 @@
-/*
+/* 
  * The MIT License
  *
- * Copyright 2017 BPjs group BGU.
+ * Copyright 2018 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,27 +21,35 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis;
 
-/**
- * Convenience class for creating requirement b-threads for verification.
- * 
- * @author michael
- */
-public class Requirements {
-   
-    /**
-     * A requirement that detects deadlocks (as in, no selectable events).
-     */
-    public static String eventNotSelected( String eventName ) {
-        return "bp.registerBThread('eventNotSelected-" + eventName + "', function(){ "
-            + "\n bsync({waitFor:bp.Event('" + eventName + "')});"
-            + "\n bp.ASSERT(false, 'event \"" + eventName + "\" selected.');"
-            + "\n });";
-    }
 
-    private Requirements(){
-        // prevent instantiation.
-    }
-    
+/* global bp, addWaiter, createDeadlock, createFailedAssertion, createBadState */
+
+// This JS file can create all the results of verification session.
+
+// This b-thread goes forward until it's done.
+bp.registerBThread("forward", function(){
+    bp.sync({request:bp.Event("A")});
+    bp.sync({request:bp.Event("B")});
+    bp.sync({request:bp.Event("C")});
+});
+
+// This b-thread will wait forever, so we can verify that the verifier does not
+//   consider waiting as part of a deadlock.
+if ( addWaiter ) {
+    bp.registerBThread("waitingForever", function() {
+        bp.sync({waitFor:bp.Event("Z")});
+    });
+}
+if ( createDeadlock ) {
+    bp.registerBThread("deadlocker", function() {
+       bp.sync({block:bp.Event("B")}) ;
+    });
+}
+
+if ( createFailedAssertion ) {
+    bp.registerBThread("assertor", function(){
+       bp.sync({waitFor:bp.Event("B")});
+       bp.ASSERT( false, "B happened" );
+    });
 }

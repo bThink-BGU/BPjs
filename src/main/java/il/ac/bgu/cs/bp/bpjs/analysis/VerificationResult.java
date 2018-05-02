@@ -32,7 +32,7 @@ import java.util.List;
  * @author michael
  */
 public class VerificationResult {
-    
+
     /**
      * The reason a b-program failed verification.
      */
@@ -61,8 +61,8 @@ public class VerificationResult {
         this.counterExampleTrace = counterExampleTrace;
     }
     
-    VerificationResult( ViolationType vt, FailedAssertion fa, List<Node> trace ) {
-        this(vt, fa, trace, 0,0);
+    VerificationResult(ViolationType aViolationType, FailedAssertion aFailedAssertion, List<Node> counterExampleTrace) {
+        this( aViolationType, aFailedAssertion, counterExampleTrace, -1l ,-1l);
     }
     
     public long getTimeMillies() {

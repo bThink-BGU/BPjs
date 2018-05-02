@@ -135,9 +135,10 @@ public class BProgramSyncSnapshotIO {
 
     private void writeBThreadSnapshot(BThreadSyncSnapshot bss, ObjectOutputStream outs, ScriptableObject scope) throws IOException {
         outs.writeObject(bss.getName());
-
+        
+        Scriptable bssGlobalScope = ScriptableObject.getTopLevelScope((Scriptable) bss.getContinuation());
         ByteArrayOutputStream bthreadBytes = new ByteArrayOutputStream();
-        try (BThreadSyncSnapshotOutputStream btos = new BThreadSyncSnapshotOutputStream(bthreadBytes, scope)) {
+        try (BThreadSyncSnapshotOutputStream btos = new BThreadSyncSnapshotOutputStream(bthreadBytes, bssGlobalScope)) {
             btos.writeObject(bss.getScope());
             btos.writeObject(bss.getEntryPoint());
             btos.writeObject(bss.getInterrupt().orElseGet(() -> null));
@@ -168,19 +169,27 @@ public class BProgramSyncSnapshotIO {
             throw new IllegalArgumentException("Unknown stub " + stub);
         };
 
-        try (ByteArrayInputStream inBytes = new ByteArrayInputStream(contBytes);
+        try (ByteArrayInputStream inBytes = new ByteArrayInputStream(contBytes); 
             BThreadSyncSnapshotInputStream bssis = new BThreadSyncSnapshotInputStream(inBytes, scope, stubPrv)) {
+            Context.enter();
+            scope.put("bp", scope, Context.javaToJS(bpProxy, scope));
+            
             Scriptable btScope = (Scriptable) bssis.readObject();
             Function entryPoint = (Function) bssis.readObject();
             Function interruptHandler = (Function) bssis.readObject();
             BSyncStatement stmt = (BSyncStatement) bssis.readObject();
-            Object cont = bssis.readObject();
-            final BThreadSyncSnapshot bThreadSyncSnapshot = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, btScope, (NativeContinuation) cont, stmt);
+            NativeContinuation cont = (NativeContinuation) bssis.readObject();
+            
+            
+            final BThreadSyncSnapshot bThreadSyncSnapshot = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, btScope, cont, stmt);
 
             btProxy.setBThread(bThreadSyncSnapshot);
             return bThreadSyncSnapshot;
+            
+        } finally {
+            Context.exit();
         }
 
     }
-
+    
 }

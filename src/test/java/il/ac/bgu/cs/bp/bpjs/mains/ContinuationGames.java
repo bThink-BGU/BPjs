@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs;
+package il.ac.bgu.cs.bp.bpjs.mains;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;

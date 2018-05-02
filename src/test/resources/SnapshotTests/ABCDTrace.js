@@ -1,7 +1,7 @@
-/* 
+/* global bp, bsync
  * The MIT License
  *
- * Copyright 2018 michael.
+ * Copyright 2017 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,34 +23,15 @@
  */
 
 
-/* global bp, addWaiter, createDeadlock, createFailedAssertion */
+/**
+ * Simple program whose trace is "A","B","C","D" 10 times.
+ */
 
-// This JS file can create all the results of verification session.
-
-// This b-thread goes forward until it's done.
-bp.registerBThread("forward", function(){
-    bp.sync({request:bp.Event("A")});
-    bp.sync({request:bp.Event("B")});
-    bp.sync({request:bp.Event("C")});
+bp.registerBThread(function(){
+    for ( var i=0; i<10; i++ ) {
+        bp.sync({request:bp.Event("A")});
+        bp.sync({request:bp.Event("B")});
+        bp.sync({request:bp.Event("C")});
+        bp.sync({request:bp.Event("D")});
+    }
 });
-
-// This b-thread will wait forever, so we can verify that the verifier does not
-//   consider waiting as part of a deadlock.
-if ( addWaiter ) {
-    bp.registerBThread("waitingForever", function() {
-        bp.sync({waitFor:bp.Event("Z")});
-    });
-}
-if ( createDeadlock ) {
-    bp.registerBThread("deadlocker", function() {
-       bp.sync({block:bp.Event("B")}) ;
-    });
-}
-
-if ( createFailedAssertion ) {
-    bp.registerBThread("assertor", function(){
-       bp.sync({waitFor:bp.Event("B")});
-       bp.ASSERT( false, "B happened" );
-    });
-}
-

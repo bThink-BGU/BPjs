@@ -43,7 +43,6 @@ public class BThreadSyncSnapshotOutputStream extends ScriptableOutputStream {
     
     private final List<StreamObjectStub> stubs = new ArrayList<>();
     
-    @SuppressWarnings("OverridableMethodCallInConstructor")
     public BThreadSyncSnapshotOutputStream(OutputStream out, Scriptable scope) throws IOException {
         super(out, scope);
     }
@@ -59,7 +58,7 @@ public class BThreadSyncSnapshotOutputStream extends ScriptableOutputStream {
             return StreamObjectStub.BP_PROXY;
             
         } else {
-            return obj;
+            return super.replaceObject(obj);
         }
     }
 

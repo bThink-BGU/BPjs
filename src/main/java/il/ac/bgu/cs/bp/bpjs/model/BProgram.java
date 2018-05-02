@@ -17,7 +17,6 @@ import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
-import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Scriptable;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.mozilla.javascript.EcmaError;
@@ -142,7 +141,7 @@ public abstract class BProgram {
      * parts for model-checking.
      * 
      * @throws IllegalStateException if the code is appended after the bprogram started.
-     * @param source 
+     * @param source Valid JS source code
      */
     public void appendSource( String source ) {
         if ( started ) {
@@ -161,7 +160,7 @@ public abstract class BProgram {
      * parts for model-checking.
      * 
      * @throws IllegalStateException if the code is appended after the bprogram started.
-     * @param source 
+     * @param source Valid JS source code
      */
     public void prependSource( String source ) {
         if ( started ) {
@@ -206,7 +205,9 @@ public abstract class BProgram {
      */
     protected Object evaluate(String script, String scriptName) {
         try {
-            return Context.getCurrentContext().evaluateString(programScope, script, scriptName, 1, null);
+            Context curCtx = Context.getCurrentContext();
+            curCtx.setLanguageVersion(Context.VERSION_1_8);
+            return curCtx.evaluateString(programScope, script, scriptName, 1, null);
         } catch (EcmaError rerr) {
             if ( rerr.getErrorMessage().trim().equals("\"bsync\" is not defined.") ) {
                 throw new BPjsCodeEvaluationException("'bsync' is only defined in BThreads. Did you forget to call 'bp.registerBThread()'?", rerr);
@@ -257,7 +258,7 @@ public abstract class BProgram {
      */
     public BProgramSyncSnapshot setup() {
         if ( started ) { 
-            throw new IllegalStateException("Program already set up.");
+            throw new IllegalStateException("Program was already set up.");
         }
         Set<BThreadSyncSnapshot> bthreads = drainRecentlyRegisteredBthreads();
         
@@ -291,14 +292,14 @@ public abstract class BProgram {
 
     private void initProgramScope(Context cx) {
         // load and execute globalScopeInit.js
-        ImporterTopLevel importer = new ImporterTopLevel(cx);
-        programScope = cx.initStandardObjects(importer);
+//        ImporterTopLevel importer = new ImporterTopLevel(cx);
+//        programScope = cx.initStandardObjects(importer);
+        programScope = cx.initStandardObjects();
         BProgramJsProxy proxy = new BProgramJsProxy(this);
-        programScope.put("bp", programScope,
-        Context.javaToJS(proxy, programScope));
+        programScope.put("bp", programScope, Context.javaToJS(proxy, programScope));
         
 //        evaluateResource("globalScopeInit.js");// <-- Currently not needed. Leaving in as we might need it soon.
-        initialScopeValues.entrySet().forEach(e->putInGlobalScope(e.getKey(), e.getValue()));
+        initialScopeValues.forEach((key, value) -> putInGlobalScope(key, value));
         initialScopeValues=null;
     }
 

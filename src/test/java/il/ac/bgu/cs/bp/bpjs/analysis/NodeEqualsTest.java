@@ -11,7 +11,7 @@ import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import java.util.concurrent.ExecutorService;
-import net.sourceforge.htmlunit.corejs.javascript.Context;
+import org.mozilla.javascript.Context;
 import org.junit.Before;
 
 public class NodeEqualsTest {

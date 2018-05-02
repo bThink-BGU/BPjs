@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 BPjs group BGU.
+ * Copyright 2018 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,27 +21,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis;
-
 /**
- * Convenience class for creating requirement b-threads for verification.
- * 
- * @author michael
+ * This package contains small runnable programs that test various aspects of
+ * BPjs, that are not suitable for unit tests. Examples include performance 
+ * tests in "real-world" settings, integration tests, etc. 
  */
-public class Requirements {
-   
-    /**
-     * A requirement that detects deadlocks (as in, no selectable events).
-     */
-    public static String eventNotSelected( String eventName ) {
-        return "bp.registerBThread('eventNotSelected-" + eventName + "', function(){ "
-            + "\n bsync({waitFor:bp.Event('" + eventName + "')});"
-            + "\n bp.ASSERT(false, 'event \"" + eventName + "\" selected.');"
-            + "\n });";
-    }
-
-    private Requirements(){
-        // prevent instantiation.
-    }
-    
-}
+package il.ac.bgu.cs.bp.bpjs.mains;
