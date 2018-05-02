@@ -35,6 +35,7 @@ import il.ac.bgu.cs.bp.bpjs.model.eventselection.EventSelectionResult;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
