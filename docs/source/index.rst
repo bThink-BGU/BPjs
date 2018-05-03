@@ -33,7 +33,7 @@ Topics:
    verification/index
    extendBPjs/index
    glossary
-   example-hot-cold
+   examples
 
 
 Indices and tables
