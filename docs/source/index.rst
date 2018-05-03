@@ -34,6 +34,9 @@ Topics:
    extendBPjs/index
    glossary
    examples
+   example-hot-cold
+   example-dining-philosophers
+   
 
 
 Indices and tables
