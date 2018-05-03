@@ -14,7 +14,7 @@ Here you can learn about :doc:`writing <BPjsTutorial/index>` and :doc:`executing
 :doc:`embedding <embed-bpjs>` BPjs programs in larger Java systems (or any JVM-based systems, really),
 and extending and modifying BPjs' behavior.
 
-.. tip:: If you are new to Behavioral Programming (that's alright, it's a fairly new concept), you're invited to read the `quick intro <BPjsTutorial/index.html>`_.
+.. tip:: If you are new to Behavioral Programming (that's alright, it's a fairly new concept), you're invited to read the `quick intro 	
 
 .. note:: Model checking for behavioral programs is coming soon!
 

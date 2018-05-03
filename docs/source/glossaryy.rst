@@ -2,7 +2,7 @@
 Terms Used in this documentation
 ================================
 
-.. glossaryy::
+.. include glossaryy::
 
   Scenario-Based Programming dudu
     .. todo:: explain
