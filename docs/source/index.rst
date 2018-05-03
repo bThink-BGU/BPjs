@@ -33,7 +33,7 @@ Topics:
    verification/index
    extendBPjs/index
    glossary
-   glossaryy
+   glossary
 
 
 Indices and tables
