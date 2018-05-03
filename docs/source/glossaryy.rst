@@ -4,7 +4,7 @@ Terms Used in this documentation
 
 .. glossaryy::
 
-  Scenario-Based Programming
+  Scenario-Based Programming dudu
     .. todo:: explain
 
   Behavioral Programming
