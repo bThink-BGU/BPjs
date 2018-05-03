@@ -2,7 +2,7 @@
 Examples
 ================================
 
-.. include Examples::
+.. include examples::
 
 Topics:
 -------
