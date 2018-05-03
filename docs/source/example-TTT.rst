@@ -1,4 +1,8 @@
+*********************
 Example - Tic Tac Toe
+*********************
+
+.. include example-TTT::
 
 This example is borrowed, with modifications, from [10]. Its main feature is that it presents the  concept of aligning bthreads to requirements. Meaning, each b-thread represents a rule, or a part of the tactics in the game of Tic-Tac-Toe.
 First, let us describe the (classical) game of Tic-Tac-Toe, and the events that represent the expected behaviors. Two players, X and O, alternately mark squares on a 3 _ 3 grid whose squares are identified by (row; column) pairs: (0; 0); (0; 1); : : : ; (2; 2). The winner is the player who manages to form a full horizontal, vertical, or diagonal line with three of his/her marks. If the entire grid becomes marked but no player has formed a line, the result is a draw. Below, we assume player X is played by a human user, and player O is played by the application.
