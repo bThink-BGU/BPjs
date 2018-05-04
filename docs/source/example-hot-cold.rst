@@ -9,7 +9,6 @@ This program models a system that fills a bath with six parts water: three cold,
 .. literalinclude:: Examples_code/HC_listing1.js
   :linenos:
   :language: javascript
-
 ``Listing 1. A naive implementation of bath-filling controller.``
 
 The code in Listing 1 is not incorrect, but it also does not use the power of behavioral programming: it leaves no decision room for the event selection mechanism. Thus, when read as a specification, it is over-restrictive. An improved b-program is shown at Listing 2.
@@ -17,7 +16,6 @@ The code in Listing 1 is not incorrect, but it also does not use the power of be
 .. literalinclude:: Examples_code/HC_listing2.js
   :linenos:
   :language: javascript
-
 ``Listing 2. A more lenient version of the bath-filling controller.``
 
 The code in Listing 2 consists of two b-threads: add-hot, which adds the hot water, and add-cold,  hich adds the cold water. This improves on the previous version in a number of ways. First, any order in which the water parts are added is supported, as the event selection mechanism of the b-program
@@ -28,7 +26,6 @@ To prevent these unbalanced scenarios, we can add an additional b-thread, that w
 .. literalinclude:: Examples_code/HC_listing3.js
   :linenos:
   :language: javascript
-
 ``Listing 3. A b-thread that ensures safe water temperature by ensuring cold water are added before hot water are.``
 
 As a useful exercise, we invite the reader to further elaborate the hot-cold example, e.g. by  upporting the insertion of the baby while filling the bath (which would require blocking of the BABY_IN event when the water temperature is too high), or by altering control-temp to be more permissive.
