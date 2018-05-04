@@ -15,54 +15,29 @@ Wall Cells: No CABs are generated for wall cells under the described implementat
 Space Cells: Space cells attract the maze walker when it is in a cell adjacent to them. To do this, they repeatedly wait for an entry event to any of their neighboring cells, and then request an entry event into them. The b-thread template for generating b-threads implementing this behavior, is shown in
 Listing 7.
 
-1 function addSpaceCell( col, row ) {
-2 bp.registerBThread("cell(c:"+col+" r:"+row+")",
-3 function() {
-4 while ( true ) {
-5 bsync({waitFor:
-6 adjacentCellEntries(col, row)});
-7 bsync({request: enterEvent(col, row),
-8 waitFor: anyEntrance});
-9 }
-10 }
-11 );
-12 }
-Listing 7. B-thread template for adding a space cell at row, col. Space cells
-wait for the maze walker to enter a cell adjacent to them, and then request
-that it enters them. If the event selection mechanism chose another cell for the
-maze walker to enter, the entry request is removed. This is achieved by waiting
-on the event set anyEntrance. The function adjacentCellEntries
-returns an event set containing cell entry events for the four cells that share
-an edge with the passed cell. The full code is available at the code appendix.
+.. literalinclude:: Examples_code/Mazes_listing1.js
+  :linenos:
+  :language: javascript
+
+``Listing 7. B-thread template for adding a space cell at row, col. Space cells wait for the maze walker to enter a cell adjacent to them, and then request that it enters them. If the event selection mechanism chose another cell for the maze walker to enter, the entry request is removed. This is achieved by waiting on the event set anyEntrance. The function adjacentCellEntries returns an event set containing cell entry events for the four cells that share an edge with the passed cell. The full code is available at the code appendix.``
 
 Target Cells: Target cells are regular space cells, with one additional trait: when the maze walker enters them, a special event celebrating the fact that the target have been found should be fired. To do this, the parser creates two CABs for a target cell: the space cell b-thread mentioned above, and
 a b-thread awaiting an entry to the cell, before announcing that the target was found. This additional CAB is shown in Listing 8. This CAB uses event blocking in order to ensure that, once requested, the TARGET_FOUND_EVENT will be selected before any other event is.
 
-1 bp.registerBThread("target", function () {
-2 bsync({
-3 waitFor: enterEvent(col, row)
-4 });
-5
-6 bsync({
-7 request: TARGET_FOUND_EVENT,
-8 block: bp.allExcept(TARGET_FOUND_EVENT)
-9 });
-10 });
-Listing 8. B-thread template for announcing a target located at (row, col
-) was found. In order to ensure that the announcement recognizes the correct
-cell, the bsync requesting the announcement event blocks all other events.
+.. literalinclude:: Examples_code/Mazes_listing2.js
+  :linenos:
+  :language: javascript
+
+``Listing 8. B-thread template for announcing a target located at (row, col) was found. In order to ensure that the announcement recognizes the correct cell, the bsync requesting the announcement event blocks all other events.``
 
 Start Cell: A start cell is, too, a space cell with one additional behavior: when the maze program starts, it already has a maze walker in it. Thus, the maze parser adds two CABs to the b-program when it encounters a start cell: the space cell b-thread, and a b-thread requesting an entry event to the
 starting cell (see Listing 9).
 
-1 function addStartCell(col, row) {
-2 bp.registerBThread("startCell", function() {
-3 bsync({
-4 request:enterEvent(col,row)
-5 });
-6 });
-7 }
-Listing 9. B-thread template for a start cell located at (row, col).
+.. literalinclude:: Examples_code/Mazes_listing3.js
+  :linenos:
+  :language: javascript
+
+``Listing 9. B-thread template for a start cell located at (row, col).``
 
 Discussion: In this example, we use BPjs to define the executable semantics of a DSL for describing two dimensional mazes using ASCII drawings. Both the technique and the model raise a few interesting points. Language semantics definitions done using construct agent b-threads can be modular and easy to navigate, as well as executable and verifiable. Thus, such definitions make it is easy for language developers to define, discuss, and experiment with semantics of various constructs. In the above example, for a reader to understand the semantics of t, it is enough to see which b-threads are added to the program when the parser encounters the character ‘t’. Moreover, definitions of constructs with similar aspects can share code. In such cases, code re-use is not merely an engineering gain; semantically, it means that the re-used b-threads capture a linguistic concept
 common to the language constructs sharing the code. Thus, creating a language definition using CABs may help the discovery and crystallization of hidden language concepts.
@@ -76,15 +51,11 @@ Wall cells are modeled using a very small b-thread, blocking the Enter(x,y) even
 b-program will select a single entry event to a cell that is not a wall (and therefore a space cell that the maze walker is semantically allowed to enter). This type of model additionally requires a mechanism for preventing the maze walker from wandering off the maze. One way of accomplishing that is adding logic to constrain the set of entry events the maze walker b-thread requests. This, however, will complicate the code by adding more conditional statements. A better, more
 BP-oriented approach, would be to add b-threads blocking all entry events for cells outside of the maze. Notably, the target b-thread (Listing 8) can be used in the alternative model with no changes.
 
-1 function addWall(col, row) {
-2 bp.registerBThread(function(){
-3 bsync({block: enterEvent(col, row)});
-4 });
-5 }
-Listing 10. A b-thread template for a wall, in an alternative maze model.
-This construct agent b-thread blocks entry to the cell it models for the entire
-duration of the program. Thus, entry requests to the modeled cell, made by
-the maze walker b-thread, will never be selected.
+.. literalinclude:: Examples_code/Mazes_listing3.js
+  :linenos:
+  :language: javascript
+
+``Listing 10. A b-thread template for a wall, in an alternative maze model. This construct agent b-thread blocks entry to the cell it models for the entire duration of the program. Thus, entry requests to the modeled cell, made by the maze walker b-thread, will never be selected.``
 
 The second bsync statement used by the target b-thread (Listing 8) might look problematic: it blocks all events except for TARGET_FOUND_EVENT. It is indeed problematic, in the sense that the block all except X idiom does not scale. If, somewhere else in the code, another b-thread uses the same idiom with a different event, the b-program will deadlock. The model needs this type of blocking, though, to  nsure that TARGET_FOUND_EVENT is selected immediately after the target cell was entered.
 Under the default semantics of BPjs, which allow any event that is requested and not blocked to be selected, using the block all except idiom is a sensible way of achieving this immediate selection. Other alternatives might use blocking an event set that contains all other events we want to block in this situation — an event set that will have to be updated each time an event is added to the system. Fortunately, BPjs’ generalized nature allows for a better alternative.
@@ -95,32 +66,18 @@ In order to efficiently solve a maze, we can verify a bprogram modeling it. Our 
 A minimal code for performing this is shown in Listing 11.
 Similar setup was used to generate the solution presented at the right side of Figure 3.
 
-1 SingleResourceBProgram bprog = new
-SingleResourceBProgram("mazes.js");
-2 bprog.putInGlobalScope("MAZE_NAME", mazeName);
-3 bprog.putInGlobalScope("TARGET_FOUND_EVENT",
-targetFoundEvent);
-4 DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-5 vfr.setRequirement(new EventNotPresent(
-targetFoundEvent) );
-6 vfr.setVisitedNodeStore(new FullVisitedNodeStore());
-7 VerificationResult res = vfr.verify(bprog);
-Listing 11. A code excerpt for verifying the mazes b-program using BPjs.
+.. literalinclude:: Examples_code/Mazes_listing5.js
+  :linenos:
+  :language: javascript
+
+``Listing 11. A code excerpt for verifying the mazes b-program using BPjs.``
 
 Verification of a maze b-program can take a long time and generate an arbitrarily long counter  example. This is because of the random walk: while a counterexample will be found, the length of the path it uses to get to the target cell is unbounded. This is easily solvable in a way that further exemplifies the additive nature of BP: for model checking only, we can add another b-thread, preventing a the maze walker from entering the same cell twice (see Listing 12). This thread turns the
 random walk into a walk that enters a new cell at every step, until it gets terminally stuck. The verification process examines all such possible walks, and returns one that ends up at the target cell. BPjs has facilities to programmatically add code to a b-program to support such cases.
 
+.. literalinclude:: Examples_code/Mazes_listing6.js
+  :linenos:
+  :language: javascript
 
-
-1 bp.registerBThread("onlyOnce", function(){
-2 var block = [];
-3 while (true) {
-4 var evt = bsync({waitFor: anyEntrance,
-5 block: block});
-6 block.push(evt);
-7 }
-8 });
-Listing 12. A b-thread preventing a the maze walker from entering a cell
-twice. This b-thread can be used during verification, in order to shorten the
-execution paths examined.
+``Listing 12. A b-thread preventing a the maze walker from entering a cell twice. This b-thread can be used during verification, in order to shorten the execution paths examined.``
 
