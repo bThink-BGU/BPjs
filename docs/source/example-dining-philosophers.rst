@@ -43,24 +43,10 @@ is passed to a verification engine, as shown in Section VI.
   :language: javascript
 ``Listing 6. The loop instantiating a dining philosophers model. If PHILOSOPHER_COUNT was not passed by the containing Java application, it defaults to 5.``
 
+.. figure::  images/Phil_fig2.png
+   :align:   center
 
-
-
-
-
-
-
-
-
-
-Fig. 3. A maze, described using our maze-description DSL (left), and a maze
-solution, found by a generic b-program model checker (right). The model
-checker output, an event sequence, was post-processed by the program to
-visualize the solution on the maze’s map.
-In both cases, the exact same code is used — no translation
-is necessary when transitioning between code execution and
-verification.
-
+``Fig. 3. A maze, described using our maze-description DSL (left), and a maze solution, found by a generic b-program model checker (right). The model checker output, an event sequence, was post-processed by the program to visualize the solution on the maze’s map. In both cases, the exact same code is used — no translation is necessary when transitioning between code execution and verification.``
 
 This example uses parametrized templates to create its bthreads. B-thread templates are a versatile and commonly used design pattern, applicable in various contexts. When creating simulations, b-thread templates can be used to generate heterogeneous b-thread population, where the template parameters are sampled from a given distribution. In the next section, they are used to create an interpreter for a small DSL.
 
