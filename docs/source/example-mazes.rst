@@ -9,9 +9,10 @@ In this subsection, we demonstrate how to use BPjs to define executable semantic
 Our maze-description DSL uses ASCII drawings. A maze is described using an array of strings, each of which describes a row of maze cells. The characters of each string describe the maze cells — one character per cell. There are three characters with special semantics; the rest are considered “walls” (see left side of Figure 3). 
 
 The special characters are:
-* (space) A space cell: A cell the maze walker can enter.
-* s A start cell: A space cell a maze walker starts in.
-* t S target cell: A space cell the maze walker should arrive at.
+
+* ``(space)`` A space cell: A cell the maze walker can enter.
+* ``s`` A start cell: A space cell a maze walker starts in.
+* ``t`` S target cell: A space cell the maze walker should arrive at.
 
 To create a model from a maze written in this DSL, a parser iterates over the characters in each of the strings, maintaining the coordinates (row, column) for each character. Based on the character it encounters, it constructs zero or more b-threads, and adds them to the program. We refer to these b-threads as construct agent b-threads (or CABs), since they act on behalf of a linguistic construct when a model is analyzed or being run.
 
