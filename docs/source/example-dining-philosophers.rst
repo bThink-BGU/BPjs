@@ -30,62 +30,18 @@ the chopstick between them. In order to eat, a philosopher has to pick up both
 sticks. After eating, a philosopher releases the sticks and thinks. Since only
 a single philosopher can use a stick at any given moment, this setting poses
 many mutual exclusion challenges.
-1 function addPhil(philNum) {
-2 bp.registerBThread("Phil"+philNum, function() {
-3 while (true) {
-4 // Request to pick the right stick
-5 bsync({
-6 request: bp.Event("Pick"+philNum+"R")
-7 });
-8
-9 // Request to pick the left stick
-10 bsync({
-11 request: bp.Event("Pick"+philNum+"L")
-12 });
-13
-14 // Request to release the left stick
-15 bsync({
-16 request: bp.Event("Rel"+philNum+"L")
-17 });
-18
-19 // Request to release the right stick
-20 bsync({
-21 request: bp.Event("Rel"+philNum+"R")
-22 });
-23 }
-24 });
-25 };
-Listing 4. A function for adding a philosopher to the dining philosophers
-b-program. A dining philosopher repeatedly attempts to pick the chopstick to
-her right, then the one to her left, and then releases them in the same order.
-For the purpose of this program, there’s no need to add an EAT or THINK
-event.
+
+.. literalinclude:: Examples_code/Phil_listing1.js
+  :linenos:
+  :language: javascript
+``Listing 4. A function for adding a philosopher to the dining philosophers b-program. A dining philosopher repeatedly attempts to pick the chopstick to her right, then the one to her left, and then releases them in the same order. For the purpose of this program, there’s no need to add an EAT or THINK event.``
 
 Some restriction apply, though: a philosopher can only pick up a chopstick when it lays on the table,  and can only release a chopstick after picking it up. Additionally, a chopstick can be picked up by at most a single philosopher at a time. Consequentially, if one philosopher have picked a chopstick up, the other philosopher has to wait for the first philosopher to release the chopstick, prior to picking it up herself. Imposing these constraints is done by the chopstick b-thread. The code for adding a these b-threads is shown in Listing 5. The implementation of chopstick b-threads demonstrates some interesting features of BP and BPjs. First, note the usage of event sets in lines 5 and 9. These are used to detect the pick up and release event of the stick being modeled.
 
-1 function addStick(i) {
-2 var j = (i%PHILOSOPHER_COUNT)+1;
-3
-4 bp.registerBThread("Stick"+i, function () {
-5 var pickMe = bp.EventSet("pick"+i, function(e) {
-6 return (e.name === "Pick"+i+"R"
-7 jj e.name === "Pick"+j+"L");
-8 });
-9 var releaseMe = [bp.Event("Rel"+i+"R"),
-10 bp.Event("Rel"+j+"L")];
-11
-12 while (true) {
-13 var e = bsync({waitFor: pickMe,
-14 block: releaseMe});
-15
-16 var wt = (e.name === "Pick"+i+"R") ?
-17 "Rel"+i+"R" : "Rel"+j+"L";
-18 bsync({waitFor: bp.Event(wt),
-19 block: releaseMe});
-20 }
-21 });
-22 }
-Listing 5. A function for adding a chopstick to the dining philosophers bprogram. This b-thread ensures that the chopstick it models can be picked up by at most a single philosopher at a time. Note the usage of event sets for detecting Pick and Release events — this is needed, since philosophers adjacent to a stick refer to it using different names. For example, the stick between philosophers 3 and 4 would be referred to as 3R by philosopher 3, and 4L by philosopher 4.
+.. literalinclude:: Examples_code/Phil_listing2.js
+  :linenos:
+  :language: javascript
+``Listing 5. A function for adding a chopstick to the dining philosophers bprogram. This b-thread ensures that the chopstick it models can be picked up by at most a single philosopher at a time. Note the usage of event sets for detecting Pick and Release events — this is needed, since philosophers adjacent to a stick refer to it using different names. For example, the stick between philosophers 3 and 4 would be referred to as 3R by philosopher 3, and 4L by philosopher 4.``
 
 The philosophers adjacent to a stick refer to it using different names. Thus, picking up stick #2 can be done using events Pick2R or Pick3L. These events are contained in the pickMe event set defined in line 5. Set membership is determined by examining the event name, which is a regular JavaScript string 
 object. Event sets created in BPjs are similar to mathematical sets: a predicate over events (although BPjs allows naming them too). Unlike set implementations in common collection frameworks, it is impossible to iterate over their members. Consequentially, it is meaningless to request such an event set during a bsync. doing so will cause BPjs’ runtime engine to throw an error.
@@ -96,15 +52,22 @@ Having described the philosophers and chopsticks, it is now time to bring them a
 Discussion: The dining philosophers b-program described here can serve both as a simulation program and as a model to be checked. For simulation purposes, this b-program is run (see Section V), and its event log can be analyzed, e.g. to get statistics about stick wait times. For verification, the b-program
 is passed to a verification engine, as shown in Section VI.
 
-1 if (!PHILOSOPHER_COUNT) PHILOSOPHER_COUNT = 5;
-2
-3 for (var i=1; i<=PHILOSOPHER_COUNT; i++) {
-4 addStick(i);
-5 addPhil(i);
-6 }
-Listing 6. The loop instantiating a dining philosophers model. If
-PHILOSOPHER_COUNT was not passed by the containing Java application,
-it defaults to 5.
+
+.. literalinclude:: Examples_code/Phil_listing3.js
+  :linenos:
+  :language: javascript
+``Listing 6. The loop instantiating a dining philosophers model. If PHILOSOPHER_COUNT was not passed by the containing Java application, it defaults to 5.``
+
+
+
+
+
+
+
+
+
+
+
 Fig. 3. A maze, described using our maze-description DSL (left), and a maze
 solution, found by a generic b-program model checker (right). The model
 checker output, an event sequence, was post-processed by the program to
