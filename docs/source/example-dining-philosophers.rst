@@ -12,7 +12,7 @@ duplication. We now turn our attention to the chopsticks. In the modeled setting
 
 
 .. figure::  images/Phil_fig1.png
-   :align:   left
+   :align:   center
 
 ``Fig. 2. Dijkstra’s Dining Philosophers problem. Each two philosophers share the chopstick between them. In order to eat, a philosopher has to pick up both sticks. After eating, a philosopher releases the sticks and thinks. Since only a single philosopher can use a stick at any given moment, this setting poses many mutual exclusion challenges.``
 
