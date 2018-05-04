@@ -6,8 +6,9 @@ Example - Hot/Cold Bath
 
 This program models a system that fills a bath with six parts water: three cold, and three hot. There are two faucets in the system: one for hot water and one for cold. The system defines an event for activating each of these faucets: HOT causes the hot faucet to release a single part of water, and COLD has a similar effect on the cold water faucet. Listing 1 shows a naive controller program: it registers a single b-thread that requests the events at an arbitrary order. For the purpose of this program, we assume HOT and COLD are defined outside of the b-program itself, as they have to be known to the faucet physical controllers; BPjs offers an easy way of achieving this, and so the listed code is realistic.
 
-.. code:: bash
-  :number-lines:
+.. literalinclude:: Examples_code/HC_listing1.js
+  :linenos:
+  :language: javascript
 
 1 bp.registerBThread(function(){
 2 bsync({request:COLD});
