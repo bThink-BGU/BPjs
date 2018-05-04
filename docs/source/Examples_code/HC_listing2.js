@@ -1,11 +1,11 @@
 bp.registerBThread("add-hot", function(){
-	bsync({request:HOT});
-	bsync({request:HOT});
-	bsync({request:HOT});
+	bp.sync({request:HOT});
+	bp.sync({request:HOT});
+	bp.sync({request:HOT});
 });
 
 bp.registerBThread("add-cold", function(){
-	bsync({request:COLD});
-	bsync({request:COLD});
-	bsync({request:COLD});
+	bp.sync({request:COLD});
+	bp.sync({request:COLD});
+	bp.sync({request:COLD});
 });

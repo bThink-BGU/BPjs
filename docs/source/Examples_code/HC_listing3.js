@@ -1,6 +1,6 @@
 bp.registerBThread("control-temp", function() {
 	while ( true ) {
-		bsync({waitFor:COLD, block:HOT});
-		bsync({waitFor:HOT, block:COLD});
+		bp.sync({waitFor:COLD, block:HOT});
+		bp.sync({waitFor:HOT, block:COLD});
 	}
 });

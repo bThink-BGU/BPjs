@@ -1,5 +1,5 @@
 function addStartCell(col, row) {
 	bp.registerBThread("startCell", function() {
-		bsync({request: enterEvent(col,row)});
+		bp.sync({request: enterEvent(col,row)});
 	});
 }

@@ -10,12 +10,12 @@ function addStick(i) {
 					bp.Event("Rel"+j+"L")];
 
 		while (true) {
-			var e = bsync({waitFor: pickMe,
+			var e = bp.sync({waitFor: pickMe,
 					block: releaseMe});
 
 			var wt = (e.name === "Pick"+i+"R") ?
 					"Rel"+i+"R" : "Rel"+j+"L";
-			bsync({waitFor: bp.Event(wt),
+			bp.sync({waitFor: bp.Event(wt),
 				block: releaseMe});
 		}
 	});

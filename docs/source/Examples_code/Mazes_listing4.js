@@ -1,5 +1,5 @@
 function addWall(col, row) {
 	bp.registerBThread(function(){
-		bsync({block: enterEvent(col, row)});
+		bp.sync({block: enterEvent(col, row)});
 	});
 }

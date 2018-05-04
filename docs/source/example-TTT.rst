@@ -4,8 +4,11 @@ Example - Tic Tac Toe
 
 .. include example-TTT::
 
-This example is borrowed, with modifications, from [10]. Its main feature is that it presents the  concept of aligning bthreads to requirements. Meaning, each b-thread represents a rule, or a part of the tactics in the game of Tic-Tac-Toe.
-First, let us describe the (classical) game of Tic-Tac-Toe, and the events that represent the expected behaviors. Two players, X and O, alternately mark squares on a 3 _ 3 grid whose squares are identified by (row; column) pairs: (0; 0); (0; 1); : : : ; (2; 2). The winner is the player who manages to form a full horizontal, vertical, or diagonal line with three of his/her marks. If the entire grid becomes marked but no player has formed a line, the result is a draw. Below, we assume player X is played by a human user, and player O is played by the application.
+This example is borrowed, with modifications, from D. Harel, A. Marron, and G. Weiss - “Programming coordinated scenarios in java”. 
+Its main feature is that it presents the  concept of aligning bthreads to requirements. Meaning, each b-thread represents a rule, or a part of the tactics in the game of Tic-Tac-Toe. 
+
+First, let us describe the (classical) game of Tic-Tac-Toe, and the events that represent the expected behaviors. Two players, X and O, alternately mark squares on a 3 X 3 grid whose squares are identified by (row, column) pairs: (0, 0), (0, 1), . . . ,(2, 2). The winner is the player who manages to form a full horizontal, vertical, or diagonal line with three of his/her marks. If the entire grid becomes marked but no player has formed a line, the result is a draw. Below, we assume player X is played by a human user, and player O is played by the application.
+
 The goal of the programmer here is to implement the tactics for the O player such that the computer never loses. To check this main requirement, we use our model-checking tool that we will present soon. The game rules translate into b-threads as follows:
 
 .. literalinclude:: Examples_code/TTT_listing1.js
@@ -50,8 +53,7 @@ The goal of the programmer here is to implement the tactics for the O player suc
 
 ``Listing 7. A b-thread that implements the requirement that no moves are allowed once the game ends.``
 
-We now present the main part of the specification: a strategy for player O implemented by b-threads. While there are many implementations of strategies for this game, our approach here is to break the strategy to elements that correspond to the way parents teach their children how to win (or, at least,
-avoid losing) the game. Arguably, we claim that people do not usually use the minimax algorithm that most computers are programmed to apply. Instead, we argue that most people use some set of intuitive rules of thumb. An example of a set of such rules is modeled by the b-threads below.
+We now present the main part of the specification: a strategy for player O implemented by b-threads. While there are many implementations of strategies for this game, our approach here is to break the strategy to elements that correspond to the way parents teach their children how to win (or, at least, avoid losing) the game. Arguably, we claim that people do not usually use the minimax algorithm that most computers are programmed to apply. Instead, we argue that most people use some set of intuitive rules of thumb. An example of a set of such rules is modeled by the b-threads below.
 
 .. literalinclude:: Examples_code/TTT_listing8.js
   :linenos:
@@ -80,7 +82,7 @@ We proceed to describe the thumb-rules that relate to scenarios in the game:
 
 ``Listing 11. A b-thread that implements the thumb-rule of putting an O in a line with two other O’s, in order to win the game. Given a permutation p and a line l (row, column, or diagonal), the b-thread waits for two O events on the line, in the order specified by the permutation, and then requests to mark its final O.``
 
-Note that the priority of the AddThirdO b-thread is higher than the priority of PreventThirdX. This is because we prefer to win a game if possible.
+Note that the priority of the *AddThirdO* b-thread is higher than the priority of PreventThirdX. This is because we prefer to win a game if possible.
 
 .. literalinclude:: Examples_code/TTT_listing12.js
   :linenos:
@@ -88,7 +90,7 @@ Note that the priority of the AddThirdO b-thread is higher than the priority of 
 
 ``Listing 12. A b-thread that implements the thumb-rule of putting an O in a line with two X’s, in order to prevent a win of player X in the next move. Given a permutation p and a line l (row, column, or diagonal), the b-thread waits for two X events on the line, in the order specified by the permutation, and then requests to mark an O on the third square.``
 
-The last type of thumb-rules in our strategy handle the so called “fork situations”, when player X tries to complete two lines at the same time. We only list one of them here, the PreventFork00X b-thread, that identifies one of the three ‘fork situations’. There are three more similar b-threads to handle the other similar situations.
+The last type of thumb-rules in our strategy handle the so called “fork situations”, when player X tries to complete two lines at the same time. We only list one of them here, the *PreventFork00X* b-thread, that identifies one of the three ‘fork situations’. There are three more similar b-threads to handle the other similar situations.
 
 .. literalinclude:: Examples_code/TTT_listing13.js
   :linenos:
@@ -103,9 +105,8 @@ The last type of thumb-rules in our strategy handle the so called “fork situat
 ``Listing 14. A b-thread that implements the thumb-rule of preventing player X from completing two lines at the same time using one of the diagonals. Given a permutation p and a “fork situation diagonal’ f, the b-thread waits for two X events on the diagonal, in the order specified by the permutation, and then requests to mark an O on one of a given set of squares.``
 
 
-Notice that the b-threads in listings 3-5 and 20-26 involve the priority option so the application can best detect the situation its facing. For example, in listing 3-5, the DetectXWin and DetectOWin b-threads have priority 100 to ensure that the application detects these before it detects a draw. Also,
-in listing 11, the priority of AddThirdO is higher than that of PreventThirdX because we want the application to prefer to win the game over a draw, or worse, giving the user (player X) another possibility to win the game in the next round (in case of a fork situation). The priority number is passed as an additional data to the bsync request. The additional data field is a general mechanism that can be used to attach meta-tdata, such as priorities, to synchronization statements. This data can,
-as done here, be used by the event selection mechanism to guide its selections.
+Notice that the b-threads in listings 3-5 and 20-26 involve the priority option so the application can best detect the situation its facing. For example, in listing 3-5, the DetectXWin and DetectOWin b-threads have priority 100 to ensure that the application detects these before it detects a draw. Also, in listing 11, the priority of *AddThirdO* is higher than that of *PreventThirdX* because we want the application to prefer to win the game over a draw, or worse, giving the user (player X) another possibility to win the game in the next round (in case of a fork situation). The priority number is passed as an additional data to the ``bp.sync`` request. The additional data field is a general mechanism that can be used to attach meta-tdata, such as priorities, to synchronization statements. This data can, as done here, be used by the event selection mechanism to guide its selections.
+
 The Tic-Tac-Toe example shows that it is possible to maintain an intuitive one-to-one relation between requirements and b-threads. It also demonstrates the usage of a customized 
 event selection strategy, that takes priorities into account when selecting events.
 

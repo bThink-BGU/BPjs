@@ -1,8 +1,8 @@
 bp.registerBThread(function(){
-	bsync({request:COLD});
-	bsync({request:COLD});
-	bsync({request:COLD});
-	bsync({request:HOT});
-	bsync({request:HOT});
-	bsync({request:HOT});
+	bp.sync({request:COLD});
+	bp.sync({request:COLD});
+	bp.sync({request:COLD});
+	bp.sync({request:HOT});
+	bp.sync({request:HOT});
+	bp.sync({request:HOT});
 });

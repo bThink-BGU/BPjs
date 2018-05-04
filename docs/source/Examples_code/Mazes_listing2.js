@@ -1,6 +1,6 @@
 bp.registerBThread("target", function () {
-	bsync({waitFor: enterEvent(col, row)});
+	bp.sync({waitFor: enterEvent(col, row)});
 
-	bsync({request: TARGET_FOUND_EVENT,
+	bp.sync({request: TARGET_FOUND_EVENT,
 		block: bp.allExcept(TARGET_FOUND_EVENT)});
 });
