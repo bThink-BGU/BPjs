@@ -15,7 +15,7 @@ The goal of the programmer here is to implement the tactics for the O player suc
   :linenos:
   :language: javascript
 
-**Listing 1. A b-thread that implements the requirement that X and O play alternatively.**
+``Listing 1. A b-thread that implements the requirement that X and O play alternatively.``
 
 .. literalinclude:: Examples_code/TTT_listing2.js
   :linenos:
