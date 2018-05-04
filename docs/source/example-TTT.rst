@@ -15,7 +15,7 @@ The goal of the programmer here is to implement the tactics for the O player suc
   :linenos:
   :language: javascript
 
-``Listing 1. A b-thread that implements the requirement that X and O play alternatively.``
+|Listing 1. A b-thread that implements the requirement that X and O play alternatively.|
 
 .. literalinclude:: Examples_code/TTT_listing2.js
   :linenos:
@@ -82,7 +82,7 @@ We proceed to describe the thumb-rules that relate to scenarios in the game:
 
 ``Listing 11. A b-thread that implements the thumb-rule of putting an O in a line with two other O’s, in order to win the game. Given a permutation p and a line l (row, column, or diagonal), the b-thread waits for two O events on the line, in the order specified by the permutation, and then requests to mark its final O.``
 
-Note that the priority of the *AddThirdO* b-thread is higher than the priority of PreventThirdX. This is because we prefer to win a game if possible.
+Note that the priority of the *AddThirdO* b-thread is higher than the priority of *PreventThirdX*. This is because we prefer to win a game if possible.
 
 .. literalinclude:: Examples_code/TTT_listing12.js
   :linenos:
@@ -105,7 +105,8 @@ The last type of thumb-rules in our strategy handle the so called “fork situat
 ``Listing 14. A b-thread that implements the thumb-rule of preventing player X from completing two lines at the same time using one of the diagonals. Given a permutation p and a “fork situation diagonal’ f, the b-thread waits for two X events on the diagonal, in the order specified by the permutation, and then requests to mark an O on one of a given set of squares.``
 
 
-Notice that the b-threads in listings 3-5 and 20-26 involve the priority option so the application can best detect the situation its facing. For example, in listing 3-5, the DetectXWin and DetectOWin b-threads have priority 100 to ensure that the application detects these before it detects a draw. Also, in listing 11, the priority of *AddThirdO* is higher than that of *PreventThirdX* because we want the application to prefer to win the game over a draw, or worse, giving the user (player X) another possibility to win the game in the next round (in case of a fork situation). The priority number is passed as an additional data to the ``bp.sync`` request. The additional data field is a general mechanism that can be used to attach meta-tdata, such as priorities, to synchronization statements. This data can, as done here, be used by the event selection mechanism to guide its selections.
+Notice that the b-threads in listings 3-5 and 20-26 involve the priority option so the application can best detect the situation its facing. For example, in listing 3-5, the DetectXWin and DetectOWin b-threads have priority 100 to ensure that the application detects these before it detects a draw. 
+Also, in listing 11, the priority of *AddThirdO* is higher than that of *PreventThirdX* because we want the application to prefer to win the game over a draw, or worse, giving the user (player X) another possibility to win the game in the next round (in case of a fork situation). The priority number is passed as an additional data to the ``bp.sync`` request. The additional data field is a general mechanism that can be used to attach meta-tdata, such as priorities, to synchronization statements. This data can, as done here, be used by the event selection mechanism to guide its selections.
 
 The Tic-Tac-Toe example shows that it is possible to maintain an intuitive one-to-one relation between requirements and b-threads. It also demonstrates the usage of a customized 
 event selection strategy, that takes priorities into account when selecting events.
