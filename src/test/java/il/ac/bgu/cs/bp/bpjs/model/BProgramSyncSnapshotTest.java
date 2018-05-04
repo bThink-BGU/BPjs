@@ -25,16 +25,17 @@ package il.ac.bgu.cs.bp.bpjs.model;
 
 import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
+import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import static org.junit.Assert.*;
 
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.EventSelectionResult;
-import org.junit.Assert;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 
+import org.junit.Assert;
 import org.junit.Ignore;
 import org.junit.Rule;
 import org.junit.Test;
@@ -203,5 +204,15 @@ public class BProgramSyncSnapshotTest {
         assertNotEquals(step3a, step3b);
         assertNotEquals(step3a, step2a);
         assertNotEquals(step3b, step2a);
+    }
+  
+    @Test
+    public void complicatedScopeTests() throws InterruptedException {
+        BProgram program = new SingleResourceBProgram("nestedCalls.js");
+        program.putInGlobalScope("taskA", true);
+        program.putInGlobalScope("taskB", true);
+        program.putInGlobalScope("taskC", true);
+        BProgramRunner rnr = new BProgramRunner(program);
+        rnr.run();
     }
 }
