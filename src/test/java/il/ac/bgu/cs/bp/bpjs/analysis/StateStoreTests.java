@@ -87,23 +87,26 @@ public class StateStoreTests {
         assertTrue(storeToUse.isVisited(initial));
         Node next = initial;
         //Iteration 1,starts already at request state A
-        for (int i = 0; i < 4; i++) {
-            next = sut.getUnvisitedNextNode(next, execSvc);
-            storeToUse.store(next);
-        }
+        next = advance4Steps(storeToUse, execSvc, sut, next);
         snapshots.add(next);
-        assertTrue(storeToUse.isVisited(next));
-        for (int i = 0; i < 4; i++) {
-            next = sut.getUnvisitedNextNode(next, execSvc);
-            storeToUse.store(next);
-        }
+        next = advance4Steps(storeToUse, execSvc, sut, next);
         snapshots.add(next);
-        assertTrue(storeToUse.isVisited(next));
-        //now we want to compare specific states
+        // As a bonus, we can compare the specific snapshots to be equal, but this is not necessary
         BProgramSyncSnapshot state1 = snapshots.get(1).getSystemState();
         BProgramSyncSnapshot state2 = snapshots.get(2).getSystemState();
         assertNotEquals(state1, state2);
     }
+
+    private Node advance4Steps(VisitedStateStore storeToUse, ExecutorService execSvc, DfsBProgramVerifier sut, Node next) throws Exception {
+        for (int i = 0; i < 4; i++) {
+            next = sut.getUnvisitedNextNode(next, execSvc);
+            assertFalse(storeToUse.isVisited(next));
+            storeToUse.store(next);
+            assertTrue(storeToUse.isVisited(next));
+        }
+        return next;
+    }
+
 
     @Test
     public void StateStoreNoHashTestEqualJSVar() throws Exception {
@@ -118,7 +121,7 @@ public class StateStoreTests {
     }
 
     private void TestEqualJSVar(VisitedStateStore storeToUse) throws Exception {
-        BProgram program = new StringBProgram("bp.registerBThread(function(){\n" +
+        BProgram program =   new StringBProgram("bp.registerBThread(function(){\n" +
                 "    for ( var i=0; i<4; ) {\n" +
                 "        bp.sync({request:bp.Event(\"A\")});\n" +
                 "        bp.sync({request:bp.Event(\"B\")});\n" +
@@ -136,19 +139,28 @@ public class StateStoreTests {
         assertTrue(storeToUse.isVisited(initial));
         Node next = initial;
         //Iteration 1,starts already at request state A
+        //At this stage, each step is different from prior due to different bsync statement
         for (int i = 0; i < 4; i++) {
             next = sut.getUnvisitedNextNode(next, execSvc);
+            assertFalse(storeToUse.isVisited(next));
             storeToUse.store(next);
+            assertTrue(storeToUse.isVisited(next));
         }
         snapshots.add(next);
-        assertTrue(storeToUse.isVisited(next));
+
+        //However at this stage, each stage should actually be identical!
         for (int i = 0; i < 4; i++) {
             next = sut.getUnvisitedNextNode(next, execSvc);
+            assertTrue(storeToUse.isVisited(next));
             storeToUse.store(next);
         }
+        /* This should return true because the variable i is not incremented
+           So we should already have this event
+         */
+        assertTrue(storeToUse.isVisited(next));
         snapshots.add(next);
         assertTrue(storeToUse.isVisited(next));
-        //now we want to compare specific
+        // As a bonus, we can compare the specific snapshots to be equal, but this is not necessary
         BProgramSyncSnapshot state1 = snapshots.get(1).getSystemState();
         BProgramSyncSnapshot state2 = snapshots.get(2).getSystemState();
         assertEquals(state1, state2);
