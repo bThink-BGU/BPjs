@@ -166,5 +166,49 @@ public class StateStoreTests {
         assertEquals(state1, state2);
     }
 
-}
+    @Test
+    public void testNestedCallsNoHash() throws Exception {
+        VisitedStateStore noHash = new BThreadSnapshotVisitedStateStore();
+        TestBasicNestedCalls(noHash);
+    }
+    @Test
+    public void testNestedCallsHash() throws Exception {
+        VisitedStateStore hashStore = new HashVisitedStateStore();
+        TestBasicNestedCalls(hashStore);
+    }
 
+    private void TestBasicNestedCalls(VisitedStateStore storeToUse) throws Exception {
+        BProgram program = new SingleResourceBProgram("nestedCalls.js");
+        program.putInGlobalScope("taskA", true);
+        program.putInGlobalScope("taskB", false);
+        program.putInGlobalScope("taskC", false);
+
+        ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvcEqualJSVar");
+        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        List<Node> snapshots = new ArrayList<>();
+
+        Node initial = Node.getInitialNode(program, execSvc);
+        storeToUse.store(initial);
+        snapshots.add(initial);
+        assertTrue(storeToUse.isVisited(initial));
+        Node next = initial;
+        //Iteration 1,starts already at request state A
+        for (int i = 0; i < 3; i++) {
+            next = sut.getUnvisitedNextNode(next, execSvc);
+            storeToUse.store(next);
+        }
+        snapshots.add(next);
+        assertTrue(storeToUse.isVisited(next));
+        for (int i = 0; i < 3; i++) {
+            next = sut.getUnvisitedNextNode(next, execSvc);
+            storeToUse.store(next);
+        }
+        snapshots.add(next);
+        assertTrue(storeToUse.isVisited(next));
+        //now we want to compare specific
+        BProgramSyncSnapshot state1 = snapshots.get(1).getSystemState();
+        BProgramSyncSnapshot state2 = snapshots.get(2).getSystemState();
+        assertNotEquals(state1,state2);
+    }
+
+}
