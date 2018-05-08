@@ -25,7 +25,7 @@ The "Hello, World" version below (:download:`source <code/hello-world-seq.js>`) 
 
 This is not a very complicated example, but it does show a few basics worth mentioning. First, b-threads are normal javascript functions that take no parameters. They are added to the b-program using ``bp.registerBThread``. Note that the b-program is never explicitly started by the client code. Starting the b-program is done by BPjs for you.
 
-Lines 2 and 3 contains a very simple ``bp.sync`` statement, requesting an event. The events are created using the event factory ``bp.Event(...)``. This code uses the simple version of ``bp.Event``, passing the event name onely.
+Lines 2 and 3 contains a very simple ``bp.sync`` statement, requesting an event. The events are created using the event factory ``bp.Event(...)``. This code uses the simple version of ``bp.Event``, passing the event name only.
 We'll see more of ``bp.XXX`` and ``bp.sync`` soon, but first let's run this program and see what happens.
 
 

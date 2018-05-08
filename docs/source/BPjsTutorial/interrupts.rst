@@ -43,7 +43,7 @@ The "Oven" b-thread waits for a ``"Bake Start"`` event. When this event is selec
 
 The "baker" b-thread is a classic scenario, listing the stages of making a cake, once it's requested. Classic, except for the ``bp.sync`` at line 6, where the ``Cake Burnt`` event is declared to be interrupting. If, while waiting for the baking to complete, the cake burns, the baker terminates. Which is preferable to decorating and serving a burnt cake.
 
-.. note:: Interrupting events do not add new capabilities to BP. The can be modeled by adding them as a ``waitFor`` parameter to ``bp.sync``, and then examining whether it is a member of the interrupting event set. Still, declaring event as *interrupting* adds declarative expressiveness (which, in turn, aids program analysis), and is more convenient.
+.. note:: Interrupting events do not add new capabilities to BP. This can be modeled by adding them as a ``waitFor`` parameter to ``bp.sync``, and then examining whether it is a member of the interrupting event set. Still, declaring event as *interrupting* adds declarative expressiveness (which, in turn, aids program analysis), and is more convenient.
 
 Here's the output of an unsuccessful baking attempt:
 
@@ -71,9 +71,9 @@ Here's the output of an unsuccessful baking attempt:
 Final Acts of an Interrupted B-Thread
 --------------------------------------
 
-A b-thread can specify a handler function for interrupting events. This functions gets the interrupting event as a parameter.
+A b-thread can specify a handler function for interrupting events. If the b-thread is interrupted, that function is invoked, with the interrupting event as a parameter.
 
-The function can be used for clean up and logging, but as it is *not executed as a b-thread*, it **cannot call ``bp.sync``**. It can, however, enqueue events externally. Let's revisit the last example, and add enqueue a "sorry, no cake" event to inform the customer (:download:`source <code/interrupts-handler.js>`).
+The function can be used for clean up and logging, but as it is *not executed as a b-thread*, it **cannot call ``bp.sync``**. It can, however, enqueue events externally. Let's revisit the last example, and enqueue a "sorry, no cake" event to inform the customer (:download:`source <code/interrupts-handler.js>`). The enqueued event is presented to the b-program as an external event; this is because the interrupt handler is external to the b-program (as it is not a b-thread).
 
 .. literalinclude:: code/interrupts-handler.js
   :linenos:

@@ -2,7 +2,7 @@
 Adding B-Threads Dynamically
 ==============================
 
-Let's count to 4 in an arbitrary order! That is, let's have 4 events, labeled ``e0`` to ``e3``, and not care about the order in which the occur. For this, we need four b-threads, each requesting a numbered event. But since they all do the same, we might want to create them from a loop, like so:
+Let's count to 4 in an arbitrary order! That is, let's have 4 events, labeled ``e0`` to ``e3``, and not care about the order in which they occur. For this, we need four b-threads, each requesting a numbered event. But since they all do the same, we might want to create them from a loop, like so:
 
 .. literalinclude:: code/dynamic-bthread-bad.js
   :linenos:

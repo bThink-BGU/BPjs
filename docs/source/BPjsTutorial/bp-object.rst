@@ -26,7 +26,7 @@ Creates an event with name and possible data object.
 ``bp.EventSet(name, predicate)``
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Creates and event set: basically a named predicate that accepts events and returns ``true`` for set members.
+Creates an event set: basically a named predicate that accepts events and returns ``true`` for set members.
 
 * ``name``: Name of the event set. String.
 * ``predicate``: The set membership predicate. Function that takes one parameter (event) and returns boolean.
@@ -57,7 +57,7 @@ Provides access to the logger. See :doc:`logging`.
 ``bp.random``
 ~~~~~~~~~~~~~
 
-provides an access to a random number generator, sporting the following methods:
+provides an access to a random number generator, supporting the following methods:
 
 * ``bp.random.nextFloat()``: Generate a random number between 0 and 1.
 * ``bp.random.nextInt(bound)``: Generate a random number between 0 (inclusive) and ``bound`` (non-inclusive).
