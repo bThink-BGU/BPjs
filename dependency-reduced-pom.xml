@@ -62,7 +62,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>il.ac.bgu.cs.bp.bpjs.mains.BPJsCliRunner</mainClass>
+              <mainClass>il.ac.bgu.cs.bp.bpjs.mains.BPJsPicoliRunner</mainClass>
             </manifest>
           </archive>
         </configuration>
