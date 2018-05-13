@@ -4,6 +4,8 @@ Examples
 
 .. include examples::
 
+Here are some examples you can learn from:
+
 .. toctree::
    :maxdepth: 2
 
