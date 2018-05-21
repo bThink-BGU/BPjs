@@ -108,6 +108,12 @@
             <version>2.44.0</version>
         </dependency>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-csv</artifactId>
+            <version>1.5</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>com.opera</groupId>
             <artifactId>operadriver</artifactId>
             <scope>test</scope>
