@@ -156,7 +156,6 @@ public class SnapshotBenchmarks {
 
                 BProgram programToTest = makeBProgram(IMPLEMENTATION, valueMap);
                 programs[i] = programToTest;
-                //Cleanup GC before and after, opportunistic
                 //have to clone the object because BPrograms are not reusable
                 System.gc();
                 snapshotSet[i] = getStateSizes(makeBProgram(IMPLEMENTATION, valueMap));
@@ -249,8 +248,6 @@ public class SnapshotBenchmarks {
             }).toArray();
         }
     }
-
-
 
 
     /**
