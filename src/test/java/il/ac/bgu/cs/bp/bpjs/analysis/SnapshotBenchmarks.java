@@ -24,112 +24,138 @@ import java.util.stream.LongStream;
  */
 public class SnapshotBenchmarks {
 
-    private static String IMPLEMENTATION = "benchmarks/variableSizedArrays.js";
-    private static String TEST_NAME = "variableSizedArrays.js";
-    private static int INITIAL_ARRAY_SIZE = 1;
-    private static int ARRAY_STEP = 5; //Size of each step, how many objects are we adding
-    private static int NUM_STEPS = 10; // How many steps to take
-    private static int OBJECT_TYPE = 0; //Set for integer
-    private static int ITERATIONS = 5;
+
+    private static int ITERATIONS = 15;
 
     public static void main(String[] args) throws Exception {
 
-        BenchmarkResult integerResults = measureIntegerSizes();
-
-        BenchmarkResult objectResults = measureObjectSize();
-        outputBenchResults(integerResults);
-        outputBenchResults(objectResults);
+        VariableSizedArraysBenchmark.benchmarkVariableSizedArrays();
     }
 
-    private static void outputBenchResults(BenchmarkResult result) throws IOException {
-        result.outputMemoryStats();
-        result.outputTimes();
-        result.outputToCsv(Paths.get("."));
-    }
 
-    private static BenchmarkResult measureIntegerSizes() throws Exception {
-        System.out.println("Measuring effect of integer size");
-        return measureProgram(0);
-    }
 
-    private static BenchmarkResult measureObjectSize() throws Exception {
-        System.out.println("Measuring effect of object size");
-        return measureProgram(1);
-    }
+    /*
+        This benchmarks a program of variableSizedArrays
+        For verification time benchmarks, each test is run ITERATIONS times, with a larger array step every time.
+            These should be pretty much identical
+        For snapshot size benchmarks, each test is run once, and we measure the snapshot size for each step.
+            Snapshot size should grow linearly.
+     */
+    static class VariableSizedArraysBenchmark{
+        private static String IMPLEMENTATION = "benchmarks/variableSizedArrays.js";
+        private static String TEST_NAME = "variableSizedArrays.js";
+        private static int INITIAL_ARRAY_SIZE = 1;
+        private static int ARRAY_STEP = 5; //Size of each step, how many objects are we adding
+        private static int NUM_STEPS = 10; // How many steps to take
 
-    private static BenchmarkResult measureProgram(int object_type) throws Exception {
-        VisitedStateStore store = new BProgramStateVisitedStateStore();
-        DfsBProgramVerifier verifier = new DfsBProgramVerifier();
-        verifier.setVisitedNodeStore(store);
 
-        /*
-            Test for variable num_steps
-            we want to see if there's a non linear increase in snapshot size
-         */
-        int[][] snapshotSet = new int[ITERATIONS][];
-        long[][] verificationTimes = new long[ITERATIONS][];
-        BProgram[] programs = new BProgram[ITERATIONS];
-        for (int i = 0; i < ITERATIONS; i++) {
-            System.out.printf("Measuring for array step of %d size\n", ARRAY_STEP + i);
-            BProgram programToTest = makeBProgram(INITIAL_ARRAY_SIZE, ARRAY_STEP + i, NUM_STEPS, object_type);
-            programs[i] = programToTest;
-            //have to clone the object because BPrograms are not reusable
-            snapshotSet[i] = getStateSizes(makeBProgram(INITIAL_ARRAY_SIZE, ARRAY_STEP + i, NUM_STEPS, OBJECT_TYPE));
-            verificationTimes[i] = getVerificationTime(verifier,INITIAL_ARRAY_SIZE, ARRAY_STEP + i, NUM_STEPS, object_type,ITERATIONS);
+        static void benchmarkVariableSizedArrays() throws Exception {
+            BenchmarkResult integerResults = measureIntegerSizes();
+
+            BenchmarkResult objectResults = measureObjectSize();
+            outputBenchResults(integerResults);
+            outputBenchResults(objectResults);
+        }
+
+
+        private static void outputBenchResults(BenchmarkResult result) throws IOException {
+            result.outputMemoryStats();
+            result.outputTimes();
+            result.outputToCsv(Paths.get("."));
+        }
+
+        private static BenchmarkResult measureIntegerSizes() throws Exception {
+            System.out.println("Measuring effect of integer size");
+            return measureProgram(0);
+        }
+
+        private static BenchmarkResult measureObjectSize() throws Exception {
+            System.out.println("Measuring effect of object size");
+            return measureProgram(1);
+        }
+
+        private static BenchmarkResult measureProgram(int object_type) throws Exception {
+            VisitedStateStore store = new BProgramStateVisitedStateStore();
+            DfsBProgramVerifier verifier = new DfsBProgramVerifier();
+            verifier.setVisitedNodeStore(store);
+            String testName = TEST_NAME + ((object_type==1) ? "object" : "integer");
+            /*
+                Test for variable num_steps
+                we want to see if there's a non linear increase in snapshot size
+             */
+            int[][] snapshotSet = new int[ITERATIONS][];
+            long[][] verificationTimes = new long[ITERATIONS][];
+            BProgram[] programs = new BProgram[ITERATIONS];
+            for (int i = 0; i < ITERATIONS; i++) {
+                System.out.printf("Measuring for array step of %d size\n", ARRAY_STEP + i);
+                BProgram programToTest = makeBProgram(INITIAL_ARRAY_SIZE, ARRAY_STEP + i, NUM_STEPS, object_type);
+                programs[i] = programToTest;
+                //have to clone the object because BPrograms are not reusable
+                snapshotSet[i] = getStateSizes(makeBProgram(INITIAL_ARRAY_SIZE, ARRAY_STEP + i, NUM_STEPS, object_type));
+                verificationTimes[i] = getVerificationTime(verifier,INITIAL_ARRAY_SIZE, ARRAY_STEP + i, NUM_STEPS, object_type,ITERATIONS);
+
+            }
+
+            return new BenchmarkResult(testName,programs,snapshotSet, verificationTimes);
+        }
+
+
+        private static BProgram makeBProgram(int init_array_size, int array_step, int num_steps, int object_type) {
+            // prepare b-program
+            final BProgram bprog = new SingleResourceBProgram(IMPLEMENTATION);
+            bprog.putInGlobalScope("INITIAL_ARRAY_SIZE", init_array_size);
+            bprog.putInGlobalScope("ARRAY_STEP", array_step);
+            bprog.putInGlobalScope("NUM_STEPS", num_steps);
+            bprog.putInGlobalScope("OBJECT_TYPE", object_type);
+            String name = String.format("%s_init_%d_stepSize_%d_numSteps_%d_type_%d", bprog.getName(), init_array_size, array_step, num_steps, object_type);
+            bprog.setName(name);
+            return bprog;
+        }
+
+
+        private static int[] getStateSizes(BProgram program) throws Exception {
+            ExecutorService execSvc = ExecutorServiceMaker.makeWithName("SnapshotStore");
+            DfsBProgramVerifier sut = new DfsBProgramVerifier();
+            List<Node> snapshots = new ArrayList<>();
+
+            Node initial = Node.getInitialNode(program, execSvc);
+
+            snapshots.add(initial);
+            Node next = initial;
+            //Iteration 1,starts already at request state A
+            for (int i = 0; i < NUM_STEPS; i++) {
+                next = sut.getUnvisitedNextNode(next, execSvc);
+                snapshots.add(next);
+            }
+            BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(program);
+            execSvc.shutdown();
+
+            return snapshots.stream().map(node -> {
+                try {
+                    return io.serialize(node.getSystemState());
+                } catch (IOException e) {
+                    return new byte[0];
+                }
+            }).mapToInt(serializedSnap -> serializedSnap.length).toArray();
 
         }
-        return new BenchmarkResult(TEST_NAME+"object",programs,snapshotSet, verificationTimes);
-    }
 
+        private static long[] getVerificationTime( DfsBProgramVerifier vfr, int init_array_size, int array_step, int num_steps, int object_type, int iteration_count) {
 
-    private static BProgram makeBProgram(int init_array_size, int array_step, int num_steps, int object_type) {
-        // prepare b-program
-        final BProgram bprog = new SingleResourceBProgram(IMPLEMENTATION);
-        bprog.putInGlobalScope("INITIAL_ARRAY_SIZE", init_array_size);
-        bprog.putInGlobalScope("ARRAY_STEP", array_step);
-        bprog.putInGlobalScope("NUM_STEPS", num_steps);
-        bprog.putInGlobalScope("OBJECT_TYPE", object_type);
-        String name = String.format("%s_init_%d_stepSize_%d_numSteps_%d_type_%d", bprog.getName(), init_array_size, array_step, num_steps, object_type);
-        bprog.setName(name);
-        return bprog;
-    }
-
-
-    private static int[] getStateSizes(BProgram program) throws Exception {
-        ExecutorService execSvc = ExecutorServiceMaker.makeWithName("SnapshotStore");
-        DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        List<Node> snapshots = new ArrayList<>();
-
-        Node initial = Node.getInitialNode(program, execSvc);
-
-        snapshots.add(initial);
-        Node next = initial;
-        //Iteration 1,starts already at request state A
-        for (int i = 0; i < NUM_STEPS; i++) {
-            next = sut.getUnvisitedNextNode(next, execSvc);
-            snapshots.add(next);
+            return LongStream.range(0, iteration_count).map(i -> {
+                try {
+                    VerificationResult res = vfr.verify(makeBProgram(init_array_size,array_step,num_steps,object_type));
+                    return res.getTimeMillies();
+                } catch (Exception e) {
+                    return 0;
+                }
+            }).toArray();
         }
-        BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(snapshots.get(0).getSystemState().getBProgram());
-        return snapshots.stream().map(node -> {
-            try {
-                return io.serialize(node.getSystemState());
-            } catch (IOException e) {
-                return new byte[0];
-            }
-        }).mapToInt(serializedSnap -> serializedSnap.length).toArray();
+
+
     }
 
-    private static long[] getVerificationTime( DfsBProgramVerifier vfr, int init_array_size, int array_step, int num_steps, int object_type, int iteration_count) {
 
-        return LongStream.range(0, iteration_count).map(i -> {
-            try {
-                VerificationResult res = vfr.verify(makeBProgram(init_array_size,array_step,num_steps,object_type));
-                return res.getTimeMillies();
-            } catch (Exception e) {
-                return 0;
-            }
-        }).toArray();
-    }
 
 
     /**
@@ -141,7 +167,7 @@ public class SnapshotBenchmarks {
         final int[][] snapshotSizes;
         final long[][] verificationTimes;
 
-        final String[] VERIFICATION_HEADERS = {"Run instance", "time"};
+        final ArrayList<String> verificationHeaders = new ArrayList<>(Collections.singletonList("Iteration count"));
         final ArrayList<String> snapshot_headers = new ArrayList<>(Collections.singletonList("Run instance"));
 
         BenchmarkResult(String name, BProgram[] programs, int[][] snapshotSizes, long[][] verificationTimes) {
@@ -151,6 +177,7 @@ public class SnapshotBenchmarks {
             this.verificationTimes = verificationTimes;
             //assume they're all identical, they better be
             IntStream.range(0, this.snapshotSizes[0].length).forEach(i -> snapshot_headers.add("raw " + i));
+            IntStream.range(0, this.verificationTimes[0].length).forEach(i -> verificationHeaders.add("raw " + i));
         }
 
         void outputMemoryStats() {
@@ -158,7 +185,7 @@ public class SnapshotBenchmarks {
         }
 
         void outputMemoryStats(int num_final_steps) {
-            for (int i = NUM_STEPS - num_final_steps; i < NUM_STEPS; i++) {
+            for (int i = snapshotSizes[0].length - num_final_steps; i < snapshotSizes[0].length; i++) {
                 final int currentStep = i;
                 IntSummaryStatistics stats = Arrays.stream(snapshotSizes).mapToInt(x -> x[currentStep]).summaryStatistics();
                 int min = stats.getMin();
@@ -190,7 +217,7 @@ public class SnapshotBenchmarks {
         /**
          * Outputs to benchName+X csv files of the raw memory and CPU times
          * @param basePath Directory where to write the results
-         * @throws IOException in case of IO failure
+         * @throws IOException in case of IO fחailure
          */
         void outputToCsv(Path basePath) throws IOException {
 
@@ -201,7 +228,7 @@ public class SnapshotBenchmarks {
         void outputTimesToCsv(Path filePath) throws IOException {
             BufferedWriter out = Files.newBufferedWriter(filePath);
             try (CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT
-                    .withHeader(VERIFICATION_HEADERS))) {
+                    .withHeader(verificationHeaders.toArray(new String[0])))) {
                 for (int i = 0; i < verificationTimes.length; i++) {
                     Object[] toPrint = new Object[verificationTimes[i].length+1];
                     toPrint[0] = i;
