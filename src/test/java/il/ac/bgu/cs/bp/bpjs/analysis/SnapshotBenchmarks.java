@@ -4,6 +4,7 @@ import il.ac.bgu.cs.bp.bpjs.analysis.bprogramio.BProgramSyncSnapshotIO;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.eventselection.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
 
@@ -25,11 +26,12 @@ import java.util.stream.LongStream;
 public class SnapshotBenchmarks {
 
 
-    private static int ITERATIONS = 15;
+    private static int ITERATIONS = 10;
 
     public static void main(String[] args) throws Exception {
 
         VariableSizedArraysBenchmark.benchmarkVariableSizedArrays();
+        EventSelectionBenchmark.benchmarkEventSelection();
     }
 
 
@@ -42,7 +44,7 @@ public class SnapshotBenchmarks {
      */
     static class VariableSizedArraysBenchmark {
         private static String IMPLEMENTATION = "benchmarks/variableSizedArrays.js";
-        private static String TEST_NAME = "variableSizedArrays.js";
+        private static String TEST_NAME = "variableSizedArrays";
         private static int INITIAL_ARRAY_SIZE = 1;
         private static int ARRAY_STEP = 5; //Size of each step, how many objects are we adding
         private static int NUM_STEPS = 10; // How many steps to take
@@ -162,6 +164,115 @@ public class SnapshotBenchmarks {
 
     }
 
+    static class EventSelectionBenchmark {
+        private static String IMPLEMENTATION = "benchmarks/eventSelection.js";
+        private static String TEST_NAME = "eventSelection";
+        private static int INITIAL_ARRAY_SIZE = 1;
+        private static int ARRAY_STEP = 5; //Size of each step, how many objects are we adding
+        private static int NUM_STEPS = 10; // How many steps to take
+
+        static void benchmarkEventSelection() throws Exception {
+            BenchmarkResult simpleEventSelectionResults = measureProgram(new SimpleEventSelectionStrategy());
+            BenchmarkResult orderedEventSelectionResults = measureProgram(new OrderedEventSelectionStrategy());
+            //BenchmarkResult PrioritizedBSyncEventSelectionResults = measureProgram(new PrioritizedBSyncEventSelectionStrategy());
+            //BenchmarkResult PrioritizedBThreadsEventSelectionResults = measureProgram(new PrioritizedBThreadsEventSelectionStrategy());
+
+            outputBenchResults(simpleEventSelectionResults);
+            outputBenchResults(orderedEventSelectionResults);
+        }
+
+
+        private static void outputBenchResults(BenchmarkResult result) throws IOException {
+            //result.outputMemoryStats();
+            result.outputTimes();
+            result.outputToCsv(Paths.get("."));
+        }
+
+        private static BenchmarkResult measureProgram(EventSelectionStrategy strategy) throws Exception {
+            VisitedStateStore store = new BThreadSnapshotVisitedStateStore();
+            DfsBProgramVerifier verifier = new DfsBProgramVerifier();
+            verifier.setVisitedNodeStore(store);
+
+            /*
+                Test for variable num_steps
+                we want to see if there's a non linear increase in snapshot size
+             */
+            int[][] snapshotSet = new int[ITERATIONS][];
+            long[][] verificationTimes = new long[ITERATIONS][];
+            long[][] verificationTimesHash = new long[ITERATIONS][];
+            BProgram[] programs = new BProgram[ITERATIONS];
+            for (int i = 0; i < ITERATIONS; i++) {
+                System.out.printf("Measuring for array step of %d size\n", ARRAY_STEP + i);
+                //Initial copy
+                BProgram programToTest = makeBProgram(INITIAL_ARRAY_SIZE, ARRAY_STEP + i, NUM_STEPS, strategy);
+                programs[i] = programToTest;
+                //Cleanup GC before and after, opportunistic
+                //have to clone the program because BPrograms are not reusable
+                System.gc();
+                snapshotSet[i] = getStateSizes(makeBProgram(INITIAL_ARRAY_SIZE, ARRAY_STEP + i, NUM_STEPS, strategy));
+                System.gc();
+                verificationTimes[i] = getVerificationTime(verifier, INITIAL_ARRAY_SIZE, ARRAY_STEP + i, NUM_STEPS, strategy, ITERATIONS);
+                verificationTimesHash[i] = getVerificationTime(verifier, INITIAL_ARRAY_SIZE, ARRAY_STEP + i, NUM_STEPS, strategy, ITERATIONS);
+                System.gc();
+
+            }
+
+            return new BenchmarkResult(TEST_NAME+strategy.getClass().getName(), programs, snapshotSet, verificationTimes, verificationTimesHash);
+        }
+
+
+        private static BProgram makeBProgram(int init_array_size, int array_step, int num_steps, EventSelectionStrategy strategy) {
+            // prepare b-program
+            final BProgram bprog = new SingleResourceBProgram(IMPLEMENTATION);
+            bprog.putInGlobalScope("INITIAL_ARRAY_SIZE", init_array_size);
+            bprog.putInGlobalScope("ARRAY_STEP", array_step);
+            bprog.putInGlobalScope("NUM_STEPS", num_steps);
+            String name = String.format("%s_strategy_%s_init_%d_stepSize_%d_numSteps_%d", bprog.getName(), strategy.getClass().getName(), init_array_size, array_step, num_steps);
+            bprog.setName(name);
+            bprog.setEventSelectionStrategy(strategy);
+            return bprog;
+        }
+
+
+        private static int[] getStateSizes(BProgram program) throws Exception {
+            ExecutorService execSvc = ExecutorServiceMaker.makeWithName("SnapshotStore");
+            DfsBProgramVerifier sut = new DfsBProgramVerifier();
+            List<Node> snapshots = new ArrayList<>();
+
+            Node initial = Node.getInitialNode(program, execSvc);
+
+            snapshots.add(initial);
+            Node next = initial;
+            //Iteration 1,starts already at request state A
+            for (int i = 0; i < NUM_STEPS; i++) {
+                next = sut.getUnvisitedNextNode(next, execSvc);
+                snapshots.add(next);
+            }
+            BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(program);
+            execSvc.shutdown();
+
+            return snapshots.stream().map(node -> {
+                try {
+                    return io.serialize(node.getSystemState());
+                } catch (IOException e) {
+                    return new byte[0];
+                }
+            }).mapToInt(serializedSnap -> serializedSnap.length).toArray();
+
+        }
+
+        private static long[] getVerificationTime(DfsBProgramVerifier vfr, int init_array_size, int array_step, int num_steps, EventSelectionStrategy strategy, int iteration_count) {
+
+            return LongStream.range(0, iteration_count).map(i -> {
+                try {
+                    VerificationResult res = vfr.verify(makeBProgram(init_array_size, array_step, num_steps, strategy));
+                    return res.getTimeMillies();
+                } catch (Exception e) {
+                    return 0;
+                }
+            }).toArray();
+        }
+    }
 
     /**
      * This consolidates benchmark results, not generic enough yet
