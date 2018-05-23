@@ -29,11 +29,73 @@ public class SnapshotBenchmarks {
     private static int ITERATIONS = 10;
 
     public static void main(String[] args) throws Exception {
-
         VariableSizedArraysBenchmark.benchmarkVariableSizedArrays();
         EventSelectionBenchmark.benchmarkEventSelection();
     }
 
+    static abstract class Benchmark {
+        static String IMPLEMENTATION = "TESTFILE.js";
+        static String TEST_NAME = "TESTNAME";
+        static int INITIAL_ARRAY_SIZE = 1;
+        static int ARRAY_STEP = 5; //Size of each step, how many objects are we adding
+        static int NUM_STEPS = 10; // How many steps to take
+
+
+        static void outputBenchResults(BenchmarkResult result) throws IOException {
+            result.outputMemoryStats();
+            result.outputTimes();
+            result.outputToCsv(Paths.get("."));
+        }
+
+        static BProgram makeBProgram(int init_array_size, int array_step, int num_steps) {
+            // prepare b-program
+            final BProgram bprog = new SingleResourceBProgram(IMPLEMENTATION);
+            bprog.putInGlobalScope("INITIAL_ARRAY_SIZE", init_array_size);
+            bprog.putInGlobalScope("ARRAY_STEP", array_step);
+            bprog.putInGlobalScope("NUM_STEPS", num_steps);
+            String name = String.format("%s_init_%d_stepSize_%d_numSteps_%d", bprog.getName(), init_array_size, array_step, num_steps);
+            bprog.setName(name);
+            return bprog;
+        }
+
+
+        static int[] getStateSizes(BProgram program) throws Exception {
+            System.out.println("Measuring state size");
+            ExecutorService execSvc = ExecutorServiceMaker.makeWithName("SnapshotStore");
+            DfsBProgramVerifier sut = new DfsBProgramVerifier();
+            List<Node> snapshots = new ArrayList<>();
+
+            Node initial = Node.getInitialNode(program, execSvc);
+
+            snapshots.add(initial);
+            Node next = initial;
+            //Iteration 1,starts already at request state A
+            for (int i = 0; i < NUM_STEPS; i++) {
+                next = sut.getUnvisitedNextNode(next, execSvc);
+                snapshots.add(next);
+            }
+            BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(program);
+            execSvc.shutdown();
+
+            return snapshots.stream().map(node -> {
+                try {
+                    return io.serialize(node.getSystemState());
+                } catch (IOException e) {
+                    return new byte[0];
+                }
+            }).mapToInt(serializedSnap -> serializedSnap.length).toArray();
+
+        }
+
+        static long getVerificationTime(DfsBProgramVerifier vfr, BProgram prog) {
+            try {
+                VerificationResult res = vfr.verify(prog);
+                return res.getTimeMillies();
+            } catch (Exception e) {
+                return 0;
+            }
+        }
+    }
 
     /*
         This benchmarks a program of variableSizedArrays
@@ -42,12 +104,12 @@ public class SnapshotBenchmarks {
         For snapshot size benchmarks, each test is run once, and we measure the snapshot size for each step.
             Snapshot size should grow linearly.
      */
-    static class VariableSizedArraysBenchmark {
-        private static String IMPLEMENTATION = "benchmarks/variableSizedArrays.js";
-        private static String TEST_NAME = "variableSizedArrays";
-        private static int INITIAL_ARRAY_SIZE = 1;
-        private static int ARRAY_STEP = 5; //Size of each step, how many objects are we adding
-        private static int NUM_STEPS = 10; // How many steps to take
+    static class VariableSizedArraysBenchmark extends Benchmark {
+        static String IMPLEMENTATION = "benchmarks/variableSizedArrays.js";
+        static String TEST_NAME = "variableSizedArrays";
+        static int INITIAL_ARRAY_SIZE = 1;
+        static int ARRAY_STEP = 5; //Size of each step, how many objects are we adding
+        static int NUM_STEPS = 10; // How many steps to take
 
 
         static void benchmarkVariableSizedArrays() throws Exception {
@@ -59,11 +121,18 @@ public class SnapshotBenchmarks {
         }
 
 
-        private static void outputBenchResults(BenchmarkResult result) throws IOException {
-            result.outputMemoryStats();
-            result.outputTimes();
-            result.outputToCsv(Paths.get("."));
+        static BProgram makeBProgram(int init_array_size, int array_step, int num_steps, int object_type) {
+            // prepare b-program
+            final BProgram bprog = new SingleResourceBProgram(IMPLEMENTATION);
+            bprog.putInGlobalScope("INITIAL_ARRAY_SIZE", init_array_size);
+            bprog.putInGlobalScope("ARRAY_STEP", array_step);
+            bprog.putInGlobalScope("NUM_STEPS", num_steps);
+            bprog.putInGlobalScope("OBJECT_TYPE", object_type);
+            String name = String.format("%s_init_%d_stepSize_%d_numSteps_%d_type_%d", bprog.getName(), init_array_size, array_step, num_steps, object_type);
+            bprog.setName(name);
+            return bprog;
         }
+
 
         private static BenchmarkResult measureIntegerSizes() throws Exception {
             System.out.println("Measuring effect of integer size");
@@ -108,68 +177,22 @@ public class SnapshotBenchmarks {
             return new BenchmarkResult(testName, programs, snapshotSet, verificationTimes, verificationTimesHash);
         }
 
-
-        private static BProgram makeBProgram(int init_array_size, int array_step, int num_steps, int object_type) {
-            // prepare b-program
-            final BProgram bprog = new SingleResourceBProgram(IMPLEMENTATION);
-            bprog.putInGlobalScope("INITIAL_ARRAY_SIZE", init_array_size);
-            bprog.putInGlobalScope("ARRAY_STEP", array_step);
-            bprog.putInGlobalScope("NUM_STEPS", num_steps);
-            bprog.putInGlobalScope("OBJECT_TYPE", object_type);
-            String name = String.format("%s_init_%d_stepSize_%d_numSteps_%d_type_%d", bprog.getName(), init_array_size, array_step, num_steps, object_type);
-            bprog.setName(name);
-            return bprog;
-        }
-
-
-        private static int[] getStateSizes(BProgram program) throws Exception {
-            ExecutorService execSvc = ExecutorServiceMaker.makeWithName("SnapshotStore");
-            DfsBProgramVerifier sut = new DfsBProgramVerifier();
-            List<Node> snapshots = new ArrayList<>();
-
-            Node initial = Node.getInitialNode(program, execSvc);
-
-            snapshots.add(initial);
-            Node next = initial;
-            //Iteration 1,starts already at request state A
-            for (int i = 0; i < NUM_STEPS; i++) {
-                next = sut.getUnvisitedNextNode(next, execSvc);
-                snapshots.add(next);
-            }
-            BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(program);
-            execSvc.shutdown();
-
-            return snapshots.stream().map(node -> {
-                try {
-                    return io.serialize(node.getSystemState());
-                } catch (IOException e) {
-                    return new byte[0];
-                }
-            }).mapToInt(serializedSnap -> serializedSnap.length).toArray();
-
-        }
-
-        private static long[] getVerificationTime(DfsBProgramVerifier vfr, int init_array_size, int array_step, int num_steps, int object_type, int iteration_count) {
+        static long[] getVerificationTime(DfsBProgramVerifier vfr, int init_array_size, int array_step, int num_steps, int object_type, int iteration_count) {
 
             return LongStream.range(0, iteration_count).map(i -> {
-                try {
-                    VerificationResult res = vfr.verify(makeBProgram(init_array_size, array_step, num_steps, object_type));
-                    return res.getTimeMillies();
-                } catch (Exception e) {
-                    return 0;
-                }
+                BProgram prog = makeBProgram(init_array_size, array_step, num_steps, object_type);
+                return getVerificationTime(vfr, prog);
             }).toArray();
         }
 
-
     }
 
-    static class EventSelectionBenchmark {
-        private static String IMPLEMENTATION = "benchmarks/eventSelection.js";
-        private static String TEST_NAME = "eventSelection";
-        private static int INITIAL_ARRAY_SIZE = 1;
-        private static int ARRAY_STEP = 5; //Size of each step, how many objects are we adding
-        private static int NUM_STEPS = 10; // How many steps to take
+    static class EventSelectionBenchmark extends Benchmark {
+        static String IMPLEMENTATION = "benchmarks/eventSelection.js";
+        static String TEST_NAME = "eventSelection";
+        static int INITIAL_ARRAY_SIZE = 1;
+        static int ARRAY_STEP = 5; //Size of each step, how many objects are we adding
+        static int NUM_STEPS = 10; // How many steps to take
 
         static void benchmarkEventSelection() throws Exception {
             BenchmarkResult simpleEventSelectionResults = measureProgram(new SimpleEventSelectionStrategy());
@@ -181,12 +204,6 @@ public class SnapshotBenchmarks {
             outputBenchResults(orderedEventSelectionResults);
         }
 
-
-        private static void outputBenchResults(BenchmarkResult result) throws IOException {
-            //result.outputMemoryStats();
-            result.outputTimes();
-            result.outputToCsv(Paths.get("."));
-        }
 
         private static BenchmarkResult measureProgram(EventSelectionStrategy strategy) throws Exception {
             VisitedStateStore store = new BProgramStateVisitedStateStore();
@@ -217,7 +234,7 @@ public class SnapshotBenchmarks {
 
             }
 
-            return new BenchmarkResult(TEST_NAME+strategy.getClass().getName(), programs, snapshotSet, verificationTimes, verificationTimesHash);
+            return new BenchmarkResult(TEST_NAME + strategy.getClass().getName(), programs, snapshotSet, verificationTimes, verificationTimesHash);
         }
 
 
@@ -234,42 +251,11 @@ public class SnapshotBenchmarks {
         }
 
 
-        private static int[] getStateSizes(BProgram program) throws Exception {
-            ExecutorService execSvc = ExecutorServiceMaker.makeWithName("SnapshotStore");
-            DfsBProgramVerifier sut = new DfsBProgramVerifier();
-            List<Node> snapshots = new ArrayList<>();
-
-            Node initial = Node.getInitialNode(program, execSvc);
-
-            snapshots.add(initial);
-            Node next = initial;
-            //Iteration 1,starts already at request state A
-            for (int i = 0; i < NUM_STEPS; i++) {
-                next = sut.getUnvisitedNextNode(next, execSvc);
-                snapshots.add(next);
-            }
-            BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(program);
-            execSvc.shutdown();
-
-            return snapshots.stream().map(node -> {
-                try {
-                    return io.serialize(node.getSystemState());
-                } catch (IOException e) {
-                    return new byte[0];
-                }
-            }).mapToInt(serializedSnap -> serializedSnap.length).toArray();
-
-        }
-
         private static long[] getVerificationTime(DfsBProgramVerifier vfr, int init_array_size, int array_step, int num_steps, EventSelectionStrategy strategy, int iteration_count) {
-
+            System.out.println("Measuring verification time");
             return LongStream.range(0, iteration_count).map(i -> {
-                try {
-                    VerificationResult res = vfr.verify(makeBProgram(init_array_size, array_step, num_steps, strategy));
-                    return res.getTimeMillies();
-                } catch (Exception e) {
-                    return 0;
-                }
+                BProgram prog = makeBProgram(init_array_size, array_step, num_steps, strategy);
+                return getVerificationTime(vfr, prog);
             }).toArray();
         }
     }
