@@ -47,14 +47,12 @@ public class SnapshotBenchmarks {
             result.outputToCsv(Paths.get("."));
         }
 
-        static BProgram makeBProgram(int init_array_size, int array_step, int num_steps) {
-            // prepare b-program
-            final BProgram bprog = new SingleResourceBProgram(IMPLEMENTATION);
-            bprog.putInGlobalScope("INITIAL_ARRAY_SIZE", init_array_size);
-            bprog.putInGlobalScope("ARRAY_STEP", array_step);
-            bprog.putInGlobalScope("NUM_STEPS", num_steps);
-            String name = String.format("%s_init_%d_stepSize_%d_numSteps_%d", bprog.getName(), init_array_size, array_step, num_steps);
-            bprog.setName(name);
+        static BProgram makeBProgram(String baseFile, Map<String, Object> init_values) {
+            final BProgram bprog = new SingleResourceBProgram(baseFile);
+            init_values.forEach(bprog::putInGlobalScope);
+            StringBuilder name = new StringBuilder(bprog.getName());
+            init_values.forEach((k, v) -> name.append(String.format("_%s_%s", k, v)));
+            bprog.setName(name.toString());
             return bprog;
         }
 
@@ -95,6 +93,13 @@ public class SnapshotBenchmarks {
                 return 0;
             }
         }
+
+        static long[] getVerificationTime(DfsBProgramVerifier vfr, String programPath, Map<String, Object> valueMap, int iteration_count) {
+            return LongStream.range(0, iteration_count).map(i -> {
+                BProgram prog = makeBProgram(programPath, valueMap);
+                return getVerificationTime(vfr, prog);
+            }).toArray();
+        }
     }
 
     /*
@@ -119,20 +124,6 @@ public class SnapshotBenchmarks {
             outputBenchResults(integerResults);
             outputBenchResults(objectResults);
         }
-
-
-        static BProgram makeBProgram(int init_array_size, int array_step, int num_steps, int object_type) {
-            // prepare b-program
-            final BProgram bprog = new SingleResourceBProgram(IMPLEMENTATION);
-            bprog.putInGlobalScope("INITIAL_ARRAY_SIZE", init_array_size);
-            bprog.putInGlobalScope("ARRAY_STEP", array_step);
-            bprog.putInGlobalScope("NUM_STEPS", num_steps);
-            bprog.putInGlobalScope("OBJECT_TYPE", object_type);
-            String name = String.format("%s_init_%d_stepSize_%d_numSteps_%d_type_%d", bprog.getName(), init_array_size, array_step, num_steps, object_type);
-            bprog.setName(name);
-            return bprog;
-        }
-
 
         private static BenchmarkResult measureIntegerSizes() throws Exception {
             System.out.println("Measuring effect of integer size");
@@ -159,30 +150,28 @@ public class SnapshotBenchmarks {
             BProgram[] programs = new BProgram[ITERATIONS];
             for (int i = 0; i < ITERATIONS; i++) {
                 System.out.printf("Measuring for array step of %d size\n", ARRAY_STEP + i);
-                BProgram programToTest = makeBProgram(INITIAL_ARRAY_SIZE, ARRAY_STEP + i, NUM_STEPS, object_type);
+                Map<String, Object> valueMap = new HashMap<>();
+                valueMap.put("INITIAL_ARRAY_SIZE", INITIAL_ARRAY_SIZE);
+                valueMap.put("ARRAY_STEP", ARRAY_STEP + i);
+                valueMap.put("NUM_STEPS", NUM_STEPS);
+                valueMap.put("OBJECT_TYPE", object_type);
+
+                BProgram programToTest = makeBProgram(IMPLEMENTATION, valueMap);
                 programs[i] = programToTest;
                 //Cleanup GC before and after, opportunistic
                 //have to clone the object because BPrograms are not reusable
                 System.gc();
-                snapshotSet[i] = getStateSizes(makeBProgram(INITIAL_ARRAY_SIZE, ARRAY_STEP + i, NUM_STEPS, object_type));
+                snapshotSet[i] = getStateSizes(makeBProgram(IMPLEMENTATION, valueMap));
                 System.gc();
                 verifier.setVisitedNodeStore(store);
-                verificationTimes[i] = getVerificationTime(verifier, INITIAL_ARRAY_SIZE, ARRAY_STEP + i, NUM_STEPS, object_type, ITERATIONS);
+                verificationTimes[i] = getVerificationTime(verifier, IMPLEMENTATION, valueMap, ITERATIONS);
                 verifier.setVisitedNodeStore(storeHash);
-                verificationTimesHash[i] = getVerificationTime(verifier, INITIAL_ARRAY_SIZE, ARRAY_STEP + i, NUM_STEPS, object_type, ITERATIONS);
+                verificationTimesHash[i] = getVerificationTime(verifier, IMPLEMENTATION, valueMap, ITERATIONS);
                 System.gc();
 
             }
 
             return new BenchmarkResult(testName, programs, snapshotSet, verificationTimes, verificationTimesHash);
-        }
-
-        static long[] getVerificationTime(DfsBProgramVerifier vfr, int init_array_size, int array_step, int num_steps, int object_type, int iteration_count) {
-
-            return LongStream.range(0, iteration_count).map(i -> {
-                BProgram prog = makeBProgram(init_array_size, array_step, num_steps, object_type);
-                return getVerificationTime(vfr, prog);
-            }).toArray();
         }
 
     }
@@ -207,8 +196,8 @@ public class SnapshotBenchmarks {
 
         private static BenchmarkResult measureProgram(EventSelectionStrategy strategy) throws Exception {
             VisitedStateStore store = new BProgramStateVisitedStateStore();
+            VisitedStateStore storeHash = new BProgramStateVisitedStateStore(true);
             DfsBProgramVerifier verifier = new DfsBProgramVerifier();
-            verifier.setVisitedNodeStore(store);
 
             /*
                 Test for variable num_steps
@@ -218,18 +207,28 @@ public class SnapshotBenchmarks {
             long[][] verificationTimes = new long[ITERATIONS][];
             long[][] verificationTimesHash = new long[ITERATIONS][];
             BProgram[] programs = new BProgram[ITERATIONS];
+
+
             for (int i = 0; i < ITERATIONS; i++) {
                 System.out.printf("Measuring for array step of %d size\n", ARRAY_STEP + i);
+
+                Map<String, Object> valueMap = new HashMap<>();
+                valueMap.put("INITIAL_ARRAY_SIZE", INITIAL_ARRAY_SIZE);
+                valueMap.put("ARRAY_STEP", ARRAY_STEP + i);
+                valueMap.put("NUM_STEPS", NUM_STEPS);
+
                 //Initial copy
-                BProgram programToTest = makeBProgram(INITIAL_ARRAY_SIZE, ARRAY_STEP + i, NUM_STEPS, strategy);
+                BProgram programToTest = makeBProgram(IMPLEMENTATION, valueMap, strategy);
                 programs[i] = programToTest;
                 //Cleanup GC before and after, opportunistic
                 //have to clone the program because BPrograms are not reusable
                 System.gc();
-                snapshotSet[i] = getStateSizes(makeBProgram(INITIAL_ARRAY_SIZE, ARRAY_STEP + i, NUM_STEPS, strategy));
+                snapshotSet[i] = getStateSizes(makeBProgram(IMPLEMENTATION, valueMap, strategy));
                 System.gc();
-                verificationTimes[i] = getVerificationTime(verifier, INITIAL_ARRAY_SIZE, ARRAY_STEP + i, NUM_STEPS, strategy, ITERATIONS);
-                verificationTimesHash[i] = getVerificationTime(verifier, INITIAL_ARRAY_SIZE, ARRAY_STEP + i, NUM_STEPS, strategy, ITERATIONS);
+                verifier.setVisitedNodeStore(store);
+                verificationTimes[i] = getVerificationTime(verifier, IMPLEMENTATION, valueMap, ITERATIONS, strategy);
+                verifier.setVisitedNodeStore(storeHash);
+                verificationTimesHash[i] = getVerificationTime(verifier, IMPLEMENTATION, valueMap, ITERATIONS, strategy);
                 System.gc();
 
             }
@@ -238,23 +237,16 @@ public class SnapshotBenchmarks {
         }
 
 
-        private static BProgram makeBProgram(int init_array_size, int array_step, int num_steps, EventSelectionStrategy strategy) {
+        private static BProgram makeBProgram(String programPath, Map<String, Object> value_map, EventSelectionStrategy strategy) {
             // prepare b-program
-            final BProgram bprog = new SingleResourceBProgram(IMPLEMENTATION);
-            bprog.putInGlobalScope("INITIAL_ARRAY_SIZE", init_array_size);
-            bprog.putInGlobalScope("ARRAY_STEP", array_step);
-            bprog.putInGlobalScope("NUM_STEPS", num_steps);
-            String name = String.format("%s_strategy_%s_init_%d_stepSize_%d_numSteps_%d", bprog.getName(), strategy.getClass().getName(), init_array_size, array_step, num_steps);
-            bprog.setName(name);
+            BProgram bprog = makeBProgram(programPath, value_map);
             bprog.setEventSelectionStrategy(strategy);
             return bprog;
         }
 
-
-        private static long[] getVerificationTime(DfsBProgramVerifier vfr, int init_array_size, int array_step, int num_steps, EventSelectionStrategy strategy, int iteration_count) {
-            System.out.println("Measuring verification time");
+        static long[] getVerificationTime(DfsBProgramVerifier vfr, String programPath, Map<String, Object> valueMap, int iteration_count, EventSelectionStrategy strategy) {
             return LongStream.range(0, iteration_count).map(i -> {
-                BProgram prog = makeBProgram(init_array_size, array_step, num_steps, strategy);
+                BProgram prog = makeBProgram(programPath, valueMap, strategy);
                 return getVerificationTime(vfr, prog);
             }).toArray();
         }
