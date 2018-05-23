@@ -38,7 +38,7 @@ function pusher(i, j) {
 
 var GLOBAL_ARRAY = [];
 for (let init = 0; init < INITIAL_ARRAY_SIZE; init++) {
-    GLOBAL_ARRAY.push(pusher());
+    GLOBAL_ARRAY.push(pusher(-1,-1)); //dummy data at init
 }
 
 bp.registerBThread("eventPicker", function () {
@@ -47,6 +47,6 @@ bp.registerBThread("eventPicker", function () {
             GLOBAL_ARRAY.push(pusher(i, j));
         }
         let e = bp.sync({request:GLOBAL_ARRAY});
-        bp.log.info(e.name);
+        bp.log.info("at step "+ i +" the event is " +e.name);
     }
 });
