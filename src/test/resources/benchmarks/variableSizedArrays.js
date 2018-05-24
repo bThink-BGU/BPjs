@@ -29,8 +29,8 @@
     NUM_STEPS - Number of steps to take
     OBJECT_TYPE - either 0 (integer), 1 (nested objects)
 */
-
 var ITERATION = 0;
+
 
 function pusher(i, j) {
     let toPush;
@@ -44,13 +44,11 @@ function pusher(i, j) {
     return toPush;
 }
 
-
-var GLOBAL_ARRAY = [];
-for (let init = 0; init < INITIAL_ARRAY_SIZE; init++) {
-    GLOBAL_ARRAY.push(pusher());
-}
-
 bp.registerBThread("arraySizer", function () {
+    let GLOBAL_ARRAY = [];
+    for (let init = 0; init < INITIAL_ARRAY_SIZE; init++) {
+        GLOBAL_ARRAY.push(pusher());
+    }
     for (let i = 0; i < NUM_STEPS; i++) {
         for (let j = 0; j < ARRAY_STEP; j++) {
             GLOBAL_ARRAY.push(pusher(i, j));
