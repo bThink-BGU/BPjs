@@ -62,6 +62,8 @@ public class SnapshotBenchmarks {
             ExecutorService execSvc = ExecutorServiceMaker.makeWithName("SnapshotStore");
             DfsBProgramVerifier sut = new DfsBProgramVerifier();
             List<Node> snapshots = new ArrayList<>();
+            BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(program);
+            ArrayList<Integer> snapshotSizes = new ArrayList<>();
 
             Node initial = Node.getInitialNode(program, execSvc);
 
@@ -69,20 +71,13 @@ public class SnapshotBenchmarks {
             Node next = initial;
             //Iteration 1,starts already at request state A
             for (int i = 0; i < NUM_STEPS; i++) {
+                snapshotSizes.add(io.serialize(next.getSystemState()).length);
                 next = sut.getUnvisitedNextNode(next, execSvc);
                 snapshots.add(next);
             }
-            BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(program);
             execSvc.shutdown();
 
-            return snapshots.stream().map(node -> {
-                try {
-                    return io.serialize(node.getSystemState());
-                } catch (IOException e) {
-                    return new byte[0];
-                }
-            }).mapToInt(serializedSnap -> serializedSnap.length).toArray();
-
+            return snapshotSizes.stream().mapToInt(i -> i).toArray();
         }
 
         static long getVerificationTime(DfsBProgramVerifier vfr, BProgram prog) {
@@ -135,11 +130,11 @@ public class SnapshotBenchmarks {
             return measureProgram(1);
         }
 
-        private static BenchmarkResult measureProgram(int object_type) throws Exception {
+        private static BenchmarkResult measureProgram(int objectType) throws Exception {
             VisitedStateStore store = new BThreadSnapshotVisitedStateStore();
             VisitedStateStore storeHash = new HashVisitedStateStore();
             DfsBProgramVerifier verifier = new DfsBProgramVerifier();
-            String testName = TEST_NAME + ((object_type == 1) ? "object" : "integer");
+            String testName = TEST_NAME + ((objectType == 1) ? "object" : "integer");
             /*
                 Test for variable num_steps
                 we want to see if there's a non linear increase in snapshot size
@@ -154,7 +149,7 @@ public class SnapshotBenchmarks {
                 valueMap.put("INITIAL_ARRAY_SIZE", INITIAL_ARRAY_SIZE);
                 valueMap.put("ARRAY_STEP", ARRAY_STEP + i);
                 valueMap.put("NUM_STEPS", NUM_STEPS);
-                valueMap.put("OBJECT_TYPE", object_type);
+                valueMap.put("OBJECT_TYPE", objectType);
 
                 BProgram programToTest = makeBProgram(IMPLEMENTATION, valueMap);
                 programs[i] = programToTest;
