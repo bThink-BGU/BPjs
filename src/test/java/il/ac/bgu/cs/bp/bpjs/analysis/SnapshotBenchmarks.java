@@ -28,13 +28,10 @@ public class SnapshotBenchmarks {
 
     private static int ITERATIONS = 10;
 
-
     public static void main(String[] args) throws Exception {
         VariableSizedArraysBenchmark.benchmarkVariableSizedArrays();
         EventSelectionBenchmark.benchmarkEventSelection();
     }
-
-
 
     static abstract class Benchmark {
         static String IMPLEMENTATION = "TESTFILE.js";
@@ -248,7 +245,6 @@ public class SnapshotBenchmarks {
             }).toArray();
         }
     }
-
 
     /**
      * This consolidates benchmark results, not generic enough yet
