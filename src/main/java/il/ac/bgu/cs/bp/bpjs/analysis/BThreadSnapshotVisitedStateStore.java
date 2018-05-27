@@ -38,17 +38,11 @@ import java.util.Set;
  * 
  * @author michael
  */
-public class BProgramStateVisitedStateStore implements VisitedStateStore {
+public class BThreadSnapshotVisitedStateStore implements VisitedStateStore {
     private final Set<Object> visited = new HashSet<>();
     
-    private boolean useHash;
-    
-    public BProgramStateVisitedStateStore() {
-        this(false);
-    }
-    
-    public BProgramStateVisitedStateStore(boolean useHash) {
-        this.useHash = useHash;
+
+    public BThreadSnapshotVisitedStateStore() {
     }
     
     @Override
@@ -62,26 +56,10 @@ public class BProgramStateVisitedStateStore implements VisitedStateStore {
     }   
     
     private Object extractStatus( Node nd ) {
-        final Set<BThreadSyncSnapshot> bThreadSnapshots = nd.getSystemState().getBThreadSnapshots();
-        return useHash ? hash(bThreadSnapshots) : bThreadSnapshots;
-    }
-    
-    private long hash( Set<BThreadSyncSnapshot> snapshots ) {
-        long hash = 0;
-        for ( BThreadSyncSnapshot snp : snapshots ) {
-            hash = hash ^ snp.getContinuationProgramState().hashCode();
-        }
-        return hash;
-    }
-    
-    public boolean isUseHash() {
-        return useHash;
+        return nd.getSystemState().getBThreadSnapshots();
     }
 
-    public void setUseHash(boolean useHash) {
-        this.useHash = useHash;
-    }
-    
+
     @Override
     public void clear() {
         visited.clear();
@@ -89,6 +67,6 @@ public class BProgramStateVisitedStateStore implements VisitedStateStore {
     
     @Override
     public String toString() {
-        return "[BProgramStateVisitedNodeStore usingHash:" + isUseHash() + ']';
+        return "[BThreadSnapshotVisitedStateStore visited:" + visited.size()+ ']';
     }
 }

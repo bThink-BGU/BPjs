@@ -25,7 +25,6 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
 
 import static il.ac.bgu.cs.bp.bpjs.TestUtils.eventNamesString;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.*;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
@@ -46,7 +45,7 @@ import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
 public class DfsBProgramVerifierTest {
 
     @Test
-    public void simpleAAABTrace() throws Exception {
+    public void simpleAAABTrace_forgetfulStore() throws Exception {
         BProgram program = new SingleResourceBProgram("DFSVerifierTests/AAABTrace.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setProgressListener(new BriefPrintDfsVerifierListener());
@@ -58,12 +57,27 @@ public class DfsBProgramVerifierTest {
     }
 
     @Test
+    public void simpleAAABTrace() throws Exception {
+        BProgram program = new SingleResourceBProgram("DFSVerifierTests/AAABTrace.js");
+        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        sut.setDebugMode(true);
+
+        sut.setProgressListener(new BriefPrintDfsVerifierListener());
+        program.appendSource(Requirements.eventNotSelected("B"));
+        sut.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
+        VerificationResult res = sut.verify(program);
+        assertTrue(res.isCounterExampleFound());
+        assertEquals("AAAB", traceEventNamesString(res.getCounterExampleTrace(), ""));
+    }
+
+    @Test
     public void simpleAAABTrace_hashedNodeStore() throws Exception {
         BProgram program = new SingleResourceBProgram("DFSVerifierTests/AAABTrace.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        sut.setDebugMode(true);
         sut.setProgressListener(new BriefPrintDfsVerifierListener());
         program.appendSource(Requirements.eventNotSelected("B"));
-        VisitedStateStore stateStore = new BProgramStateVisitedStateStore(true);
+        VisitedStateStore stateStore = new HashVisitedStateStore();
         sut.setVisitedNodeStore(stateStore);
         VerificationResult res = sut.verify(program);
         assertTrue(res.isCounterExampleFound());

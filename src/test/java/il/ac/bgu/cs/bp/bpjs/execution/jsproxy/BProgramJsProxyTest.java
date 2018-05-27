@@ -23,7 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.BProgramStateVisitedStateStore;
+import il.ac.bgu.cs.bp.bpjs.analysis.BThreadSnapshotVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
@@ -77,7 +77,7 @@ public class BProgramJsProxyTest {
     public void DeadlockSameThread() throws Exception{
         BProgram bpr = new SingleResourceBProgram("bpsync-blockrequest.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        sut.setVisitedNodeStore(new BProgramStateVisitedStateStore());
+        sut.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
         VerificationResult res = sut.verify(bpr);
         assertTrue(res.isCounterExampleFound());
         assertEquals(VerificationResult.ViolationType.Deadlock, res.getViolationType());

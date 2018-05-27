@@ -1,6 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.TicTacToe;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.BProgramStateVisitedStateStore;
+import il.ac.bgu.cs.bp.bpjs.analysis.BThreadSnapshotVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
@@ -45,7 +45,7 @@ public class TicTacToeVerMain  {
 
             vfr.setMaxTraceLength(70);
 //            vfr.setDebugMode(true);
-            vfr.setVisitedNodeStore(new BProgramStateVisitedStateStore(false));
+            vfr.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
             vfr.setProgressListener( new BriefPrintDfsVerifierListener() );
 
             final VerificationResult res = vfr.verify(bprog);

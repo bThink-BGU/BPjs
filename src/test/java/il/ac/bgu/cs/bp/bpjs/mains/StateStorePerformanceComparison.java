@@ -23,15 +23,10 @@
  */
 package il.ac.bgu.cs.bp.bpjs.mains;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.BProgramStateVisitedStateStore;
-import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
-import il.ac.bgu.cs.bp.bpjs.analysis.ForgetfulVisitedStateStore;
-import il.ac.bgu.cs.bp.bpjs.analysis.Requirements;
-import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
+import il.ac.bgu.cs.bp.bpjs.analysis.*;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
-import il.ac.bgu.cs.bp.bpjs.analysis.VisitedStateStore;
 
 /**
  * This program runs the DFS verifier against the same maze using different
@@ -66,9 +61,9 @@ public class StateStorePerformanceComparison {
         verifier.setDetectDeadlocks(false);
 
         // test
-        verifier.setVisitedNodeStore(new BProgramStateVisitedStateStore(false));
+        verifier.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
         runVerifier(verifier);
-        verifier.setVisitedNodeStore(new BProgramStateVisitedStateStore(true));
+        verifier.setVisitedNodeStore(new HashVisitedStateStore());
         runVerifier(verifier);
         verifier.setVisitedNodeStore(new ForgetfulVisitedStateStore());
         runVerifier(verifier);

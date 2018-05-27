@@ -23,7 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis.examples;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.BProgramStateVisitedStateStore;
+import il.ac.bgu.cs.bp.bpjs.analysis.BThreadSnapshotVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
@@ -86,7 +86,7 @@ public class Mazes {
 
             vfr.setProgressListener(new BriefPrintDfsVerifierListener());
             vfr.setIterationCountGap(10);
-            vfr.setVisitedNodeStore(new BProgramStateVisitedStateStore(false));
+            vfr.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
 //            vfr.setVisitedNodeStore(new ForgetfulVisitedStateStore());
             
             vfr.setDetectDeadlocks(false); // prevent from detecting cases where we ust hit a wall.
