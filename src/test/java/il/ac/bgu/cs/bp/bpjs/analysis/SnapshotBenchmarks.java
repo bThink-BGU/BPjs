@@ -34,13 +34,6 @@ public class SnapshotBenchmarks {
     }
 
     static abstract class Benchmark {
-        static String IMPLEMENTATION = "TESTFILE.js";
-        static String TEST_NAME = "TESTNAME";
-        static int INITIAL_ARRAY_SIZE = 1;
-        static int ARRAY_STEP = 5; //Size of each step, how many objects are we adding
-        static int NUM_STEPS = 10; // How many steps to take
-
-
         static void outputBenchResults(BenchmarkResult result) throws IOException {
             result.outputMemoryStats();
             result.outputTimes();
@@ -57,7 +50,7 @@ public class SnapshotBenchmarks {
         }
 
 
-        static int[] getStateSizes(BProgram program) throws Exception {
+        static int[] getStateSizes(BProgram program, int num_steps) throws Exception {
             System.out.println("Measuring state size");
             ExecutorService execSvc = ExecutorServiceMaker.makeWithName("SnapshotStore");
             DfsBProgramVerifier sut = new DfsBProgramVerifier();
@@ -70,7 +63,7 @@ public class SnapshotBenchmarks {
             snapshots.add(initial);
             Node next = initial;
             //Iteration 1,starts already at request state A
-            for (int i = 0; i < NUM_STEPS; i++) {
+            for (int i = 0; i < num_steps; i++) {
                 snapshotSizes.add(io.serialize(next.getSystemState()).length);
                 next = sut.getUnvisitedNextNode(next, execSvc);
                 snapshots.add(next);
@@ -130,11 +123,11 @@ public class SnapshotBenchmarks {
             return measureProgram(1);
         }
 
-        private static BenchmarkResult measureProgram(int objectType) throws Exception {
+        private static BenchmarkResult measureProgram(int object_type) throws Exception {
             VisitedStateStore store = new BThreadSnapshotVisitedStateStore();
             VisitedStateStore storeHash = new HashVisitedStateStore();
             DfsBProgramVerifier verifier = new DfsBProgramVerifier();
-            String testName = TEST_NAME + ((objectType == 1) ? "object" : "integer");
+            String testName = TEST_NAME + ((object_type == 1) ? "object" : "integer");
             /*
                 Test for variable num_steps
                 we want to see if there's a non linear increase in snapshot size
@@ -149,13 +142,13 @@ public class SnapshotBenchmarks {
                 valueMap.put("INITIAL_ARRAY_SIZE", INITIAL_ARRAY_SIZE);
                 valueMap.put("ARRAY_STEP", ARRAY_STEP + i);
                 valueMap.put("NUM_STEPS", NUM_STEPS);
-                valueMap.put("OBJECT_TYPE", objectType);
+                valueMap.put("OBJECT_TYPE", object_type);
 
                 BProgram programToTest = makeBProgram(IMPLEMENTATION, valueMap);
                 programs[i] = programToTest;
                 //have to clone the object because BPrograms are not reusable
                 System.gc();
-                snapshotSet[i] = getStateSizes(makeBProgram(IMPLEMENTATION, valueMap));
+                snapshotSet[i] = getStateSizes(makeBProgram(IMPLEMENTATION, valueMap), NUM_STEPS);
                 System.gc();
                 verifier.setVisitedNodeStore(store);
                 verificationTimes[i] = getVerificationTime(verifier, IMPLEMENTATION, valueMap, ITERATIONS);
@@ -177,18 +170,26 @@ public class SnapshotBenchmarks {
         static int ARRAY_STEP = 5; //Size of each step, how many objects are we adding
         static int NUM_STEPS = 10; // How many steps to take
 
+        static int MAX_THREADS = 10;
+
         static void benchmarkEventSelection() throws Exception {
-            BenchmarkResult simpleEventSelectionResults = measureProgram(new SimpleEventSelectionStrategy());
-            BenchmarkResult orderedEventSelectionResults = measureProgram(new OrderedEventSelectionStrategy());
+            BenchmarkResult simpleEventSelectionResults = measureProgram(new SimpleEventSelectionStrategy(), 1);
+            BenchmarkResult orderedEventSelectionResults = measureProgram(new OrderedEventSelectionStrategy(), 1);
             //BenchmarkResult PrioritizedBSyncEventSelectionResults = measureProgram(new PrioritizedBSyncEventSelectionStrategy());
             //BenchmarkResult PrioritizedBThreadsEventSelectionResults = measureProgram(new PrioritizedBThreadsEventSelectionStrategy());
 
             outputBenchResults(simpleEventSelectionResults);
             outputBenchResults(orderedEventSelectionResults);
+
+            //Start from 2 because 1 was implicitly tested by simpleEvent
+            for (int i = 2; i < MAX_THREADS; i++) {
+                BenchmarkResult threadResults = measureProgram(new SimpleEventSelectionStrategy(), i);
+                outputBenchResults(threadResults );
+            }
         }
 
 
-        private static BenchmarkResult measureProgram(EventSelectionStrategy strategy) throws Exception {
+        private static BenchmarkResult measureProgram(EventSelectionStrategy strategy, int num_threads) throws Exception {
             VisitedStateStore store = new BThreadSnapshotVisitedStateStore();
             VisitedStateStore storeHash = new HashVisitedStateStore();
             DfsBProgramVerifier verifier = new DfsBProgramVerifier();
@@ -207,6 +208,7 @@ public class SnapshotBenchmarks {
                 System.out.printf("Measuring for array step of %d size\n", ARRAY_STEP + i);
 
                 Map<String, Object> valueMap = new HashMap<>();
+                valueMap.put("NUM_THREADS", num_threads);
                 valueMap.put("INITIAL_ARRAY_SIZE", INITIAL_ARRAY_SIZE);
                 valueMap.put("ARRAY_STEP", ARRAY_STEP + i);
                 valueMap.put("NUM_STEPS", NUM_STEPS);
@@ -217,7 +219,7 @@ public class SnapshotBenchmarks {
                 //Cleanup GC before and after, opportunistic
                 //have to clone the program because BPrograms are not reusable
                 System.gc();
-                snapshotSet[i] = getStateSizes(makeBProgram(IMPLEMENTATION, valueMap, strategy));
+                snapshotSet[i] = getStateSizes(makeBProgram(IMPLEMENTATION, valueMap, strategy), NUM_STEPS);
                 System.gc();
                 verifier.setVisitedNodeStore(store);
                 verificationTimes[i] = getVerificationTime(verifier, IMPLEMENTATION, valueMap, ITERATIONS, strategy);
@@ -227,7 +229,7 @@ public class SnapshotBenchmarks {
 
             }
 
-            return new BenchmarkResult(TEST_NAME + strategy.getClass().getName(), programs, snapshotSet, verificationTimes, verificationTimesHash);
+            return new BenchmarkResult(TEST_NAME + strategy.getClass().getName() + "_threads_"+Integer.toString(num_threads), programs, snapshotSet, verificationTimes, verificationTimesHash);
         }
 
 

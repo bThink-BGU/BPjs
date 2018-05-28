@@ -24,6 +24,7 @@
 
 
 /* globals
+    NUM_THREADS - number of bthreads to spawn
     INITIAL_ARRAY_SIZE - Size of initial array of events
     ARRAY_STEP - Number of events to add per step
     NUM_STEPS - Number of steps to take
@@ -40,13 +41,15 @@ var GLOBAL_ARRAY = [];
 for (let init = 0; init < INITIAL_ARRAY_SIZE; init++) {
     GLOBAL_ARRAY.push(pusher(-1,-1)); //dummy data at init
 }
-
-bp.registerBThread("eventPicker", function () {
-    for (let i = 0; i < NUM_STEPS; i++) {
-        for (let j = 0; j < ARRAY_STEP; j++) {
-            GLOBAL_ARRAY.push(pusher(i, j));
+for (let i = 0; i < NUM_THREADS ; i++) {
+    let name = "eventPicker" + i;
+    bp.registerBThread(name, function () {
+        for (let i = 0; i < NUM_STEPS; i++) {
+            for (let j = 0; j < ARRAY_STEP; j++) {
+                GLOBAL_ARRAY.push(pusher(i, j));
+            }
+            let e = bp.sync({request: GLOBAL_ARRAY});
+            bp.log.info("at step " + i + " the event is " + e.name);
         }
-        let e = bp.sync({request:GLOBAL_ARRAY});
-        bp.log.info("at step "+ i +" the event is " +e.name);
-    }
-});
+    });
+}
