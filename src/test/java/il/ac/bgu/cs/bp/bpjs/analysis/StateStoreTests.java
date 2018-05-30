@@ -154,5 +154,50 @@ public class StateStoreTests {
         assertEquals(state1, state2);
     }
 
+    /*
+        A bunch of tests from BProgramSyncSnapshot modified to check nodes.
+     */
+
+
+    @Test
+    public void StateStoreNoHashTestIdenticalRuns() throws Exception {
+        VisitedStateStore noHash = new BProgramStateVisitedStateStore(false);
+        testEqualRuns(noHash);
+    }
+
+    @Test
+    public void StateStoreHashTestIdenticalRuns() throws Exception {
+        VisitedStateStore hashStore = new BProgramStateVisitedStateStore(true);
+        testEqualRuns(hashStore);
+    }
+    /*
+        This test makes sure we compare nodes/states properly.
+        these two objects (by debugging) share program counter and frame index and should differ on variables only
+     */
+    private void testEqualRuns(VisitedStateStore storeToUse) throws Exception {
+        BProgram bprog = new SingleResourceBProgram("SnapshotTests/ABCDTrace.js");
+        BProgram bprog2 = new SingleResourceBProgram("SnapshotTests/ABCDTrace.js");
+
+
+        ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvcEqualJSVar");
+        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        List<Node> snapshots = new ArrayList<>();
+
+        Node initial1 = Node.getInitialNode(bprog, execSvc);
+        Node initial2 = Node.getInitialNode(bprog2, execSvc);
+
+        assertEquals(initial1,initial2);
+
+
+        Node next1 = initial1;
+        Node next2 = initial2;
+        storeToUse.store(next1);
+        assertTrue(storeToUse.isVisited(next2));
+        for (int i = 0; i < 4; i++) {
+            next1 = sut.getUnvisitedNextNode(next1, execSvc);
+            storeToUse.store(next1);
+            assertTrue(storeToUse.isVisited(next2));
+        }
+    }
 }
 
