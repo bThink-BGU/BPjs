@@ -131,8 +131,8 @@ public class SnapshotBenchmarks {
         }
 
         private static BenchmarkResult measureProgram(int objectType) throws Exception {
-            VisitedStateStore store = new BProgramStateVisitedStateStore();
-            VisitedStateStore storeHash = new BProgramStateVisitedStateStore(true);
+            VisitedStateStore store = new BThreadSnapshotVisitedStateStore();
+            VisitedStateStore storeHash = new HashVisitedStateStore();
             DfsBProgramVerifier verifier = new DfsBProgramVerifier();
             String testName = TEST_NAME + ((objectType == 1) ? "object" : "integer");
             /*
@@ -190,8 +190,8 @@ public class SnapshotBenchmarks {
 
 
         private static BenchmarkResult measureProgram(EventSelectionStrategy strategy) throws Exception {
-            VisitedStateStore store = new BProgramStateVisitedStateStore();
-            VisitedStateStore storeHash = new BProgramStateVisitedStateStore(true);
+            VisitedStateStore store = new BThreadSnapshotVisitedStateStore();
+            VisitedStateStore storeHash = new HashVisitedStateStore();
             DfsBProgramVerifier verifier = new DfsBProgramVerifier();
 
             /*

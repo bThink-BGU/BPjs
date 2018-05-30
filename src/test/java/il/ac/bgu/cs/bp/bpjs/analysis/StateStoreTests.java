@@ -28,13 +28,13 @@ public class StateStoreTests {
 
     @Test
     public void VisitedStateStoreNoHashBasic() throws Exception {
-        VisitedStateStore noHash = new BProgramStateVisitedStateStore(false);
+        VisitedStateStore noHash = new BThreadSnapshotVisitedStateStore();
         TestAAABTraceStore(noHash);
     }
 
     @Test
     public void VisitedStateStoreHashBasic() throws Exception {
-        VisitedStateStore useHash = new BProgramStateVisitedStateStore(true);
+        VisitedStateStore useHash = new HashVisitedStateStore();
         TestAAABTraceStore(useHash);
     }
 
@@ -58,13 +58,13 @@ public class StateStoreTests {
 
     @Test
     public void StateStoreNoHashTestDiffJSVar() throws Exception {
-        VisitedStateStore noHash = new BProgramStateVisitedStateStore(false);
+        VisitedStateStore noHash = new BThreadSnapshotVisitedStateStore();
         TestDiffJSVar(noHash);
     }
 
     @Test
     public void StateStoreHashTestDiffJSVar() throws Exception {
-        VisitedStateStore hashStore = new BProgramStateVisitedStateStore(true);
+        VisitedStateStore hashStore = new HashVisitedStateStore();
         TestDiffJSVar(hashStore);
     }
 
@@ -107,13 +107,13 @@ public class StateStoreTests {
 
     @Test
     public void StateStoreNoHashTestEqualJSVar() throws Exception {
-        VisitedStateStore noHash = new BProgramStateVisitedStateStore(false);
+        VisitedStateStore noHash = new BThreadSnapshotVisitedStateStore();
         TestEqualJSVar(noHash);
     }
 
     @Test
     public void StateStoreHashTestEqualJSVar() throws Exception {
-        VisitedStateStore hashStore = new BProgramStateVisitedStateStore(true);
+        VisitedStateStore hashStore = new HashVisitedStateStore();
         TestEqualJSVar(hashStore);
     }
 
