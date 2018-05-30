@@ -161,13 +161,13 @@ public class StateStoreTests {
 
     @Test
     public void StateStoreNoHashTestIdenticalRuns() throws Exception {
-        VisitedStateStore noHash = new BProgramStateVisitedStateStore(false);
+        VisitedStateStore noHash = new BThreadSnapshotVisitedStateStore();
         testEqualRuns(noHash);
     }
 
     @Test
     public void StateStoreHashTestIdenticalRuns() throws Exception {
-        VisitedStateStore hashStore = new BProgramStateVisitedStateStore(true);
+        VisitedStateStore hashStore = new HashVisitedStateStore();
         testEqualRuns(hashStore);
     }
     /*
