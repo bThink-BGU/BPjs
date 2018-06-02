@@ -144,6 +144,7 @@ public class StateStoreTests {
         assertTrue(storeToUse.isVisited(next));
         for (int i = 0; i < 4; i++) {
             next = sut.getUnvisitedNextNode(next, execSvc);
+            assertTrue(storeToUse.isVisited(next));
             storeToUse.store(next);
         }
         snapshots.add(next);
@@ -181,7 +182,6 @@ public class StateStoreTests {
 
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvcEqualJSVar");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        List<Node> snapshots = new ArrayList<>();
 
         Node initial1 = Node.getInitialNode(bprog, execSvc);
         Node initial2 = Node.getInitialNode(bprog2, execSvc);
