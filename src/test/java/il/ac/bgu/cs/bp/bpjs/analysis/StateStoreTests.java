@@ -199,5 +199,50 @@ public class StateStoreTests {
             assertTrue(storeToUse.isVisited(next2));
         }
     }
+
+    @Test
+    public void testStateStoreJavaVarsNoHash() throws Exception {
+        VisitedStateStore noHash = new BThreadSnapshotVisitedStateStore();
+        testStateStoreJavaVars(noHash);
+    }
+
+    @Test
+    public void testStateStoreJavaVarsHash() throws Exception {
+        VisitedStateStore hashStore = new HashVisitedStateStore();
+        testStateStoreJavaVars(hashStore);
+    }
+
+    private void testStateStoreJavaVars(VisitedStateStore storeToUse) throws Exception {
+        BProgram bprog = new StringBProgram("bp.registerBThread(function(){\n" +
+                "        var a = new java.lang.Integer(7);\n" +
+                "        bp.sync({request:bp.Event(\"A\")});\n" +
+                "        while (true) {" +
+                "           //bp.log.warn(a);\n" +
+                "           bp.sync({request:bp.Event(\"R\")});\n" +
+                "           a = java.lang.Integer.reverse(a);\n" +
+                "        }\n" +
+                "});");
+        ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvcEqualJSVar");
+        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+
+        Node next = Node.getInitialNode(bprog, execSvc);
+        storeToUse.store(next);
+        assertTrue(storeToUse.isVisited(next));
+        //now we enter the loop and generate initial node
+        //a is 7
+        next = sut.getUnvisitedNextNode(next, execSvc);
+        assertFalse(storeToUse.isVisited(next));
+        storeToUse.store(next);
+        //Now loop again, this should also not exist
+        next = sut.getUnvisitedNextNode(next, execSvc);
+        //a should be -536870912
+        assertFalse(storeToUse.isVisited(next));
+        storeToUse.store(next);
+        //now a should be 7 again
+        //and now we should see the node
+        next = sut.getUnvisitedNextNode(next, execSvc);
+        assertTrue(storeToUse.isVisited(next));
+
+    }
 }
 
