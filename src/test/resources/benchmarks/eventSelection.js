@@ -36,19 +36,18 @@ function pusher(i, j) {
     return toPush;
 }
 
-
-var GLOBAL_ARRAY = [];
-for (let init = 0; init < INITIAL_ARRAY_SIZE; init++) {
-    GLOBAL_ARRAY.push(pusher(-1,-1)); //dummy data at init
-}
 for (let i = 0; i < NUM_THREADS ; i++) {
     let name = "eventPicker" + i;
     bp.registerBThread(name, function () {
+        let perThreadArray = [];
+        for (let init = 0; init < INITIAL_ARRAY_SIZE; init++) {
+            perThreadArray.push(pusher(-1,-1)); //dummy data at init
+        }
         for (let i = 0; i < NUM_STEPS; i++) {
             for (let j = 0; j < ARRAY_STEP; j++) {
-                GLOBAL_ARRAY.push(pusher(i, j));
+                perThreadArray.push(pusher(i, j));
             }
-            let e = bp.sync({request: GLOBAL_ARRAY});
+            let e = bp.sync({request: perThreadArray});
             bp.log.info("at step " + i + " the event is " + e.name);
         }
     });
