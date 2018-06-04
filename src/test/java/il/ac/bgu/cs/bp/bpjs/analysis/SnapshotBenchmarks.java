@@ -73,20 +73,21 @@ public class SnapshotBenchmarks {
             return snapshotSizes.stream().mapToInt(i -> i).toArray();
         }
 
-        static long getVerificationTime(DfsBProgramVerifier vfr, BProgram prog) {
-            try {
-                VerificationResult res = vfr.verify(prog);
-                return res.getTimeMillies();
-            } catch (Exception e) {
-                return 0;
-            }
+        static VerificationResult getVerification(DfsBProgramVerifier vfr, BProgram prog) throws Exception {
+            VerificationResult res = vfr.verify(prog);
+            return res;
         }
 
-        static long[] getVerificationTime(DfsBProgramVerifier vfr, String programPath, Map<String, Object> valueMap, int iteration_count) {
-            return LongStream.range(0, iteration_count).map(i -> {
-                BProgram prog = makeBProgram(programPath, valueMap);
-                return getVerificationTime(vfr, prog);
-            }).toArray();
+        static VerificationResult[] getVerification(DfsBProgramVerifier vfr, String programPath, Map<String, Object> valueMap, int iteration_count) {
+            return LongStream.range(0, iteration_count).mapToObj(i -> {
+                try {
+                    BProgram prog = makeBProgram(programPath, valueMap);
+                    return getVerification(vfr, prog);
+                } catch (Exception ex) {
+                    return new VerificationResult(VerificationResult.ViolationType.None, null, null);
+                }
+            }).toArray(VerificationResult[]::new);
+
         }
     }
 
@@ -133,8 +134,8 @@ public class SnapshotBenchmarks {
                 we want to see if there's a non linear increase in snapshot size
              */
             int[][] snapshotSet = new int[ITERATIONS][];
-            long[][] verificationTimes = new long[ITERATIONS][];
-            long[][] verificationTimesHash = new long[ITERATIONS][];
+            VerificationResult[][] verificationTimes = new VerificationResult[ITERATIONS][];
+            VerificationResult[][] verificationTimesHash = new VerificationResult[ITERATIONS][];
             BProgram[] programs = new BProgram[ITERATIONS];
             for (int i = 0; i < ITERATIONS; i++) {
                 System.out.printf("Measuring for array step of %d size\n", ARRAY_STEP + i);
@@ -151,9 +152,9 @@ public class SnapshotBenchmarks {
                 snapshotSet[i] = getStateSizes(makeBProgram(IMPLEMENTATION, valueMap), NUM_STEPS);
                 System.gc();
                 verifier.setVisitedNodeStore(store);
-                verificationTimes[i] = getVerificationTime(verifier, IMPLEMENTATION, valueMap, ITERATIONS);
+                verificationTimes[i] = getVerification(verifier, IMPLEMENTATION, valueMap, ITERATIONS);
                 verifier.setVisitedNodeStore(storeHash);
-                verificationTimesHash[i] = getVerificationTime(verifier, IMPLEMENTATION, valueMap, ITERATIONS);
+                verificationTimesHash[i] = getVerification(verifier, IMPLEMENTATION, valueMap, ITERATIONS);
                 System.gc();
 
             }
@@ -174,8 +175,8 @@ public class SnapshotBenchmarks {
         static int MAX_THREADS = 10;
 
         static void benchmarkEventSelection() throws Exception {
-            BenchmarkResult simpleEventSelectionResults = measureProgram(new SimpleEventSelectionStrategy(), 1,true);
-            BenchmarkResult orderedEventSelectionResults = measureProgram(new OrderedEventSelectionStrategy(), 1,true);
+            BenchmarkResult simpleEventSelectionResults = measureProgram(new SimpleEventSelectionStrategy(), 1, true);
+            BenchmarkResult orderedEventSelectionResults = measureProgram(new OrderedEventSelectionStrategy(), 1, true);
             //BenchmarkResult PrioritizedBSyncEventSelectionResults = measureProgram(new PrioritizedBSyncEventSelectionStrategy());
             //BenchmarkResult PrioritizedBThreadsEventSelectionResults = measureProgram(new PrioritizedBThreadsEventSelectionStrategy());
 
@@ -184,9 +185,9 @@ public class SnapshotBenchmarks {
 
             //Start from 2 because 1 was implicitly tested by simpleEvent
             for (int i = 1; i < MAX_THREADS; i++) {
-                BenchmarkResult threadResults = measureProgram(new SimpleEventSelectionStrategy(), i,true);
-                outputBenchResults(threadResults );
-                BenchmarkResult threadResultsNoDisplay = measureProgram(new SimpleEventSelectionStrategy(), i,false);
+                BenchmarkResult threadResults = measureProgram(new SimpleEventSelectionStrategy(), i, true);
+                outputBenchResults(threadResults);
+                BenchmarkResult threadResultsNoDisplay = measureProgram(new SimpleEventSelectionStrategy(), i, false);
                 outputBenchResults(threadResultsNoDisplay);
             }
         }
@@ -202,8 +203,8 @@ public class SnapshotBenchmarks {
                 we want to see if there's a non linear increase in snapshot size
              */
             int[][] snapshotSet = new int[ITERATIONS][];
-            long[][] verificationTimes = new long[ITERATIONS][];
-            long[][] verificationTimesHash = new long[ITERATIONS][];
+            VerificationResult[][] verificationTimes = new VerificationResult[ITERATIONS][];
+            VerificationResult[][] verificationTimesHash = new VerificationResult[ITERATIONS][];
             BProgram[] programs = new BProgram[ITERATIONS];
 
 
@@ -235,8 +236,8 @@ public class SnapshotBenchmarks {
             }
 
             return new BenchmarkResult(TEST_NAME + strategy.getClass().getName()
-                    + "_save_state_" + Boolean.toString(save_sync)+
-                    "_threads_"+Integer.toString(num_threads),
+                    + "_save_state_" + Boolean.toString(save_sync) +
+                    "_threads_" + Integer.toString(num_threads),
                     programs, snapshotSet, verificationTimes, verificationTimesHash);
         }
 
@@ -248,10 +249,14 @@ public class SnapshotBenchmarks {
             return bprog;
         }
 
-        static long[] getVerificationTime(DfsBProgramVerifier vfr, String programPath, Map<String, Object> valueMap, int iteration_count, EventSelectionStrategy strategy) {
-            return LongStream.range(0, iteration_count).map(i -> {
-                BProgram prog = makeBProgram(programPath, valueMap, strategy);
-                return getVerificationTime(vfr, prog);
+        static VerificationResult[] getVerificationTime(DfsBProgramVerifier vfr, String programPath, Map<String, Object> valueMap, int iteration_count, EventSelectionStrategy strategy) {
+            return (VerificationResult[]) LongStream.range(0, iteration_count).mapToObj(i -> {
+                try {
+                    BProgram prog = makeBProgram(programPath, valueMap, strategy);
+                    return getVerification(vfr, prog);
+                } catch (Exception ex) {
+                    return new VerificationResult(VerificationResult.ViolationType.None, null, null);
+                }
             }).toArray();
         }
     }
@@ -264,13 +269,13 @@ public class SnapshotBenchmarks {
         final String benchName;
         final BProgram[] programs;
         final int[][] snapshotSizes;
-        final long[][] verificationTimesNoHash;
-        final long[][] verificationTimesHash;
+        final VerificationResult[][] verificationTimesNoHash;
+        final VerificationResult[][] verificationTimesHash;
 
         final ArrayList<String> verificationHeaders = new ArrayList<>(Collections.singletonList("Iteration count"));
         final ArrayList<String> snapshot_headers = new ArrayList<>(Collections.singletonList("Run instance"));
 
-        BenchmarkResult(String name, BProgram[] programs, int[][] snapshotSizes, long[][] verificationTimesNoHash, long[][] verificationTimesHash) {
+        BenchmarkResult(String name, BProgram[] programs, int[][] snapshotSizes, VerificationResult[][] verificationTimesNoHash, VerificationResult[][] verificationTimesHash) {
             this.benchName = name;
             this.programs = programs;
             this.snapshotSizes = snapshotSizes;
@@ -278,7 +283,10 @@ public class SnapshotBenchmarks {
             this.verificationTimesHash = verificationTimesHash;
             //assume they're all identical, they better be
             IntStream.range(0, this.snapshotSizes[0].length).forEach(i -> snapshot_headers.add("raw " + i));
-            IntStream.range(0, this.verificationTimesNoHash[0].length).forEach(i -> verificationHeaders.add("raw " + i));
+            IntStream.range(0, this.verificationTimesNoHash[0].length).forEach(i -> {
+                verificationHeaders.add("time " + i);
+                verificationHeaders.add("nodeCount " + i);
+            });
         }
 
 
@@ -308,7 +316,7 @@ public class SnapshotBenchmarks {
 
         void outputTimes() {
             for (int i = 0; i < verificationTimesNoHash.length; i++) {
-                LongSummaryStatistics stats = Arrays.stream(verificationTimesNoHash[i]).summaryStatistics();
+                LongSummaryStatistics stats = Arrays.stream(verificationTimesNoHash[i]).mapToLong(VerificationResult::getTimeMillies).summaryStatistics();
                 long min = stats.getMin();
                 long max = stats.getMax();
                 double avg = stats.getAverage();
@@ -332,15 +340,17 @@ public class SnapshotBenchmarks {
             outputSnapToCsv(basePath.resolve(benchName + "_memory.csv"));
         }
 
-        void outputTimesToCsv(Path filePath, long[][] verificationTimes) throws IOException {
+        void outputTimesToCsv(Path filePath, VerificationResult[][] verificationResults) throws IOException {
             BufferedWriter out = Files.newBufferedWriter(filePath);
             try (CSVPrinter printer = new CSVPrinter(out, CSVFormat.DEFAULT
                     .withHeader(verificationHeaders.toArray(new String[0])))) {
-                for (int i = 0; i < verificationTimes.length; i++) {
-                    Object[] toPrint = new Object[verificationTimes[i].length + 1];
+                for (int i = 0; i < verificationResults.length; i++) {
+                    Object[] toPrint = new Object[(verificationResults[i].length * 2) + 1];
                     toPrint[0] = i;
-                    for (int j = 0; j < verificationTimes[i].length; j++) {
-                        toPrint[j + 1] = verificationTimes[i][j];
+                    for (int j = 0; j < verificationResults[i].length; j++) {
+                        int realIndex = (j * 2) + 1;
+                        toPrint[realIndex] = verificationResults[i][j].getTimeMillies();
+                        toPrint[realIndex + 1] = verificationResults[i][j].getScannedStatesCount();
                     }
                     printer.printRecord(toPrint);
                 }
