@@ -74,6 +74,7 @@ public class SnapshotBenchmarks {
         }
 
         static VerificationResult[] getVerification(DfsBProgramVerifier vfr, String programPath, Map<String, Object> valueMap, int iteration_count) {
+            System.out.println("Measuring verification time");
             return LongStream.range(0, iteration_count).mapToObj(i -> {
                 try {
                     BProgram prog = makeBProgram(programPath, valueMap);
@@ -170,8 +171,8 @@ public class SnapshotBenchmarks {
         static int MAX_THREADS = 10;
 
         static void benchmarkEventSelection() throws Exception {
-            BenchmarkResult simpleEventSelectionResults = measureProgram(new SimpleEventSelectionStrategy(), 1, true);
-            BenchmarkResult orderedEventSelectionResults = measureProgram(new OrderedEventSelectionStrategy(), 1, true);
+            BenchmarkResult simpleEventSelectionResults = measureProgram(new SimpleEventSelectionStrategy(), 1,false);
+            BenchmarkResult orderedEventSelectionResults = measureProgram(new OrderedEventSelectionStrategy(), 1, false);
             //BenchmarkResult PrioritizedBSyncEventSelectionResults = measureProgram(new PrioritizedBSyncEventSelectionStrategy());
             //BenchmarkResult PrioritizedBThreadsEventSelectionResults = measureProgram(new PrioritizedBThreadsEventSelectionStrategy());
 
@@ -192,7 +193,6 @@ public class SnapshotBenchmarks {
             VisitedStateStore store = new BThreadSnapshotVisitedStateStore();
             VisitedStateStore storeHash = new HashVisitedStateStore();
             DfsBProgramVerifier verifier = new DfsBProgramVerifier();
-
             /*
                 Test for variable num_steps
                 we want to see if there's a non linear increase in snapshot size
@@ -245,14 +245,14 @@ public class SnapshotBenchmarks {
         }
 
         static VerificationResult[] getVerificationTime(DfsBProgramVerifier vfr, String programPath, Map<String, Object> valueMap, int iteration_count, EventSelectionStrategy strategy) {
-            return (VerificationResult[]) LongStream.range(0, iteration_count).mapToObj(i -> {
+            return LongStream.range(0, iteration_count).mapToObj(i -> {
                 try {
-                    BProgram prog = makeBProgram(programPath, valueMap, strategy);
+                    BProgram prog = makeBProgram(programPath, valueMap,strategy);
                     return getVerification(vfr, prog);
                 } catch (Exception ex) {
                     return new VerificationResult(VerificationResult.ViolationType.None, null, null);
                 }
-            }).toArray();
+            }).toArray(VerificationResult[]::new);
         }
     }
 
