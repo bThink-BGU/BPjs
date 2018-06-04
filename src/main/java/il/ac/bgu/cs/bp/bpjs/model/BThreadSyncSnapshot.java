@@ -188,6 +188,9 @@ public class BThreadSyncSnapshot implements Serializable {
         final int prime = 31;
         int result = 1;
         result = prime * result + Objects.hashCode(name.hashCode());
+        if (continuation != null) {
+            result += getContinuationProgramState().hashCode();
+        }
         return result;
     }
 
