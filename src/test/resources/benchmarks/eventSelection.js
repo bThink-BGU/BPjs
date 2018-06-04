@@ -28,11 +28,12 @@
     INITIAL_ARRAY_SIZE - Size of initial array of events
     ARRAY_STEP - Number of events to add per step
     NUM_STEPS - Number of steps to take
+    SAVE_EVENT - Whether to save the bsync result or not
 */
 
 bp.log.setLevel("Info");
 function pusher(i, j) {
-    let toPush = bp.Event("event"+i); //TODO: use string formatting if Rhino allows
+    let toPush = bp.Event("event:"+i+","+j); //TODO: use string formatting if Rhino allows
     return toPush;
 }
 
@@ -47,8 +48,13 @@ for (let i = 0; i < NUM_THREADS ; i++) {
             for (let j = 0; j < ARRAY_STEP; j++) {
                 perThreadArray.push(pusher(i, j));
             }
-            let e = bp.sync({request: perThreadArray});
-            bp.log.info("at step " + i + " the event is " + e.name);
+            if (SAVE_EVENT) {
+                let e = bp.sync({request: perThreadArray});
+                bp.log.info("at step " + i + " the event is " + e.name);
+             } else {
+                bp.sync({request: perThreadArray});
+            }
+
         }
     });
 }

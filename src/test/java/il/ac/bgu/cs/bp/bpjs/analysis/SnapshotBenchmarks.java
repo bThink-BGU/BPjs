@@ -173,8 +173,8 @@ public class SnapshotBenchmarks {
         static int MAX_THREADS = 10;
 
         static void benchmarkEventSelection() throws Exception {
-            BenchmarkResult simpleEventSelectionResults = measureProgram(new SimpleEventSelectionStrategy(), 1);
-            BenchmarkResult orderedEventSelectionResults = measureProgram(new OrderedEventSelectionStrategy(), 1);
+            BenchmarkResult simpleEventSelectionResults = measureProgram(new SimpleEventSelectionStrategy(), 1,true);
+            BenchmarkResult orderedEventSelectionResults = measureProgram(new OrderedEventSelectionStrategy(), 1,true);
             //BenchmarkResult PrioritizedBSyncEventSelectionResults = measureProgram(new PrioritizedBSyncEventSelectionStrategy());
             //BenchmarkResult PrioritizedBThreadsEventSelectionResults = measureProgram(new PrioritizedBThreadsEventSelectionStrategy());
 
@@ -183,13 +183,13 @@ public class SnapshotBenchmarks {
 
             //Start from 2 because 1 was implicitly tested by simpleEvent
             for (int i = 2; i < MAX_THREADS; i++) {
-                BenchmarkResult threadResults = measureProgram(new SimpleEventSelectionStrategy(), i);
+                BenchmarkResult threadResults = measureProgram(new SimpleEventSelectionStrategy(), i,true);
                 outputBenchResults(threadResults );
             }
         }
 
 
-        private static BenchmarkResult measureProgram(EventSelectionStrategy strategy, int num_threads) throws Exception {
+        private static BenchmarkResult measureProgram(EventSelectionStrategy strategy, int num_threads, boolean save_sync) throws Exception {
             VisitedStateStore store = new BThreadSnapshotVisitedStateStore();
             VisitedStateStore storeHash = new HashVisitedStateStore();
             DfsBProgramVerifier verifier = new DfsBProgramVerifier();
@@ -212,6 +212,8 @@ public class SnapshotBenchmarks {
                 valueMap.put("INITIAL_ARRAY_SIZE", INITIAL_ARRAY_SIZE);
                 valueMap.put("ARRAY_STEP", ARRAY_STEP + i);
                 valueMap.put("NUM_STEPS", NUM_STEPS);
+                valueMap.put("SAVE_EVENT", save_sync);
+
 
                 //Initial copy
                 BProgram programToTest = makeBProgram(IMPLEMENTATION, valueMap, strategy);
@@ -229,7 +231,10 @@ public class SnapshotBenchmarks {
 
             }
 
-            return new BenchmarkResult(TEST_NAME + strategy.getClass().getName() + "_threads_"+Integer.toString(num_threads), programs, snapshotSet, verificationTimes, verificationTimesHash);
+            return new BenchmarkResult(TEST_NAME + strategy.getClass().getName()
+                    + "_save_state_" + Boolean.toString(save_sync)+
+                    "_threads_"+Integer.toString(num_threads),
+                    programs, snapshotSet, verificationTimes, verificationTimesHash);
         }
 
 
