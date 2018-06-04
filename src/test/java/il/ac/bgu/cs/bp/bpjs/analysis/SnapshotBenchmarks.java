@@ -54,19 +54,15 @@ public class SnapshotBenchmarks {
             System.out.println("Measuring state size");
             ExecutorService execSvc = ExecutorServiceMaker.makeWithName("SnapshotStore");
             DfsBProgramVerifier sut = new DfsBProgramVerifier();
-            List<Node> snapshots = new ArrayList<>();
             BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(program);
             ArrayList<Integer> snapshotSizes = new ArrayList<>();
 
-            Node initial = Node.getInitialNode(program, execSvc);
+            Node next = Node.getInitialNode(program, execSvc);
 
-            snapshots.add(initial);
-            Node next = initial;
             //Iteration 1,starts already at request state A
             for (int i = 0; i < num_steps; i++) {
                 snapshotSizes.add(io.serialize(next.getSystemState()).length);
                 next = sut.getUnvisitedNextNode(next, execSvc);
-                snapshots.add(next);
             }
             execSvc.shutdown();
 
@@ -74,8 +70,7 @@ public class SnapshotBenchmarks {
         }
 
         static VerificationResult getVerification(DfsBProgramVerifier vfr, BProgram prog) throws Exception {
-            VerificationResult res = vfr.verify(prog);
-            return res;
+            return vfr.verify(prog);
         }
 
         static VerificationResult[] getVerification(DfsBProgramVerifier vfr, String programPath, Map<String, Object> valueMap, int iteration_count) {
