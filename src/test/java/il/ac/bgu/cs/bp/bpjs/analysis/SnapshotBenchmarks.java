@@ -163,6 +163,7 @@ public class SnapshotBenchmarks {
 
     }
 
+    @SuppressWarnings("SameParameterValue")
     static class EventSelectionBenchmark extends Benchmark {
         static String IMPLEMENTATION = "benchmarks/eventSelection.js";
         static String TEST_NAME = "eventSelection";
@@ -256,6 +257,7 @@ public class SnapshotBenchmarks {
     /**
      * This consolidates benchmark results, not generic enough yet
      */
+    @SuppressWarnings("SameParameterValue")
     static class BenchmarkResult {
         final String benchName;
         final BProgram[] programs;
