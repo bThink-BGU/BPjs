@@ -183,9 +183,11 @@ public class SnapshotBenchmarks {
             outputBenchResults(orderedEventSelectionResults);
 
             //Start from 2 because 1 was implicitly tested by simpleEvent
-            for (int i = 2; i < MAX_THREADS; i++) {
+            for (int i = 1; i < MAX_THREADS; i++) {
                 BenchmarkResult threadResults = measureProgram(new SimpleEventSelectionStrategy(), i,true);
                 outputBenchResults(threadResults );
+                BenchmarkResult threadResultsNoDisplay = measureProgram(new SimpleEventSelectionStrategy(), i,false);
+                outputBenchResults(threadResultsNoDisplay);
             }
         }
 
