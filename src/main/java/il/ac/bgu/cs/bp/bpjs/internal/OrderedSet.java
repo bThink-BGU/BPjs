@@ -58,11 +58,8 @@ public class OrderedSet<T> implements SortedSet<T>, java.io.Serializable {
 
     public OrderedSet(Collection<T> someItems) {
         items = new ArrayList<>(someItems.size());
-        for (T t : someItems) {
-            if (!items.contains(t)) {
-                items.add(t);
-            }
-        }
+
+        addAll(someItems);
     }
 
     @Override
