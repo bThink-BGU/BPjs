@@ -50,7 +50,7 @@ for (let i = 0; i < NUM_THREADS ; i++) {
             }
             if (SAVE_EVENT) {
                 let e = bp.sync({request: perThreadArray});
-                bp.log.info("at step " + i + " the event is " + e.name);
+                bp.log.info("Thread " + name + " at step " + i + " the event is " + e.name);
              } else {
                 bp.sync({request: perThreadArray});
             }
