@@ -15,6 +15,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.concurrent.ExecutorService;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
@@ -25,10 +27,12 @@ import java.util.stream.LongStream;
  */
 public class SnapshotBenchmarks {
 
+    private final static Logger LOGGER = Logger.getLogger(SnapshotBenchmarks.class.getName());
 
     private static int ITERATIONS = 10;
 
     public static void main(String[] args) throws Exception {
+        LOGGER.setLevel(Level.INFO);
         VariableSizedArraysBenchmark.benchmarkVariableSizedArrays();
         EventSelectionBenchmark.benchmarkEventSelection();
     }
@@ -51,7 +55,7 @@ public class SnapshotBenchmarks {
 
 
         static int[] getStateSizes(BProgram program, int num_steps) throws Exception {
-            System.out.println("Measuring state size");
+            LOGGER.info("Measuring state size");
             ExecutorService execSvc = ExecutorServiceMaker.makeWithName("SnapshotStore");
             DfsBProgramVerifier sut = new DfsBProgramVerifier();
             BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(program);
@@ -74,7 +78,7 @@ public class SnapshotBenchmarks {
         }
 
         static VerificationResult[] getVerification(DfsBProgramVerifier vfr, String programPath, Map<String, Object> valueMap, int iteration_count) {
-            System.out.println("Measuring verification time");
+            LOGGER.info("Measuring verification time");
             return LongStream.range(0, iteration_count).mapToObj(i -> {
                 try {
                     BProgram prog = makeBProgram(programPath, valueMap);
@@ -111,12 +115,12 @@ public class SnapshotBenchmarks {
         }
 
         private static BenchmarkResult measureIntegerSizes() throws Exception {
-            System.out.println("Measuring effect of integer size");
+            LOGGER.info("Measuring effect of integer size");
             return measureProgram(0);
         }
 
         private static BenchmarkResult measureObjectSize() throws Exception {
-            System.out.println("Measuring effect of object size");
+            LOGGER.info("Measuring effect of object size");
             return measureProgram(1);
         }
 
@@ -134,7 +138,8 @@ public class SnapshotBenchmarks {
             VerificationResult[][] verificationTimesHash = new VerificationResult[ITERATIONS][];
             BProgram[] programs = new BProgram[ITERATIONS];
             for (int i = 0; i < ITERATIONS; i++) {
-                System.out.printf("Measuring for array step of %d size\n", ARRAY_STEP + i);
+                String res = String.format("Measuring for array step of %d size\n", ARRAY_STEP + i);
+                LOGGER.info(res);
                 Map<String, Object> valueMap = new HashMap<>();
                 valueMap.put("INITIAL_ARRAY_SIZE", INITIAL_ARRAY_SIZE);
                 valueMap.put("ARRAY_STEP", ARRAY_STEP + i);
@@ -181,9 +186,9 @@ public class SnapshotBenchmarks {
 
             //Start from 2 because 1 was implicitly tested by simpleEvent
             for (int i = 1; i < MAX_THREADS; i++) {
-                BenchmarkResult threadResults = measureProgram(new SimpleEventSelectionStrategy(), i, true);
+                BenchmarkResult threadResults = measureProgram(new SimpleEventSelectionStrategy(), i, false);
                 outputBenchResults(threadResults);
-                BenchmarkResult threadResultsNoDisplay = measureProgram(new SimpleEventSelectionStrategy(), i, false);
+                BenchmarkResult threadResultsNoDisplay = measureProgram(new SimpleEventSelectionStrategy(), i, true);
                 outputBenchResults(threadResultsNoDisplay);
             }
         }
@@ -204,7 +209,9 @@ public class SnapshotBenchmarks {
 
 
             for (int i = 0; i < ITERATIONS; i++) {
-                System.out.printf("Measuring for array step of %d size\n", ARRAY_STEP + i);
+
+                String res = String.format("Measuring for array step of %d size\n", ARRAY_STEP + i);
+                LOGGER.info(res);
 
                 Map<String, Object> valueMap = new HashMap<>();
                 valueMap.put("NUM_THREADS", num_threads);
