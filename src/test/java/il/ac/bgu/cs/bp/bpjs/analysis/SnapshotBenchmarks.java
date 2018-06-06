@@ -252,6 +252,8 @@ public class SnapshotBenchmarks {
         }
 
         static VerificationResult[] getVerificationTime(DfsBProgramVerifier vfr, String programPath, Map<String, Object> valueMap, int iteration_count, EventSelectionStrategy strategy) {
+            String res = String.format("Measuring Verification time with %s store", vfr.getVisitedNodeStore().getClass().getName());
+            LOGGER.info(res);
             return LongStream.range(0, iteration_count).mapToObj(i -> {
                 try {
                     BProgram prog = makeBProgram(programPath, valueMap,strategy);
