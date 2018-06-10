@@ -31,17 +31,17 @@ import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
+
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- *
- * Takes a {@link BProgram}, and verifies that it does not run into false 
+ * Takes a {@link BProgram}, and verifies that it does not run into false
  * assertions, given all possible event selections.
- * Take care to use the appropriate {@link VisitedStateStore} for the 
+ * Take care to use the appropriate {@link VisitedStateStore} for the
  * {@link BProgram} being verified.
- *
+ * <p>
  * States are scanned using a DFS.
  *
  * @author michael
@@ -57,6 +57,7 @@ public class DfsBProgramVerifier {
      */
     public final static long DEFAULT_ITERATION_COUNT_GAP = 1000;
 
+
     /**
      * A listener to the progress of the DFS state scanning.
      */
@@ -71,6 +72,7 @@ public class DfsBProgramVerifier {
         void done(DfsBProgramVerifier v);
     }
 
+    private long visitedEdgeCount;
     private long visitedStatesCount;
     private VisitedStateStore visited = new BThreadSnapshotVisitedStateStore();
     private long maxTraceLength = DEFAULT_MAX_TRACE;
@@ -80,10 +82,11 @@ public class DfsBProgramVerifier {
     private BProgram currentBProgram;
     private boolean debugMode = false;
     private boolean detectDeadlocks = true;
-    
+
     public VerificationResult verify(BProgram aBp) throws Exception {
         currentBProgram = aBp;
         visitedStatesCount = 1;
+        visitedEdgeCount = 1;
         currentPath.clear();
         visited.clear();
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("DfsBProgramRunner-" + INSTANCE_COUNTER.incrementAndGet());
@@ -93,13 +96,13 @@ public class DfsBProgramVerifier {
         long end = System.currentTimeMillis();
         listenerOpt.ifPresent(l -> l.done(this));
         execSvc.shutdown();
-        return new VerificationResult(vr.getViolationType(), vr.getFailedAssertion(), vr.getCounterExampleTrace(), end-start, visitedStatesCount);
+        return new VerificationResult(vr.getViolationType(), vr.getFailedAssertion(), vr.getCounterExampleTrace(), end - start, visitedStatesCount);
     }
 
     protected VerificationResult dfsUsingStack(Node aStartNode, ExecutorService execSvc) throws Exception {
         long iterationCount = 0;
         visitedStatesCount = 0;
-        
+
         visited.store(aStartNode);
         push(aStartNode);
 
@@ -109,21 +112,21 @@ public class DfsBProgramVerifier {
             }
 
             Node curNode = peek();
-            if ( curNode != null ) {
-                if ( isDetectDeadlocks() && 
-                    hasRequestedEvents( curNode.getSystemState() ) && 
-                    curNode.getSelectableEvents().isEmpty()
-                   ) {
+            if (curNode != null) {
+                if (isDetectDeadlocks() &&
+                        hasRequestedEvents(curNode.getSystemState()) &&
+                        curNode.getSelectableEvents().isEmpty()
+                        ) {
                     // detected deadlock
                     return new VerificationResult(VerificationResult.ViolationType.Deadlock, null, currentPath);
                 }
-                if ( ! curNode.getSystemState().isStateValid() ) {
+                if (!curNode.getSystemState().isStateValid()) {
                     // detected assertion failure.
                     return new VerificationResult(VerificationResult.ViolationType.FailedAssertion,
-                                                  curNode.getSystemState().getFailedAssertion(),
-                                                  currentPath);
+                            curNode.getSystemState().getFailedAssertion(),
+                            currentPath);
                 }
-                
+
             }
             iterationCount++;
 
@@ -157,7 +160,7 @@ public class DfsBProgramVerifier {
                 listenerOpt.get().iterationCount(iterationCount, visitedStatesCount, this);
             }
         }
-        
+
         return new VerificationResult(VerificationResult.ViolationType.None, null, null);
     }
 
@@ -165,11 +168,16 @@ public class DfsBProgramVerifier {
         while (src.getEventIterator().hasNext()) {
             final BEvent nextEvent = src.getEventIterator().next();
             Node possibleNextNode = src.getNextNode(nextEvent, execSvc);
-            if ( !visited.isVisited(possibleNextNode) ) {
+            visitedEdgeCount++;
+            if (!visited.isVisited(possibleNextNode)) {
                 return possibleNextNode;
             }
         }
         return null;
+    }
+
+    public long getVisitedEdgeCount() {
+        return visitedEdgeCount;
     }
 
     public void setMaxTraceLength(long maxTraceLength) {
@@ -245,9 +253,9 @@ public class DfsBProgramVerifier {
     public void setDetectDeadlocks(boolean detectDeadlocks) {
         this.detectDeadlocks = detectDeadlocks;
     }
-    
-    private boolean hasRequestedEvents( BProgramSyncSnapshot bpss ) {
-        return bpss.getBThreadSnapshots().stream().anyMatch(btss -> (!btss.getBSyncStatement().getRequest().isEmpty()) );
+
+    private boolean hasRequestedEvents(BProgramSyncSnapshot bpss) {
+        return bpss.getBThreadSnapshots().stream().anyMatch(btss -> (!btss.getBSyncStatement().getRequest().isEmpty()));
     }
-    
+
 }
