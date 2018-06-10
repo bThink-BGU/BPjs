@@ -24,29 +24,37 @@
 
 
 /* globals
+    NUM_THREADS - number of bthreads to spawn
     INITIAL_ARRAY_SIZE - Size of initial array of events
     ARRAY_STEP - Number of events to add per step
     NUM_STEPS - Number of steps to take
+    SAVE_EVENT - Whether to save the bsync result or not
 */
 
 bp.log.setLevel("Info");
 function pusher(i, j) {
-    let toPush = bp.Event("event"+i); //TODO: use string formatting if Rhino allows
+    let toPush = bp.Event("event:"+i+","+j); //TODO: use string formatting if Rhino allows
     return toPush;
 }
 
-
-var GLOBAL_ARRAY = [];
-for (let init = 0; init < INITIAL_ARRAY_SIZE; init++) {
-    GLOBAL_ARRAY.push(pusher(-1,-1)); //dummy data at init
-}
-
-bp.registerBThread("eventPicker", function () {
-    for (let i = 0; i < NUM_STEPS; i++) {
-        for (let j = 0; j < ARRAY_STEP; j++) {
-            GLOBAL_ARRAY.push(pusher(i, j));
+for (let i = 0; i < NUM_THREADS ; i++) {
+    let name = "eventPicker" + i;
+    bp.registerBThread(name, function () {
+        let perThreadArray = [];
+        for (let init = 0; init < INITIAL_ARRAY_SIZE; init++) {
+            perThreadArray.push(pusher(-1,-1)); //dummy data at init
         }
-        let e = bp.sync({request:GLOBAL_ARRAY});
-        bp.log.info("at step "+ i +" the event is " +e.name);
-    }
-});
+        for (let i = 0; i < NUM_STEPS; i++) {
+            for (let j = 0; j < ARRAY_STEP; j++) {
+                perThreadArray.push(pusher(i, j));
+            }
+            if (SAVE_EVENT) {
+                let e = bp.sync({request: perThreadArray});
+                bp.log.info("Thread " + name + " at step " + i + " the event is " + e.name);
+             } else {
+                bp.sync({request: perThreadArray});
+            }
+
+        }
+    });
+}
