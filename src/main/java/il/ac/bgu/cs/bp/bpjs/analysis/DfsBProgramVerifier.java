@@ -96,7 +96,7 @@ public class DfsBProgramVerifier {
         long end = System.currentTimeMillis();
         listenerOpt.ifPresent(l -> l.done(this));
         execSvc.shutdown();
-        return new VerificationResult(vr.getViolationType(), vr.getFailedAssertion(), vr.getCounterExampleTrace(), end - start, visitedStatesCount);
+        return new VerificationResult(vr.getViolationType(), vr.getFailedAssertion(), vr.getCounterExampleTrace(), end - start, visitedStatesCount, visitedEdgeCount);
     }
 
     protected VerificationResult dfsUsingStack(Node aStartNode, ExecutorService execSvc) throws Exception {

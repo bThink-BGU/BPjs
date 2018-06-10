@@ -24,47 +24,60 @@
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
 import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
+
 import java.util.List;
 
 /**
  * Result of a program verification.
- * 
+ *
  * @author michael
  */
 public class VerificationResult {
-    
+
+    public long getEdgesScanned() {
+        return edgesScanned;
+    }
+
     /**
      * The reason a b-program failed verification.
      */
     public enum ViolationType {
-        /** No violation was found (program was successfully verified) */
+        /**
+         * No violation was found (program was successfully verified)
+         */
         None,
-        
-        /** Program contains deadlocks while is shouldn't */
+
+        /**
+         * Program contains deadlocks while is shouldn't
+         */
         Deadlock,
-        
-        /** Program can generate an illegal event trace */
+
+        /**
+         * Program can generate an illegal event trace
+         */
         FailedAssertion
     }
-    
+
     private final long timeMillies;
     private final long statesScanned;
+    private final long edgesScanned;
     private final List<Node> counterExampleTrace;
     private final ViolationType violationType;
     private final FailedAssertion failedAssertion;
 
-    public VerificationResult( ViolationType aViolationType, FailedAssertion aFailedAssertion, List<Node> counterExampleTrace, long timeMillies, long statesScanned ) {
+    public VerificationResult(ViolationType aViolationType, FailedAssertion aFailedAssertion, List<Node> counterExampleTrace, long timeMillies, long statesScanned, long edgesScanned) {
         failedAssertion = aFailedAssertion;
         violationType = aViolationType;
         this.timeMillies = timeMillies;
         this.statesScanned = statesScanned;
+        this.edgesScanned = edgesScanned;
         this.counterExampleTrace = counterExampleTrace;
     }
-    
-    VerificationResult( ViolationType vt, FailedAssertion fa, List<Node> trace ) {
-        this(vt, fa, trace, 0,0);
+
+    VerificationResult(ViolationType vt, FailedAssertion fa, List<Node> trace) {
+        this(vt, fa, trace, 0, 0, 0);
     }
-    
+
     public long getTimeMillies() {
         return timeMillies;
     }
@@ -76,15 +89,15 @@ public class VerificationResult {
     public List<Node> getCounterExampleTrace() {
         return counterExampleTrace;
     }
-    
+
     public boolean isCounterExampleFound() {
-        return counterExampleTrace!=null;
+        return counterExampleTrace != null;
     }
 
     public ViolationType getViolationType() {
         return violationType;
     }
-    
+
     public boolean isVerifiedSuccessfully() {
         return violationType == ViolationType.None;
     }
@@ -92,5 +105,5 @@ public class VerificationResult {
     public FailedAssertion getFailedAssertion() {
         return failedAssertion;
     }
-    
+
 }
