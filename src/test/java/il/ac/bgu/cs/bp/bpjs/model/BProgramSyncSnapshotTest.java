@@ -196,12 +196,14 @@ public class BProgramSyncSnapshotTest {
         event_a = bprog.getEventSelectionStrategy().select(step2a.getStatements(), step2a.getExternalEvents(), possibleEvents_a).get();
         event_b = bprog2.getEventSelectionStrategy().select(step2b.getStatements(), step2b.getExternalEvents(), possibleEvents_b).get();
         BProgramSyncSnapshot step3a = step2a.triggerEvent(event_a.getEvent(), execSvcA, listeners);
+        assertFalse(step3a.isStateValid());
         assertNotEquals(step3a, step2a);
         assertTrue(step2a.isStateValid());
-        assertTrue(!step3a.isStateValid());
         BProgramSyncSnapshot step3b = step2b.triggerEvent(event_b.getEvent(), execSvcB, listeners);
         assertNotEquals(step3a, step3b);
         assertNotEquals(step3a, step2a);
         assertNotEquals(step3b, step2a);
+
+
     }
 }
