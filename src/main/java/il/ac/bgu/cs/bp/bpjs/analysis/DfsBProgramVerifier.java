@@ -86,7 +86,7 @@ public class DfsBProgramVerifier {
     public VerificationResult verify(BProgram aBp) throws Exception {
         currentBProgram = aBp;
         visitedStatesCount = 1;
-        visitedEdgeCount = 1;
+        visitedEdgeCount = 0;
         currentPath.clear();
         visited.clear();
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("DfsBProgramRunner-" + INSTANCE_COUNTER.incrementAndGet());

@@ -219,6 +219,8 @@ public class DfsBProgramVerifierTest {
         assertFalse(res.isCounterExampleFound());
         assertEquals(res.getViolationType(), VerificationResult.ViolationType.None);
         assertEquals(10, res.getScannedStatesCount());
+        assertEquals(10, res.getEdgesScanned()); //in this case only one option per state
+
     }
 
     @Test(timeout = 3000)
@@ -253,6 +255,7 @@ public class DfsBProgramVerifierTest {
         assertEquals(res.getViolationType(), VerificationResult.ViolationType.FailedAssertion);
         assertTrue(res.isCounterExampleFound());
         assertEquals(1, res.getScannedStatesCount());
+        assertEquals(1, res.getEdgesScanned());
     }
 
 }
