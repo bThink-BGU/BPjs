@@ -55,7 +55,12 @@ public class VerificationResult {
         /**
          * Program can generate an illegal event trace
          */
-        FailedAssertion
+        FailedAssertion,
+
+        /**
+         * Program verification can time out
+         */
+        Timeout,
     }
 
     private final long timeMillies;

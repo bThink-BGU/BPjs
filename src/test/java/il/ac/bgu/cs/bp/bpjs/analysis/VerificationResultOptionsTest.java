@@ -116,5 +116,27 @@ public class VerificationResultOptionsTest {
         assertEquals(0, res.getScannedStatesCount());
     }
 
+    @Test(timeout=2000)
+    public void testTimeout() throws Exception {
+        //simple program with enough states that shouldn't take less than 10 ms
+        final BProgram bprog = new StringBProgram("bp.registerBThread('timeout', function(){" + //
+                "    while(true) \n" + //
+                "      for(var i=0; i<10; i++){\n" + //
+                "         var e = bp.sync({ waitFor:[ bp.Event(\"X\") ] });\n" + //
+                "      }\n" + //
+                "});\n" + "bp.registerBThread('bt2', function(){" + //
+                "    while(true){\n" + //
+                "       var y = bp.sync({ request:[ bp.Event(\"X\") ] });\n" + //
+                "}});\n");
+        DfsBProgramVerifier vfr = new DfsBProgramVerifier();
+        long timeout = 2;
+        vfr.setTimeout(timeout);
+        final VerificationResult res = vfr.verify(bprog);
+        assertEquals(VerificationResult.ViolationType.Timeout, res.getViolationType());
+        assertTrue(res.getTimeMillies() >= timeout);
+
+
+    }
+
 
 }

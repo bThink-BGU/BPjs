@@ -72,6 +72,10 @@ public class DfsBProgramVerifier {
         void done(DfsBProgramVerifier v);
     }
 
+    private long start;
+
+
+    private long timeout; //timeout in ms
     private long visitedEdgeCount;
     private long visitedStatesCount;
     private VisitedStateStore visited = new BThreadSnapshotVisitedStateStore();
@@ -90,7 +94,7 @@ public class DfsBProgramVerifier {
         currentPath.clear();
         visited.clear();
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("DfsBProgramRunner-" + INSTANCE_COUNTER.incrementAndGet());
-        long start = System.currentTimeMillis();
+        start = System.currentTimeMillis();
         listenerOpt.ifPresent(l -> l.started(this));
         VerificationResult vr = dfsUsingStack(Node.getInitialNode(aBp, execSvc), execSvc);
         long end = System.currentTimeMillis();
@@ -107,8 +111,19 @@ public class DfsBProgramVerifier {
         push(aStartNode);
 
         while (!isPathEmpty()) {
+
             if (debugMode) {
                 printStatus(iterationCount, Collections.unmodifiableList(currentPath));
+            }
+            if (timeout != 0) {
+                long currTime = System.currentTimeMillis();
+                if ((currTime - start) > timeout) {
+                    //done
+                    if (debugMode) {
+                        System.out.println("Timeout exceeded, returning current state");
+                    }
+                    return new VerificationResult(VerificationResult.ViolationType.Timeout, null, null);
+                }
             }
 
             Node curNode = peek();
@@ -131,9 +146,7 @@ public class DfsBProgramVerifier {
             iterationCount++;
 
             if (pathLength() == maxTraceLength) {
-                if (listenerOpt.isPresent()) {
-                    listenerOpt.get().maxTraceLengthHit(currentPath, this);
-                }
+                listenerOpt.ifPresent(progressListener -> progressListener.maxTraceLengthHit(currentPath, this));
                 // fold stack;
                 pop();
 
@@ -146,7 +159,7 @@ public class DfsBProgramVerifier {
                         System.out.println("-pop!-");
                     }
                 } else {
-                    // go deeper 
+                    // go deeper
                     visited.store(nextNode);
                     if (isDebugMode()) {
                         System.out.println("-visiting: " + nextNode);
@@ -156,8 +169,9 @@ public class DfsBProgramVerifier {
                 }
             }
 
-            if (iterationCount % iterationCountGap == 0 && listenerOpt.isPresent()) {
-                listenerOpt.get().iterationCount(iterationCount, visitedStatesCount, this);
+            if (iterationCount % iterationCountGap == 0) {
+                long finalIterationCount = iterationCount;
+                listenerOpt.ifPresent(progressListener -> progressListener.iterationCount(finalIterationCount, visitedStatesCount, this));
             }
         }
 
@@ -174,6 +188,18 @@ public class DfsBProgramVerifier {
             }
         }
         return null;
+    }
+
+    public long getTimeout() {
+        return timeout;
+    }
+
+    /**
+     * Set timeout, 0 to disable timeout checks
+     * @param timeout - 0 to disable timeout
+     */
+    public void setTimeout(long timeout) {
+        this.timeout = timeout;
     }
 
     public long getVisitedEdgeCount() {

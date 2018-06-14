@@ -219,7 +219,7 @@ public class DfsBProgramVerifierTest {
         assertFalse(res.isCounterExampleFound());
         assertEquals(res.getViolationType(), VerificationResult.ViolationType.None);
         assertEquals(10, res.getScannedStatesCount());
-        assertEquals(10, res.getEdgesScanned()); //in this case only one option per state
+        assertEquals(11, res.getEdgesScanned()); //in this case only one option per state
 
     }
 
