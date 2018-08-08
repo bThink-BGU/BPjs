@@ -43,6 +43,11 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+### 2018-08-08
+* :sparkles: Decorating event selection strategies just go easier with the introduction of `AbstractEventSelectionStrategyDecorator`.
+
+### 2108-06-*
+* :sparkles: Many more tests and benchmarks.
 
 ### 2018-04-26
 * :bug: Verifiers can be re-used.

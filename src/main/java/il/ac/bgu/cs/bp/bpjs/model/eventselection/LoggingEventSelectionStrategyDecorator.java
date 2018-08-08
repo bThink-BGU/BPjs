@@ -32,32 +32,29 @@ import java.util.Optional;
 import java.util.Set;
 
 /**
- *
  * A decorator that logs the state of the BProgram prior to letting the 
- * decorated {@link EventSelectionStrategy} select the event.
- * 
- * Logging is done to a {@link PrintStream}, which defaults to {@code System.out}. 
+ * decorated {@link EventSelectionStrategy} select the event.Logging is done to a {@link PrintStream}, which defaults to {@code System.out}.
+ *  
+ * @param <ESS> The type of event selection strategy being decorated.
  * 
  * @author michael
  */
-public class LoggingEventSelectionStrategyDecorator implements EventSelectionStrategy {
-    
-    private final EventSelectionStrategy decorated;
+public class LoggingEventSelectionStrategyDecorator<ESS extends EventSelectionStrategy> extends AbstractEventSelectionStrategyDecorator<ESS> {
     
     private final PrintWriter out;
     
-    public LoggingEventSelectionStrategyDecorator(EventSelectionStrategy decorated, PrintWriter anOut) {
+    public LoggingEventSelectionStrategyDecorator(ESS decorated, PrintWriter anOut) {
+        super(decorated);
         out = anOut;
-        this.decorated = decorated;
     }
     
-    public LoggingEventSelectionStrategyDecorator(EventSelectionStrategy decorated) {
+    public LoggingEventSelectionStrategyDecorator(ESS decorated) {
         this(decorated, new PrintWriter(System.out));
     }
 
     @Override
     public Set<BEvent> selectableEvents(Set<BSyncStatement> statements, List<BEvent> externalEvents) {
-        final Set<BEvent> selectableEvents = decorated.selectableEvents(statements, externalEvents);
+        final Set<BEvent> selectableEvents = getDecorated().selectableEvents(statements, externalEvents);
 
         out.println("== Choosing Selectable Events ==");
         out.println("BThread Sync Statements:");
@@ -84,7 +81,7 @@ public class LoggingEventSelectionStrategyDecorator implements EventSelectionStr
 
     @Override
     public Optional<EventSelectionResult> select(Set<BSyncStatement> statements, List<BEvent> externalEvents, Set<BEvent> selectableEvents) {
-        Optional<EventSelectionResult> selectedEvent = decorated.select(statements, externalEvents, selectableEvents);
+        Optional<EventSelectionResult> selectedEvent = getDecorated().select(statements, externalEvents, selectableEvents);
         out.println("== Actual Event Selection ======");
         out.println( selectedEvent.toString() );
         out.println("================================");

@@ -17,7 +17,7 @@ import java.util.Set;
  * @author michael
  */
 public interface EventSelectionStrategy {
-    
+
     /**
      * Creates the set of selectable events, given the {@link BSyncStatement}s from 
      * all participating BThreads.
