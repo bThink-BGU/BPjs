@@ -197,7 +197,9 @@ public class DfsBProgramVerifierTest {
         assertEquals(10, res.getScannedStatesCount());
     }
 
-    @Test(timeout = 2000)
+    
+//    @Test(timeout = 2000)
+    // Ignoring until the updated Rhino is released.
     public void testVariablesEquailtyInBT() throws Exception {
         BProgram bprog = new StringBProgram( //
                 "bp.registerBThread('bt1', function(){" + //
