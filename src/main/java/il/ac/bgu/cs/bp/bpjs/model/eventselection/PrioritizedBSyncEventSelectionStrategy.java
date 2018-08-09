@@ -35,6 +35,7 @@ import java.util.OptionalInt;
 import java.util.Set;
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toSet;
+import org.mozilla.javascript.Context;
 
 /**
  * An event selection strategy that prefers events requested by BSync statements with higher priority. 
@@ -69,15 +70,20 @@ public class PrioritizedBSyncEventSelectionStrategy extends AbstractEventSelecti
                                             .mapToInt(this::getValue)
                                             .max();
         
-        if ( maxValueOpt.isPresent() ) {
-            int maxValue = maxValueOpt.getAsInt();
-            return statements.stream().filter( s -> getValue(s) == maxValue )
-                             .flatMap( s -> getRequestedAndNotBlocked(s, blocked).stream() )
-                             .collect( toSet() );
-        } else {
-            // Can't select any internal event, defer to the external, non-blocked ones.
-            return externalEvents.stream().filter( e->!blocked.contains(e) ) // No internal events requested, defer to externals.
-                                  .findFirst().map( e->singleton(e) ).orElse(emptySet());
+        try {
+            Context.enter();
+            if ( maxValueOpt.isPresent() ) {
+                int maxValue = maxValueOpt.getAsInt();
+                return statements.stream().filter( s -> getValue(s) == maxValue )
+                                 .flatMap( s -> getRequestedAndNotBlocked(s, blocked).stream() )
+                                 .collect( toSet() );
+            } else {
+                // Can't select any internal event, defer to the external, non-blocked ones.
+                return externalEvents.stream().filter( e->!blocked.contains(e) ) // No internal events requested, defer to externals.
+                                      .findFirst().map( e->singleton(e) ).orElse(emptySet());
+            }
+        } finally {
+            Context.exit();
         }
        
     }
