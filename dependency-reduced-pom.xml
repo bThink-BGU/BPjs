@@ -4,7 +4,7 @@
   <groupId>com.github.bthink-bgu</groupId>
   <artifactId>BPjs</artifactId>
   <name>BPjs</name>
-  <version>0.9.2-SNAPSHOT</version>
+  <version>0.9.2</version>
   <description>Provides a runtime for behavioral programs written in Javascript. It can 
         run stand-alone (from the commmandline) or be embedded in larger 
         JVM-based systems.</description>
@@ -199,6 +199,12 @@
           <groupId>org.webbitserver</groupId>
         </exclusion>
       </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-csv</artifactId>
+      <version>1.5</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.opera</groupId>
