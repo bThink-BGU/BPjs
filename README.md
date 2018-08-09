@@ -47,6 +47,7 @@ a link to this page somewhere in the documentation/system about section.
 * :sparkles: Decorating event selection strategies just go easier with the introduction of `AbstractEventSelectionStrategyDecorator`.
 * :sparkles: Added a pausing event selection strategy, to allow pausing and rate-limiting the execution of a BProgram.
 * :bug: PrioritizedBSyncEventSelectionStrategy deals with its own JS Context properly (fixes #34).
+* :sparkles: Added a "what do you want to do" section to the docs, to help newcomers.
 
 ### 2108-06-*
 * :sparkles: Many more tests and benchmarks.
