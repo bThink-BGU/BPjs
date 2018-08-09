@@ -44,6 +44,7 @@ a link to this page somewhere in the documentation/system about section.
 ## Change log for the BPjs library.
 
 ### 2018-08-08
+* :sparkles: Added a pausing event selection strategy, to allow pausing and rate-limiting the execution of a BProgram.
 * :sparkles: Decorating event selection strategies just go easier with the introduction of `AbstractEventSelectionStrategyDecorator`.
 
 ### 2108-06-*
