@@ -52,7 +52,7 @@ public class PausingEventSelectionStrategyDecoratorTest {
             runner.addListener( new PrintBProgramRunnerListener() );
             
             PausingEventSelectionStrategyDecorator sut =
-                new PausingEventSelectionStrategyDecorator( new SimpleEventSelectionStrategy());
+                new PausingEventSelectionStrategyDecorator(new SimpleEventSelectionStrategy());
             runner.getBProgram().setEventSelectionStrategy(sut);
             
             long pauseTime = 500;

@@ -271,14 +271,18 @@ public abstract class BProgram {
             Context cx = ContextFactory.getGlobal().enterContext();
             cx.setOptimizationLevel(-1); // must use interpreter mode
             initProgramScope(cx);
+            
+            // evaluate code in order
             if ( prependedCode != null ) {
                 prependedCode.forEach( s -> evaluate(s, "prependedCode") );
             }
             setupProgramScope(programScope);
-            bthreads.forEach(bt -> bt.setupScope(programScope));
             if ( appendedCode != null ) {
                 appendedCode.forEach( s -> evaluate(s, "appendedCode") );
             }
+            
+            // setup registered b-threads
+            bthreads.forEach(bt -> bt.setupScope(programScope));
             
         } catch ( FailedAssertionException fae ) {
             failedAssertion = new FailedAssertion(fae.getMessage(), "---init_code");
@@ -296,8 +300,7 @@ public abstract class BProgram {
         ImporterTopLevel importer = new ImporterTopLevel(cx);
         programScope = cx.initStandardObjects(importer);
         BProgramJsProxy proxy = new BProgramJsProxy(this);
-        programScope.put("bp", programScope,
-        Context.javaToJS(proxy, programScope));
+        programScope.put("bp", programScope, Context.javaToJS(proxy, programScope));
         
 //        evaluateResource("globalScopeInit.js");// <-- Currently not needed. Leaving in as we might need it soon.
         initialScopeValues.entrySet().forEach(e->putInGlobalScope(e.getKey(), e.getValue()));
