@@ -21,7 +21,7 @@ public class TicTacToeVerMain  {
 		BProgram bprog = new SingleResourceBProgram("BPJSTicTacToe.js");
 
 		bprog.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());
-		bprog.setDaemonMode(true);
+		bprog.setWaitForExternalEvents(true);
 		
 		String simulatedPlayer =   "bp.registerBThread('XMoves', function() {\n" +
 									"while (true) {\n" +

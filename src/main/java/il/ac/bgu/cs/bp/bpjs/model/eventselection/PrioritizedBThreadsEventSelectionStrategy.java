@@ -19,10 +19,13 @@ import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.stream.Stream;
 
 /**
- * An event selection strategy that prefers events from b-threads with higher priorities.
+ * An event selection strategy that prefers events from b-threads with higher
+ * priorities. The higher the number assigned to a b-thread, the higher its
+ * priority is.
  * 
  * @author geraw
  * @author michael
@@ -67,7 +70,9 @@ public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSele
                     .filter( req -> !blocked.contains(req.getLeft()) )
                     .collect( toSet() );
             
-            Integer highestPriority = requestedAndNotBlockedWithPriorities.stream().map(p -> p.getRight()).max(Integer::max).get();
+            Integer highestPriority = requestedAndNotBlockedWithPriorities.stream()
+                .map(p -> p.getRight())
+                .max(Comparator.comparing(Integer::valueOf)).get();
             
             Set<BEvent> requestedAndNotBlocked = requestedAndNotBlockedWithPriorities.stream()
             	.filter(p -> p.getRight().intValue() == highestPriority.intValue())

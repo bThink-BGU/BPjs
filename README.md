@@ -24,7 +24,7 @@ a link to this page somewhere in the documentation/system about section.
     <dependency>
         <groupId>com.github.bthink-bgu</groupId>
         <artifactId>BPjs</artifactId>
-        <version>0.8.7</version>
+        <version>0.9.3</version>
     </dependency>
     ...
 </dependencies>
@@ -43,13 +43,21 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+### 2018-10-16
+* :arrows_counterclockwise: ambiguous term `daemonMode` changed to `waitForExternalEvents` (#54). 
+* :bug: `PrioritizedBSyncEventSelectionStrategy` selected wrong event.
+
+### 2018-10-20
+* :sparkles: `BPJsCliRunner` can now directly executed from Maven, using `mvn exec:java`. Pass arguments using `-Dexec.args="args go here"`.
+* :sparkles: `BPJsCliRunner` can verify a program. Pass `--verify` as a commandline argument. Use `--full-state-storage` to force the verification to use the full state data when determining whether a state was visited (requires more memory).
+
 ### 2018-10-13
 * :bug: B-Program setup sequence is consistent for all b-threads, including those in appended code.
 
 ### 2018-08-08
 * :sparkles: Decorating event selection strategies just go easier with the introduction of `AbstractEventSelectionStrategyDecorator`.
 * :sparkles: Added a pausing event selection strategy, to allow pausing and rate-limiting the execution of a BProgram.
-* :bug: PrioritizedBSyncEventSelectionStrategy deals with its own JS Context properly (fixes #34).
+* :bug: `PrioritizedBSyncEventSelectionStrategy` deals with its own JavaScript Context properly (fixes #34).
 * :sparkles: Added a "what do you want to do" section to the docs, to help newcomers.
 
 ### 2108-06-*
@@ -66,7 +74,7 @@ a link to this page somewhere in the documentation/system about section.
 * :sparkles: MOAR UNIT TESTSTSSSTTTSTSS!!!!!!! 
 
 ### 2018-03-21
-* :sparkles: `bsync` is *depredated*, in favor of `bp.sync`. The latter can be called from any function, not just the immediate b-thread function.
+* :sparkles: `bsync` is *deprecated*, in favor of `bp.sync`. The latter can be called from any function, not just the immediate b-thread function.
 * :sparkles: `BProgramRunner` now implements Java's `Runnable`.
 * :arrow_up: Simplified b-thread scope processing. This means scopes behave closer to what a JavaScript programmer would expect.
 * :arrow_up: Javadoc references use latest version (rather than a fixed one).

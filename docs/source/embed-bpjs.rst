@@ -78,6 +78,7 @@ At Runtime
 * Instantiate the proper ``BProgram`` sub-class, and supply it with the source BPjs code.
 * If needed, set a new ``EventSelectionStrategy``. When no strategy is supplied, SimpleEventSelectionStrategy_ will by used. This strategy randomly selects an event from the set of events that are requested and not blocked.
 * If needed, add Java objects to the global b-program scope using `putInGlobalScope`_.
+* If the host Java program will push external events to the b-program, make the b-program wait for these events by calling ``bprog.setWaitForExternalEvents(true)``.
 * Instantiate a ``BProgramRunner`` object, and supply it with the ``BProgram`` instance.
 * Add listeners to the runner.
 * In the common case when the program needs to wait for external events (such as GUI interactions), set the ``isDaemon`` property of the ``BProgram`` to ``true``.

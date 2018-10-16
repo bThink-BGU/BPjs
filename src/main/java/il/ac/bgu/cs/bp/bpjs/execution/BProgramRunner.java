@@ -93,7 +93,7 @@ public class BProgramRunner implements Runnable {
                 Set<BEvent> possibleEvents = bprog.getEventSelectionStrategy().selectableEvents(cur.getStatements(), cur.getExternalEvents());
                 if ( possibleEvents.isEmpty() ) {
                     // No events available or selection. Terminate or wait for external one (in daemon mode).
-                    if ( bprog.isDaemonMode() ) {
+                    if ( bprog.isWaitForExternalEvents() ) {
                         listeners.forEach( l->l.superstepDone(bprog) );
                         BEvent next = bprog.takeExternalEvent(); // and now we wait.
                         if ( next == null ) {

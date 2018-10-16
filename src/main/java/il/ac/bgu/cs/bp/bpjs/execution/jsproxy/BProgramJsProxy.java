@@ -256,11 +256,11 @@ public class BProgramJsProxy implements java.io.Serializable {
      *                      {@code false} otherwise.
      */
     public void setDaemonMode( boolean newDaemonMode ) {
-        program.setDaemonMode( newDaemonMode );
+        program.setWaitForExternalEvents( newDaemonMode );
     }
     
     public boolean isDaemonMode() {
-        return program.isDaemonMode();
+        return program.isWaitForExternalEvents();
     }
     
     /**

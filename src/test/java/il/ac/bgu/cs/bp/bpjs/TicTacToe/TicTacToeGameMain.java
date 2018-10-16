@@ -26,7 +26,7 @@ class TicTacToeGameMain extends JFrame {
 		BProgram bprog = new SingleResourceBProgram("BPJSTicTacToe.js");
 
 		bprog.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());
-		bprog.setDaemonMode(true);
+		bprog.setWaitForExternalEvents(true);
 		JFrame f = new TicTacToeGameMain();
 		BProgramRunner rnr = new BProgramRunner(bprog);
 		rnr.addListener(new PrintBProgramRunnerListener());

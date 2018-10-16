@@ -23,6 +23,11 @@
  */
 package il.ac.bgu.cs.bp.bpjs.mains;
 
+import il.ac.bgu.cs.bp.bpjs.analysis.BThreadSnapshotVisitedStateStore;
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
+import il.ac.bgu.cs.bp.bpjs.analysis.HashVisitedStateStore;
+import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
+import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
@@ -52,7 +57,7 @@ import org.mozilla.javascript.Scriptable;
  */
 public class BPJsCliRunner {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         if (args.length == 0) {
             printUsageAndExit();
         }
@@ -100,16 +105,61 @@ public class BPJsCliRunner {
         };
 
         SimpleEventSelectionStrategy sess = new SimpleEventSelectionStrategy();
-        EventSelectionStrategy ess = switchPresent("-v", args) ? new LoggingEventSelectionStrategyDecorator(sess) : sess;
+        
+        if ( switchPresent("--verify", args) ) {
+            bpp.setEventSelectionStrategy(sess);
+            DfsBProgramVerifier vfr = new DfsBProgramVerifier();
+            vfr.setDebugMode( switchPresent("-v", args));
+            vfr.setProgressListener( new BriefPrintDfsVerifierListener() );
+            
+            if ( switchPresent("--full-state-storage", args) ) {
+                println("Using full state storage");
+                vfr.setVisitedNodeStore( new BThreadSnapshotVisitedStateStore() );
+            } else {
+                vfr.setVisitedNodeStore( new HashVisitedStateStore() );
+            }
+            
+            try {
+                println("Starting vberification");
+                VerificationResult res = vfr.verify(bpp);
+                println("Verification completed.");
+                if ( res.isVerifiedSuccessfully() ) {
+                    println("No violations found");
+                } else {
+                    println("Violation type: " + res.getViolationType());
+                    println("Failed assertion: " + res.getFailedAssertion().getMessage() );
+                    println("     By b-thread: " + res.getFailedAssertion().getBThreadName());
+                    if ( res.isCounterExampleFound() ) {
+                        println("Counter example:");
+                        res.getCounterExampleTrace().stream()
+                            .skip(1) // the first node has no previsou event.
+                            .forEach(nd -> println(nd.getLastEvent().toString()));
+                    }
+                }
+                println("General statistics:");
+                println(String.format("Time:\t%,d (msec)", res.getTimeMillies()));
+                println(String.format("States scanned:\t%,d", res.getScannedStatesCount()));
+                                    
+                
+            } catch ( Exception e ) {
+                println("!! Exception during verifying the program: " + e.getMessage());
+                println("!! Stack trace:");
+                e.printStackTrace(System.out);
+            }
+            
+        } else {
+            EventSelectionStrategy ess = switchPresent("-v", args) ? new LoggingEventSelectionStrategyDecorator(sess) : sess;
 
-        bpp.setEventSelectionStrategy(ess);
+            bpp.setEventSelectionStrategy(ess);
 
-        BProgramRunner bpr = new BProgramRunner(bpp);
-        if (!switchPresent("-v", args)) {
-            bpr.addListener(new PrintBProgramRunnerListener());
+            BProgramRunner bpr = new BProgramRunner(bpp);
+            if (!switchPresent("-v", args)) {
+                bpr.addListener(new PrintBProgramRunnerListener());
+            }
+
+            bpr.run();            
         }
-
-        bpr.run();
+        
 
     }
 

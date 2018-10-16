@@ -63,9 +63,10 @@ public abstract class BProgram {
 
     /**
      * When {@code true}, the BProgram waits for an external event when no
-     * internal ones are available.
+     * internal ones are available. Corollary: the program does not terminate 
+     * at the end of a super-step.
      */
-    private boolean daemonMode;
+    private boolean waitForExternalEvents;
 
     /**
      * Events are enqueued here by external threads
@@ -327,7 +328,7 @@ public abstract class BProgram {
         BEvent next = recentlyEnqueuedExternalEvents.take();
         
         if (next == NO_MORE_DAEMON) {
-            daemonMode = false;
+            waitForExternalEvents = false;
             return null;
         } else {
             return next;
@@ -335,36 +336,34 @@ public abstract class BProgram {
     }
 
     /**
-     * Sets whether this program is a daemon or not. When daemon, program will
-     * wait for external events even when there are no selectable internal events. 
+     * Sets whether this program waits for external events or not.
      *
-     * In normal mode ({@code daemon==false}), when no events are available for 
+     * When set to {@code false}, when no events are available for 
      * selection, the program terminates.
      * 
-     * @param newDaemonMode {@code true} to make the program a daemon, 
-     *                      {@code false} otherwise.
+     * @param shouldWait 
      */
-    public void setDaemonMode(boolean newDaemonMode) {
-        if (daemonMode && !newDaemonMode) {
-            daemonMode = false;
+    public void setWaitForExternalEvents(boolean shouldWait) {
+        if (waitForExternalEvents && !shouldWait) {
+            waitForExternalEvents = false;
             recentlyEnqueuedExternalEvents.add(NO_MORE_DAEMON);
         } else {
-            daemonMode = newDaemonMode;
+            waitForExternalEvents = shouldWait;
         }
     }
 
     /**
-     * Returns {@code true} iff the program is in daemon mode. When in this mode,
+     * Returns {@code true} iff the program waits for external events. When {@code true},
      * the program will not terminate when it has no event available for selection.
      * Rather, it will wait for an external event to be enqueued into its external
      * event queue.
      * 
-     * @return {@code true} if this BProgram is in daemon mode,
+     * @return {@code true} if this BProgram waits for external events,
      *         {@code false} otherwise.
      * @see #enqueueExternalEvent(il.ac.bgu.cs.bp.bpjs.events.BEvent) 
      */
-    public boolean isDaemonMode() {
-        return daemonMode;
+    public boolean isWaitForExternalEvents() {
+        return waitForExternalEvents;
     }
     
     /**

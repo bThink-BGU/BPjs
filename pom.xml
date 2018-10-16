@@ -41,6 +41,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>1.8</java.version>
+        <exec.mainClass>il.ac.bgu.cs.bp.bpjs.mains.BPJsCliRunner</exec.mainClass>
     </properties>
 
     <distributionManagement>

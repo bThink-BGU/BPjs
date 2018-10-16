@@ -1,7 +1,7 @@
 BPjs Execution Runtime
 ----------------------
 
-This program takes a series of BPjs files, and executes them 
+This program takes a series of BPjs files, and executes or verifies them 
 as a single BProgram.
 
 Use "-" to also read from stdin.
@@ -10,4 +10,8 @@ BProgram log and event sequence are written to stdout.
 
 Switches:
    -v ("verbose")
-        Print more data about the BProgram's status as synchronization points..
+        Print more data about the BProgram's status as synchronization points.
+   --verify 
+        Verify the program, rather than execute it.
+   --full-state-storage (verification only)
+        Use full state storage, rather than a hashed one.

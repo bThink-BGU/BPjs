@@ -121,9 +121,7 @@ public class BEvent implements Comparable<BEvent>, EventSet, java.io.Serializabl
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 67 * hash + Objects.hashCode(this.name);
-        return hash;
+        return name.hashCode();
     }
 
     @Override
