@@ -388,7 +388,7 @@ public abstract class BProgram {
      *
      * @return {@code true} if this BProgram waits for external events,
      * {@code false} otherwise.
-     * @see #enqueueExternalEvent(il.ac.bgu.cs.bp.bpjs.events.BEvent)
+     * @see #enqueueExternalEvent(il.ac.bgu.cs.bp.bpjs.model.BEvent) 
      */
     public boolean isWaitForExternalEvents() {
         return waitForExternalEvents;

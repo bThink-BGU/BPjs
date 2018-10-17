@@ -32,7 +32,7 @@ public interface BProgramRunnerListener {
      * 
      * @param bp The BProgram informing the change.
      * 
-     * @see BProgram#setDaemonMode(boolean) 
+     * @see BProgram#setWaitForExternalEvents(boolean)
      */
     void superstepDone( BProgram bp );
     

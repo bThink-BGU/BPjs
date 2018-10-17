@@ -23,6 +23,8 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+
 /**
  * Simple logging mechanism for {@link BProgram}s.
  * 
