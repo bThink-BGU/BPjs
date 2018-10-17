@@ -43,6 +43,9 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+### 2018-10-17
+* :sparkles: `BProgramRunner` now has a `halt()` method (#53).
+
 ### 2018-10-16
 * :arrows_counterclockwise: ambiguous term `daemonMode` changed to `waitForExternalEvents` (#54). 
 * :bug: `PrioritizedBSyncEventSelectionStrategy` selected wrong event.

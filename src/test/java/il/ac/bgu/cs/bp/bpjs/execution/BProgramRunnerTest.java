@@ -23,14 +23,19 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution;
 
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.Test;
@@ -86,5 +91,44 @@ public class BProgramRunnerTest {
         String exName = bprog.getFromGlobalScope("exName", String.class).get();
         assertTrue("Java executor name is wrong (got:'" + exName + "')",
                 exName.startsWith("BProgramRunner-"));
+    }
+    
+    @Test(timeout=3000)
+    public void testHalt() {
+        BProgram bprog = new StringBProgram(
+            "bp.registerBThread(function(){\n" +
+            "while (true){\n" +
+                "bp.sync({request:bp.Event(\"evt\")});"+
+                "}"+
+            "});"
+        );
+        
+        BProgramRunner rnr = new BProgramRunner(bprog);
+        AtomicBoolean haltedCalled = new AtomicBoolean();
+        AtomicBoolean endedCalled = new AtomicBoolean();
+        rnr.addListener( new BProgramRunnerListenerAdapter() {
+            @Override
+            public void halted(BProgram bp) {
+                haltedCalled.set(true);
+            }
+
+            @Override
+            public void ended(BProgram bp) {
+                endedCalled.set(true);
+            }
+        });
+        
+        new Thread(()->{
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ex) {}
+            rnr.halt();
+        }).start();
+        
+        rnr.run();
+        
+        assertTrue( haltedCalled.get() );
+        assertFalse( endedCalled.get() );
+
     }
 }

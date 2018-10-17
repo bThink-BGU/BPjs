@@ -37,6 +37,7 @@ import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
@@ -53,6 +54,9 @@ public class BProgramRunner implements Runnable {
     private BProgram bprog = null;
     private final List<BProgramRunnerListener> listeners = new ArrayList<>();
     private FailedAssertion failedAssertion;
+    private final AtomicBoolean go = new AtomicBoolean(true);
+    private volatile boolean halted;
+    
     
     public BProgramRunner(){
         this(null);
@@ -78,26 +82,28 @@ public class BProgramRunner implements Runnable {
             listeners.forEach(l -> l.started(bprog));
             cur = cur.start(execSvc);
 
-            boolean go=true;
+            go.set(true);
+            halted = false;
 
             if ( ! cur.isStateValid() ) {
                 failedAssertion = cur.getFailedAssertion();
                 listeners.forEach( l->l.assertionFailed(bprog, failedAssertion));
-                go = false;
+                go.set(false);
             }
 
             // while snapshot not empty, select an event and get the next snapshot.
-            while ( (!cur.noBThreadsLeft()) && go ) {
+            while ( (!cur.noBThreadsLeft()) && go.get() ) {
 
                 // see which events are selectable
                 Set<BEvent> possibleEvents = bprog.getEventSelectionStrategy().selectableEvents(cur.getStatements(), cur.getExternalEvents());
                 if ( possibleEvents.isEmpty() ) {
-                    // No events available or selection. Terminate or wait for external one (in daemon mode).
+                    // Superstep done: No events available or selection.
+                    
                     if ( bprog.isWaitForExternalEvents() ) {
                         listeners.forEach( l->l.superstepDone(bprog) );
-                        BEvent next = bprog.takeExternalEvent(); // and now we wait.
+                        BEvent next = bprog.takeExternalEvent(); // and now we wait for external event
                         if ( next == null ) {
-                            go=false; // program is not a daemon anymore.
+                            go.set(false); // program no longer waits for external events
                         } else {
                             cur.getExternalEvents().add(next);
                         }
@@ -105,7 +111,7 @@ public class BProgramRunner implements Runnable {
                     } else {
                         // Ending the program - no selectable event.
                         listeners.forEach(l->l.superstepDone(bprog));
-                        go = false;
+                        go.set(false); 
                     }
 
                 } else {
@@ -128,16 +134,20 @@ public class BProgramRunner implements Runnable {
                         if ( ! cur.isStateValid() ) {
                             failedAssertion = cur.getFailedAssertion();
                             listeners.forEach( l->l.assertionFailed(bprog, failedAssertion));
-                            go = false;
+                            go.set(false);
                         }
 
                     } else {
                         // edge case: we can select events, but we didn't. Might be a bug in the EventSelectionStrategy.
-                        go = false;
+                        go.set(false); 
                     }
                 }
             }
-            listeners.forEach(l->l.ended(bprog)); 
+            if ( halted ) {
+                listeners.forEach(l->l.halted(bprog)); 
+            } else {
+                listeners.forEach(l->l.ended(bprog));
+            }
             
         } catch (InterruptedException itr) {
             System.err.println("BProgramRunner interrupted: " + itr.getMessage() );
@@ -145,6 +155,15 @@ public class BProgramRunner implements Runnable {
         } finally {
             execSvc.shutdown();
         }
+    }
+    
+    /**
+     * Halts the running b-program. The program will terminate on the next
+     * synchronization point.
+     */
+    public void halt() {
+        halted=true;
+        go.set(false);
     }
     
     /**

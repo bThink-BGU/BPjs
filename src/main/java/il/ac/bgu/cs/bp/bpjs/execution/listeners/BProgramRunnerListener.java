@@ -52,14 +52,14 @@ public interface BProgramRunnerListener {
     void assertionFailed( BProgram bp, FailedAssertion theFailedAssertion );
     
     /**
-     * Called when a BThread is added to a BProgram.
+     * Called when a BThread is added to a b-program.
      * @param bp the program the thread was added to.
      * @param theBThread the new BThread
      */
     void bthreadAdded( BProgram bp, BThreadSyncSnapshot theBThread );
     
     /**
-     * Called when a BThread is removed from a BProgram.
+     * Called when a BThread is removed from a b-program.
      * @param bp the program the thread was removed from.
      * @param theBThread the removed BThread
      */
@@ -67,17 +67,21 @@ public interface BProgramRunnerListener {
     
     /**
      * Called when a BThread has ran to completion.
-     * @param bp the program the thread ran in.
+     * @param bp the b-program in which {@code theBThread} ran.
      * @param theBThread the done BThread
      */
     void bthreadDone( BProgram bp, BThreadSyncSnapshot theBThread);
     
     /**
-     * Called when a BProgram selects an event.
-     * @param bp The BProgram the event was selected in.
+     * Called when a b-program selects an event.
+     * @param bp The b-program the event was selected in.
      * @param theEvent the new event selected.
      */
     void eventSelected( BProgram bp, BEvent theEvent );
     
-    
+    /**
+     * Called when the b-program was halted.
+     * @param bp the b-program that was halted.
+     */
+    void halted(BProgram bp);
 }

@@ -62,6 +62,8 @@ public abstract class BProgramRunnerListenerAdapter implements BProgramRunnerLis
 
     @Override
     public void eventSelected(BProgram bp, BEvent theEvent) {}
-    
+
+    @Override
+    public void halted(BProgram bp) {}
     
 }
