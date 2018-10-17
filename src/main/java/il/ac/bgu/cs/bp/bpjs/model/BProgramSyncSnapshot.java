@@ -1,6 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.model;
 
-import il.ac.bgu.cs.bp.bpjs.exceptions.BProgramException;
+import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.ResumeBThread;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.StartBThread;
 
@@ -175,7 +175,7 @@ public class BProgramSyncSnapshot {
                             try {
                                 ctxt.callFunctionWithContinuations(func, scope, new Object[]{anEvent});
                             } catch ( ContinuationPending ise ) {
-                                throw new BProgramException("Cannot call bsync from a break-upon handler. Please consider pushing an external event.");
+                                throw new BPjsRuntimeException("Cannot call bsync from a break-upon handler. Please consider pushing an external event.");
                             }
                         });
             });

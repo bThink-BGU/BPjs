@@ -56,6 +56,7 @@ public class BEventTest {
         assertEquals(bEvent, bEvent );
         assertNotEquals( bEvent, null );
         assertNotEquals( null, bEvent );
+        assertNotEquals( "hello", bEvent );
     }
     
     @Test
