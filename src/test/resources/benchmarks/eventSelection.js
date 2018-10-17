@@ -1,4 +1,5 @@
-/*
+/* global bp
+ * 
  * The MIT License
  *
  * Copyright 2018 acepace.
@@ -28,7 +29,7 @@
     INITIAL_ARRAY_SIZE - Size of initial array of events
     ARRAY_STEP - Number of events to add per step
     NUM_STEPS - Number of steps to take
-    SAVE_EVENT - Whether to save the bsync result or not
+    SAVE_EVENT - Whether to save the bp.sync result or not
 */
 
 bp.log.setLevel("Info");

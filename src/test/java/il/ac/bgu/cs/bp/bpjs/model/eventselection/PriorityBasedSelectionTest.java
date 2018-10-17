@@ -30,10 +30,10 @@ public class PriorityBasedSelectionTest {
 
 			StringBProgram bProgram = new StringBProgram("" //
 					+ "bp.registerBThread('bt1',function(){" //
-					+ "  bsync({request:bp.Event('X')});"//
+					+ "  bp.sync({request:bp.Event('X')});"//
 					+ "});"//
 					+ "bp.registerBThread('bt2',function(){"//
-					+ "  bsync({request:bp.Event('Y')});"//
+					+ "  bp.sync({request:bp.Event('Y')});"//
 					+ "});"//
 			);
 			

@@ -60,7 +60,7 @@ public class BProgramTest {
     @Test
     public void testDuplicateSetup() {
         String coreSource = "bp.registerBThread(function() {\n" +
-                "    bsync( {request: bp.Event(\"1\")} );\n" +
+                "    bp.sync( {request: bp.Event(\"1\")} );\n" +
                 "});";
         BProgram sanitySut = new StringBProgram(coreSource);
 
@@ -74,15 +74,15 @@ public class BProgramTest {
     @Test
     public void testAppendSource() {
         String coreSource = "bp.registerBThread(function() {\n" +
-                "    bsync( {request: bp.Event(\"1\")} );\n" +
-                "    bsync( {request: bp.Event(\"2\")} );\n" +
-                "    bsync( {request: bp.Event(\"3\")} );\n" +
+                "    bp.sync( {request: bp.Event(\"1\")} );\n" +
+                "    bp.sync( {request: bp.Event(\"2\")} );\n" +
+                "    bp.sync( {request: bp.Event(\"3\")} );\n" +
                 "});" +
                 "bp.log.info('Source code evaluated');";
 
         String additionalSource = "bp.registerBThread(function(){\n" +
-                "   bsync({waitFor: bp.Event(\"2\")});\n" +
-                "   bsync({request: bp.Event(\"2a\"),\n" +
+                "   bp.sync({waitFor: bp.Event(\"2\")});\n" +
+                "   bp.sync({request: bp.Event(\"2a\"),\n" +
                 "            block: bp.Event(\"3\")});\n" +
                 "});\n" +
                 "bp.log.info('Additional code evaluated');";
@@ -119,9 +119,9 @@ public class BProgramTest {
                 + "bp.log.info('Prepended code evaluated');";
 
         String coreSource = "bp.registerBThread(function() {\n" +
-                "    bsync( {request: e1} );\n" +
-                "    bsync( {request: e2} );\n" +
-                "    bsync( {request: e3} );\n" +
+                "    bp.sync( {request: e1} );\n" +
+                "    bp.sync( {request: e2} );\n" +
+                "    bp.sync( {request: e3} );\n" +
                 "});" +
                 "bp.log.info('Source code evaluated');";
 
@@ -149,16 +149,16 @@ public class BProgramTest {
                 + "var o1=1; var o2=1; var o3=1;";
 
         String coreSource = "bp.registerBThread(function() {\n" +
-                "    bsync( {request: e1} );\n" +
-                "    bsync( {request: e2} );\n" +
-                "    bsync( {request: e3} );\n" +
+                "    bp.sync( {request: e1} );\n" +
+                "    bp.sync( {request: e2} );\n" +
+                "    bp.sync( {request: e3} );\n" +
                 "});" +
                 "bp.log.info('main code evaluated');\n"
                 + "var o2=2; var o3=2;";
 
         String appendedSource = "bp.registerBThread(function(){\n" +
-                "   bsync({waitFor: e2});\n" +
-                "   bsync({request: bp.Event(\"2a\"),\n" +
+                "   bp.sync({waitFor: e2});\n" +
+                "   bp.sync({request: bp.Event(\"2a\"),\n" +
                 "            block: e3});\n" +
                 "});\n" +
                 "bp.log.info('appended code evaluated');\n"
@@ -187,9 +187,9 @@ public class BProgramTest {
     @Test(expected = IllegalStateException.class)
     public void testIllegalAppend() {
         String coreSource = "bp.registerBThread(function() {\n" +
-                "    bsync( {request: bp.Event(\"1\")} );\n" +
-                "    bsync( {request: bp.Event(\"2\")} );\n" +
-                "    bsync( {request: bp.Event(\"3\")} );\n" +
+                "    bp.sync( {request: bp.Event(\"1\")} );\n" +
+                "    bp.sync( {request: bp.Event(\"2\")} );\n" +
+                "    bp.sync( {request: bp.Event(\"3\")} );\n" +
                 "});" +
                 "bp.log.info('Source code evaluated');";
 
@@ -202,9 +202,9 @@ public class BProgramTest {
     @Test(expected = IllegalStateException.class)
     public void testIllegalPrepend() {
         String coreSource = "bp.registerBThread(function() {\n" +
-                "    bsync( {request: bp.Event(\"1\")} );\n" +
-                "    bsync( {request: bp.Event(\"2\")} );\n" +
-                "    bsync( {request: bp.Event(\"3\")} );\n" +
+                "    bp.sync( {request: bp.Event(\"1\")} );\n" +
+                "    bp.sync( {request: bp.Event(\"2\")} );\n" +
+                "    bp.sync( {request: bp.Event(\"3\")} );\n" +
                 "});" +
                 "bp.log.info('Source code evaluated');";
 

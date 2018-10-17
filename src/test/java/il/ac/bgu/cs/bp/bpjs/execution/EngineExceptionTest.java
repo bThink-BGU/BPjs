@@ -2,6 +2,7 @@ package il.ac.bgu.cs.bp.bpjs.execution;
 
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsCodeEvaluationException;
+import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -15,22 +16,18 @@ import org.mozilla.javascript.Scriptable;
 public class EngineExceptionTest {
     @Test
     public void testInvalidBSyncCall() throws InterruptedException {
-        BProgram sut = new BProgram("bad"){
-            @Override
-            protected void setupProgramScope(Scriptable scope) {
-                evaluate("var i=0;\n var j=42;\n var k=5; bsync({request:bp.Event(\"A\")});", "hardcoded");
-            }
-        };
+        BProgram sut = new StringBProgram(
+            "bad",
+            "var i=0;\n var j=42;\n var k=5; bp.sync({request:bp.Event(\"A\")});"
+        );
         
         try { 
             new BProgramRunner(sut).run();
-            fail("System should have thrown an error due to bsync called outside of a BThread.");
+            fail("System should have thrown an error due to bp.sync called outside of a BThread.");
         } catch (BPjsCodeEvaluationException exp) {
-            assertEquals( 3, exp.getLineNumber() );
-            assertEquals( "hardcoded", exp.getSourceName() );
-            assertTrue( exp.getMessage().contains("bsync"));
-            assertTrue( exp.getMessage().contains("Did you forget")); // make sure this is the friendly message
-            assertEquals(1, exp.getScriptStackTrace().size());
+            assertTrue( exp.getMessage().contains("bp.sync"));
+            System.out.println("Error message details: ");
+            System.out.println(exp.getDetails());
         }
     }
     
@@ -52,6 +49,7 @@ public class EngineExceptionTest {
         } catch (BPjsCodeEvaluationException exp) {
             assertEquals( 2, exp.getLineNumber() );
             assertEquals( 1, exp.getColumnNumber() );
+            assertEquals( "hardcoded", exp.getSourceName() );
             assertEquals("#This isn't a javascript line.", exp.getLineSource());
             
         }

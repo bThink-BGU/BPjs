@@ -47,6 +47,7 @@ a link to this page somewhere in the documentation/system about section.
 * :sparkles: `BProgramRunner` now has a `halt()` method #53.
 * :sparkles: A b-progrm's logging level can be set from Java (#50)
 * :put_litter_in_its_place: Removed old exception code. More tests.
+* :put_litter_in_its_place: `bsync`, deprecated long ago, was removed.
 
 ### 2018-10-16
 * :arrows_counterclockwise: ambiguous term `daemonMode` changed to `waitForExternalEvents` (#54). 

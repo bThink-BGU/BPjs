@@ -46,9 +46,9 @@ public class PutInContextTest {
     @Test
     public void testPutInContext_midRun() throws InterruptedException {
         final String program = "bp.registerBThread(function(){\n"
-                + "bsync({request:bp.Event('A')});\n"
+                + "bp.sync({request:bp.Event('A')});\n"
                 + "bp.log.info(obj);var len=obj.length;\n"
-                + "bsync({request:bp.Event(String(len))});\n"
+                + "bp.sync({request:bp.Event(String(len))});\n"
                 + "});";
         final String outsideObject = "I'm an outside object";
         

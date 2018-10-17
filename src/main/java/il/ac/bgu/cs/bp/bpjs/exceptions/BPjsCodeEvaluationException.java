@@ -1,6 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.exceptions;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.mozilla.javascript.EcmaError;
@@ -30,31 +31,40 @@ public class BPjsCodeEvaluationException extends BPjsException {
         super(cause.details() + " (at " + cause.lineNumber() + ":" + cause.columnNumber() + ")", cause);
         this.cause = cause;
     }
+
+    public BPjsCodeEvaluationException(String message) {
+        super(message);
+        cause = null;
+    }
     
     public List<String> getScriptStackTrace() {
-        return Arrays.stream(cause.getScriptStack())
-                .map(sf->String.format("%s, %s:%d", sf.fileName, (sf.functionName!=null)? sf.functionName : "<top scope>", sf.lineNumber) )
-                .collect( Collectors.toList() );
+        if ( cause == null ) {
+            return Collections.emptyList();
+        } else {
+            return Arrays.stream(cause.getScriptStack())
+                    .map(sf->String.format("%s, %s:%d", sf.fileName, (sf.functionName!=null)? sf.functionName : "<top scope>", sf.lineNumber) )
+                    .collect( Collectors.toList() );
+        }
     }
     
     public String getDetails() {
-        return cause.details();
+        return (cause!=null) ? cause.details() : null;
     }
 
     public final String getSourceName() {
-        return cause.sourceName();
+        return (cause!=null) ? cause.sourceName() : null;
     }
 
     public final int getLineNumber() {
-        return cause.lineNumber();
+        return  (cause!=null) ?cause.lineNumber() : -1;
     }
 
     public final int getColumnNumber() {
-        return cause.columnNumber();
+        return (cause!=null) ?cause.columnNumber() : -1;
     }
 
     public final String getLineSource() {
-        return cause.lineSource();
+        return (cause!=null) ?cause.lineSource() : null;
     }
    
 }

@@ -9,6 +9,7 @@ import java.util.concurrent.*;
 
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsCodeEvaluationException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
+import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BpLog;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.FailedAssertionException;
 import java.io.BufferedReader;
@@ -224,20 +225,29 @@ public abstract class BProgram {
             curCtx.setLanguageVersion(Context.VERSION_1_8);
             return curCtx.evaluateString(programScope, script, scriptName, 1, null);
         } catch (EcmaError rerr) {
-            if (rerr.getErrorMessage().trim().equals("\"bsync\" is not defined.")) {
-                throw new BPjsCodeEvaluationException("'bsync' is only defined in BThreads. Did you forget to call 'bp.registerBThread()'?", rerr);
-            }
             throw new BPjsCodeEvaluationException(rerr);
 
         } catch (WrappedException wrapped) {
-            if (wrapped.getCause() instanceof BPjsException) {
-                throw (BPjsException) wrapped.getCause();
-            } else {
-                throw wrapped;
+            try {
+                throw wrapped.getCause();
+            } catch (BPjsException be ) {
+                throw be;
+            } catch ( IllegalStateException ise ) {
+                String msg = ise.getMessage();
+                if ( msg.contains("Cannot capture continuation") && msg.contains("executeScriptWithContinuations or callFunctionWithContinuations") ){
+                    throw new BPjsCodeEvaluationException("bp.sync called outside of a b-thread");
+                } else {
+                    throw ise;
+                }
+            } catch ( Throwable generalException ) {
+                throw new BPjsRuntimeException("(Wrapped) Exception evaluating BProgram code: " + generalException.getMessage(), generalException);
             }
 
         } catch (EvaluatorException evalExp) {
             throw new BPjsCodeEvaluationException(evalExp);
+            
+        } catch ( Exception exp ) {
+            throw new BPjsRuntimeException("Error evaluating BProgram code: " + exp.getMessage(), exp);
         }
     }
 

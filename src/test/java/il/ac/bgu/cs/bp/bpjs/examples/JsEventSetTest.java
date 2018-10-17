@@ -48,10 +48,10 @@ public class JsEventSetTest {
         new BProgramRunner(new StringBProgram(
                   "var es=bp.EventSet('bad',function(e){return 1;});\n"
                 + "bp.registerBThread('a',function(){\n"
-                + "  bsync({request:bp.Event('X')});"
+                + "  bp.sync({request:bp.Event('X')});"
                 + "});\n"
                 + "bp.registerBThread('b',function(){\n"
-                + "  bsync({waitFor:es});\n"
+                + "  bp.sync({waitFor:es});\n"
                 + "});"
         )).run();
     }

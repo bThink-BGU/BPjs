@@ -52,7 +52,7 @@ public class ContinuationProgramStateTest {
                     + "   var fObjVar={a:'obj->a content'}\n"
                     + "   var fVar2='fVar2 content';\n"
                     + "   var shadowed='updated content';\n" 
-                    + "   var evt = bsync({request: bp.Event(\"e\")});\n"
+                    + "   var evt = bp.sync({request: bp.Event(\"e\")});\n"
                     + "   bp.log.info('gVar:' + gVar + ' bVar:'+bVar + ' event.name:' + evt.name);"
                     + "   gVar = gVar+1;"
                     + "   bVar = bVar+1;"
@@ -62,18 +62,18 @@ public class ContinuationProgramStateTest {
                       "var gVar='gVar content';\n" 
                     + "var shadowed='original content (you should not see this)';\n" 
                     + "bp.registerBThread( \"bt\", function(){\n"
-                    + "   var f=function(){bsync({request: bp.Event(\"e\")});};\n"
+                    + "   var f=function(){bp.sync({request: bp.Event(\"e\")});};\n"
                     + "   var fVar='fVar content';\n"
                     + "   var fObjVar={a:'obj->a content'}\n"
                     + "   var shadowed='updated content';\n" 
-                    + "   bsync({request: bp.Event(\"e\")});\n"
+                    + "   bp.sync({request: bp.Event(\"e\")});\n"
                     + "});";
     
     static final String SRC_MORE_FUNC = 
                       "var gVar='gVar content';\n" 
                     + "var shadowed='original content (you should not see this)';\n" 
                     + "bp.registerBThread( \"bt\", function(){\n"
-                    + "   var f=function(){bsync({request: bp.Event(\"e\")});};\n"
+                    + "   var f=function(){bp.sync({request: bp.Event(\"e\")});};\n"
                     + "   var fVar='fVar content';\n"
                     + "   var fObjVar={a:'obj->a content'}\n"
                     + "   var shadowed='updated content';\n"
@@ -84,11 +84,11 @@ public class ContinuationProgramStateTest {
                       "var obj={a:1, b:2, f:function(){return 9;}};\n" 
                     + "var obj={a:{f:function(){return 9;}}, k:42};\n" 
                     + "bp.registerBThread( \"bt\", function(){\n"
-                    + "   var f=function(){bsync({request: bp.Event(\"e\")});};\n"
+                    + "   var f=function(){bp.sync({request: bp.Event(\"e\")});};\n"
                     + "   var fVar='fVar content';\n"
                     + "   var fObjVar={a:'obj->a content'}\n"
                     + "   var shadowed='updated content';\n" 
-                    + "   bsync({request: bp.Event(\"e\")});\n"
+                    + "   bp.sync({request: bp.Event(\"e\")});\n"
                     + "});";
     
     ExecutorService exSvc;
@@ -160,15 +160,15 @@ public class ContinuationProgramStateTest {
         "bp.registerBThread( function(){ \n" +
         "var dbl=1;\n" +
         "var str='a';\n"+
-        "bsync({waitFor:bp.Event(\"e\")});\n" +
+        "bp.sync({waitFor:bp.Event(\"e\")});\n" +
         "dbl = 42;\n" +
         "str = 'b';\n" +
-        "bsync({waitFor:bp.Event(\"e\")});\n" +
+        "bp.sync({waitFor:bp.Event(\"e\")});\n" +
         "while ( true ) { \n" +
         "    dbl = dbl + 5;\n" +
         "    str = str + 'a';\n" + 
         "    bp.log.info(\"dbl=\" + dbl);\n" +
-        "    bsync({waitFor:bp.Event(\"e\")});\n" +
+        "    bp.sync({waitFor:bp.Event(\"e\")});\n" +
         "}});";
     
     @Test
@@ -217,16 +217,16 @@ public class ContinuationProgramStateTest {
             "var gVar='gVar content';\n" 
           + "var shadowed='original content (you should not see this)';\n" 
           + "bp.registerBThread( \"bt\", function(){\n"
-          + "   var f=function(){bsync({request: bp.Event(\"e\")});};\n"
+          + "   var f=function(){bp.sync({request: bp.Event(\"e\")});};\n"
           + "   var fVar='fVar content';\n"
           + "   var aVar=[1,2,3,4];\n"
           + "   var fObjVar={a:'obj->a content'}\n"
           + "   var shadowed='updated content';\n" 
-          + "   bsync({request: bp.Event(\"e\")}); "
+          + "   bp.sync({request: bp.Event(\"e\")}); "
           + "   while(true) { "
           + "       var loopLocal='ll';\n "
           + "       bp.log.info('iteration.' + fVar  + ' ' + aVar); \n"
-          + "       bsync({request: bp.Event(\"e\")}); "
+          + "       bp.sync({request: bp.Event(\"e\")}); "
           + "   }\n"
           + "});";
     

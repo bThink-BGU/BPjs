@@ -56,7 +56,7 @@ public class ContinuationGames {
                     + "bp.registerBThread( \"bt\", function(){\n"
                     + "   bp.log.info(\"started\");"
                     + "   var bVar=1;"
-                    + "   var evt = bsync({request: bp.Event(\"e\")});\n"
+                    + "   var evt = bp.sync({request: bp.Event(\"e\")});\n"
                     + "   bp.log.info('gVar:' + gVar + ' bVar:'+bVar + ' event.name:' + evt.name);"
                     + "   gVar = gVar+1;"
                     + "   bVar = bVar+1;"
@@ -70,7 +70,7 @@ public class ContinuationGames {
         // Run the top-level code (b-threads are registered but not yet run)
         BProgramSyncSnapshot cur = bprog.setup();
         
-        // Run to first bsync
+        // Run to first bp.sync
         cur = cur.start( ExecutorServiceMaker.makeWithName("TEST"));
         
         // Get a snapshot

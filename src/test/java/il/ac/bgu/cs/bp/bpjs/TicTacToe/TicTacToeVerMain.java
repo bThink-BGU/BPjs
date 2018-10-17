@@ -25,7 +25,7 @@ public class TicTacToeVerMain  {
 		
 		String simulatedPlayer =   "bp.registerBThread('XMoves', function() {\n" +
 									"while (true) {\n" +
-										"bsync({ request:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), \n" +
+										"bp.sync({ request:[ X(0, 0), X(0, 1), X(0, 2), X(1, 0), \n" +
 										"X(1, 1), X(1, 2), X(2, 0), X(2, 1), X(2, 2) ] }, 10); \n" +
 										"}\n" +
 									"});\n";

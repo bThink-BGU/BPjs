@@ -38,8 +38,6 @@ import org.mozilla.javascript.NativeObject;
  */
 public class BThreadJsProxy implements java.io.Serializable {
     
-    private static volatile boolean deprecationWarningPrinted = false;
-    
     private BThreadSyncSnapshot bthread;
 
     public BThreadJsProxy(BThreadSyncSnapshot aBthread) {
@@ -47,73 +45,6 @@ public class BThreadJsProxy implements java.io.Serializable {
     }
     
     public BThreadJsProxy() {}
-    
-    @Deprecated
-    public void bsync( NativeObject jsRWB ) {
-        bsync(jsRWB, null);
-    }
-    
-    @Deprecated
-    public void bsync( NativeObject jsRWB, Object data ) {
-        if ( ! deprecationWarningPrinted ) {
-            deprecationWarningPrinted = true;
-            System.err.println("Warning: bsync is deprecated and will be removed shortly. Please use bp.sync instead.");
-        }
-        Map<String, Object> jRWB = (Map)Context.jsToJava(jsRWB, Map.class);
-        
-        BSyncStatement stmt = BSyncStatement.make();
-        Object req = jRWB.get("request");
-        if ( req != null ) {
-            if ( req instanceof BEvent ) {
-                stmt = stmt.request((BEvent)req);
-            } else if ( req instanceof NativeArray ) {
-                NativeArray arr = (NativeArray) req;
-                stmt = stmt.request(
-                        Arrays.asList( arr.getIndexIds() ).stream()
-                              .map( i -> (BEvent)arr.get(i) )
-                              .collect( toList() ));
-            } 
-        }
-        
-        stmt = stmt.waitFor( convertToEventSet(jRWB.get("waitFor")) )
-                     .block( convertToEventSet(jRWB.get("block")) )
-                 .interrupt( convertToEventSet(jRWB.get("interrupt")) )
-                      .data( data );
-        
-        captureBThreadState(stmt);
-        
-    }
-
-    private EventSet convertToEventSet( Object jsObject ) {
-        if ( jsObject == null ) return EventSets.none;
-        
-        // This covers event sets AND events.
-        if ( jsObject instanceof EventSet ) {
-            return (EventSet)jsObject;
-        
-        } else if ( jsObject instanceof NativeArray ) {
-            NativeArray arr = (NativeArray) jsObject;
-            if ( Stream.of(arr.getIds()).anyMatch( id -> arr.get(id)==null) ) {
-                throw new RuntimeException("EventSet Array contains null sets.");
-            }
-            return ComposableEventSet.anyOf(
-              Arrays.asList(arr.getIndexIds()).stream()
-                    .map( i ->(EventSet)arr.get(i) )
-                    .collect( toSet() ) );
-        } else {
-            final String errorMessage = "Cannot convert " + jsObject + " of class " + jsObject.getClass() + " to an event set";
-            Logger.getLogger(BThreadSyncSnapshot.class.getName()).log(Level.SEVERE, errorMessage);
-            throw new IllegalArgumentException( errorMessage);
-        }
-    }
-    
-    private void captureBThreadState(BSyncStatement stmt) throws ContinuationPending {
-        bthread.setBSyncStatement(stmt);
-        stmt.setBthread(bthread);
-        ContinuationPending capturedContinuation = Context.getCurrentContext().captureContinuation();
-        capturedContinuation.setApplicationState(stmt);
-        throw capturedContinuation;
-    }
 
     public void setInterruptHandler( Object aPossibleHandler ) {
         bthread.setInterruptHandler(

@@ -139,8 +139,8 @@ public class DfsBProgramVerifierTest {
     @Test
     public void testTwoSimpleBThreads() throws Exception {
         BProgram bprog = new StringBProgram(
-                "bp.registerBThread('bt1', function(){bsync({ request:[ bp.Event(\"STAM1\") ] });});"
-                        + "bp.registerBThread('bt2', function(){bsync({ request:[ bp.Event(\"STAM2\") ] });});");
+                "bp.registerBThread('bt1', function(){bp.sync({ request:[ bp.Event(\"STAM1\") ] });});"
+                        + "bp.registerBThread('bt2', function(){bp.sync({ request:[ bp.Event(\"STAM2\") ] });});");
 
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setIterationCountGap(1);
@@ -156,9 +156,9 @@ public class DfsBProgramVerifierTest {
     @Test(timeout = 2000)
     public void testTwoLoopingBThreads() throws Exception {
         BProgram bprog = new StringBProgram("bp.registerBThread('bt1', function(){" + "    while(true){\n"
-                + "       bsync({ request:[ bp.Event(\"STAM1\") ] });\n" + "}});\n"
+                + "       bp.sync({ request:[ bp.Event(\"STAM1\") ] });\n" + "}});\n"
                 + "bp.registerBThread('bt2', function(){" + "    while(true){\n"
-                + "       bsync({ request:[ bp.Event(\"STAM2\") ] });\n" + "}});\n" + "");
+                + "       bp.sync({ request:[ bp.Event(\"STAM2\") ] });\n" + "}});\n" + "");
 
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setIterationCountGap(1);
@@ -174,14 +174,14 @@ public class DfsBProgramVerifierTest {
     public void testVariablesInBT() throws Exception {
         BProgram bprog = new StringBProgram("bp.registerBThread('bt1', function(){" + //
                 "    for(var i=0; i<10; i++){\n" + //
-                "       bsync({ waitFor:[ bp.Event(\"X\") ] });\n" + //
+                "       bp.sync({ waitFor:[ bp.Event(\"X\") ] });\n" + //
                 "    }\n" + //
-                "    bsync({ block:[ bp.Event(\"X\") ] });\n" + //
+                "    bp.sync({ block:[ bp.Event(\"X\") ] });\n" + //
                 "});\n" + //
 
                 "bp.registerBThread('bt2', function(){" + //
                 "    while(true){\n" + //
-                "       bsync({ request:[ bp.Event(\"X\") ] });\n" + //
+                "       bp.sync({ request:[ bp.Event(\"X\") ] });\n" + //
                 "}});\n" + //
                 "" //
         );
@@ -205,11 +205,11 @@ public class DfsBProgramVerifierTest {
                 "bp.registerBThread('bt1', function(){" + //
                         "    while(true) \n" + //
                         "      for(var i=0; i<10; i++){\n" + //
-                        "         bsync({ waitFor:[ bp.Event(\"X\") ] });\n" + //
+                        "         bp.sync({ waitFor:[ bp.Event(\"X\") ] });\n" + //
                         "      }\n" + //
                         "});\n" + "bp.registerBThread('bt2', function(){" + //
                         "    while(true){\n" + //
-                        "       bsync({ request:[ bp.Event(\"X\") ] });\n" + //
+                        "       bp.sync({ request:[ bp.Event(\"X\") ] });\n" + //
                         "}});\n");
 
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
@@ -231,8 +231,8 @@ public class DfsBProgramVerifierTest {
                 "bp.registerBThread('bt1', function(){" + //
                         "    while(true) \n" + //
                         "      for(var i=0; i<10; i++){\n" + //
-                        "         bsync({ request:[ bp.Event(\"X\"+i) ] });\n" + //
-                        "         if (i == 5) {bsync({ request:[ bp.Event(\"X\"+i) ] });}\n" + //
+                        "         bp.sync({ request:[ bp.Event(\"X\"+i) ] });\n" + //
+                        "         if (i == 5) {bp.sync({ request:[ bp.Event(\"X\"+i) ] });}\n" + //
                         "      }\n" + //
                         "});\n" +
                         "var x = bp.EventSet( \"X\", function(e){\r\n" +
@@ -242,7 +242,7 @@ public class DfsBProgramVerifierTest {
                         "bp.registerBThread('bt2', function(){" + //
                         "	 var lastE = {name:\"what\"};" + //
                         "    while(true) {\n" + //
-                        "       var e = bsync({ waitFor: x});\n" + //
+                        "       var e = bp.sync({ waitFor: x});\n" + //
                         "		lastE = e;" + //
                         "       if( e.name == lastE.name) { bp.ASSERT(false,\"Poof\");} " + //
                         "}});\n"

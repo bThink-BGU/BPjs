@@ -18,8 +18,8 @@ public class NodeEqualsTest {
     static final String P1
             = "bp.registerBThread(\"BThread 1\", function() {"
             + "	while (true) {"
-            + "		bsync({request: bp.Event(\"X\")});"
-            + "		bsync({wait : bp.Event(\"X\")});"
+            + "		bp.sync({request: bp.Event(\"X\")});"
+            + "		bp.sync({wait : bp.Event(\"X\")});"
             + "	}"
             + "});";
     

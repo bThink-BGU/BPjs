@@ -1,7 +1,8 @@
+/* global bp */
 // This b-thread goes forward until it's done.\n" +
 bp.registerBThread("forward", function () {
 bp.ASSERT(false, "failRightAWay!");
-    bsync({request: bp.Event("A")});
+    bp.sync({request: bp.Event("A")});
 });
 bp.registerBThread("assertor", function () {
     var e = bp.sync({waitFor: bp.Event("B")});

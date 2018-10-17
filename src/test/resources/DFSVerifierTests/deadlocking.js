@@ -1,4 +1,4 @@
-/* global bp, bsync
+/* global bp
  * The MIT License
  *
  * Copyright 2017 michael.

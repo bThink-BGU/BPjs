@@ -35,7 +35,7 @@ public class Requirements {
      */
     public static final String eventNotSelected( String eventName ) {
         return "bp.registerBThread('eventNotSelected-" + eventName + "', function(){ "
-            + "\n bsync({waitFor:bp.Event('" + eventName + "')});"
+            + "\n bp.sync({waitFor:bp.Event('" + eventName + "')});"
             + "\n bp.ASSERT(false, 'event \"" + eventName + "\" selected.');"
             + "\n });";
     }
