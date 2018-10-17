@@ -65,10 +65,10 @@ public class BProgramJsProxyTest {
         
         new BProgramRunner(sut).run();
         String logLevel1 = sut.getFromGlobalScope("logLevel1", String.class).get();
-        assertEquals(BProgramJsProxy.LogLevel.Off.name(), logLevel1);
+        assertEquals(BpLog.LogLevel.Off.name(), logLevel1);
         
         String logLevel2 = sut.getFromGlobalScope("logLevel2", String.class).get();
-        assertEquals(BProgramJsProxy.LogLevel.Warn.name(), logLevel2);
+        assertEquals(BpLog.LogLevel.Warn.name(), logLevel2);
         
 
     }

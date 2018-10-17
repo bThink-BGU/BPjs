@@ -24,7 +24,10 @@
 package il.ac.bgu.cs.bp.bpjs.examples;
 
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BpLog;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
@@ -53,5 +56,50 @@ public class LoggingTest {
         System.out.println(result);
         
         org.junit.Assert.assertEquals(6l, (long)result.split("\n").length);
+    }
+    
+    @Test
+    public void testExternalSetLogLevel() throws UnsupportedEncodingException {
+        PrintStream originalOut = System.out;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (PrintStream myOut = new PrintStream(baos)) {
+            System.setOut(myOut);
+            BProgram bprog = new StringBProgram(
+                "bp.registerBThread(function(){\n" +
+                "  bp.sync({request:bp.Event(\"x\")});\n" +
+                "  bp.log.fine(\"msg\");\n" +
+                "  bp.log.info(\"msg\");\n" +
+                "  bp.log.warn(\"msg\");\n" +
+                "});");
+            bprog.setLogLevel(BpLog.LogLevel.Fine);
+            new BProgramRunner(bprog).run();
+            myOut.flush();
+        }
+        String result1 = baos.toString(StandardCharsets.UTF_8.name());
+        org.junit.Assert.assertEquals(3l, (long)result1.split("\n").length);
+        
+        baos = new ByteArrayOutputStream();
+        try (PrintStream myOut = new PrintStream(baos)) {
+            System.setOut(myOut);
+            BProgram bprog = new StringBProgram(
+                "bp.registerBThread(function(){\n" +
+                "  bp.sync({request:bp.Event(\"x\")});\n" +
+                "  bp.log.fine(\"msg\");\n" +
+                "  bp.log.info(\"msg\");\n" +
+                "  bp.log.warn(\"msg\");\n" +
+                "});");
+            bprog.setLogLevel(BpLog.LogLevel.Warn);
+            new BProgramRunner(bprog).run();
+            myOut.flush();
+        }
+        String result2 = baos.toString(StandardCharsets.UTF_8.name());
+        org.junit.Assert.assertEquals(1l, (long)result2.split("\n").length);
+        
+        System.setOut(originalOut);
+        System.out.println("Result 1:");
+        System.out.println(result1);
+        System.out.println();
+        System.out.println("Result 2:");
+        System.out.println(result2);
     }
 }

@@ -43,31 +43,6 @@ import org.mozilla.javascript.NativeObject;
  */
 public class BProgramJsProxy implements java.io.Serializable {
     
-    public enum LogLevel {Off, Warn, Info, Fine}
-    
-    public static class BpLog implements java.io.Serializable {
-        LogLevel level = LogLevel.Info;
-        
-        public void warn( String msg ) { log( LogLevel.Warn, msg ); }
-        public void info( String msg ) { log( LogLevel.Info, msg ); }
-        public void fine( String msg ) { log( LogLevel.Fine, msg ); }
-        
-        public void log( LogLevel lvl, String msg ) {
-            if ( level.compareTo(lvl) >= 0 ) {
-                System.out.println("[BP][" + lvl.name() + "] " + msg );
-            }
-        }
-        
-        public void setLevel( String levelName ) {
-            synchronized(this){
-                level = LogLevel.valueOf(levelName);
-            }
-        }
-        
-        public String getLevel() {
-            return level.name();
-        }
-    }
     
     private final BProgram program;
     

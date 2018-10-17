@@ -44,7 +44,8 @@ a link to this page somewhere in the documentation/system about section.
 ## Change log for the BPjs library.
 
 ### 2018-10-17
-* :sparkles: `BProgramRunner` now has a `halt()` method (#53).
+* :sparkles: `BProgramRunner` now has a `halt()` method #53.
+* :sparkles: A b-progrm's logging level can be set from Java (#50)
 
 ### 2018-10-16
 * :arrows_counterclockwise: ambiguous term `daemonMode` changed to `waitForExternalEvents` (#54). 
