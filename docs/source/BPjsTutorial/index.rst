@@ -22,10 +22,9 @@ Behavioral Programming was introduced by Harel, Marron and Weiss in 2012 in a `p
 
 
 .. topic:: How come BPjs does not use ``bsync``?
-  
-  BPjs used to have a ``bsync`` pseudo-keyword. It still works, but is deprecated in favor of ``bp.sync``. This change packs almost everything BP under the ``bp`` object, and also makes it easier to synchronize from any code executed by the b-thread (including called functions).
 
-  ``bsync`` is deprecated in BPjs. It will be removed in a not-to-distant future version. On the first use of ``bsync`` in code, BPjs will print a warning to standated error.
+  The classic BP literature uses the term `bsync` for behavioral synchronization between b-threads. BPjs used to have a ``bsync`` pseudo-keyword, but we replaced it with ``bp.sync``. This change packs almost everything BP under the ``bp`` object, and also makes it easier to synchronize from any code executed by the b-thread (including called functions). Equally important, is does not add a new keywords to Javascript.
+
 
 Tutorial
 ~~~~~~~~

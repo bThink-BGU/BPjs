@@ -145,3 +145,8 @@ div.topic {
 code.literal {
   background-color: transparent;
 }
+
+p.caption {
+  font-style: italic;
+  color: #343;
+}

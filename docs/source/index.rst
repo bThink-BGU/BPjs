@@ -20,6 +20,7 @@ What Do You Want to Do
 * **Learn Behavioral Programming:** If you are new to Behavioral Programming (that's alright, it's a fairly new concept), you're invited to read the :doc:`quick intro <BPjsTutorial/index>`.
 * **Use BPjs from a console/commandline:** see :ref:`Running BPjs from the Commandline <running_cmd_line>`.
 * **Use BPjs as a library in a software system:** If you're using `maven`_, just add BPjs `as a dependency`_. Otherwise, you can `download a .jar file`_.
+* **Verify BPjs Programs/Models** see :doc:`Verification <verification/index>`.
 * **Learn more about how to use, embed, and extend BPjs:** Read below.
 
 
