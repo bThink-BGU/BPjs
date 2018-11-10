@@ -38,7 +38,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * Takes a {@link BProgram}, and verifies that it does not run into false
- * assertions, given all possible event selections.
+ * assertions or deadlock, given all possible event selections.
  * Take care to use the appropriate {@link VisitedStateStore} for the
  * {@link BProgram} being verified.
  * <p>
@@ -52,8 +52,8 @@ public class DfsBProgramVerifier {
     public final static long DEFAULT_MAX_TRACE = 100;
 
     /**
-     * Default number of iterations between invocation of {@link ProgressListener#iterationCount(long, long, il.ac.bgu.cs.bp.bpjs.verification.DfsBProgramVerifier)
-     * }.
+     * Default number of iterations between invocation of
+     * {@link ProgressListener#iterationCount(long, long, il.ac.bgu.cs.bp.bpjs.verification.DfsBProgramVerifier)}.
      */
     public final static long DEFAULT_ITERATION_COUNT_GAP = 1000;
 

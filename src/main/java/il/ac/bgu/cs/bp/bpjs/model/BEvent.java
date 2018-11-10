@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import org.mozilla.javascript.ConsString;
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ScriptableObject;
 
 /**
@@ -89,7 +90,7 @@ public class BEvent implements Comparable<BEvent>, EventSet, java.io.Serializabl
         if (!(obj instanceof BEvent)) {
             return false;
         }
-
+        
         BEvent other = (BEvent) obj;
         // simple cases
         if (!name.equals(other.name)) {

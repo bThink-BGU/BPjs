@@ -27,6 +27,8 @@ import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.analysis.Node;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 import static java.util.stream.Collectors.joining;
 
 /**
@@ -56,5 +58,14 @@ public abstract class TestUtils {
         return trace.stream()
                     .map(BEvent::getName)
                     .collect(joining(delimiter));
+    }
+    
+    public static <T> T safeGet( Future<T> f ) {
+        try {
+            return f.get();
+        } catch (InterruptedException|ExecutionException ex) {
+            System.out.println("Exception while calling safeGet:" + ex.getMessage());
+            throw new RuntimeException(ex);
+        }
     }
 }
