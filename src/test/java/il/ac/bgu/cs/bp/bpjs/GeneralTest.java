@@ -53,7 +53,8 @@ public class GeneralTest {
      */
     @Test
     public void multipleBPjsInstances() throws InterruptedException {
-        int rangeStart = 100;
+        int rangeStart = 1000;
+//      rangeStart = 100; // iun-comment for a stress test
         int rangeEnd   = 1100;
         boolean printResults = false;
         
