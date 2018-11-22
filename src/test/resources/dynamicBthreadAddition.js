@@ -25,11 +25,43 @@
 /* global bp */
 
 var COUNT=4;
-for ( var i=0; i<COUNT; i++ ) {
-    (function(j){
-        bp.registerBThread("requestor-" + j, function(){
-           bp.log.info("I'll request e" + j + "!" );
-           bp.sync({request:bp.Event("e"+j)});
-        });        
-    })(i);
-};
+
+if ( ADD_ON_START ) {
+    for ( var i=0; i<COUNT; i++ ) {
+        (function(j){
+            bp.registerBThread("requestor-" + j, function(){
+               bp.log.info("I'll request e" + j + "!" );
+               bp.sync({request:bp.Event("e"+j)});
+            });        
+        })(i);
+    };
+
+} else {
+    
+    var countEvt = bp.Event("COUNT");
+    bp.registerBThread("coutner", function(){
+        for (var i = 0; i < COUNT; i++) {
+            bp.sync({request:countEvt});
+        }
+    });
+    bp.registerBThread("beeperMaker", function(){
+        var c = 0;
+        while ( true ) {
+            bp.sync({waitFor:countEvt});
+            c++;
+            bp.log.info("c="+c);
+            (function(cj){
+                bp.registerBThread("bp"+cj, function(){
+                    while ( true ) {
+                        bp.sync({waitFor:countEvt});
+                        bp.sync({
+                            request:bp.Event("beep-" + cj),
+                              block:countEvt
+                        });
+                    }
+            })})(c);
+        }
+    });
+    
+    
+}

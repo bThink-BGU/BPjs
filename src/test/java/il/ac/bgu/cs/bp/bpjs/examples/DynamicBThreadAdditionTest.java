@@ -30,7 +30,10 @@ import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import static java.util.stream.Collectors.toSet;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
@@ -42,13 +45,35 @@ import org.junit.Test;
 public class DynamicBThreadAdditionTest {
     
     @Test
-    public void test() throws InterruptedException {
-        BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("dynamicBthreadAddition.js"));
+    public void testAddOnStart() throws InterruptedException {
+        SingleResourceBProgram bprog = new SingleResourceBProgram("dynamicBthreadAddition.js");
+        bprog.putInGlobalScope("ADD_ON_START", true);
+        BProgramRunner sut = new BProgramRunner(bprog);
         sut.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
         sut.run();
         Set<String> expected = new HashSet<>(Arrays.asList("e0","e1","e2","e3"));
         assertEquals( expected, eventLogger.getEvents().stream().map(BEvent::getName).collect(toSet()));
+    }
+    
+    @Test
+    public void testAddOnResume() throws InterruptedException {
+        SingleResourceBProgram bprog = new SingleResourceBProgram("dynamicBthreadAddition.js");
+        bprog.putInGlobalScope("ADD_ON_START", false);
+        BProgramRunner sut = new BProgramRunner(bprog);
+        
+        sut.addListener(new PrintBProgramRunnerListener() );
+        InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
+        
+        sut.run();
+        
+        eventLogger.eventNames().stream().forEach( System.out::println );
+        Map<String, Long> counts = eventLogger.eventNames().stream().collect( Collectors.groupingBy(Function.identity(),Collectors.counting() ) );
+        assertEquals( new Long(4), counts.get("COUNT") );
+        assertEquals( new Long(3), counts.get("beep-1") );
+        assertEquals( new Long(2), counts.get("beep-2") );
+        assertEquals( new Long(1), counts.get("beep-3") );
+        
     }
 }

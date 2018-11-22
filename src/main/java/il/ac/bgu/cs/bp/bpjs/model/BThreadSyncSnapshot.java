@@ -11,6 +11,7 @@ import org.mozilla.javascript.Scriptable;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BThreadJsProxy;
 import il.ac.bgu.cs.bp.bpjs.analysis.ContinuationProgramState;
 import java.util.Objects;
+import org.mozilla.javascript.ScriptableObject;
 
 /**
  * The state of a BThread at {@code bsync}.
@@ -29,7 +30,7 @@ public class BThreadSyncSnapshot implements Serializable {
      * The Javascript function that will be called when {@code this} BThread
      * runs.
      */
-    private Function entryPoint;
+    private final Function entryPoint;
 
     /**
      * BThreads may specify a function that runs when they are removed because
@@ -65,13 +66,6 @@ public class BThreadSyncSnapshot implements Serializable {
     }
 
     /**
-     * Convenience constructor with default parameters.
-     */
-    public BThreadSyncSnapshot() {
-        this(BThreadSyncSnapshot.class.getName(), null);
-    }
-
-    /**
      * Fully detailed constructor. Mostly useful for getting objects out of
      * serialized forms.
      *
@@ -103,7 +97,7 @@ public class BThreadSyncSnapshot implements Serializable {
         BThreadSyncSnapshot retVal = new BThreadSyncSnapshot(name, entryPoint);
         retVal.continuation = aContinuation;
         retVal.setInterruptHandler(interruptHandler);
-        retVal.setupScope(scope.getParentScope());
+        retVal.setupScope(ScriptableObject.getTopLevelScope(scope));
 
         retVal.bSyncStatement = aStatement;
         aStatement.setBthread(retVal);
@@ -111,25 +105,39 @@ public class BThreadSyncSnapshot implements Serializable {
         return retVal;
     }
 
+    /**
+     * Setting up the scope like so:
+     * <code>
+     *  
+     * entryPoint -> ... -> top level scope -> bthread -> bprogram
+     * 
+     * </code>
+     * @param programScope 
+     */
     void setupScope(Scriptable programScope) {
-        scope = (Scriptable) Context.javaToJS(proxy, programScope);
-        scope.delete("equals");
-        scope.delete("hashCode");
-        scope.delete("toString");
-        scope.setParentScope(programScope);
+        
+        Scriptable bthreadProxyScope = (Scriptable) Context.javaToJS(proxy, programScope);
+        bthreadProxyScope.delete("equals");
+        bthreadProxyScope.delete("hashCode");
+        bthreadProxyScope.delete("toString");
+        bthreadProxyScope.delete("toString");
+        bthreadProxyScope.delete("wait");
+        bthreadProxyScope.delete("notify");
+        bthreadProxyScope.delete("notifyAll");
+        
+        bthreadProxyScope.setParentScope(programScope);
         
         // setup entryPoint's scope s.t. it knows our proxy
-        Scriptable curScope = entryPoint.getParentScope();
-        entryPoint.setParentScope(scope);
-        scope.setParentScope(curScope);
+//        Scriptable entryPointTopScope = ScriptableObject.getTopLevelScope(entryPoint);
+        Scriptable penultimateEntryPointScope = entryPoint;
+        while ( penultimateEntryPointScope.getParentScope()!=null &&
+                penultimateEntryPointScope.getParentScope().getParentScope() != null ) {
+            penultimateEntryPointScope = penultimateEntryPointScope.getParentScope();
+        }
+        penultimateEntryPointScope.setParentScope(bthreadProxyScope);
         
-//        if (curScope.getParentScope() != null) {
-//            while (curScope.getParentScope().getParentScope() != null) {
-//                curScope = curScope.getParentScope();
-//            }
-//            scope.setParentScope(curScope.getParentScope());
-//            curScope.setParentScope(scope);
-//        }
+        scope = entryPoint;
+        
     }
 
     public BSyncStatement getBSyncStatement() {

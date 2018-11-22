@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 michael.
+ * Copyright 2018 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,36 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis.bprogramio;
+package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
-import java.io.IOException;
-import java.io.InputStream;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.serialize.ScriptableInputStream;
+import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
+import org.mozilla.javascript.Context;
 
 /**
- *
+ * Starts a forked child b-thread.
+ * 
  * @author michael
  */
-public class BThreadSyncSnapshotInputStream extends ScriptableInputStream {
+public class StartFork extends BPEngineTask {
     
-    private final StubProvider stubProvider;
+    private final Object forkValue;
+
+    public StartFork(Object aForkValue, BThreadSyncSnapshot aBss, Listener aListener) {
+        super(aBss, aListener);
+        forkValue = aForkValue;
+    }
     
-    public BThreadSyncSnapshotInputStream(InputStream in, Scriptable scope, StubProvider aProvider) throws IOException {
-        super(in, scope);
-        stubProvider = aProvider;
+    @Override
+    BThreadSyncSnapshot callImpl(Context jsContext) {
+        jsContext.resumeContinuation(bss.getContinuation(), bss.getScope(), forkValue);
+        return null;
     }
 
     @Override
-    protected Object resolveObject(Object obj) throws IOException {
-        return ( obj instanceof StreamObjectStub )
-            ? stubProvider.get((StreamObjectStub) obj)
-            : obj;
+    public String toString() {
+        return "[StartFork bthread:" + bss.getName() + " value:" + forkValue + "]";
     }
-
-    @Override
-    protected Object readObjectOverride() throws IOException, ClassNotFoundException {
-        return super.readObjectOverride();
-    }
+    
+    
     
 }

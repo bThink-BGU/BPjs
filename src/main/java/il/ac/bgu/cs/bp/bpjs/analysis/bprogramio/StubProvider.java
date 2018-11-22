@@ -27,7 +27,7 @@ package il.ac.bgu.cs.bp.bpjs.analysis.bprogramio;
  *
  * @author michael
  */
-interface StubProvider {
+public interface StubProvider {
     
     Object get(StreamObjectStub stub);
     

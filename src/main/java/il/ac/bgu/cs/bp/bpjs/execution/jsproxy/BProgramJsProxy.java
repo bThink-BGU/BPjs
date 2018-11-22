@@ -9,6 +9,7 @@ import il.ac.bgu.cs.bp.bpjs.model.eventsets.JsEventSet;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.FailedAssertionException;
 import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
+import il.ac.bgu.cs.bp.bpjs.model.ForkStatement;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
 import java.util.Arrays;
 import java.util.Map;
@@ -141,6 +142,13 @@ public class BProgramJsProxy implements java.io.Serializable {
     }
     
     
+    public void fork() throws ContinuationPending {
+        ContinuationPending capturedContinuation = Context.getCurrentContext().captureContinuation();
+        capturedContinuation.setApplicationState(new ForkStatement(capturedContinuation.getContinuation()));
+        throw capturedContinuation;
+    }
+    
+    
     ////////////////////////
     // sync ("bsync") related code
     
@@ -174,7 +182,7 @@ public class BProgramJsProxy implements java.io.Serializable {
                       .data( data );
         boolean hasCollision = stmt.getRequest().stream().anyMatch(blockSet::contains);
         if (hasCollision) {
-            System.err.println("Warning: BThread is blocking an event it is also requesting, this may lead to a deadlock.");
+            System.err.println("Warning: B-thread is blocking an event it is also requesting, this may lead to a deadlock.");
         }
         captureBThreadState(stmt);
         

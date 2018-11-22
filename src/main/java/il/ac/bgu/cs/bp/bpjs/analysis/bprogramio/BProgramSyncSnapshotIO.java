@@ -131,6 +131,50 @@ public class BProgramSyncSnapshotIO {
             Context.exit();
         }
     }
+    
+    public byte[] serializeBThread(BThreadSyncSnapshot btss) {
+        try {
+            Context ctxt = Context.enter(); // need Javascript environment for
+            // this, even though we're not
+            // executing code per se.
+
+            final ScriptableObject globalScope = ctxt.initStandardObjects();
+
+            try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+                ObjectOutputStream outs = new ObjectOutputStream(bytes)) {
+                writeBThreadSnapshot(btss, outs, globalScope);
+                outs.flush();
+                return bytes.toByteArray();
+                
+            } catch (IOException ex) {
+                // all read/writes are in-memory.
+                throw new RuntimeException("IO exception serializing a b-thread:"+ex.getMessage(), ex);
+            }
+
+        } finally {
+            Context.exit();
+        }   
+    }
+    
+    public BThreadSyncSnapshot deserializeBThread( byte[] serializedBT ) {
+        try {
+            Context ctxt = ContextFactory.getGlobal().enterContext();
+
+            // must use interpreter mode
+            ctxt.setOptimizationLevel(-1);
+            final ScriptableObject globalScope = ctxt.initStandardObjects();
+
+            try (ScriptableInputStream sis
+                = new ScriptableInputStream(new ByteArrayInputStream(serializedBT), globalScope)) {
+                return readBThreadSnapshot(sis, globalScope);
+            } catch (ClassNotFoundException|IOException ex) {
+                // reading from memory here.
+                throw new RuntimeException("Error reading a serialized b-thread: " + ex.getMessage(), ex );
+            }
+        } finally {
+            Context.exit();
+        }
+    }
 
     private void writeBThreadSnapshot(BThreadSyncSnapshot bss, ObjectOutputStream outs, ScriptableObject scope) throws IOException {
         outs.writeObject(bss.getName());
@@ -139,7 +183,7 @@ public class BProgramSyncSnapshotIO {
         try (BThreadSyncSnapshotOutputStream btos = new BThreadSyncSnapshotOutputStream(bthreadBytes, scope)) {
             btos.writeObject(bss.getScope());
             btos.writeObject(bss.getEntryPoint());
-            btos.writeObject(bss.getInterrupt().orElseGet(() -> null));
+            btos.writeObject(bss.getInterrupt().orElse(null));
             btos.writeObject(bss.getBSyncStatement());
 
             btos.writeObject(bss.getContinuation());

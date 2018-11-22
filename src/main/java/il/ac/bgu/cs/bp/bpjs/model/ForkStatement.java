@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 michael.
+ * Copyright 2018 BPjs team.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,36 +21,43 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis.bprogramio;
-
-import java.io.IOException;
-import java.io.InputStream;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.serialize.ScriptableInputStream;
+package il.ac.bgu.cs.bp.bpjs.model;
 
 /**
- *
+ * Data required for performing {@code bp.fork}.
+ * 
+ * TODO: Add array of parameters such that each for gets it's own value (parent should get {@code undefined}).
+ * 
  * @author michael
  */
-public class BThreadSyncSnapshotInputStream extends ScriptableInputStream {
+public class ForkStatement {
     
-    private final StubProvider stubProvider;
+    private final Object continuation;
+    private byte[] serializedContinuation;
+    private BThreadSyncSnapshot forkingBThread;
+
+    public ForkStatement(Object aContinuation) {
+        continuation = aContinuation;        
+    }
     
-    public BThreadSyncSnapshotInputStream(InputStream in, Scriptable scope, StubProvider aProvider) throws IOException {
-        super(in, scope);
-        stubProvider = aProvider;
+    public Object getContinuation() {
+        return continuation;
     }
 
-    @Override
-    protected Object resolveObject(Object obj) throws IOException {
-        return ( obj instanceof StreamObjectStub )
-            ? stubProvider.get((StreamObjectStub) obj)
-            : obj;
+    public void setForkingBThread(BThreadSyncSnapshot forkingBThread) {
+        this.forkingBThread = forkingBThread;
     }
 
-    @Override
-    protected Object readObjectOverride() throws IOException, ClassNotFoundException {
-        return super.readObjectOverride();
+    public BThreadSyncSnapshot getForkingBThread() {
+        return forkingBThread;
+    }
+
+    public byte[] getSerializedContinuation() {
+        return serializedContinuation;
+    }
+
+    public void setSerializedContinuation(byte[] serializedContinuation) {
+        this.serializedContinuation = serializedContinuation;
     }
     
 }

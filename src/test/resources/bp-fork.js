@@ -1,7 +1,7 @@
-/*
+/* 
  * The MIT License
  *
- * Copyright 2017 michael.
+ * Copyright 2018 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,36 +21,40 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis.bprogramio;
 
-import java.io.IOException;
-import java.io.InputStream;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.serialize.ScriptableInputStream;
 
-/**
- *
- * @author michael
- */
-public class BThreadSyncSnapshotInputStream extends ScriptableInputStream {
+/* global bp */
+
+var EVT_C = bp.Event("childPrint");
+var EVT_P = bp.Event("parentPrint");
+
+bp.registerBThread("source", function(){
+    var myInt = 0;
+    var myString = "baseString";
+    var myObj = {
+        forkReturn: 0
+    };
     
-    private final StubProvider stubProvider;
-    
-    public BThreadSyncSnapshotInputStream(InputStream in, Scriptable scope, StubProvider aProvider) throws IOException {
-        super(in, scope);
-        stubProvider = aProvider;
-    }
-
-    @Override
-    protected Object resolveObject(Object obj) throws IOException {
-        return ( obj instanceof StreamObjectStub )
-            ? stubProvider.get((StreamObjectStub) obj)
-            : obj;
-    }
-
-    @Override
-    protected Object readObjectOverride() throws IOException, ClassNotFoundException {
-        return super.readObjectOverride();
+    if ( bp.fork() ) {
+        myInt=myInt+2;
+        myString = myString+" - forkedString";
+        myObj.forkReturn=1;
+        myObj.childMessage="Child b-t";
+        bp.info.log("XX IN Child");
+    } else {
+        bp.log.info("XX IN Parent");
+        myObj.forkReturn=2;
+        myInt=myInt+1;
+        myString=myString+" - parentString";
+        myObj.parentMessage="Parent b-t";
     }
     
-}
+    bp.sync({
+        request: myObj.forkReturn===1? EVT_C : EVT_P
+    });
+    
+    bp.log.info("myInt: " + myInt);
+    bp.log.info("myString: " + myString);
+    bp.log.info("myObj: " + JSON.stringify(myObj) );
+    
+});

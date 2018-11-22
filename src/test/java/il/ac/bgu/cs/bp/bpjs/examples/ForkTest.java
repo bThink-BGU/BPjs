@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 michael.
+ * Copyright 2018 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,36 +21,28 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis.bprogramio;
+package il.ac.bgu.cs.bp.bpjs.examples;
 
-import java.io.IOException;
-import java.io.InputStream;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.serialize.ScriptableInputStream;
+import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
+import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import org.junit.Test;
 
 /**
  *
  * @author michael
  */
-public class BThreadSyncSnapshotInputStream extends ScriptableInputStream {
-    
-    private final StubProvider stubProvider;
-    
-    public BThreadSyncSnapshotInputStream(InputStream in, Scriptable scope, StubProvider aProvider) throws IOException {
-        super(in, scope);
-        stubProvider = aProvider;
+public class ForkTest {
+ 
+    @Test
+    public void testFork() {
+        BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("bp-fork.js"));
+        sut.addListener( new PrintBProgramRunnerListener() );
+        InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
+        
+        sut.run();
+        
+        eventLogger.getEvents().forEach(e->System.out.println(e) );
     }
-
-    @Override
-    protected Object resolveObject(Object obj) throws IOException {
-        return ( obj instanceof StreamObjectStub )
-            ? stubProvider.get((StreamObjectStub) obj)
-            : obj;
-    }
-
-    @Override
-    protected Object readObjectOverride() throws IOException, ClassNotFoundException {
-        return super.readObjectOverride();
-    }
-    
 }

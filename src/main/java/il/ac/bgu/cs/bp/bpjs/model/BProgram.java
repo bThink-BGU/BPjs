@@ -80,6 +80,8 @@ public abstract class BProgram {
      * BThreads added between bsyncs are added here.
      */
     private final BlockingQueue<BThreadSyncSnapshot> recentlyRegisteredBthreads = new LinkedBlockingDeque<>();
+    
+    private final BlockingQueue<ForkStatement> recentlyAddedForks = new LinkedBlockingDeque<>();
 
     private volatile boolean started = false;
 
@@ -262,7 +264,14 @@ public abstract class BProgram {
         recentlyRegisteredBthreads.add(bt);
         addBThreadCallback.ifPresent(cb -> cb.bthreadAdded(this, bt));
     }
-
+    
+    void registerForkedChild( BThreadSyncSnapshot btss ) {
+        btss.setupScope(programScope);
+        
+        btss.getScope().put("bp", programScope, Context.javaToJS(jsProxy, programScope));
+        addBThreadCallback.ifPresent(cb -> cb.bthreadAdded(this, btss));
+    }
+    
     /**
      * Adds an event to {@code this}' external event queue.
      *
@@ -456,7 +465,7 @@ public abstract class BProgram {
     public String getName() {
         return name;
     }
-
+    
     Set<BThreadSyncSnapshot> drainRecentlyRegisteredBthreads() {
         Set<BThreadSyncSnapshot> out = new HashSet<>();
         recentlyRegisteredBthreads.drainTo(out);
@@ -468,7 +477,17 @@ public abstract class BProgram {
         recentlyEnqueuedExternalEvents.drainTo(out);
         return out;
     }
-
+    
+    void addFork( ForkStatement fkStmt ) {
+        recentlyAddedForks.add(fkStmt);
+    }
+    
+    Set<ForkStatement> drainRecentlyAddedForks() {
+        Set<ForkStatement> out = new HashSet<>();
+        recentlyAddedForks.drainTo(out);
+        return out;
+    }
+    
     public void setAddBThreadCallback(BProgramCallback anAddBThreadCallback) {
         addBThreadCallback = Optional.ofNullable(anAddBThreadCallback);
     }

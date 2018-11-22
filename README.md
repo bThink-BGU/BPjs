@@ -36,12 +36,22 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Documentation
 
+* [Devoxx Belgium 2018 talk](https://www.youtube.com/watch?v=PW8VdWA0UcA) introducing Behavioral Programming and BPjs.
 * Presentations: [Introduction](https://www.slideshare.net/MichaelBarSinai/introducing-bpjs-web)
                  [Deeper dive](https://www.slideshare.net/MichaelBarSinai/deep-dive-into-bpjs)
 * [Tutorial and Reference](http://bpjs.readthedocs.io/en/develop/)
 * [API Javadocs](http://www.javadoc.io/doc/com.github.bthink-bgu/BPjs/)
 
 ## Change log for the BPjs library.
+
+### 2018-11-23
+* :bug: Fixed scope issues with b-thread continuations.
+
+### 2018-11-20
+* :sparkles: more tests, re: dynamic b-thread addition
+* :sparkles: added [Devoxx.be2018 talk](https://www.youtube.com/watch?v=PW8VdWA0UcA) :tada:
+* :put_litter_in_its_place: code cleanup
+ 
 
 ### 2018-10-17
 * :sparkles: `BProgramRunner` now has a `halt()` method #53.

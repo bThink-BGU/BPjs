@@ -47,15 +47,6 @@ public class BThreadSyncSnapshotTest {
     public final ExpectedException exception = ExpectedException.none();
     private final List<BProgramRunnerListener> listeners = new ArrayList<>();
 
-    /**
-     * Test default naming.
-     */
-    @Test
-    public void testDefaultNaming() {
-        BThreadSyncSnapshot sut = new BThreadSyncSnapshot();
-        assertEquals(BThreadSyncSnapshot.class.getName(), sut.getName());
-    }
-
     @Test
     @Ignore("Shared state exists between different snapshots")
     public void testJSVarState() throws InterruptedException {

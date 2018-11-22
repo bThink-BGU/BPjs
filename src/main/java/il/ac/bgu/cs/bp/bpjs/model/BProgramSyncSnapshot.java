@@ -1,6 +1,12 @@
 package il.ac.bgu.cs.bp.bpjs.model;
 
+import il.ac.bgu.cs.bp.bpjs.analysis.bprogramio.BProgramSyncSnapshotIO;
+import il.ac.bgu.cs.bp.bpjs.analysis.bprogramio.BThreadSyncSnapshotInputStream;
+import il.ac.bgu.cs.bp.bpjs.analysis.bprogramio.StreamObjectStub;
+import il.ac.bgu.cs.bp.bpjs.analysis.bprogramio.StubProvider;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BThreadJsProxy;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.ResumeBThread;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.StartBThread;
 
@@ -20,10 +26,16 @@ import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.Scriptable;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.BPEngineTask;
+import il.ac.bgu.cs.bp.bpjs.execution.tasks.StartFork;
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Stream;
+import org.mozilla.javascript.ScriptableObject;
 
 /**
  * The state of a {@link BProgram} when all its BThreads are at {@code bsync}.
@@ -33,6 +45,8 @@ import java.util.concurrent.atomic.AtomicReference;
  * @author michael
  */
 public class BProgramSyncSnapshot {
+    
+    private static final AtomicInteger FORK_NEXT_ID = new AtomicInteger(0);
     
     private final Set<BThreadSyncSnapshot> threadSnapshots;
     private final List<BEvent> externalEvents;
@@ -48,15 +62,22 @@ public class BProgramSyncSnapshot {
      */
     private class HaltOnAssertion implements BPEngineTask.Listener {
         private final ExecutorService exSvc;
+        private final BProgram bprogram;
 
-        public HaltOnAssertion(ExecutorService exSvc) {
+        public HaltOnAssertion(ExecutorService exSvc, BProgram bprogram) {
             this.exSvc = exSvc;
+            this.bprogram = bprogram;
         }
         
         @Override
         public void assertionFailed(FailedAssertion fa) {
             violationRecord.compareAndSet(null, fa);
             exSvc.shutdownNow();
+        }
+
+        @Override
+        public void addFork(ForkStatement stmt) {
+            bprogram.addFork(stmt);
         }
     }
     
@@ -82,7 +103,7 @@ public class BProgramSyncSnapshot {
      */
     public BProgramSyncSnapshot start( ExecutorService exSvc ) throws InterruptedException {
         Set<BThreadSyncSnapshot> nextRound = new HashSet<>(threadSnapshots.size());
-        BPEngineTask.Listener halter = new HaltOnAssertion(exSvc);
+        BPEngineTask.Listener halter = new HaltOnAssertion(exSvc, bprog);
         nextRound.addAll(exSvc.invokeAll(threadSnapshots.stream()
                                 .map(bt -> new StartBThread(bt, halter))
                                 .collect(toList())
@@ -127,7 +148,7 @@ public class BProgramSyncSnapshot {
             Context.exit();
         }
         
-        BPEngineTask.Listener halter = new HaltOnAssertion(exSvc);
+        BPEngineTask.Listener halter = new HaltOnAssertion(exSvc, bprog);
         
         try {
             // add the run results of all those who advance this stage
@@ -135,7 +156,7 @@ public class BProgramSyncSnapshot {
                                 resumingThisRound.stream()
                                                  .map(bt -> new ResumeBThread(bt, anEvent, halter))
                                                  .collect(toList())
-                    ).stream().map(f -> safeGet(f) ).filter(Objects::nonNull).collect(toList())
+                    ).stream().map(f -> safeGet(f)).filter(Objects::nonNull).collect(toList())
             );
 
             // inform listeners which b-threads completed
@@ -171,7 +192,6 @@ public class BProgramSyncSnapshot {
                 bt.getInterrupt()
                         .ifPresent( func -> {
                             final Scriptable scope = bt.getScope();
-                            scope.delete("bsync"); // can't call bsync from a break handler.
                             try {
                                 ctxt.callFunctionWithContinuations(func, scope, new Object[]{anEvent});
                             } catch ( ContinuationPending ise ) {
@@ -243,22 +263,70 @@ public class BProgramSyncSnapshot {
      * are registered.
      * @param nextRound the set of b-threads that will participate in the next round
      * @param exSvc The executor service to run the b-threads
-     * @param assertionListener handling assertion failures, if they happen.
+     * @param listener handling assertion failures, if they happen.
      * @throws InterruptedException 
      */
-    private void executeAllAddedBThreads(Set<BThreadSyncSnapshot> nextRound, ExecutorService exSvc, BPEngineTask.Listener assertionListener) throws InterruptedException {
+    private void executeAllAddedBThreads(Set<BThreadSyncSnapshot> nextRound, ExecutorService exSvc, BPEngineTask.Listener listener) throws InterruptedException {
         // if any new bthreads are added, run and add their result
-        Set<BThreadSyncSnapshot> added = bprog.drainRecentlyRegisteredBthreads();
-        while ( ! added.isEmpty() ) {
-            nextRound.addAll(exSvc.invokeAll(
-                    added.stream()
-                            .map(bt -> new StartBThread(bt, assertionListener))
-                            .collect(toList())
-            ).stream().map(f -> safeGet(f) ).filter(Objects::nonNull).collect(toList()));
-            added = bprog.drainRecentlyRegisteredBthreads();
+        Set<BThreadSyncSnapshot> addedBThreads = bprog.drainRecentlyRegisteredBthreads();
+        Set<ForkStatement> addedForks = bprog.drainRecentlyAddedForks();
+        while ( ! (addedBThreads.isEmpty() && addedForks.isEmpty()) ) {
+            Stream<BPEngineTask> threadStream = addedBThreads.stream()
+                .map(bt -> new StartBThread(bt, listener));
+            Stream<BPEngineTask> forkStream = addedForks.stream().flatMap( f -> convertToTasks(f, listener) );
+            
+            nextRound.addAll(exSvc.invokeAll(Stream.concat(forkStream, threadStream).collect(toList())).stream()
+                     .map(f -> safeGet(f) ).filter(Objects::nonNull).collect(toList()));
+            addedBThreads = bprog.drainRecentlyRegisteredBthreads();
         }
     }
+    
+    Stream<StartFork> convertToTasks(ForkStatement fkStmt, BPEngineTask.Listener listener) {
+        
+        // read continuation
+        Object cont=null;
+        final BThreadJsProxy btProxy = new BThreadJsProxy();
+        final BProgramJsProxy bpProxy = new BProgramJsProxy(bprog);
 
+        StubProvider stubPrv = (StreamObjectStub stub) -> {
+            if (stub == StreamObjectStub.BP_PROXY) {
+                return bpProxy;
+            }
+            if (stub == StreamObjectStub.BT_PROXY) {
+                return btProxy;
+            }
+            throw new IllegalArgumentException("Unknown stub " + stub);
+        };
+
+        try ( ByteArrayInputStream bais = new ByteArrayInputStream(fkStmt.getSerializedContinuation());
+            BThreadSyncSnapshotInputStream bssis = new BThreadSyncSnapshotInputStream(bais, ScriptableObject.getTopLevelScope(bprog.getGlobalScope()), stubPrv) ) {
+            cont = bssis.readObject();
+        } catch (ClassNotFoundException|IOException ex) {
+            throw new RuntimeException("Error while deserializing fork continuation: " + ex.getMessage(), ex);
+        }
+        
+        // construct a BThreadSyncSnapshot
+        BThreadSyncSnapshot btss = new BThreadSyncSnapshot(
+            "f" + FORK_NEXT_ID.incrementAndGet() + "$" + fkStmt.getForkingBThread().getName(),
+            fkStmt.getForkingBThread().getEntryPoint(), 
+            fkStmt.getForkingBThread().getInterrupt().orElse(null),
+            fkStmt.getForkingBThread().getScope(),
+            cont,
+            null
+        );
+        
+        // duplicate snapshot and register the copy with the b-program
+        try {
+            Context.enter();
+            BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(bprog);
+            BThreadSyncSnapshot forkedBT = io.deserializeBThread(io.serializeBThread(btss));
+            bprog.registerForkedChild(btss);
+            return Stream.of(new StartFork(fkStmt, forkedBT, listener));
+        } finally {
+            Context.exit();
+        }
+    }
+    
     @Override
     public int hashCode() {
         final int prime = 31;
