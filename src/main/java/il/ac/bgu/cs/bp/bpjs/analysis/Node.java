@@ -1,6 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.bprogramio.BProgramSyncSnapshotCloner;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotCloner;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;

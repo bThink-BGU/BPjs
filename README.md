@@ -46,6 +46,7 @@ a link to this page somewhere in the documentation/system about section.
 
 ### 2018-11-23
 * :bug: Fixed scope issues with b-thread continuations.
+* :sparkles: Validated scope unit tests are passing.
 
 ### 2018-11-20
 * :sparkles: more tests, re: dynamic b-thread addition

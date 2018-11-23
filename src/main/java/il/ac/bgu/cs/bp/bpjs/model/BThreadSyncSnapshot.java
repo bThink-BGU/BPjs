@@ -10,6 +10,7 @@ import org.mozilla.javascript.Scriptable;
 
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BThreadJsProxy;
 import il.ac.bgu.cs.bp.bpjs.analysis.ContinuationProgramState;
+import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
 import java.util.Objects;
 import org.mozilla.javascript.ScriptableObject;
 
@@ -128,12 +129,7 @@ public class BThreadSyncSnapshot implements Serializable {
         bthreadProxyScope.setParentScope(programScope);
         
         // setup entryPoint's scope s.t. it knows our proxy
-//        Scriptable entryPointTopScope = ScriptableObject.getTopLevelScope(entryPoint);
-        Scriptable penultimateEntryPointScope = entryPoint;
-        while ( penultimateEntryPointScope.getParentScope()!=null &&
-                penultimateEntryPointScope.getParentScope().getParentScope() != null ) {
-            penultimateEntryPointScope = penultimateEntryPointScope.getParentScope();
-        }
+        Scriptable penultimateEntryPointScope = ScriptableUtils.getPenultiamteParent(entryPoint);
         penultimateEntryPointScope.setParentScope(bthreadProxyScope);
         
         scope = entryPoint;

@@ -35,7 +35,7 @@ import org.junit.Test;
  */
 public class ForkTest {
  
-    @Test
+//    @Test
     public void testFork() {
         BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("bp-fork.js"));
         sut.addListener( new PrintBProgramRunnerListener() );

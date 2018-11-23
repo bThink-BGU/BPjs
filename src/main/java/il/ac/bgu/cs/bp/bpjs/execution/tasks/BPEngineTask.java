@@ -1,6 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.bprogramio.BThreadSyncSnapshotOutputStream;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.BThreadSyncSnapshotOutputStream;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
 import java.util.concurrent.Callable;

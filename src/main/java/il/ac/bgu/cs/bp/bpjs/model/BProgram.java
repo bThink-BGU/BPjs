@@ -12,6 +12,7 @@ import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BpLog;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.FailedAssertionException;
+import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -266,9 +267,10 @@ public abstract class BProgram {
     }
     
     void registerForkedChild( BThreadSyncSnapshot btss ) {
-        btss.setupScope(programScope);
+        // make the top-level scope be *this* program's programScope
+        Scriptable pus = ScriptableUtils.getPenultiamteParent(btss.getScope());
+        pus.setParentScope(programScope);
         
-        btss.getScope().put("bp", programScope, Context.javaToJS(jsProxy, programScope));
         addBThreadCallback.ifPresent(cb -> cb.bthreadAdded(this, btss));
     }
     

@@ -54,9 +54,11 @@ public class GeneralTest {
     @Test
     public void multipleBPjsInstances() throws InterruptedException {
         int rangeStart = 1000;
-//      rangeStart = 100; // iun-comment for a stress test
-        int rangeEnd   = 1100;
-        boolean printResults = false;
+//      rangeStart = 100; // in-comment for a stress test
+        int rangeEnd   = 1010;
+        int threadPoolSize = 4;
+        
+        boolean printResults = true;
         
         Set<? extends Callable<String>> tasks = IntStream.rangeClosed(rangeStart, rangeEnd).mapToObj( i -> {
             return (Callable<String>) () -> {
@@ -95,7 +97,7 @@ public class GeneralTest {
         
         // Init a true multithreading service, since we need 
         // to test concurrency
-        ExecutorService svc = Executors.newFixedThreadPool(8);
+        ExecutorService svc = Executors.newFixedThreadPool(threadPoolSize);
         List<Future<String>> results = svc.invokeAll(tasks);
         boolean areAllCompleted = results.stream().allMatch( fs -> fs.isDone() );
         

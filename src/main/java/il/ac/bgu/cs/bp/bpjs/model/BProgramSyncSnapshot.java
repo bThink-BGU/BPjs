@@ -1,9 +1,9 @@
 package il.ac.bgu.cs.bp.bpjs.model;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.bprogramio.BProgramSyncSnapshotIO;
-import il.ac.bgu.cs.bp.bpjs.analysis.bprogramio.BThreadSyncSnapshotInputStream;
-import il.ac.bgu.cs.bp.bpjs.analysis.bprogramio.StreamObjectStub;
-import il.ac.bgu.cs.bp.bpjs.analysis.bprogramio.StubProvider;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotIO;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.BThreadSyncSnapshotInputStream;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.StreamObjectStub;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.StubProvider;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BThreadJsProxy;
@@ -299,7 +299,8 @@ public class BProgramSyncSnapshot {
         };
 
         try ( ByteArrayInputStream bais = new ByteArrayInputStream(fkStmt.getSerializedContinuation());
-            BThreadSyncSnapshotInputStream bssis = new BThreadSyncSnapshotInputStream(bais, ScriptableObject.getTopLevelScope(bprog.getGlobalScope()), stubPrv) ) {
+            BThreadSyncSnapshotInputStream bssis = new BThreadSyncSnapshotInputStream(bais,
+                                                                ScriptableObject.getTopLevelScope(bprog.getGlobalScope()), stubPrv) ) {
             cont = bssis.readObject();
         } catch (ClassNotFoundException|IOException ex) {
             throw new RuntimeException("Error while deserializing fork continuation: " + ex.getMessage(), ex);
@@ -314,6 +315,7 @@ public class BProgramSyncSnapshot {
             cont,
             null
         );
+        btProxy.setBThread(btss);
         
         // duplicate snapshot and register the copy with the b-program
         try {

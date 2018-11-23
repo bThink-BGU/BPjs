@@ -1,5 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.analysis.bprogramio;
 
+import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotIO;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis.bprogramio;
+package il.ac.bgu.cs.bp.bpjs.bprogramio;
 
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import java.io.IOException;

@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis.bprogramio;
+package il.ac.bgu.cs.bp.bpjs.bprogramio;
 
 /**
  * Placeholders to put in the application stream. Used to break connections from the

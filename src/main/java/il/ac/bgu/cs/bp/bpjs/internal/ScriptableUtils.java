@@ -1,4 +1,4 @@
-/* 
+/*
  * The MIT License
  *
  * Copyright 2018 michael.
@@ -21,41 +21,22 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package il.ac.bgu.cs.bp.bpjs.internal;
 
+import org.mozilla.javascript.Scriptable;
 
-/* global bp */
-
-var EVT_C = bp.Event("childPrint");
-var EVT_P = bp.Event("parentPrint");
-
-bp.registerBThread("source", function(){
-    var myInt = 0;
-    var myString = "baseString";
-    var myObj = {
-        forkReturn: 0
-    };
+/**
+ * Some methods to make working with {@link Scriptable} easier.
+ * @author michael
+ */
+public class ScriptableUtils {
     
-    if ( bp.fork() ) {
-        myInt=myInt+2;
-        myString = myString+" - forkedString";
-        myObj.forkReturn=1;
-        myObj.childMessage="Child b-t";
-        bpq.toString();
-        bp.info.log("XX IN Child");
-    } else {
-        bp.log.info("XX IN Parent");
-        myObj.forkReturn=2;
-        myInt=myInt+1;
-        myString=myString+" - parentString";
-        myObj.parentMessage="Parent b-t";
+    public static Scriptable getPenultiamteParent( Scriptable aScope ) {
+        Scriptable penultimateScope = aScope;
+        while ( penultimateScope.getParentScope()!=null &&
+                penultimateScope.getParentScope().getParentScope() != null ) {
+            penultimateScope = penultimateScope.getParentScope();
+        }
+        return penultimateScope;
     }
-    
-    bp.sync({
-        request: myObj.forkReturn===1? EVT_C : EVT_P
-    });
-    
-    bp.log.info("myInt: " + myInt);
-    bp.log.info("myString: " + myString);
-    bp.log.info("myObj: " + JSON.stringify(myObj) );
-    
-});
+}

@@ -25,6 +25,7 @@ package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.NativeContinuation;
 
 /**
  * Starts a forked child b-thread.
@@ -42,7 +43,9 @@ public class StartFork extends BPEngineTask {
     
     @Override
     BThreadSyncSnapshot callImpl(Context jsContext) {
-        jsContext.resumeContinuation(bss.getContinuation(), bss.getScope(), forkValue);
+        NativeContinuation cont = (NativeContinuation) bss.getContinuation();
+        cont.put("bpq", cont.getPrototype(), "kjhkjhkjh");
+        jsContext.resumeContinuation(cont, cont.getParentScope(), forkValue);
         return null;
     }
 

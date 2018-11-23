@@ -21,14 +21,36 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis.bprogramio;
+package il.ac.bgu.cs.bp.bpjs.bprogramio;
+
+import java.io.IOException;
+import java.io.InputStream;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.serialize.ScriptableInputStream;
 
 /**
  *
  * @author michael
  */
-public interface StubProvider {
+public class BThreadSyncSnapshotInputStream extends ScriptableInputStream {
     
-    Object get(StreamObjectStub stub);
+    private final StubProvider stubProvider;
+    
+    public BThreadSyncSnapshotInputStream(InputStream in, Scriptable scope, StubProvider aProvider) throws IOException {
+        super(in, scope);
+        stubProvider = aProvider;
+    }
+
+    @Override
+    protected Object resolveObject(Object obj) throws IOException {
+        return ( obj instanceof StreamObjectStub )
+            ? stubProvider.get((StreamObjectStub) obj)
+            : obj;
+    }
+
+    @Override
+    protected Object readObjectOverride() throws IOException, ClassNotFoundException {
+        return super.readObjectOverride();
+    }
     
 }
