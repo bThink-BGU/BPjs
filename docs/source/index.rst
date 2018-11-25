@@ -6,9 +6,10 @@ BPjs is a library for executing behavioral programs written in Javascript. It ca
 be used from the commandline, or embedded in a Java application.
 
 BPjs is an open source project, maintained by a research group in Ben-Gurion
-University of the Negev, Israel. The code is `available on GitHub`_.
+University of the Negev, Israel. The code is `available on GitHub`_. This project, as well as the concepts behind it, were presented at `Devoxx Belgium 2018`_.
 
 .. _available on GitHub: https://github.com/bThink-BGU/BPjs
+.. _Devoxx Belgium 2018: https://www.youtube.com/watch?v=PW8VdWA0UcA
 
 Here you can learn about :doc:`writing <BPjsTutorial/index>` and :doc:`executing <execute-bpjs>` BPjs programs,
 :doc:`embedding <embed-bpjs>` BPjs programs in larger Java systems (or any JVM-based systems, really),

@@ -49,6 +49,11 @@ Registers a new b-thread into the running b-program. The caller may specify a na
 * ``bthreadFunction``: A no-parameter function that is the body of the b-thread.
 
 
+``bp.fork()``
+~~~~~~~~~~~~~
+
+Splits the calling b-thread to two identical b-threads. On the "parent" b-thread, ``fork`` returns ``0``. On the child b-thread, it returns ``1``. Similar to fork in, e.g., C.
+
 ``bp.log``
 ~~~~~~~~~~
 
