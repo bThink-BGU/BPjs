@@ -278,6 +278,7 @@ public class BProgramSyncSnapshot {
             nextRound.addAll(exSvc.invokeAll(Stream.concat(forkStream, threadStream).collect(toList())).stream()
                      .map(f -> safeGet(f) ).filter(Objects::nonNull).collect(toList()));
             addedBThreads = bprog.drainRecentlyRegisteredBthreads();
+            addedForks = bprog.drainRecentlyAddedForks();
         }
     }
     
@@ -323,7 +324,7 @@ public class BProgramSyncSnapshot {
             BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(bprog);
             BThreadSyncSnapshot forkedBT = io.deserializeBThread(io.serializeBThread(btss));
             bprog.registerForkedChild(btss);
-            return Stream.of(new StartFork(fkStmt, forkedBT, listener));
+            return Stream.of(new StartFork(fkStmt, forkedBT, listener, bprog));
         } finally {
             Context.exit();
         }

@@ -30,23 +30,22 @@ var EVT_P = bp.Event("parentPrint");
 
 bp.registerBThread("source", function(){
     var myInt = 0;
-    var myString = "baseString";
+    var myString = "base";
     var myObj = {
         forkReturn: 0
     };
     
     if ( bp.fork() ) {
         myInt=myInt+2;
-        myString = myString+" - forkedString";
+        myString = myString+"/child/";
         myObj.forkReturn=1;
         myObj.childMessage="Child b-t";
-        bpq.toString();
-        bp.info.log("XX IN Child");
+        bp.log.info("XX IN Child");
     } else {
         bp.log.info("XX IN Parent");
         myObj.forkReturn=2;
         myInt=myInt+1;
-        myString=myString+" - parentString";
+        myString=myString+"/parent/";
         myObj.parentMessage="Parent b-t";
     }
     
@@ -57,5 +56,7 @@ bp.registerBThread("source", function(){
     bp.log.info("myInt: " + myInt);
     bp.log.info("myString: " + myString);
     bp.log.info("myObj: " + JSON.stringify(myObj) );
+    
+    bp.sync({request:bp.Event(myString + myInt)});
     
 });

@@ -26,7 +26,12 @@ package il.ac.bgu.cs.bp.bpjs.examples;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import java.util.Arrays;
+import java.util.HashSet;
+import static java.util.stream.Collectors.toSet;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 /**
@@ -35,7 +40,7 @@ import org.junit.Test;
  */
 public class ForkTest {
  
-//    @Test
+    @Test
     public void testFork() {
         BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("bp-fork.js"));
         sut.addListener( new PrintBProgramRunnerListener() );
@@ -43,6 +48,11 @@ public class ForkTest {
         
         sut.run();
         
+        System.out.println("\nEvents: ");
         eventLogger.getEvents().forEach(e->System.out.println(e) );
+        assertEquals(
+            new HashSet<>(Arrays.asList("parentPrint", "childPrint", "base/child/2", "base/parent/1")),
+            eventLogger.getEvents().stream().map(BEvent::getName).collect(toSet())
+        );
     }
 }

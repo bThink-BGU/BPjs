@@ -23,9 +23,13 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.NativeContinuation;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptableObject;
 
 /**
  * Starts a forked child b-thread.
@@ -35,17 +39,21 @@ import org.mozilla.javascript.NativeContinuation;
 public class StartFork extends BPEngineTask {
     
     private final Object forkValue;
+    private final BProgram bprog;
 
-    public StartFork(Object aForkValue, BThreadSyncSnapshot aBss, Listener aListener) {
+    public StartFork(Object aForkValue, BThreadSyncSnapshot aBss, Listener aListener, BProgram aBprog) {
         super(aBss, aListener);
         forkValue = aForkValue;
+        bprog = aBprog;
     }
-    
+
     @Override
     BThreadSyncSnapshot callImpl(Context jsContext) {
         NativeContinuation cont = (NativeContinuation) bss.getContinuation();
-        cont.put("bpq", cont.getPrototype(), "kjhkjhkjh");
-        jsContext.resumeContinuation(cont, cont.getParentScope(), forkValue);
+        Scriptable tls = ScriptableObject.getTopLevelScope(cont);
+        BProgramJsProxy bprPxy = new BProgramJsProxy(bprog);
+        ScriptableObject.defineProperty(tls, "bp", bprPxy, 0);
+        jsContext.resumeContinuation(cont, tls, forkValue);
         return null;
     }
 

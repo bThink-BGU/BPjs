@@ -44,6 +44,9 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+### 2018-11-25
+* :sparkles: `fork()` added (#57).
+
 ### 2018-11-23
 * :bug: Fixed scope issues with b-thread continuations.
 * :sparkles: Validated scope unit tests are passing.
