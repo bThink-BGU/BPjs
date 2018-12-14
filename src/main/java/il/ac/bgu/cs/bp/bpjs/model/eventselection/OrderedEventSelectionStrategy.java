@@ -23,7 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
-import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
+import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
@@ -50,7 +50,7 @@ import org.mozilla.javascript.Context;
 public class OrderedEventSelectionStrategy extends AbstractEventSelectionStrategy {
 
     @Override
-    public Set<BEvent> selectableEvents(Set<BSyncStatement> statements, List<BEvent> externalEvents) {
+    public Set<BEvent> selectableEvents(Set<SyncStatement> statements, List<BEvent> externalEvents) {
         if ( statements.isEmpty() ) {
             // Corner case, not sure this is even possible.
             return externalEvents.isEmpty() ? emptySet() : singleton(externalEvents.get(0));
@@ -58,7 +58,7 @@ public class OrderedEventSelectionStrategy extends AbstractEventSelectionStrateg
         
         EventSet blocked = ComposableEventSet.anyOf(statements.stream()
                 .filter( stmt -> stmt!=null )
-                .map(BSyncStatement::getBlock )
+                .map(SyncStatement::getBlock )
                 .filter(r -> r != EventSets.none )
                 .collect( toSet() ) );
         

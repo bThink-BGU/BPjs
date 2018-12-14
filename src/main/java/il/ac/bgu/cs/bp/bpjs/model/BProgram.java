@@ -499,9 +499,16 @@ public abstract class BProgram {
         }
         return eventSelectionStrategy;
     }
-
-    public void setEventSelectionStrategy(EventSelectionStrategy eventSelectionStrategy) {
-        this.eventSelectionStrategy = eventSelectionStrategy;
+    
+    /**
+     * Sets the event selection strategy to be used.
+     * @param <T> Actual type of the strategy
+     * @param anEventSelectionStrategy the strategy
+     * @return the strategy (so it can be cleanly assigned to a variable).
+     */
+    public <T extends EventSelectionStrategy> T setEventSelectionStrategy(T anEventSelectionStrategy) {
+        eventSelectionStrategy = anEventSelectionStrategy;
+        return anEventSelectionStrategy;
     }
     
     public void setLogLevel( BpLog.LogLevel aLevel ) {

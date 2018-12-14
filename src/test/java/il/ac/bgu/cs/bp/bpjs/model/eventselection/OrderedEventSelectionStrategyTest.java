@@ -23,7 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
-import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
+import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import java.util.Arrays;
 import java.util.Collections;
@@ -54,9 +54,9 @@ public class OrderedEventSelectionStrategyTest {
         
        OrderedEventSelectionStrategy sut = new OrderedEventSelectionStrategy();
        
-       Set<BSyncStatement> stmts = new HashSet<>();
-       stmts.add(BSyncStatement.make().request(Arrays.asList(evt1, evt2, evt3, evt4)));
-       stmts.add(BSyncStatement.make().request(Arrays.asList(evt2, evt3, evt4)));
+       Set<SyncStatement> stmts = new HashSet<>();
+       stmts.add(SyncStatement.make().request(Arrays.asList(evt1, evt2, evt3, evt4)));
+       stmts.add(SyncStatement.make().request(Arrays.asList(evt2, evt3, evt4)));
        
        assertEquals( new HashSet<>(Arrays.asList(evt1, evt2)), sut.selectableEvents(stmts, Collections.emptyList()));
     }
@@ -66,10 +66,10 @@ public class OrderedEventSelectionStrategyTest {
         
        OrderedEventSelectionStrategy sut = new OrderedEventSelectionStrategy();
        
-       Set<BSyncStatement> stmts = new HashSet<>();
-       stmts.add(BSyncStatement.make().request(Arrays.asList(evt1, evt2, evt3, evt4)));
-       stmts.add(BSyncStatement.make().request(Arrays.asList(evt2, evt3, evt4)));
-       stmts.add(BSyncStatement.make().request(Arrays.asList(evt3, evt4)).block(evt1));
+       Set<SyncStatement> stmts = new HashSet<>();
+       stmts.add(SyncStatement.make().request(Arrays.asList(evt1, evt2, evt3, evt4)));
+       stmts.add(SyncStatement.make().request(Arrays.asList(evt2, evt3, evt4)));
+       stmts.add(SyncStatement.make().request(Arrays.asList(evt3, evt4)).block(evt1));
        
        assertEquals( new HashSet<>(Arrays.asList(evt3, evt2)), sut.selectableEvents(stmts, Collections.emptyList()));
     }

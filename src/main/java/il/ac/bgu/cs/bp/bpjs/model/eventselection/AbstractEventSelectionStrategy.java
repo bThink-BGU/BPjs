@@ -23,7 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
-import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
+import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import java.util.ArrayList;
@@ -71,14 +71,14 @@ public abstract class AbstractEventSelectionStrategy implements EventSelectionSt
      * @return An optional event selection result.
      */
     @Override
-    public Optional<EventSelectionResult> select(Set<BSyncStatement> statements, List<BEvent> externalEvents, Set<BEvent> selectableEvents) {
+    public Optional<EventSelectionResult> select(Set<SyncStatement> statements, List<BEvent> externalEvents, Set<BEvent> selectableEvents) {
         if (selectableEvents.isEmpty()) {
             return Optional.empty();
         }
         BEvent chosen = new ArrayList<>(selectableEvents).get(rnd.nextInt(selectableEvents.size()));
         Set<BEvent> requested = statements.stream()
-                                          .filter((BSyncStatement stmt) -> stmt != null)
-                                          .flatMap((BSyncStatement stmt) -> stmt.getRequest().stream())
+                                          .filter((SyncStatement stmt) -> stmt != null)
+                                          .flatMap((SyncStatement stmt) -> stmt.getRequest().stream())
                                           .collect(Collectors.toSet());
         
         if (requested.contains(chosen)) {
@@ -89,7 +89,7 @@ public abstract class AbstractEventSelectionStrategy implements EventSelectionSt
         }
     }
 
-    protected Set<BEvent> getRequestedAndNotBlocked(BSyncStatement stmt, EventSet blocked) {
+    protected Set<BEvent> getRequestedAndNotBlocked(SyncStatement stmt, EventSet blocked) {
         try {
             Context.enter();
             return stmt.getRequest().stream().filter((BEvent req) -> !blocked.contains(req)).collect(toSet());

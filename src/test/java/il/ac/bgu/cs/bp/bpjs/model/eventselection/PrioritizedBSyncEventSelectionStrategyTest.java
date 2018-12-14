@@ -9,7 +9,7 @@ import java.util.Set;
 
 import org.junit.Test;
 
-import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
+import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 
 public class PrioritizedBSyncEventSelectionStrategyTest {
@@ -23,11 +23,11 @@ public class PrioritizedBSyncEventSelectionStrategyTest {
 	public void testSelectableEvents_noBlocking() throws InterruptedException {
 		PrioritizedBSyncEventSelectionStrategy sut = new PrioritizedBSyncEventSelectionStrategy();
 
-		Set<BSyncStatement> stmts = new HashSet<>();
-		stmts.add(BSyncStatement.make().request(Arrays.asList(evt4)));
-		stmts.add(BSyncStatement.make().request(Arrays.asList(evt1)).data(5));
-		stmts.add(BSyncStatement.make().request(Arrays.asList(evt2)).data(10));
-		stmts.add(BSyncStatement.make().request(Arrays.asList(evt3)).data(10));
+		Set<SyncStatement> stmts = new HashSet<>();
+		stmts.add(SyncStatement.make().request(Arrays.asList(evt4)));
+		stmts.add(SyncStatement.make().request(Arrays.asList(evt1)).data(5));
+		stmts.add(SyncStatement.make().request(Arrays.asList(evt2)).data(10));
+		stmts.add(SyncStatement.make().request(Arrays.asList(evt3)).data(10));
 
 		assertEquals(new HashSet<>(Arrays.asList(evt2, evt3)),
 				sut.selectableEvents(stmts, Collections.emptyList()));
@@ -37,11 +37,11 @@ public class PrioritizedBSyncEventSelectionStrategyTest {
 	public void testSelectableEvents_withBlocking() {
 		PrioritizedBSyncEventSelectionStrategy sut = new PrioritizedBSyncEventSelectionStrategy();
 
-		Set<BSyncStatement> stmts = new HashSet<>();
-		stmts.add(BSyncStatement.make().request(Arrays.asList(evt4)));
-		stmts.add(BSyncStatement.make().request(Arrays.asList(evt1)).data(5));
-		stmts.add(BSyncStatement.make().request(Arrays.asList(evt2)).data(1));
-		stmts.add(BSyncStatement.make().request(Arrays.asList(evt3)).data(10).block(evt2));
+		Set<SyncStatement> stmts = new HashSet<>();
+		stmts.add(SyncStatement.make().request(Arrays.asList(evt4)));
+		stmts.add(SyncStatement.make().request(Arrays.asList(evt1)).data(5));
+		stmts.add(SyncStatement.make().request(Arrays.asList(evt2)).data(1));
+		stmts.add(SyncStatement.make().request(Arrays.asList(evt3)).data(10).block(evt2));
 
 		assertEquals(new HashSet<>(Arrays.asList(evt3)), 
 				sut.selectableEvents(stmts, Collections.emptyList()));

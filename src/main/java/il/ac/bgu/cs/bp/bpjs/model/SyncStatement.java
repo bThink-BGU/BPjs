@@ -12,13 +12,13 @@ import il.ac.bgu.cs.bp.bpjs.internal.OrderedSet;
 import java.util.SortedSet;
 
 /**
- * A statement a BThread makes at a {@code bsync} point. Contains data about 
- * what events it requests, waits for, and blocks, and possible additional data,
+ * A statement a BThread makes at a synchronization point (i.e when {@code bp.sync} is called).
+ * Contains data about what events it requests, waits for, and blocks, and possible additional data,
  * such as labels, or a break-upon event set.
  * 
  * @author michael
  */
-public class BSyncStatement implements java.io.Serializable {
+public class SyncStatement implements java.io.Serializable {
 
     /**
      * The event requested by this statement
@@ -41,6 +41,12 @@ public class BSyncStatement implements java.io.Serializable {
     private final EventSet interrupt;    
     
     /**
+     * When {@code true}, the b-thread states that it cannot stay in this
+     * synchronization point forever.
+     */
+    private final boolean hot;
+    
+    /**
      * Optional data a BThread can pass to the event selector. This may serve as
      * "hot/cold", "danger level", or any other hint for a specific event selection policy.
      */
@@ -57,18 +63,19 @@ public class BSyncStatement implements java.io.Serializable {
      * @param creator the {@link BThreadSyncSnapshot} that created this statement.
      * @return an empty statement
      */
-    public static BSyncStatement make(BThreadSyncSnapshot creator) {
-        return new BSyncStatement(creator, Collections.emptySet(), none, none, none, null);
+    public static SyncStatement make(BThreadSyncSnapshot creator) {
+        return new SyncStatement(creator, Collections.emptySet(), none, none, none, false, null);
     }
-    public static BSyncStatement make() {
-        return new BSyncStatement(null, Collections.emptySet(), none, none, none, null);
+    public static SyncStatement make() {
+        return new SyncStatement(null, Collections.emptySet(), none, none, none, false, null);
     }
     
-    public BSyncStatement(BThreadSyncSnapshot creator, Collection<? extends BEvent> request, EventSet waitFor, EventSet block, EventSet except, Object data) {
+    public SyncStatement(BThreadSyncSnapshot creator, Collection<? extends BEvent> request, EventSet waitFor, EventSet block, EventSet except, boolean isHot, Object data) {
         this.request = new OrderedSet<>(request);
         this.waitFor = waitFor;
         this.block = block;
         this.interrupt = except;
+        this.hot = isHot;
         this.data = data;
         this.bthread = creator;
     }
@@ -78,39 +85,43 @@ public class BSyncStatement implements java.io.Serializable {
     }
     
     /**
-     * Creates a new {@link BSyncStatement} based on {@code this}, with the 
+     * Creates a new {@link SyncStatement} based on {@code this}, with the 
      * request updated to the {@code toRequest} parameter.
      * @param toRequest the request part of the new statement
      * @return a new statement
      */
-    public BSyncStatement request( Collection<? extends BEvent> toRequest ) {
-        return new BSyncStatement(getBthread(), toRequest, getWaitFor(), getBlock(), getInterrupt(), getData());
+    public SyncStatement request( Collection<? extends BEvent> toRequest ) {
+        return new SyncStatement(getBthread(), toRequest, getWaitFor(), getBlock(), getInterrupt(), isHot(), getData());
     }
-    public BSyncStatement request( BEvent requestedEvent ) {
+    public SyncStatement request( BEvent requestedEvent ) {
         Set<BEvent> toRequest = new HashSet<>();
         toRequest.add(requestedEvent);
-        return new BSyncStatement(getBthread(), toRequest, getWaitFor(), getBlock(), getInterrupt(), getData());
+        return new SyncStatement(getBthread(), toRequest, getWaitFor(), getBlock(), getInterrupt(), isHot(), getData());
     }
-    public BSyncStatement request( ExplicitEventSet ees ) {
-        return new BSyncStatement(getBthread(), ees.getCollection(), getWaitFor(), getBlock(), getInterrupt(), getData());
+    public SyncStatement request( ExplicitEventSet ees ) {
+        return new SyncStatement(getBthread(), ees.getCollection(), getWaitFor(), getBlock(), getInterrupt(), isHot(), getData());
     }
     
-    public BSyncStatement waitFor( EventSet events ) {
-        return new BSyncStatement(getBthread(), getRequest(), events, getBlock(), getInterrupt(), getData());
+    public SyncStatement waitFor( EventSet events ) {
+        return new SyncStatement(getBthread(), getRequest(), events, getBlock(), getInterrupt(), isHot(), getData());
     }
 
-    public BSyncStatement block( EventSet events ) {
-        return new BSyncStatement(getBthread(), getRequest(), getWaitFor(), events, getInterrupt(), getData());
+    public SyncStatement block( EventSet events ) {
+        return new SyncStatement(getBthread(), getRequest(), getWaitFor(), events, getInterrupt(), isHot(), getData());
     }
     
-    public BSyncStatement interrupt( EventSet events ) {
-        return new BSyncStatement(getBthread(), getRequest(), getWaitFor(), getBlock(), events, getData());
+    public SyncStatement interrupt( EventSet events ) {
+        return new SyncStatement(getBthread(), getRequest(), getWaitFor(), getBlock(), events, isHot(), getData());
     }
     
-    public BSyncStatement data( Object someData ) { 
-        return new BSyncStatement(getBthread(), getRequest(), getWaitFor(), getBlock(), getInterrupt(), someData);
+    public SyncStatement hot( boolean shouldBeHot ) { 
+        return new SyncStatement(getBthread(), getRequest(), getWaitFor(), getBlock(), getInterrupt(), shouldBeHot, getData());
     }
     
+    public SyncStatement data( Object someData ) { 
+        return new SyncStatement(getBthread(), getRequest(), getWaitFor(), getBlock(), getInterrupt(), isHot(), someData);
+    }
+
     public Collection<? extends BEvent> getRequest() {
         return request;
     }
@@ -131,7 +142,7 @@ public class BSyncStatement implements java.io.Serializable {
         return bthread;
     }
 
-    public BSyncStatement setBthread(BThreadSyncSnapshot bthread) {
+    public SyncStatement setBthread(BThreadSyncSnapshot bthread) {
         this.bthread = bthread;
         return this;
     }
@@ -143,10 +154,15 @@ public class BSyncStatement implements java.io.Serializable {
     public boolean hasData() {
         return data != null;
     }
-    
+
+    public boolean isHot() {
+        return hot;
+    }
+        
     @Override
     public String toString() {
-        return String.format("[RWBStatement r:%s w:%s b:%s i:%s d:%s]", getRequest(), getWaitFor(), getBlock(), getInterrupt(), getData());
+        return String.format("[SyncStatement%s r:%s w:%s b:%s i:%s d:%s]", isHot()?"<hot>":"",
+                getRequest(), getWaitFor(), getBlock(), getInterrupt(), getData());
     }
 
     @Override
@@ -164,10 +180,13 @@ public class BSyncStatement implements java.io.Serializable {
         if (obj == null) {
             return false;
         }
-        if (! (obj instanceof BSyncStatement)) {
+        if (! (obj instanceof SyncStatement)) {
             return false;
         }
-        final BSyncStatement other = (BSyncStatement) obj;
+        final SyncStatement other = (SyncStatement) obj;
+        if ( this.isHot() != other.isHot() ) {
+            return false;
+        }
         if (!Objects.equals(this.getRequest(), other.getRequest())) {
             return false;
         }

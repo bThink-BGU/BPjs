@@ -25,7 +25,7 @@ package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
+import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -61,7 +61,7 @@ public class PausingEventSelectionStrategyDecorator<ESS extends EventSelectionSt
     }
 
     @Override
-    public Optional<EventSelectionResult> select(Set<BSyncStatement> statements, List<BEvent> externalEvents, Set<BEvent> selectableEvents) {
+    public Optional<EventSelectionResult> select(Set<SyncStatement> statements, List<BEvent> externalEvents, Set<BEvent> selectableEvents) {
         Optional<EventSelectionResult> res = getDecorated().select(statements, externalEvents, selectableEvents);
         lock.readLock().lock();
         listener.eventSelectionPaused(this);

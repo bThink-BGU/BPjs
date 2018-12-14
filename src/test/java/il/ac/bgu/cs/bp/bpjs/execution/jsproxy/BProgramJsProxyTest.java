@@ -42,7 +42,7 @@ import static org.junit.Assert.assertTrue;
 public class BProgramJsProxyTest {
     
     @Test
-    public void randomProxyText() throws InterruptedException {
+    public void randomProxyTest() throws InterruptedException {
         
         BProgram sut = new SingleResourceBProgram("RandomProxy.js");
         
@@ -59,7 +59,7 @@ public class BProgramJsProxyTest {
     }
 
     @Test
-    public void logLevelProxyText() throws InterruptedException {
+    public void logLevelProxyTest() throws InterruptedException {
         
         BProgram sut = new SingleResourceBProgram("RandomProxy.js");
         

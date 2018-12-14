@@ -8,7 +8,7 @@ import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.JsEventSet;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.FailedAssertionException;
-import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
+import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.ForkStatement;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
 import java.util.Arrays;
@@ -42,7 +42,8 @@ import org.mozilla.javascript.NativeObject;
  * 
  * @author michael
  */
-public class BProgramJsProxy implements java.io.Serializable {
+public class BProgramJsProxy extends SyncStatementBuilder
+                             implements java.io.Serializable {
     
     
     private final BProgram program;
@@ -152,14 +153,34 @@ public class BProgramJsProxy implements java.io.Serializable {
     ////////////////////////
     // sync ("bsync") related code
     
-    public void sync( NativeObject jsRWB ) {
-        sync(jsRWB, null);
+    @Override
+    public void sync( NativeObject jsRWB, Object data ) {
+        synchronizationPoint(jsRWB, null, data);
     }
     
-    public void sync( NativeObject jsRWB, Object data ) {
+    @Override
+    public SyncStatementBuilder hot(boolean isHot) {
+        SyncStatementBuilderImpl sub = new SyncStatementBuilderImpl(this);
+        sub.setHotness(isHot);
+        
+        return sub;
+    }
+    
+    /**
+     * Where the actual Behavioral Programming synchronization point is done.
+     * 
+     * @param jsRWB The JavaScript object {@code {request:... waitFor:...}} 
+     * @param hot   {@code True} if this should be a "hot" synchronization point.
+     * @param data Optional extra data the synchronizing b-thread may want to add.
+     */
+    @Override
+    void synchronizationPoint( NativeObject jsRWB, Boolean hot, Object data ) {
         Map<String, Object> jRWB = (Map)Context.jsToJava(jsRWB, Map.class);
         
-        BSyncStatement stmt = BSyncStatement.make();
+        SyncStatement stmt = SyncStatement.make();
+        if ( hot != null ) {
+            stmt = stmt.hot(hot);
+        }
         Object req = jRWB.get("request");
         if ( req != null ) {
             if ( req instanceof BEvent ) {
@@ -184,8 +205,8 @@ public class BProgramJsProxy implements java.io.Serializable {
         if (hasCollision) {
             System.err.println("Warning: B-thread is blocking an event it is also requesting, this may lead to a deadlock.");
         }
-        captureBThreadState(stmt);
         
+        captureBThreadState(stmt);
     }
 
     private EventSet convertToEventSet( Object jsObject ) {
@@ -211,7 +232,7 @@ public class BProgramJsProxy implements java.io.Serializable {
         }
     }
     
-    private void captureBThreadState(BSyncStatement stmt) throws ContinuationPending {
+    private void captureBThreadState(SyncStatement stmt) throws ContinuationPending {
         ContinuationPending capturedContinuation = Context.getCurrentContext().captureContinuation();
         capturedContinuation.setApplicationState(stmt);
         throw capturedContinuation;
@@ -293,6 +314,5 @@ public class BProgramJsProxy implements java.io.Serializable {
         final BProgramJsProxy other = (BProgramJsProxy) obj;
         return Objects.equals(this.program, other.program);
     }
-    
-    
+
 }

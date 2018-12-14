@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 import org.junit.Test;
 
-import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
+import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import org.junit.Before;
@@ -33,10 +33,10 @@ public class PrioritizedBThreadsEventSelectionStrategyTest {
     
 	@Test
 	public void testSelectableEvents_noBlocking() throws InterruptedException {
-		Set<BSyncStatement> stmts = new HashSet<>();
-		stmts.add(BSyncStatement.make(bt("1")).request(Arrays.asList(EVT_1)));
-		stmts.add(BSyncStatement.make(bt("2")).request(Arrays.asList(EVT_2)));
-		stmts.add(BSyncStatement.make(bt("3")).request(Arrays.asList(EVT_3)));
+		Set<SyncStatement> stmts = new HashSet<>();
+		stmts.add(SyncStatement.make(bt("1")).request(Arrays.asList(EVT_1)));
+		stmts.add(SyncStatement.make(bt("2")).request(Arrays.asList(EVT_2)));
+		stmts.add(SyncStatement.make(bt("3")).request(Arrays.asList(EVT_3)));
 		
 		assertEquals(new HashSet<>(Arrays.asList(EVT_3)),
 				sut.selectableEvents(stmts, Collections.emptyList()));
@@ -44,10 +44,10 @@ public class PrioritizedBThreadsEventSelectionStrategyTest {
 	
     @Test
 	public void testSelectableEvents_noBlocking_double() throws InterruptedException {
-		Set<BSyncStatement> stmts = new HashSet<>();
-		stmts.add(BSyncStatement.make(bt("1")).request(Arrays.asList(EVT_1)));
-		stmts.add(BSyncStatement.make(bt("2")).request(Arrays.asList(EVT_2)));
-		stmts.add(BSyncStatement.make(bt("2a")).request(Arrays.asList(EVT_2A)));
+		Set<SyncStatement> stmts = new HashSet<>();
+		stmts.add(SyncStatement.make(bt("1")).request(Arrays.asList(EVT_1)));
+		stmts.add(SyncStatement.make(bt("2")).request(Arrays.asList(EVT_2)));
+		stmts.add(SyncStatement.make(bt("2a")).request(Arrays.asList(EVT_2A)));
 		
 		assertEquals(new HashSet<>(Arrays.asList(EVT_2, EVT_2A)),
 				sut.selectableEvents(stmts, Collections.emptyList()));
@@ -55,11 +55,11 @@ public class PrioritizedBThreadsEventSelectionStrategyTest {
 
 	@Test	
 	public void testSelectableEvents_withBlocking() {
-		Set<BSyncStatement> stmts = new HashSet<>();
+		Set<SyncStatement> stmts = new HashSet<>();
         
-        stmts.add(BSyncStatement.make(bt("1")).request(Arrays.asList(EVT_1)));
-		stmts.add(BSyncStatement.make(bt("2")).request(Arrays.asList(EVT_2)).block(EVT_3));
-		stmts.add(BSyncStatement.make(bt("3")).request(Arrays.asList(EVT_3)));
+        stmts.add(SyncStatement.make(bt("1")).request(Arrays.asList(EVT_1)));
+		stmts.add(SyncStatement.make(bt("2")).request(Arrays.asList(EVT_2)).block(EVT_3));
+		stmts.add(SyncStatement.make(bt("3")).request(Arrays.asList(EVT_3)));
 		
         
         assertEquals(new HashSet<>(Arrays.asList(EVT_2)),
@@ -68,12 +68,12 @@ public class PrioritizedBThreadsEventSelectionStrategyTest {
 	
     @Test	
 	public void testSelectableEvents_withBlocking_double() {
-		Set<BSyncStatement> stmts = new HashSet<>();
+		Set<SyncStatement> stmts = new HashSet<>();
         
-        stmts.add(BSyncStatement.make(bt("1")).request(Arrays.asList(EVT_1)));
-		stmts.add(BSyncStatement.make(bt("2")).request(Arrays.asList(EVT_2)));
-		stmts.add(BSyncStatement.make(bt("2a")).request(Arrays.asList(EVT_2A)));
-		stmts.add(BSyncStatement.make(bt("3")).block(EVT_2A));
+        stmts.add(SyncStatement.make(bt("1")).request(Arrays.asList(EVT_1)));
+		stmts.add(SyncStatement.make(bt("2")).request(Arrays.asList(EVT_2)));
+		stmts.add(SyncStatement.make(bt("2a")).request(Arrays.asList(EVT_2A)));
+		stmts.add(SyncStatement.make(bt("3")).block(EVT_2A));
         
         assertEquals(new HashSet<>(Arrays.asList(EVT_2)),
 				sut.selectableEvents(stmts, Collections.emptyList()));

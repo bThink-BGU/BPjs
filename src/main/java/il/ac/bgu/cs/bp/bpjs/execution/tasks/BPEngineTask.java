@@ -2,7 +2,7 @@ package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BThreadSyncSnapshotOutputStream;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
+import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import java.util.concurrent.Callable;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
@@ -82,8 +82,8 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
     private BThreadSyncSnapshot handleContinuationPending(ContinuationPending cbs, Context jsContext) throws IllegalStateException {
         final Object capturedStatement = cbs.getApplicationState();
         
-        if ( capturedStatement instanceof BSyncStatement ) {
-            final BSyncStatement syncStatement = (BSyncStatement) cbs.getApplicationState();
+        if ( capturedStatement instanceof SyncStatement ) {
+            final SyncStatement syncStatement = (SyncStatement) cbs.getApplicationState();
             syncStatement.setBthread(bss);
             return bss.copyWith(cbs.getContinuation(), syncStatement);
             

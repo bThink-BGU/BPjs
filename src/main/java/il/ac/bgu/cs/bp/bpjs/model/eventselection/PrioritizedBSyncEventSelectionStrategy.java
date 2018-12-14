@@ -23,7 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
-import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
+import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
@@ -57,11 +57,11 @@ public class PrioritizedBSyncEventSelectionStrategy extends AbstractEventSelecti
     }
     
     @Override
-    public Set<BEvent> selectableEvents(Set<BSyncStatement> statements, List<BEvent> externalEvents) {
+    public Set<BEvent> selectableEvents(Set<SyncStatement> statements, List<BEvent> externalEvents) {
         
         EventSet blocked = ComposableEventSet.anyOf(statements.stream()
                 .filter( stmt -> stmt!=null )
-                .map( BSyncStatement::getBlock )
+                .map(SyncStatement::getBlock )
                 .filter( r -> r != EventSets.none )
                 .collect( Collectors.toSet() ) );
         
@@ -88,7 +88,7 @@ public class PrioritizedBSyncEventSelectionStrategy extends AbstractEventSelecti
        
     }
     
-    private int getValue( BSyncStatement stmt ) {
+    private int getValue( SyncStatement stmt ) {
         return (stmt.hasData() && (stmt.getData() instanceof Number))? 
                 ((Number)stmt.getData()).intValue() : Integer.MIN_VALUE;
     }

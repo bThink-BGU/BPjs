@@ -1,7 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
+import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.ExplicitEventSet;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -54,10 +54,9 @@ public class SimpleEventSelectionStrategyTest {
     public void testUnanimousCase() {
         BEvent expected = eventOne;
         
-        Set<BSyncStatement> sets = new HashSet<>(Arrays.asList(
-                BSyncStatement.make(null).request(eventOne),
-                BSyncStatement.make(null).request(eventOne).waitFor(eventTwo),
-                BSyncStatement.make(null).request(eventOne)
+        Set<SyncStatement> sets = new HashSet<>(Arrays.asList(SyncStatement.make(null).request(eventOne),
+                SyncStatement.make(null).request(eventOne).waitFor(eventTwo),
+                SyncStatement.make(null).request(eventOne)
         ));
         assertEquals(singleton(expected), sut.selectableEvents(sets, Collections.emptyList()));
         assertEquals(Optional.of(new EventSelectionResult(expected)), sut.select(sets, Collections.emptyList(),singleton(eventOne)));
@@ -67,9 +66,9 @@ public class SimpleEventSelectionStrategyTest {
     public void testWithBlockingCase() {
         BEvent expected = eventOne;
         
-        Set<BSyncStatement> sets = new HashSet<>(Arrays.asList(BSyncStatement.make(null).request(eventOne),
-                BSyncStatement.make(null).request(eventTwo),
-                BSyncStatement.make(null).block(eventTwo)
+        Set<SyncStatement> sets = new HashSet<>(Arrays.asList(SyncStatement.make(null).request(eventOne),
+                SyncStatement.make(null).request(eventTwo),
+                SyncStatement.make(null).block(eventTwo)
         ));
         assertEquals(singleton(expected), sut.selectableEvents(sets, Collections.emptyList()));
         assertEquals(Optional.of(new EventSelectionResult(expected)),
@@ -80,11 +79,10 @@ public class SimpleEventSelectionStrategyTest {
     public void testDeadlock() {
         ExplicitEventSet setOfEvt2 = new ExplicitEventSet();
         setOfEvt2.add(eventTwo);
-        Set<BSyncStatement> sets = new HashSet<>(Arrays.asList(
-                BSyncStatement.make(null).request(eventOne),
-                BSyncStatement.make(null).request(setOfEvt2),
-                BSyncStatement.make(null).block(eventTwo),
-                BSyncStatement.make(null).block(eventOne)
+        Set<SyncStatement> sets = new HashSet<>(Arrays.asList(SyncStatement.make(null).request(eventOne),
+                SyncStatement.make(null).request(setOfEvt2),
+                SyncStatement.make(null).block(eventTwo),
+                SyncStatement.make(null).block(eventOne)
         ));
         assertEquals(emptySet(), sut.selectableEvents(sets, Collections.emptyList()));
         assertEquals(Optional.empty(), sut.select(sets, Collections.emptyList(), emptySet()));
@@ -92,11 +90,10 @@ public class SimpleEventSelectionStrategyTest {
     
     @Test
     public void testNoRequests() {
-        Set<BSyncStatement> sets = new HashSet<>(Arrays.asList(
-                BSyncStatement.make(null).waitFor(eventOne),
-                BSyncStatement.make(null).waitFor(eventTwo),
-                BSyncStatement.make(null).block(eventTwo),
-                BSyncStatement.make(null).block(eventOne)
+        Set<SyncStatement> sets = new HashSet<>(Arrays.asList(SyncStatement.make(null).waitFor(eventOne),
+                SyncStatement.make(null).waitFor(eventTwo),
+                SyncStatement.make(null).block(eventTwo),
+                SyncStatement.make(null).block(eventOne)
         ));
         assertEquals(emptySet(), sut.selectableEvents(sets, Collections.emptyList()));
         assertEquals(Optional.empty(), sut.select(sets, Collections.emptyList(), emptySet()));
@@ -104,11 +101,10 @@ public class SimpleEventSelectionStrategyTest {
     
     @Test
     public void testDeadlockWithExternals() {
-        Set<BSyncStatement> sets = new HashSet<>(Arrays.asList(
-                BSyncStatement.make(null).request(eventOne),
-                BSyncStatement.make(null).request(eventTwo),
-                BSyncStatement.make(null).block(eventTwo),
-                BSyncStatement.make(null).block(eventOne)
+        Set<SyncStatement> sets = new HashSet<>(Arrays.asList(SyncStatement.make(null).request(eventOne),
+                SyncStatement.make(null).request(eventTwo),
+                SyncStatement.make(null).block(eventTwo),
+                SyncStatement.make(null).block(eventOne)
         ));
         List<BEvent> externals = Arrays.asList(eventOne, eventTri, eventTri, eventTwo);
         assertEquals( singleton(eventTri), sut.selectableEvents(sets, externals));
@@ -118,10 +114,9 @@ public class SimpleEventSelectionStrategyTest {
     
     @Test
     public void testNoInternalRequests() {
-        Set<BSyncStatement> sets = new HashSet<>(Arrays.asList(
-                BSyncStatement.make(null).waitFor(eventOne),
-                BSyncStatement.make(null).waitFor(eventTri),
-                BSyncStatement.make(null).waitFor(eventTwo)
+        Set<SyncStatement> sets = new HashSet<>(Arrays.asList(SyncStatement.make(null).waitFor(eventOne),
+                SyncStatement.make(null).waitFor(eventTri),
+                SyncStatement.make(null).waitFor(eventTwo)
         ));
         List<BEvent> externals = Arrays.asList(eventOne, eventTwo, eventTri, eventTwo);
         
@@ -133,7 +128,7 @@ public class SimpleEventSelectionStrategyTest {
     @Test
     public void testSeed() {
         Set<BEvent> events = IntStream.range(0, 1000).mapToObj( i -> BEvent.named("evt"+i) ).collect( toSet() );
-        Set<BSyncStatement> stmts = events.stream().map( e -> BSyncStatement.make().request(e)).collect(toSet());
+        Set<SyncStatement> stmts = events.stream().map(e -> SyncStatement.make().request(e)).collect(toSet());
         
         // See what sut does
         List<BEvent> selectedBySut = new ArrayList<>(1000);

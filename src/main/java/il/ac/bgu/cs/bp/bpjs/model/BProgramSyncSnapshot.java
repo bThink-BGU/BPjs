@@ -210,7 +210,7 @@ public class BProgramSyncSnapshot {
         return threadSnapshots;
     }
     
-    public Set<BSyncStatement> getStatements() {
+    public Set<SyncStatement> getStatements() {
         return getBThreadSnapshots().stream().map(BThreadSyncSnapshot::getBSyncStatement)
                 .collect(toSet());
     }

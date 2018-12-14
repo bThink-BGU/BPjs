@@ -44,6 +44,11 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+### 2018-12-14
+* :arrows_counterclockwise: Renamed `BSyncStatement` to `SyncStatement`, as we don't call it "bsync" anymore. Also updated the `toString` method, which still used the pre-historic `RWBStatement` term.
+* :sparkles: `SyncStatement`s can now be "hot".
+* :arrow_up: Improvements to `BProgram`'s API.
+
 ### 2018-11-25
 * :sparkles: `fork()` added (#57).
 
