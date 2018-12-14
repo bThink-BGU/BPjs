@@ -28,13 +28,12 @@ import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.WrappedException;
 
 /**
- * Base class for BPrograms. Provides the context (Javascript scope, external
- * event queue, etc.) bthreads interact with while running. Concrete BProgram
+ * Base class for BPrograms. Provides the context (JavaScript scope, external
+ * event queue, etc.) b-threads interact with while running. Concrete BProgram
  * extend this class by implementing the
  * {@link #setupProgramScope(org.mozilla.javascript.Scriptable)} method.
  *
- * <p>
- * For creating a BProgram that uses a single Javascript file available in the
+ * For creating a BProgram that uses a single JavaScript file available in the
  * classpath, see {@link SingleResourceBProgram}. For creating them from a
  * hard-coded string, see {@link StringBProgram}.
  *

@@ -31,8 +31,8 @@ import java.util.Set;
 
 /**
  * Base class for {@link EventSelectionStrategy} decorators.These allow
- modification/inspection of existing event selection strategies via 
- composition rather than subclassing.
+ * modification/inspection of existing event selection strategies via 
+ * composition rather than sub-classing.
  * 
  * @author michael
  * @param <ESS> The type of event selection strategy being decorated.
