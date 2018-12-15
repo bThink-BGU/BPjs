@@ -1,7 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.analysis.examples;
 
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
-import il.ac.bgu.cs.bp.bpjs.analysis.Node;
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import java.util.List;
@@ -29,10 +29,10 @@ public class DiningPhilTest {
 
     private static void printCounterExample(VerificationResult res) {
         System.out.println("Found a counterexample");
-        final List<Node> trace = res.getCounterExampleTrace();
+        final List<DfsTraversalNode> trace = res.getCounterExampleTrace();
         trace.forEach(nd -> System.out.println(" " + nd.getLastEvent()));
         
-        Node last = trace.get(trace.size() - 1);
+        DfsTraversalNode last = trace.get(trace.size() - 1);
         System.out.println("selectableEvents: " + last.getSelectableEvents());
         last.getSystemState().getBThreadSnapshots().stream()
                 .sorted((s1, s2) -> s1.getName().compareTo(s2.getName()))

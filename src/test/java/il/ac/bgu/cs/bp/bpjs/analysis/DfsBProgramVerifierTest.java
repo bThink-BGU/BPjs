@@ -115,7 +115,7 @@ public class DfsBProgramVerifierTest {
     public void testDeadlockSetting() throws Exception {
         BProgram program = new SingleResourceBProgram("DFSVerifierTests/deadlocking.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        sut.setDetectDeadlocks(false);
+        sut.addInspector(DfsVerificationInspections.FailedAssertions);
         VerificationResult res = sut.verify(program);
         assertFalse(res.isCounterExampleFound());
         assertEquals(VerificationResult.ViolationType.None, res.getViolationType());
@@ -145,7 +145,7 @@ public class DfsBProgramVerifierTest {
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setIterationCountGap(1);
         sut.setProgressListener(new BriefPrintDfsVerifierListener());
-        sut.setDetectDeadlocks(false);
+        sut.addInspector(DfsVerificationInspections.FailedAssertions);
         VerificationResult res = sut.verify(bprog);
 
         assertTrue(res.isVerifiedSuccessfully());

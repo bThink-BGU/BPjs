@@ -249,6 +249,18 @@ public class BProgramSyncSnapshot {
         return violationRecord.get();
     }
     
+    /**
+     * Returns {@code true} if any of the b-threads at this point is at a "hot"
+     * sync. Similar to the "hot cut" idiom in LSC.
+     * @return {@code true} is at least one of the b-threads is at a hot sync; {@code false} otherwise.
+     */
+    public boolean isHot() {
+        return getBThreadSnapshots().stream()
+                    .map(BThreadSyncSnapshot::getBSyncStatement)
+                    .filter(SyncStatement::isHot)
+                    .findAny().isPresent();
+    }
+    
     private BThreadSyncSnapshot safeGet(Future<BThreadSyncSnapshot> fbss) {
         try {
             return fbss.get();

@@ -56,7 +56,7 @@ public class SyncStatementTempTest {
 
         @Override
         public Set<BEvent> selectableEvents(Set<SyncStatement> statements, List<BEvent> externalEvents) {
-            isHotRecord.add( statements.stream().filter(SyncStatement::isHot).findAny().isPresent());
+            isHotRecord.add(statements.stream().filter(SyncStatement::isHot).findAny().isPresent());
             return decorated.selectableEvents(statements, externalEvents);
         }
         

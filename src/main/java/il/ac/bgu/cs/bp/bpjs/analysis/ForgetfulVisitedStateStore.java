@@ -34,12 +34,12 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
 public class ForgetfulVisitedStateStore implements VisitedStateStore {
 
     @Override
-    public void store(Node nd) {
+    public void store(DfsTraversalNode nd) {
         // ignore.
     }
 
     @Override
-    public boolean isVisited(Node nd) {
+    public boolean isVisited(DfsTraversalNode nd) {
         return false;
     }
         

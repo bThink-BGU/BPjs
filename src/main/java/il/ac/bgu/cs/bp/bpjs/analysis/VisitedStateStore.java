@@ -29,7 +29,7 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
  * @author michael
  */
 public interface VisitedStateStore {
-    void store( Node nd );
-    boolean isVisited( Node nd );
+    void store( DfsTraversalNode nd );
+    boolean isVisited( DfsTraversalNode nd );
     void clear();
 }

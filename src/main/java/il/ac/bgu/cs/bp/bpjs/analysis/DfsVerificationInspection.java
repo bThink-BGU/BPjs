@@ -23,42 +23,25 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
-import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.List;
+import java.util.Optional;
 
 /**
- * A {@link VisitedStateStore} that uses a hash function over the BProgram's states.
+ * Detects illegal states during a DFS verification. Instances are used by
+ * {@link DfsBProgramVerifier} to detect deadlocks, assertion failures, etc.
+ * 
+ * @see il.ac.bgu.cs.bp.bpjs.analysis.DefaultDfsVerificationInspections
+ * 
  * @author michael
  */
-public class HashVisitedStateStore implements VisitedStateStore {
-    private final Set<Long> visited = new TreeSet<>();
-
-    @Override
-    public void store(DfsTraversalNode nd) {
-        visited.add( hash(nd.getSystemState().getBThreadSnapshots()) );
-    }
-
-    @Override
-    public boolean isVisited(DfsTraversalNode nd) {
-        return visited.contains( hash(nd.getSystemState().getBThreadSnapshots()) );
-    }
-
-    private long hash( Set<BThreadSyncSnapshot> snapshots ) {
-        long hash = 0;
-        for ( BThreadSyncSnapshot snp : snapshots ) {
-            hash = hash ^ snp.getContinuationProgramState().hashCode();
-        }
-        return hash;
-    }
-
-    @Override
-    public void clear() {
-        visited.clear();
-    }
-
-    @Override
-    public String toString() {
-        return "[HashVisitedStateStore stateCount:" + visited.size()+ ']';
-    }
+public interface DfsVerificationInspection {
+    
+    /**
+     * Inspects the current trace for violations.
+     * @param currentTrace The trace of the b-program, up to the current point.
+     * @return A non-empty optional with the violation details, or an empty 
+     *         optional, if everything is fine.
+     */
+    Optional<VerificationResult> inspect( List<DfsTraversalNode> currentTrace );
+    
 }

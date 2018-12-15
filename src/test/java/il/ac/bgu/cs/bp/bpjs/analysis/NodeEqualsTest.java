@@ -29,12 +29,12 @@ public class NodeEqualsTest {
     public void test1() throws Exception {
         // Create a program
         final BProgram bprog = new StringBProgram(P1);
-        Node[] nodes = new Node[10];
+        DfsTraversalNode[] nodes = new DfsTraversalNode[10];
 
         BEvent eventX = new BEvent("X");
         // Discard initial node, as it has no event, and so can't
         // be used in the even/odd equalities later.
-        nodes[0] = Node.getInitialNode(bprog, exSvc).getNextNode(eventX, exSvc);
+        nodes[0] = DfsTraversalNode.getInitialNode(bprog, exSvc).getNextNode(eventX, exSvc);
 
         for (int i = 1; i < 10; i++) {
             nodes[i] = nodes[i - 1].getNextNode(eventX, exSvc);
@@ -57,9 +57,9 @@ public class NodeEqualsTest {
         bprog.putInGlobalScope("PHILOSOPHER_COUNT", 5);
 
         String events[] = {"Pick1R", "Pick2R", "Pick3R", "Pick4R", "Pick5R"};
-        Node[] nodes = new Node[events.length + 1];
+        DfsTraversalNode[] nodes = new DfsTraversalNode[events.length + 1];
 
-        nodes[0] = Node.getInitialNode(bprog, exSvc);
+        nodes[0] = DfsTraversalNode.getInitialNode(bprog, exSvc);
 
         for (int i = 0; i < events.length; i++) {
             nodes[i + 1] = nodes[i].getNextNode(new BEvent(events[i]), exSvc);
@@ -79,12 +79,12 @@ public class NodeEqualsTest {
         // Create a program
         final BProgram bprog = new StringBProgram(P1);
 
-        Node[] nodes = new Node[10];
+        DfsTraversalNode[] nodes = new DfsTraversalNode[10];
 
         BEvent eventX = new BEvent("X");
         // Discard initial node, as it has no event, and so can't
         // be used in the even/odd equalities later.
-        nodes[0] = Node.getInitialNode(bprog, exSvc).getNextNode(eventX, exSvc);
+        nodes[0] = DfsTraversalNode.getInitialNode(bprog, exSvc).getNextNode(eventX, exSvc);
 
         assertTrue(nodes[0].equals(nodes[0]));
         assertFalse(nodes[0].equals(null));

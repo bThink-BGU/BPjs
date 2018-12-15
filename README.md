@@ -44,6 +44,12 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+### 2018-12-15
+* :sparkles: Verification area gets some well-needed refactoring:
+    * Inspections get their own interface (so it's easier to add new ones)
+    * Common inspections no live in the `DfsVerificationInspections` utility class.
+    * 
+
 ### 2018-12-14
 * :arrows_counterclockwise: Renamed `BSyncStatement` to `SyncStatement`, as we don't call it "bsync" anymore. Also updated the `toString` method, which still used the pre-historic `RWBStatement` term.
 * :sparkles: `SyncStatement`s can now be "hot".

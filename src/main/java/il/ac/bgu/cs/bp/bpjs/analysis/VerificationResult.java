@@ -55,17 +55,23 @@ public class VerificationResult {
         /**
          * Program can generate an illegal event trace
          */
-        FailedAssertion
+        FailedAssertion, 
+        
+        /**
+         * Program can get into an infinite loop where it is always in hot syncs.
+         * This normally means a liveness requirement violation.
+         */
+        BProgramHotCycle
     }
 
     private final long timeMillies;
     private final long statesScanned;
     private final long edgesScanned;
-    private final List<Node> counterExampleTrace;
+    private final List<DfsTraversalNode> counterExampleTrace;
     private final ViolationType violationType;
     private final FailedAssertion failedAssertion;
 
-    public VerificationResult(ViolationType aViolationType, FailedAssertion aFailedAssertion, List<Node> counterExampleTrace, long timeMillies, long statesScanned, long edgesScanned) {
+    public VerificationResult(ViolationType aViolationType, FailedAssertion aFailedAssertion, List<DfsTraversalNode> counterExampleTrace, long timeMillies, long statesScanned, long edgesScanned) {
         failedAssertion = aFailedAssertion;
         violationType = aViolationType;
         this.timeMillies = timeMillies;
@@ -74,7 +80,7 @@ public class VerificationResult {
         this.counterExampleTrace = counterExampleTrace;
     }
 
-    VerificationResult(ViolationType vt, FailedAssertion fa, List<Node> trace) {
+    VerificationResult(ViolationType vt, FailedAssertion fa, List<DfsTraversalNode> trace) {
         this(vt, fa, trace, 0, 0, 0);
     }
 
@@ -86,7 +92,7 @@ public class VerificationResult {
         return statesScanned;
     }
 
-    public List<Node> getCounterExampleTrace() {
+    public List<DfsTraversalNode> getCounterExampleTrace() {
         return counterExampleTrace;
     }
 

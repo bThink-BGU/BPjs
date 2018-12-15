@@ -92,7 +92,7 @@ function addPhil(philNum) {
   bp.registerBThread("NoStarvation", function() {
     while (true) {
       bp.sync({waitFor:bp.Event(i+"-is-hungry")});
-      val reqRef = bp.setHot( i + " is hungry, but never got to eat.");
+      var reqRef = bp.setHot( i + " is hungry, but never got to eat.");
       bp.sync({waitFor:bp.Event(i+"-eats")});
       bp.setCold(reqRef);
     }

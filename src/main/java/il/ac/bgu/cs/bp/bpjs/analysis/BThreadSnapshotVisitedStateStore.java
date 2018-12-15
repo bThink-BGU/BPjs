@@ -46,16 +46,16 @@ public class BThreadSnapshotVisitedStateStore implements VisitedStateStore {
     }
     
     @Override
-    public void store(Node nd) {
+    public void store(DfsTraversalNode nd) {
         visited.add( extractStatus(nd) );
     }
 
     @Override
-    public boolean isVisited(Node nd) {
+    public boolean isVisited(DfsTraversalNode nd) {
         return visited.contains( extractStatus(nd) );
     }   
     
-    private Object extractStatus( Node nd ) {
+    private Object extractStatus( DfsTraversalNode nd ) {
         return nd.getSystemState().getBThreadSnapshots();
     }
 

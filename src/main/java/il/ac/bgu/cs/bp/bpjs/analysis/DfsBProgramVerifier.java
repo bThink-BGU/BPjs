@@ -31,8 +31,10 @@ import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
+import java.util.HashSet;
 
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -67,7 +69,7 @@ public class DfsBProgramVerifier {
 
         void iterationCount(long count, long statesHit, DfsBProgramVerifier v);
 
-        void maxTraceLengthHit(List<Node> trace, DfsBProgramVerifier v);
+        void maxTraceLengthHit(List<DfsTraversalNode> trace, DfsBProgramVerifier v);
 
         void done(DfsBProgramVerifier v);
     }
@@ -76,12 +78,12 @@ public class DfsBProgramVerifier {
     private long visitedStatesCount;
     private VisitedStateStore visited = new BThreadSnapshotVisitedStateStore();
     private long maxTraceLength = DEFAULT_MAX_TRACE;
-    private final ArrayList<Node> currentPath = new ArrayList<>();
+    private final List<DfsTraversalNode> currentPath = new ArrayList<>();
     private Optional<ProgressListener> listenerOpt = Optional.empty();
     private long iterationCountGap = DEFAULT_ITERATION_COUNT_GAP;
     private BProgram currentBProgram;
     private boolean debugMode = false;
-    private boolean detectDeadlocks = true;
+    private final Set<DfsVerificationInspection> inspectors = new HashSet<>();
 
     public VerificationResult verify(BProgram aBp) throws Exception {
         currentBProgram = aBp;
@@ -89,17 +91,20 @@ public class DfsBProgramVerifier {
         visitedEdgeCount = 0;
         currentPath.clear();
         visited.clear();
+        if ( inspectors.isEmpty() ) { // in case no verifications were specified, use the defauls set.
+            inspectors.addAll( DfsVerificationInspections.ALL );
+        }
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("DfsBProgramRunner-" + INSTANCE_COUNTER.incrementAndGet());
         long start = System.currentTimeMillis();
         listenerOpt.ifPresent(l -> l.started(this));
-        VerificationResult vr = dfsUsingStack(Node.getInitialNode(aBp, execSvc), execSvc);
+        VerificationResult vr = dfsUsingStack(DfsTraversalNode.getInitialNode(aBp, execSvc), execSvc);
         long end = System.currentTimeMillis();
         listenerOpt.ifPresent(l -> l.done(this));
         execSvc.shutdown();
         return new VerificationResult(vr.getViolationType(), vr.getFailedAssertion(), vr.getCounterExampleTrace(), end - start, visitedStatesCount, visitedEdgeCount);
     }
 
-    protected VerificationResult dfsUsingStack(Node aStartNode, ExecutorService execSvc) throws Exception {
+    protected VerificationResult dfsUsingStack(DfsTraversalNode aStartNode, ExecutorService execSvc) throws Exception {
         long iterationCount = 0;
         visitedStatesCount = 0;
 
@@ -111,22 +116,15 @@ public class DfsBProgramVerifier {
                 printStatus(iterationCount, Collections.unmodifiableList(currentPath));
             }
 
-            Node curNode = peek();
+            DfsTraversalNode curNode = peek();
             if (curNode != null) {
-                if (isDetectDeadlocks() &&
-                        hasRequestedEvents(curNode.getSystemState()) &&
-                        curNode.getSelectableEvents().isEmpty()
-                        ) {
-                    // detected deadlock
-                    return new VerificationResult(VerificationResult.ViolationType.Deadlock, null, currentPath);
+                Optional<VerificationResult> res = inspectors.stream()
+                        .map(v->v.inspect(currentPath))
+                        .filter(o->o.isPresent()).map(Optional::get)
+                        .findAny();
+                if ( res.isPresent() ) {
+                    return res.get();
                 }
-                if (!curNode.getSystemState().isStateValid()) {
-                    // detected assertion failure.
-                    return new VerificationResult(VerificationResult.ViolationType.FailedAssertion,
-                            curNode.getSystemState().getFailedAssertion(),
-                            currentPath);
-                }
-
             }
             iterationCount++;
 
@@ -138,7 +136,7 @@ public class DfsBProgramVerifier {
                 pop();
 
             } else {
-                Node nextNode = getUnvisitedNextNode(curNode, execSvc);
+                DfsTraversalNode nextNode = getUnvisitedNextNode(curNode, execSvc);
                 if (nextNode == null) {
                     // fold stack, retry next iteration;
                     pop();
@@ -164,10 +162,10 @@ public class DfsBProgramVerifier {
         return new VerificationResult(VerificationResult.ViolationType.None, null, null);
     }
 
-    protected Node getUnvisitedNextNode(Node src, ExecutorService execSvc) throws Exception {
+    protected DfsTraversalNode getUnvisitedNextNode(DfsTraversalNode src, ExecutorService execSvc) throws Exception {
         while (src.getEventIterator().hasNext()) {
             final BEvent nextEvent = src.getEventIterator().next();
-            Node possibleNextNode = src.getNextNode(nextEvent, execSvc);
+            DfsTraversalNode possibleNextNode = src.getNextNode(nextEvent, execSvc);
             visitedEdgeCount++;
             if (!visited.isVisited(possibleNextNode)) {
                 return possibleNextNode;
@@ -212,13 +210,13 @@ public class DfsBProgramVerifier {
         return currentBProgram;
     }
 
-    void printStatus(long iteration, List<Node> path) {
+    void printStatus(long iteration, List<DfsTraversalNode> path) {
         System.out.println("Iteration " + iteration);
         System.out.println("  visited: " + visitedStatesCount);
         path.forEach(n -> System.out.println("  " + n.getLastEvent()));
     }
 
-    private void push(Node n) {
+    private void push(DfsTraversalNode n) {
         currentPath.add(n);
     }
 
@@ -230,11 +228,11 @@ public class DfsBProgramVerifier {
         return pathLength() == 0;
     }
 
-    private Node peek() {
+    private DfsTraversalNode peek() {
         return isPathEmpty() ? null : currentPath.get(currentPath.size() - 1);
     }
 
-    private Node pop() {
+    private DfsTraversalNode pop() {
         return currentPath.remove(currentPath.size() - 1);
     }
 
@@ -245,13 +243,17 @@ public class DfsBProgramVerifier {
     public void setDebugMode(boolean debugMode) {
         this.debugMode = debugMode;
     }
-
-    public boolean isDetectDeadlocks() {
-        return detectDeadlocks;
+    
+    public void addInspector( DfsVerificationInspection ins ) {
+        inspectors.add(ins);
     }
-
-    public void setDetectDeadlocks(boolean detectDeadlocks) {
-        this.detectDeadlocks = detectDeadlocks;
+    
+    public Set<DfsVerificationInspection> getInspectors() {
+        return inspectors;
+    }
+    
+    public boolean removeInspector( DfsVerificationInspection ins ) {
+        return inspectors.remove(ins);
     }
 
     private boolean hasRequestedEvents(BProgramSyncSnapshot bpss) {

@@ -29,8 +29,9 @@ import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.analysis.Node;
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsVerificationInspections;
 import il.ac.bgu.cs.bp.bpjs.analysis.Requirements;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
@@ -89,14 +90,14 @@ public class Mazes {
             vfr.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
 //            vfr.setVisitedNodeStore(new ForgetfulVisitedStateStore());
             
-            vfr.setDetectDeadlocks(false); // prevent from detecting cases where we ust hit a wall.
+            vfr.addInspector(DfsVerificationInspections.FailedAssertions); // prevent from detecting cases where we ust hit a wall.
             final VerificationResult res = vfr.verify(bprog);
 
             char[][] maze = getMaze(bprog);
             printMaze(maze);
             if (res.isCounterExampleFound()) {
                 System.out.println("Found a counterexample");
-                for (Node nd : res.getCounterExampleTrace()) {
+                for (DfsTraversalNode nd : res.getCounterExampleTrace()) {
                     System.out.println(" " + nd.getLastEvent());
                     if (nd.getLastEvent() != null) {
                         String name = nd.getLastEvent().getName();

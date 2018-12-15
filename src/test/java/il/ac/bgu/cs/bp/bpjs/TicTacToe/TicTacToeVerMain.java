@@ -5,6 +5,7 @@ import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsVerificationInspections;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
 
@@ -41,7 +42,7 @@ public class TicTacToeVerMain  {
 //		bprog.appendSource(infiBThread);
         try {
             DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-            vfr.setDetectDeadlocks(false);
+            vfr.addInspector(DfsVerificationInspections.FailedAssertions);
 
             vfr.setMaxTraceLength(70);
 //            vfr.setDebugMode(true);

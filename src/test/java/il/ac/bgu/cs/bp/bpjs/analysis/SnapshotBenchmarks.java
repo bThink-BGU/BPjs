@@ -61,7 +61,7 @@ public class SnapshotBenchmarks {
             BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(program);
             ArrayList<Integer> snapshotSizes = new ArrayList<>();
 
-            Node next = Node.getInitialNode(program, execSvc);
+            DfsTraversalNode next = DfsTraversalNode.getInitialNode(program, execSvc);
 
             //Iteration 1,starts already at request state A
             for (int i = 0; i < num_steps; i++) {

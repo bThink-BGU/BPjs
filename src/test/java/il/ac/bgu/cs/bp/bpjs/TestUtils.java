@@ -24,7 +24,7 @@
 package il.ac.bgu.cs.bp.bpjs;
 
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.analysis.Node;
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ExecutionException;
@@ -45,10 +45,10 @@ public abstract class TestUtils {
     private TestUtils(){}
     
     
-    public static String traceEventNamesString( List<Node> trace, String delimiter ) {
+    public static String traceEventNamesString( List<DfsTraversalNode> trace, String delimiter ) {
         
         return trace.stream()
-                    .map(Node::getLastEvent)
+                    .map(DfsTraversalNode::getLastEvent)
                     .filter(Objects::nonNull)
                     .map(BEvent::getName)
                     .collect(joining(delimiter));
