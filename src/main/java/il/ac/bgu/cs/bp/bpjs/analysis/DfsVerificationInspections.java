@@ -26,6 +26,7 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.DeadlockViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.FailedAssertionViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotTerminationViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import java.util.Arrays;
 import java.util.List;
@@ -43,30 +44,54 @@ import static java.util.stream.Collectors.toSet;
 public final class DfsVerificationInspections {
     
     
-    public static final DfsVerificationInspection Deadlock = trace -> {
-        DfsTraversalNode curNode = peek(trace);
-        if (hasRequestedEvents(curNode.getSystemState()) &&
-                       curNode.getSelectableEvents().isEmpty()) {
-           return Optional.of(new DeadlockViolation(trace));
-        } else return Optional.empty();
+    public static final DfsVerificationInspection Deadlock = new DfsVerificationInspection() {
+        @Override
+        public Optional<Violation> inspectTrace(List<DfsTraversalNode> trace) {
+            DfsTraversalNode curNode = peek(trace);
+            if (hasRequestedEvents(curNode.getSystemState()) &&
+                           curNode.getSelectableEvents().isEmpty()) {
+               return Optional.of(new DeadlockViolation(trace));
+            } else return Optional.empty();
+        }
+
+        @Override
+        public Optional<Violation> inspectCycle(List<DfsTraversalNode> currentTrace, DfsTraversalNode cyclicPass) {
+            return Optional.empty();
+        }
     };
     
-    public static final DfsVerificationInspection FailedAssertions = trace -> {
-        DfsTraversalNode curNode = peek(trace);
-        if (!curNode.getSystemState().isStateValid()) {
-            return Optional.of(new FailedAssertionViolation(curNode.getSystemState().getFailedAssertion(), trace));
-        } else return Optional.empty();
+    public static final DfsVerificationInspection FailedAssertions = new DfsVerificationInspection() {
+        @Override
+        public Optional<Violation> inspectTrace(List<DfsTraversalNode> trace) {
+            DfsTraversalNode curNode = peek(trace);
+            if (!curNode.getSystemState().isStateValid()) {
+                return Optional.of(new FailedAssertionViolation(curNode.getSystemState().getFailedAssertion(), trace));
+            } else return Optional.empty();
+        }
+
+        @Override
+        public Optional<Violation> inspectCycle(List<DfsTraversalNode> currentTrace, DfsTraversalNode cyclicPass) {
+            return Optional.empty();
+        }
     };
-    
-    public static final DfsVerificationInspection HotTermination = trace -> {
-        DfsTraversalNode curNode = peek(trace);
-        if ( curNode.getSystemState().isHot() &&
-                curNode.getSelectableEvents().isEmpty() ) {
-            Set<String> hotlyTerminated = curNode.getSystemState().getBThreadSnapshots().stream()
-                    .filter( s -> s.getBSyncStatement().isHot() ).map( s->s.getName() ).collect( toSet() );
-            return Optional.of( new HotTerminationViolation(hotlyTerminated, trace) );
-        } else return Optional.empty();
-    };
+        
+    public static final DfsVerificationInspection HotTermination = new DfsVerificationInspection() {
+        @Override
+        public Optional<Violation> inspectTrace(List<DfsTraversalNode> trace) {
+            DfsTraversalNode curNode = peek(trace);
+            if ( curNode.getSystemState().isHot() &&
+                    curNode.getSelectableEvents().isEmpty() ) {
+                Set<String> hotlyTerminated = curNode.getSystemState().getBThreadSnapshots().stream()
+                        .filter( s -> s.getBSyncStatement().isHot() ).map( s->s.getName() ).collect( toSet() );
+                return Optional.of( new HotTerminationViolation(hotlyTerminated, trace) );
+            } else return Optional.empty();
+        }
+
+        @Override
+        public Optional<Violation> inspectCycle(List<DfsTraversalNode> currentTrace, DfsTraversalNode cyclicPass) {
+            return Optional.empty();
+        }
+    }; 
     
     public static final List<DfsVerificationInspection> ALL = Arrays.asList(
             DfsVerificationInspections.Deadlock,

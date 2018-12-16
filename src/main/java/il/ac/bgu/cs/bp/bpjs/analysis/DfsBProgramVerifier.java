@@ -120,7 +120,7 @@ public class DfsBProgramVerifier {
             DfsTraversalNode curNode = peek();
             if (curNode != null) {
                 Optional<Violation> res = inspectors.stream()
-                        .map(v->v.inspect(currentPath))
+                        .map(v->v.inspectTrace(currentPath))
                         .filter(o->o.isPresent()).map(Optional::get)
                         .findAny();
                 if ( res.isPresent() ) {

@@ -367,6 +367,10 @@ public class BProgramSyncSnapshot {
                 return false;
             }
         }
+        if ( ! getExternalEvents().equals(other.getExternalEvents()) ) {
+            return false;
+        }
+        // TODO 
         return Objects.equals(threadSnapshots, other.threadSnapshots);
     }
 }

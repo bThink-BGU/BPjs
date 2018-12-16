@@ -43,6 +43,25 @@ public interface DfsVerificationInspection {
      * @return A non-empty optional with the violation details, or an empty 
      *         optional, if everything is fine.
      */
-    Optional<Violation> inspect( List<DfsTraversalNode> currentTrace );
+    Optional<Violation> inspectTrace( List<DfsTraversalNode> currentTrace );
     
+    /**
+     * Inspects a cycle in the program graph for possible violations.
+     * 
+     * For example, in the following graph:
+     * <code>
+     * [a]-[b]-[c]-[d]--...
+     *       \      |
+     *        +-----+
+     * </code>
+     * 
+     * This methods will be called with trace={@code [a][b][c][d]} and 
+     * cyclicPass={@code [b]}.
+     * 
+     * @param currentTrace Program trace up to this point.
+     * @param cyclicPass   A node in the current trace the cycle returns to.
+     * @return A non-empty optional with the violation details, or an empty 
+     *         optional, if everything is fine.
+     */
+    Optional<Violation> inspectCycle( List<DfsTraversalNode> currentTrace, DfsTraversalNode cyclicPass);
 }
