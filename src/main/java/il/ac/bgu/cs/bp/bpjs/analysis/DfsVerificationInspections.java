@@ -23,10 +23,15 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.DeadlockViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.FailedAssertionViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotTerminationViolation;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import static java.util.stream.Collectors.toSet;
 
 /**
  *
@@ -42,16 +47,14 @@ public final class DfsVerificationInspections {
         DfsTraversalNode curNode = peek(trace);
         if (hasRequestedEvents(curNode.getSystemState()) &&
                        curNode.getSelectableEvents().isEmpty()) {
-           return Optional.of(new VerificationResult(VerificationResult.ViolationType.Deadlock, null, trace));
+           return Optional.of(new DeadlockViolation(trace));
         } else return Optional.empty();
     };
     
     public static final DfsVerificationInspection FailedAssertions = trace -> {
         DfsTraversalNode curNode = peek(trace);
         if (!curNode.getSystemState().isStateValid()) {
-            return Optional.of(new VerificationResult(VerificationResult.ViolationType.FailedAssertion,
-                    curNode.getSystemState().getFailedAssertion(),
-                    trace));
+            return Optional.of(new FailedAssertionViolation(curNode.getSystemState().getFailedAssertion(), trace));
         } else return Optional.empty();
     };
     
@@ -59,7 +62,9 @@ public final class DfsVerificationInspections {
         DfsTraversalNode curNode = peek(trace);
         if ( curNode.getSystemState().isHot() &&
                 curNode.getSelectableEvents().isEmpty() ) {
-            return Optional.of( new VerificationResult(VerificationResult.ViolationType.BProgramHotCycle, null, trace) );
+            Set<String> hotlyTerminated = curNode.getSystemState().getBThreadSnapshots().stream()
+                    .filter( s -> s.getBSyncStatement().isHot() ).map( s->s.getName() ).collect( toSet() );
+            return Optional.of( new HotTerminationViolation(hotlyTerminated, trace) );
         } else return Optional.empty();
     };
     

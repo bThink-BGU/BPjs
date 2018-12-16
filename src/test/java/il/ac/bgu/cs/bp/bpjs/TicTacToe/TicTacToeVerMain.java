@@ -50,9 +50,11 @@ public class TicTacToeVerMain  {
             vfr.setProgressListener( new BriefPrintDfsVerifierListener() );
 
             final VerificationResult res = vfr.verify(bprog);
-            if (res.isCounterExampleFound()) {
+            if (res.isViolationFound()) {
                 System.out.println("Found a counterexample");
-                res.getCounterExampleTrace().forEach(nd -> System.out.println(" " + nd.getLastEvent()));
+                res.getViolation().get()
+                    .getCounterExampleTrace()
+                    .forEach(nd -> System.out.println(" " + nd.getLastEvent()));
 
             } else {
                 System.out.println("No counterexample found.");

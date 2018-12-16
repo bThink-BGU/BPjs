@@ -32,6 +32,7 @@ import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
 import org.junit.Test;
 
 import static il.ac.bgu.cs.bp.bpjs.TestUtils.traceEventNamesString;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.DeadlockViolation;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -43,7 +44,6 @@ public class BProgramJsProxyTest {
     
     @Test
     public void randomProxyTest() throws InterruptedException {
-        
         BProgram sut = new SingleResourceBProgram("RandomProxy.js");
         
         new BProgramRunner(sut).run();
@@ -55,7 +55,6 @@ public class BProgramJsProxyTest {
         
         Double floatCount = sut.getFromGlobalScope("floatCount", Double.class).get();
         assertEquals(500.0, floatCount, 100);
-
     }
 
     @Test
@@ -69,8 +68,6 @@ public class BProgramJsProxyTest {
         
         String logLevel2 = sut.getFromGlobalScope("logLevel2", String.class).get();
         assertEquals(BpLog.LogLevel.Warn.name(), logLevel2);
-        
-
     }
 
     @Test
@@ -79,13 +76,14 @@ public class BProgramJsProxyTest {
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
         VerificationResult res = sut.verify(bpr);
-        assertTrue(res.isCounterExampleFound());
-        assertEquals(VerificationResult.ViolationType.Deadlock, res.getViolationType());
-        assertEquals("sampleEvent", traceEventNamesString(res.getCounterExampleTrace(), ""));
+        assertTrue(res.isViolationFound());
+        assertTrue(res.getViolation().get() instanceof DeadlockViolation);
+        assertEquals("sampleEvent", traceEventNamesString(res.getViolation().get().getCounterExampleTrace(), ""));
+        
         BProgram bprPred = new SingleResourceBProgram("bpsync-blockrequestPredicate.js");
         res = sut.verify(bprPred);
-        assertTrue(res.isCounterExampleFound());
-        assertEquals(VerificationResult.ViolationType.Deadlock, res.getViolationType());
-        assertEquals("sampleEvent", traceEventNamesString(res.getCounterExampleTrace(), ""));
+        assertTrue(res.isViolationFound());
+        assertTrue(res.getViolation().get() instanceof DeadlockViolation);
+        assertEquals("sampleEvent", traceEventNamesString(res.getViolation().get().getCounterExampleTrace(), ""));
     }
 }

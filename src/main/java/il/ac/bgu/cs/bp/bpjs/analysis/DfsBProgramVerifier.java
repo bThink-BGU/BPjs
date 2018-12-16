@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -97,14 +98,14 @@ public class DfsBProgramVerifier {
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("DfsBProgramRunner-" + INSTANCE_COUNTER.incrementAndGet());
         long start = System.currentTimeMillis();
         listenerOpt.ifPresent(l -> l.started(this));
-        VerificationResult vr = dfsUsingStack(DfsTraversalNode.getInitialNode(aBp, execSvc), execSvc);
+        Violation vio = dfsUsingStack(DfsTraversalNode.getInitialNode(aBp, execSvc), execSvc);
         long end = System.currentTimeMillis();
         listenerOpt.ifPresent(l -> l.done(this));
         execSvc.shutdown();
-        return new VerificationResult(vr.getViolationType(), vr.getFailedAssertion(), vr.getCounterExampleTrace(), end - start, visitedStatesCount, visitedEdgeCount);
+        return new VerificationResult(vio, end - start, visitedStatesCount, visitedEdgeCount);
     }
 
-    protected VerificationResult dfsUsingStack(DfsTraversalNode aStartNode, ExecutorService execSvc) throws Exception {
+    protected Violation dfsUsingStack(DfsTraversalNode aStartNode, ExecutorService execSvc) throws Exception {
         long iterationCount = 0;
         visitedStatesCount = 0;
 
@@ -118,7 +119,7 @@ public class DfsBProgramVerifier {
 
             DfsTraversalNode curNode = peek();
             if (curNode != null) {
-                Optional<VerificationResult> res = inspectors.stream()
+                Optional<Violation> res = inspectors.stream()
                         .map(v->v.inspect(currentPath))
                         .filter(o->o.isPresent()).map(Optional::get)
                         .findAny();
@@ -159,7 +160,7 @@ public class DfsBProgramVerifier {
             }
         }
 
-        return new VerificationResult(VerificationResult.ViolationType.None, null, null);
+        return null;
     }
 
     protected DfsTraversalNode getUnvisitedNextNode(DfsTraversalNode src, ExecutorService execSvc) throws Exception {

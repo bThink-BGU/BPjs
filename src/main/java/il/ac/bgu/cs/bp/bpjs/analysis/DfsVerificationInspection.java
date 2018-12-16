@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import java.util.List;
 import java.util.Optional;
 
@@ -42,6 +43,6 @@ public interface DfsVerificationInspection {
      * @return A non-empty optional with the violation details, or an empty 
      *         optional, if everything is fine.
      */
-    Optional<VerificationResult> inspect( List<DfsTraversalNode> currentTrace );
+    Optional<Violation> inspect( List<DfsTraversalNode> currentTrace );
     
 }

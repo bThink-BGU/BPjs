@@ -84,7 +84,7 @@ public class SnapshotBenchmarks {
                     BProgram prog = makeBProgram(programPath, valueMap);
                     return getVerification(vfr, prog);
                 } catch (Exception ex) {
-                    return new VerificationResult(VerificationResult.ViolationType.None, null, null);
+                    return new VerificationResult(null, 1000, 100, 100);
                 }
             }).toArray(VerificationResult[]::new);
 
@@ -259,7 +259,7 @@ public class SnapshotBenchmarks {
                     BProgram prog = makeBProgram(programPath, valueMap,strategy);
                     return getVerification(vfr, prog);
                 } catch (Exception ex) {
-                    return new VerificationResult(VerificationResult.ViolationType.None, null, null);
+                    return new VerificationResult(null, 0, 0, 0);
                 }
             }).toArray(VerificationResult[]::new);
         }

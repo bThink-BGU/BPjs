@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 michael.
+ * Copyright 2018 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,49 +21,24 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis;
+package il.ac.bgu.cs.bp.bpjs.analysis.violations;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
-import java.util.Optional;
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
+import java.util.List;
 
 /**
- * Result of a program verification.
  *
  * @author michael
  */
-public class VerificationResult {
+public class DeadlockViolation extends Violation {
 
-    private final long timeMillies;
-    private final long statesScanned;
-    private final long edgesScanned;
-    private final Violation violation;
+    public DeadlockViolation(List<DfsTraversalNode> counterExampleTrace) {
+        super(counterExampleTrace);
+    }
 
-    public VerificationResult(Violation aViolation,
-                                long aTimeMillies, long aStatesScanned, long anEdgesScanned) {
-        violation = aViolation;
-        timeMillies = aTimeMillies;
-        statesScanned = aStatesScanned;
-        edgesScanned = anEdgesScanned;
+    @Override
+    public String decsribe() {
+        return "Deadlock";
     }
     
-    public Optional<Violation> getViolation(){
-        return Optional.ofNullable(violation);
-    }
-    
-    public boolean isViolationFound(){
-        return (violation!=null);
-    }
-    
-    public long getTimeMillies() {
-        return timeMillies;
-    }
-
-    public long getScannedStatesCount() {
-        return statesScanned;
-    }
-
-    public long getEdgesScanned() {
-        return edgesScanned;
-    }
-
 }

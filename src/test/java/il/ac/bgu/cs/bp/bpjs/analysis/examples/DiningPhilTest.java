@@ -18,7 +18,7 @@ public class DiningPhilTest {
     @Test
     public void testCounterexampleFound() throws InterruptedException {
         VerificationResult res = verifyPhilosophers(5);
-        if ( res.isCounterExampleFound() ) {
+        if ( res.isViolationFound()) {
             printCounterExample(res);
 
         } else {
@@ -29,7 +29,7 @@ public class DiningPhilTest {
 
     private static void printCounterExample(VerificationResult res) {
         System.out.println("Found a counterexample");
-        final List<DfsTraversalNode> trace = res.getCounterExampleTrace();
+        final List<DfsTraversalNode> trace = res.getViolation().get().getCounterExampleTrace();
         trace.forEach(nd -> System.out.println(" " + nd.getLastEvent()));
         
         DfsTraversalNode last = trace.get(trace.size() - 1);

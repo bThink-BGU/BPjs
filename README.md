@@ -48,7 +48,7 @@ a link to this page somewhere in the documentation/system about section.
 * :sparkles: Verification area gets some well-needed refactoring:
     * Inspections get their own interface (so it's easier to add new ones)
     * Common inspections no live in the `DfsVerificationInspections` utility class.
-    * 
+    * The violations part of `VerificationResult` moved into `Violation` class. This allows much cleaner code for inspecting violation as as an open infrastructure for detecting new types of violations (#61).
 
 ### 2018-12-14
 * :arrows_counterclockwise: Renamed `BSyncStatement` to `SyncStatement`, as we don't call it "bsync" anymore. Also updated the `toString` method, which still used the pre-historic `RWBStatement` term.

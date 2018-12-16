@@ -95,9 +95,9 @@ public class Mazes {
 
             char[][] maze = getMaze(bprog);
             printMaze(maze);
-            if (res.isCounterExampleFound()) {
+            if (res.isViolationFound()) {
                 System.out.println("Found a counterexample");
-                for (DfsTraversalNode nd : res.getCounterExampleTrace()) {
+                for (DfsTraversalNode nd : res.getViolation().get().getCounterExampleTrace()) {
                     System.out.println(" " + nd.getLastEvent());
                     if (nd.getLastEvent() != null) {
                         String name = nd.getLastEvent().getName();

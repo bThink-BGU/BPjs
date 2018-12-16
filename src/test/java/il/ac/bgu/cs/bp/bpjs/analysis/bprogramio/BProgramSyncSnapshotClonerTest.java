@@ -81,7 +81,8 @@ public class BProgramSyncSnapshotClonerTest {
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         BProgram bprog = new SingleResourceBProgram("SnapshotTests/BProgramSyncSnapshotClonerTest.js");
         final VerificationResult res = vfr.verify(bprog);
-        System.out.println("res = " + res.getCounterExampleTrace());
+        res.getViolation().ifPresent( vio->System.out.println("res = " + vio.getCounterExampleTrace()) );
+        
     }
     
 }
