@@ -21,35 +21,34 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis.violations;
+package il.ac.bgu.cs.bp.bpjs.analysis;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
-import java.util.List;
-import java.util.Set;
-import static java.util.stream.Collectors.joining;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotTerminationViolation;
+import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import java.util.Collections;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 /**
  *
  * @author michael
  */
-public class HotTerminationViolation extends Violation {
-    
-    private final Set<String> hotlyTerminated;
-
-    public HotTerminationViolation(Set<String> hotlyTerminated, List<DfsTraversalNode> counterExampleTrace) {
-        super(counterExampleTrace);
-        this.hotlyTerminated = hotlyTerminated;
-    }
-
-    @Override
-    public String decsribe() {
-        return "Hot Termination - The following b-threads were hot when the b-program ended: " +
-                hotlyTerminated.stream().sorted().collect(joining(", "));
-    }
-
-    public Set<String> getBThreadNames() {
-        return hotlyTerminated;
-    }
+public class TempVerificationsTest {
     
     
+    @Test
+    public void testHotTermination() throws Exception{
+        final SingleResourceBProgram bprog = new SingleResourceBProgram("statementtemp/hotTerminationExample.js");
+
+        DfsBProgramVerifier vfr = new DfsBProgramVerifier();
+        final VerificationResult res = vfr.verify(bprog);
+
+        assertTrue(res.isViolationFound());
+        assertTrue(res.getViolation().get() instanceof HotTerminationViolation);
+        
+        HotTerminationViolation htv = (HotTerminationViolation) res.getViolation().get();
+        assertEquals( htv.getBThreadNames(), Collections.singleton("hotter") );
+        System.out.println(htv.decsribe());
+    }
 }
