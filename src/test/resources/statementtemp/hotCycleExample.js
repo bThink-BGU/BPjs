@@ -1,4 +1,4 @@
-/*
+/* 
  * The MIT License
  *
  * Copyright 2018 michael.
@@ -21,34 +21,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotTerminationViolation;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
-import java.util.Collections;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import org.junit.Test;
 
-/**
- *
- * @author michael
+/* global bp */
+
+/*
+ * The general state-space for the stuck b-thread is this (H) - hot
+ *    a    b    c    d 
+ * ( )->(H)->(H)->(H)->( )-X
+ *       |         |e
+ *       +--<--<---+ 
  */
-public class TempVerificationsTest {
-    
-    
-    @Test
-    public void testHotTermination() throws Exception{
-        final SingleResourceBProgram bprog = new SingleResourceBProgram("statementtemp/hotTerminationExample.js");
 
-        DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-        final VerificationResult res = vfr.verify(bprog);
+var a = bp.Event("a");
+var b = bp.Event("b");
+var c = bp.Event("c");
+var d = bp.Event("d");
+var e = bp.Event("e");
 
-        assertTrue(res.isViolationFound());
-        assertTrue(res.getViolation().get() instanceof HotTerminationViolation);
-        
-        HotTerminationViolation htv = (HotTerminationViolation) res.getViolation().get();
-        assertEquals( htv.getBThreadNames(), Collections.singleton("hotter") );
-        System.out.println(htv.decsribe());
+bp.registerBThread("cycled-thread", function(){
+    bp.sync({request:a});
+    var go = true;
+    while ( go ) {
+        bp.hot(true).sync({request:b});
+        bp.hot(true).sync({request:c});
+        var evt=bp.hot(true).sync({waitFor:[d,e]});
+        if ( evt.name == "d" ) {
+            go=false;
+        }
     }
-}
+});
+
+bp.registerBThread("requesting-d", function(){
+    while ( true ) {
+        bp.sync({waitFor:c});
+        bp.sync({request:d, waitFor:e});
+    }
+});
+
+bp.registerBThread("requesting-e", function(){
+    while ( true ) {
+        bp.sync({waitFor:c});
+        bp.sync({request:e, waitFor:d});
+    }
+});

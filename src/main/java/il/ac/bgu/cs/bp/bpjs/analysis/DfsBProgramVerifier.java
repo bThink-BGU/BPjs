@@ -60,7 +60,6 @@ public class DfsBProgramVerifier {
      */
     public final static long DEFAULT_ITERATION_COUNT_GAP = 1000;
 
-
     /**
      * A listener to the progress of the DFS state scanning.
      */
@@ -74,7 +73,15 @@ public class DfsBProgramVerifier {
 
         void done(DfsBProgramVerifier v);
     }
+    
+    private static class ViolatingCycleFoundException extends Exception{
+        final Violation v;
 
+        public ViolatingCycleFoundException(Violation v) {
+            this.v = v;
+        }
+    }
+    
     private long visitedEdgeCount;
     private long visitedStatesCount;
     private VisitedStateStore visited = new BThreadSnapshotVisitedStateStore();
@@ -84,7 +91,8 @@ public class DfsBProgramVerifier {
     private long iterationCountGap = DEFAULT_ITERATION_COUNT_GAP;
     private BProgram currentBProgram;
     private boolean debugMode = false;
-    private final Set<DfsVerificationInspection> inspectors = new HashSet<>();
+    private final Set<DfsTraceInspection> traceInspectors = new HashSet<>();
+    private final Set<DfsCycleInspection> cycleInspectors = new HashSet<>();
 
     public VerificationResult verify(BProgram aBp) throws Exception {
         currentBProgram = aBp;
@@ -92,8 +100,9 @@ public class DfsBProgramVerifier {
         visitedEdgeCount = 0;
         currentPath.clear();
         visited.clear();
-        if ( inspectors.isEmpty() ) { // in case no verifications were specified, use the defauls set.
-            inspectors.addAll( DfsVerificationInspections.ALL );
+        if ( traceInspectors.isEmpty() && cycleInspectors.isEmpty() ) { // in case no verifications were specified, use the defauls set.
+            traceInspectors.addAll( DfsInspections.ALL_TRACE );
+            cycleInspectors.add( DfsInspections.HotCycles );
         }
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("DfsBProgramRunner-" + INSTANCE_COUNTER.incrementAndGet());
         long start = System.currentTimeMillis();
@@ -119,7 +128,7 @@ public class DfsBProgramVerifier {
 
             DfsTraversalNode curNode = peek();
             if (curNode != null) {
-                Optional<Violation> res = inspectors.stream()
+                Optional<Violation> res = traceInspectors.stream()
                         .map(v->v.inspectTrace(currentPath))
                         .filter(o->o.isPresent()).map(Optional::get)
                         .findAny();
@@ -137,21 +146,25 @@ public class DfsBProgramVerifier {
                 pop();
 
             } else {
-                DfsTraversalNode nextNode = getUnvisitedNextNode(curNode, execSvc);
-                if (nextNode == null) {
-                    // fold stack, retry next iteration;
-                    pop();
-                    if (isDebugMode()) {
-                        System.out.println("-pop!-");
+                try {
+                    DfsTraversalNode nextNode = getUnvisitedNextNode(curNode, execSvc);
+                    if (nextNode == null) {
+                        // fold stack, retry next iteration;
+                        pop();
+                        if (isDebugMode()) {
+                            System.out.println("-pop!-");
+                        }
+                    } else {
+                        // go deeper 
+                        visited.store(nextNode);
+                        if (isDebugMode()) {
+                            System.out.println("-visiting: " + nextNode);
+                        }
+                        push(nextNode);
+                        visitedStatesCount++;
                     }
-                } else {
-                    // go deeper 
-                    visited.store(nextNode);
-                    if (isDebugMode()) {
-                        System.out.println("-visiting: " + nextNode);
-                    }
-                    push(nextNode);
-                    visitedStatesCount++;
+                } catch (ViolatingCycleFoundException vcfe ) {
+                    return vcfe.v;
                 }
             }
 
@@ -163,12 +176,31 @@ public class DfsBProgramVerifier {
         return null;
     }
 
-    protected DfsTraversalNode getUnvisitedNextNode(DfsTraversalNode src, ExecutorService execSvc) throws Exception {
+    protected DfsTraversalNode getUnvisitedNextNode(DfsTraversalNode src, ExecutorService execSvc) throws ViolatingCycleFoundException, Exception {
         while (src.getEventIterator().hasNext()) {
             final BEvent nextEvent = src.getEventIterator().next();
             DfsTraversalNode possibleNextNode = src.getNextNode(nextEvent, execSvc);
             visitedEdgeCount++;
-            if (!visited.isVisited(possibleNextNode)) {
+            if (visited.isVisited(possibleNextNode) ) {
+                // Found a possible cycle
+                if ( !cycleInspectors.isEmpty() ) {
+                    BProgramSyncSnapshot pns = possibleNextNode.getSystemState();
+                    final AtomicInteger idx = new AtomicInteger();
+                    for ( DfsTraversalNode nd : currentPath ){
+                        if ( pns.equals(nd.getSystemState()) ) {
+                            // found an actual cycle
+                            Optional<Violation> res = cycleInspectors.stream().map(i->i.inspectCycle(currentPath, idx.intValue(), nextEvent))
+                                .filter(o->o.isPresent()).map(Optional::get)
+                                .findAny();
+                            if ( res.isPresent() ) {
+                                throw new ViolatingCycleFoundException(res.get());
+                            }
+                        }
+                        idx.incrementAndGet();
+                    }                    
+                }
+            } else {
+                // advance to this newly discovered node
                 return possibleNextNode;
             }
         }
@@ -245,20 +277,27 @@ public class DfsBProgramVerifier {
         this.debugMode = debugMode;
     }
     
-    public void addInspector( DfsVerificationInspection ins ) {
-        inspectors.add(ins);
+    public void addInspector( DfsTraceInspection ins ) {
+        traceInspectors.add(ins);
     }
     
-    public Set<DfsVerificationInspection> getInspectors() {
-        return inspectors;
+    public Set<DfsTraceInspection> getTraceInspectors() {
+        return traceInspectors;
     }
     
-    public boolean removeInspector( DfsVerificationInspection ins ) {
-        return inspectors.remove(ins);
+    public boolean removeInspector( DfsTraceInspection ins ) {
+        return traceInspectors.remove(ins);
     }
 
-    private boolean hasRequestedEvents(BProgramSyncSnapshot bpss) {
-        return bpss.getBThreadSnapshots().stream().anyMatch(btss -> (!btss.getBSyncStatement().getRequest().isEmpty()));
+    public void addInspector( DfsCycleInspection ins ) {
+        cycleInspectors.add(ins);
     }
-
+    
+    public Set<DfsCycleInspection> getCycleInspectors() {
+        return cycleInspectors;
+    }
+    
+    public boolean removeInspector( DfsCycleInspection ins ) {
+        return cycleInspectors.remove(ins);
+    }
 }

@@ -31,7 +31,7 @@ import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
-import il.ac.bgu.cs.bp.bpjs.analysis.DfsVerificationInspections;
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsInspections;
 import il.ac.bgu.cs.bp.bpjs.analysis.Requirements;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
@@ -90,7 +90,7 @@ public class Mazes {
             vfr.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
 //            vfr.setVisitedNodeStore(new ForgetfulVisitedStateStore());
             
-            vfr.addInspector(DfsVerificationInspections.FailedAssertions); // prevent from detecting cases where we ust hit a wall.
+            vfr.addInspector(DfsInspections.FailedAssertions); // prevent from detecting cases where we ust hit a wall.
             final VerificationResult res = vfr.verify(bprog);
 
             char[][] maze = getMaze(bprog);

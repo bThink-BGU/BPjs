@@ -45,6 +45,10 @@ a link to this page somewhere in the documentation/system about section.
 ## Change log for the BPjs library.
 
 ### 2018-12-15
+* :sparkles: More verification package updates: now differing between cycle inspections and trace inspections.
+* :sparkles: Detection of hot cycles. That is, we can verify liveness requirements. :tada: :tada: :tada:
+
+### 2018-12-15
 * :sparkles: Verification area gets some well-needed refactoring:
     * Inspections get their own interface (so it's easier to add new ones)
     * Common inspections no live in the `DfsVerificationInspections` utility class.

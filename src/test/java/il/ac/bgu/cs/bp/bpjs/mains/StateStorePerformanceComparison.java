@@ -58,7 +58,7 @@ public class StateStorePerformanceComparison {
 
         // prepare verifier
         DfsBProgramVerifier verifier = new DfsBProgramVerifier();
-        verifier.addInspector(DfsVerificationInspections.FailedAssertions);
+        verifier.addInspector(DfsInspections.FailedAssertions);
 
         // test
         verifier.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());

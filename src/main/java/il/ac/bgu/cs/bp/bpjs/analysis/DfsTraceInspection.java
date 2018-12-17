@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 michael.
+ * Copyright 2018 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,44 +23,20 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
-import java.util.HashSet;
-import java.util.Set;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
+import java.util.List;
+import java.util.Optional;
 
 /**
- *
- * A {@link VisitedStateStore} that stores the state of the {@code BThread}s in the node.
- * Ignores the last event that led to this node.
- * 
- * Client code can specify to use a hash of the state instead of the state itself. This 
- * may create false positives on hash collisions, but would make the dearch run faster and 
- * consume less memory.
- * 
+ * A class inspecting a b-program trace during DFS.
  * @author michael
  */
-public class BThreadSnapshotVisitedStateStore implements VisitedStateStore {
-    private final Set<Object> visited = new HashSet<>();
-    
-    @Override
-    public void store(DfsTraversalNode nd) {
-        visited.add(extractStatus(nd));
-    }
-
-    @Override
-    public boolean isVisited(DfsTraversalNode nd) {
-        return visited.contains( extractStatus(nd) );
-    }   
-    
-    private Object extractStatus( DfsTraversalNode nd ) {
-        return nd.getSystemState().getBThreadSnapshots();
-    }
-
-    @Override
-    public void clear() {
-        visited.clear();
-    }
-    
-    @Override
-    public String toString() {
-        return "[BThreadSnapshotVisitedStateStore visited:" + visited.size()+ ']';
-    }
+public interface DfsTraceInspection {
+    /**
+     * Inspects the current trace for violations.
+     * @param currentTrace The trace of the b-program, up to the current point.
+     * @return A non-empty optional with the violation details, or an empty 
+     *         optional, if everything is fine.
+     */
+    Optional<Violation> inspectTrace( List<DfsTraversalNode> currentTrace );
 }

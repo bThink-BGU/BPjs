@@ -161,7 +161,7 @@ public class BThreadSyncSnapshot implements Serializable {
 
     @Override
     public String toString() {
-        return "[BThreadSyncSnapshot: " + name + "]";
+        return "[BThreadSyncSnapshot: " + name + " @" + hashCode() + "]";
     }
 
     public Optional<Function> getInterrupt() {
@@ -193,7 +193,7 @@ public class BThreadSyncSnapshot implements Serializable {
         int result = 1;
         result = prime * result + Objects.hashCode(name.hashCode());
         if (continuation != null) {
-            result += getContinuationProgramState().hashCode();
+            result ^= getContinuationProgramState().hashCode();
         }
         return result;
     }

@@ -24,28 +24,18 @@
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import java.util.List;
 import java.util.Optional;
 
 /**
- * Detects illegal states during a DFS verification. Instances are used by
- * {@link DfsBProgramVerifier} to detect deadlocks, assertion failures, etc.
- * 
- * @see il.ac.bgu.cs.bp.bpjs.analysis.DefaultDfsVerificationInspections
+ *
+ * a DFS inspection that verifies cycles in the b-program state graph.
  * 
  * @author michael
  */
-public interface DfsVerificationInspection {
-    
-    /**
-     * Inspects the current trace for violations.
-     * @param currentTrace The trace of the b-program, up to the current point.
-     * @return A non-empty optional with the violation details, or an empty 
-     *         optional, if everything is fine.
-     */
-    Optional<Violation> inspectTrace( List<DfsTraversalNode> currentTrace );
-    
-    /**
+public interface DfsCycleInspection {
+     /**
      * Inspects a cycle in the program graph for possible violations.
      * 
      * For example, in the following graph:
@@ -56,12 +46,13 @@ public interface DfsVerificationInspection {
      * </code>
      * 
      * This methods will be called with trace={@code [a][b][c][d]} and 
-     * cyclicPass={@code [b]}.
+     * cycleToIdx={@code 1}.
      * 
      * @param currentTrace Program trace up to this point.
-     * @param cyclicPass   A node in the current trace the cycle returns to.
+     * @param cycleToIdx   The index of the node in the trace where the cycle returns
+     * @param event        The event leading to the cycle at index {@code cycleToIdx}, from the end of {@code currentTrace}.
      * @return A non-empty optional with the violation details, or an empty 
      *         optional, if everything is fine.
      */
-    Optional<Violation> inspectCycle( List<DfsTraversalNode> currentTrace, DfsTraversalNode cyclicPass);
+    Optional<Violation> inspectCycle( List<DfsTraversalNode> currentTrace, int cycleToIdx, BEvent event);
 }

@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 michael.
+ * Copyright 2018 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,46 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis;
+package il.ac.bgu.cs.bp.bpjs.analysis.violations;
 
-import java.util.HashSet;
-import java.util.Set;
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import java.util.List;
 
 /**
  *
- * A {@link VisitedStateStore} that stores the state of the {@code BThread}s in the node.
- * Ignores the last event that led to this node.
- * 
- * Client code can specify to use a hash of the state instead of the state itself. This 
- * may create false positives on hash collisions, but would make the dearch run faster and 
- * consume less memory.
- * 
  * @author michael
  */
-public class BThreadSnapshotVisitedStateStore implements VisitedStateStore {
-    private final Set<Object> visited = new HashSet<>();
+public class HotCycleViolation extends Violation {
     
-    @Override
-    public void store(DfsTraversalNode nd) {
-        visited.add(extractStatus(nd));
+    private final int cycleToIndex;
+    private final BEvent event;
+
+    public HotCycleViolation(List<DfsTraversalNode> counterExampleTrace, int cycleToIndex, BEvent event) {
+        super(counterExampleTrace);
+        this.cycleToIndex = cycleToIndex;
+        this.event = event;
     }
 
     @Override
-    public boolean isVisited(DfsTraversalNode nd) {
-        return visited.contains( extractStatus(nd) );
-    }   
-    
-    private Object extractStatus( DfsTraversalNode nd ) {
-        return nd.getSystemState().getBThreadSnapshots();
+    public String decsribe() {
+        return "Hot cycle violation: returning to index " + getCycleToIndex() + " in the trace";
     }
 
-    @Override
-    public void clear() {
-        visited.clear();
+    public int getCycleToIndex() {
+        return cycleToIndex;
+    }
+
+    public BEvent getCycleToEvent() {
+        return event;
     }
     
-    @Override
-    public String toString() {
-        return "[BThreadSnapshotVisitedStateStore visited:" + visited.size()+ ']';
-    }
 }
