@@ -22,22 +22,59 @@
  * THE SOFTWARE.
  */
 
+
 /* global bp */
 
-var EVT_A = bp.Event("A");
-var EVT_B = bp.Event("B");
-var EVT_C = bp.Event("C");
+/*
+ * The general state-space for the stuck b-thread is this (H) - hot
+ * 
+ * <code>
+ *    a    b    c    d 
+ * ( )->(H)->(P)->(H)->( )-X
+ *       |         |e
+ *       +--<--<---+ 
+ * </code>
+ * 
+ * P: The "main" b-thread is not hot, but another b-thread is.
+ *       
+ */
 
-bp.registerBThread("hotter", function(){
-    bp.sync({request:EVT_A});
-    bp.hot(true).sync({request:EVT_B});
+var a = bp.Event("a");
+var b = bp.Event("b");
+var c = bp.Event("c");
+var d = bp.Event("d");
+var e = bp.Event("e");
+
+bp.registerBThread("main", function(){
+    bp.sync({request:a});
+    var go = true;
+    while ( go ) {
+        bp.hot(true).sync({request:b});
+        bp.sync({request:c});
+        var evt=bp.hot(true).sync({waitFor:[d,e]});
+        if ( evt.name == "d" ) {
+            go=false;
+        }
+    }
 });
 
-bp.registerBThread("blocker",function(){
-    bp.sync({block:EVT_B});
+bp.registerBThread("b-requires-c", function(){
+    while ( true ) {
+        bp.sync({waitFor:b});
+        bp.hot(true).sync({waitFor:c});
+    }
 });
 
-bp.registerBThread("not-helping",function(){
-    bp.sync({waitFor:EVT_A});
-    bp.sync({request:EVT_C});
+bp.registerBThread("requesting-d", function(){
+    while ( true ) {
+        bp.sync({waitFor:c});
+        bp.sync({request:d, waitFor:e});
+    }
+});
+
+bp.registerBThread("requesting-e", function(){
+    while ( true ) {
+        bp.sync({waitFor:c});
+        bp.sync({request:e, waitFor:d});
+    }
 });

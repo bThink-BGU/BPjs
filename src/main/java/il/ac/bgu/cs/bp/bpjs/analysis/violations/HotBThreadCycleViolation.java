@@ -26,25 +26,34 @@ package il.ac.bgu.cs.bp.bpjs.analysis.violations;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import java.util.List;
+import java.util.Set;
+import static java.util.stream.Collectors.joining;
 
 /**
  *
+ * A violation where a set of one or more b-threads can be caught in an infinite
+ * loop where all their sync points are hot.
+ * 
  * @author michael
  */
-public class HotCycleViolation extends Violation {
+public class HotBThreadCycleViolation extends Violation {
     
     private final int cycleToIndex;
     private final BEvent event;
-
-    public HotCycleViolation(List<DfsTraversalNode> counterExampleTrace, int cycleToIndex, BEvent event) {
+    private final Set<String> bthreads;
+    
+    public HotBThreadCycleViolation(List<DfsTraversalNode> counterExampleTrace, int cycleToIndex, BEvent event, Set<String> bthreads) {
         super(counterExampleTrace);
         this.cycleToIndex = cycleToIndex;
         this.event = event;
+        this.bthreads = bthreads;
     }
-
+    
     @Override
     public String decsribe() {
-        return "Hot cycle violation: returning to index " + getCycleToIndex() + " in the trace";
+        return "Hot b-thread cycle violation: b-threads "
+            + (bthreads.stream().collect(joining(" ,"))) 
+            + " can get to an infinite hot loop."; 
     }
 
     public int getCycleToIndex() {
@@ -53,6 +62,10 @@ public class HotCycleViolation extends Violation {
 
     public BEvent getCycleToEvent() {
         return event;
+    }
+
+    public Set<String> getBThreads() {
+        return bthreads;
     }
     
 }

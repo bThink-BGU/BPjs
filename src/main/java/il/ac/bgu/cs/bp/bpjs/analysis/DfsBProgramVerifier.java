@@ -102,7 +102,7 @@ public class DfsBProgramVerifier {
         visited.clear();
         if ( traceInspectors.isEmpty() && cycleInspectors.isEmpty() ) { // in case no verifications were specified, use the defauls set.
             traceInspectors.addAll( DfsInspections.ALL_TRACE );
-            cycleInspectors.add( DfsInspections.HotCycles );
+            cycleInspectors.add(DfsInspections.HotBThreadCycles );
         }
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("DfsBProgramRunner-" + INSTANCE_COUNTER.incrementAndGet());
         long start = System.currentTimeMillis();

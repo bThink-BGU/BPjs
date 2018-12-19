@@ -32,6 +32,7 @@ bp.registerBThread(function(){
     
     hotBP.sync({request:bp.Event("hot2")});
     
+    // Silly example, just to see that the hot(x) works.
     hotBP.hot(false).sync({request:bp.Event("cold2")});
     
 });

@@ -25,26 +25,36 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.DeadlockViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.FailedAssertionViolation;
-import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotCycleViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotBThreadCycleViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotBProgramCycleViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotTerminationViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
+import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Function;
+import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 /**
  *
- * A static collection of {@link DfsInspection}s, commonly used 
- * in verifying b-programs.
+ * A static collection of commonly used inspections. These objects can detect
+ * problems in a b-program, during a DFS traversal of its state space.
  * 
+ * @see DfsBProgramVerifier
  * @author michael
  */
 public final class DfsInspections {
     
+    /**
+     * Detects a deadlock in a b-program: where there are requested events, but
+     * non of them is selectable.
+     */
     public static final DfsTraceInspection Deadlock = (List<DfsTraversalNode> trace) -> {
         DfsTraversalNode curNode = peek(trace);
         if (hasRequestedEvents(curNode.getSystemState()) &&
@@ -53,6 +63,9 @@ public final class DfsInspections {
         } else return Optional.empty();
     };
     
+    /**
+     * Detects when a b-thread calls an assertion which evaluates to {@code false}.
+     */
     public static final DfsTraceInspection FailedAssertions = (List<DfsTraversalNode> trace) -> {
         DfsTraversalNode curNode = peek(trace);
         if (!curNode.getSystemState().isStateValid()) {
@@ -60,6 +73,10 @@ public final class DfsInspections {
         } else return Optional.empty();
     };
         
+    /**
+     * Detects a case where a b-program ends, while one of its b-threads is in a 
+     * hot sync.
+     */
     public static final DfsTraceInspection HotTermination = (List<DfsTraversalNode> trace) -> {
         DfsTraversalNode curNode = peek(trace);
         if ( curNode.getSystemState().isHot() &&
@@ -70,10 +87,47 @@ public final class DfsInspections {
         } else return Optional.empty();
     }; 
     
-    public static final DfsCycleInspection HotCycles = (List<DfsTraversalNode> currentTrace, int cycleToIdx, BEvent event) -> {
+    /**
+     * Detects a case where a b-program can get into an infinite loop where, at 
+     * each sync point, at least one of the b-threads is in a hot sync. This does
+     * not mean that individually b-threads are hot all along the loop.
+     */
+    public static final DfsCycleInspection HotBProgramCycles = (List<DfsTraversalNode> currentTrace, int cycleToIdx, BEvent event) -> {
         if ( currentTrace.subList(cycleToIdx, currentTrace.size()).stream().allMatch(s -> s.getSystemState().isHot()) ){
-            return Optional.of( new HotCycleViolation(currentTrace, cycleToIdx, event));
+            return Optional.of(new HotBProgramCycleViolation(currentTrace, cycleToIdx, event));
         } else return Optional.empty();
+    };
+    
+    /**
+     * Detects a case where a b-thread can get into an infinite loop where all
+     * its sync points are hot.
+     */
+    public static final DfsCycleInspection HotBThreadCycles = new DfsCycleInspection() {
+        @Override
+        public Optional<Violation> inspectCycle(List<DfsTraversalNode> currentTrace, int cycleToIdx, BEvent event) {
+            if ( peek(currentTrace).getSystemState().isHot() ) {
+                List<DfsTraversalNode> cycle = currentTrace.subList(cycleToIdx, currentTrace.size());
+                List<Set<String>> hots = cycle.stream().map( nd -> nd.getSystemState().getBThreadSnapshots() )
+                                           .map( this::getHotThreadNames )
+                                            .collect( toList() );
+                
+                Optional<Set<String>> alwaysHotOpt = hots.stream().reduce((s1, s2)->{
+                    Set<String> retVal = new HashSet<>(s1);
+                    retVal.retainAll(s2);
+                    return retVal;
+                });
+                
+                return alwaysHotOpt.filter( ahs -> ahs.size()>0 )
+                    .map( alwaysHots -> new HotBThreadCycleViolation(currentTrace, cycleToIdx, event, alwaysHots) );
+                    
+            } else return Optional.empty();
+        }
+        
+        private Set<String> getHotThreadNames( Set<BThreadSyncSnapshot> bts ) {
+            return bts.stream().filter( bt -> bt.getBSyncStatement().isHot() )
+                      .map( bt -> bt.getName() )
+                      .collect( toSet() );
+        }
     };
     
     public static final List<DfsTraceInspection> ALL_TRACE = Arrays.asList(

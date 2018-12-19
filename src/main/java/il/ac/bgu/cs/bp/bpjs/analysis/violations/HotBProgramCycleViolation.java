@@ -1,4 +1,4 @@
-/* 
+/*
  * The MIT License
  *
  * Copyright 2018 michael.
@@ -21,23 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package il.ac.bgu.cs.bp.bpjs.analysis.violations;
 
-/* global bp */
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import java.util.List;
 
-var EVT_A = bp.Event("A");
-var EVT_B = bp.Event("B");
-var EVT_C = bp.Event("C");
+/**
+ *
+ * @author michael
+ */
+public class HotBProgramCycleViolation extends Violation {
+    
+    private final int cycleToIndex;
+    private final BEvent event;
 
-bp.registerBThread("hotter", function(){
-    bp.sync({request:EVT_A});
-    bp.hot(true).sync({request:EVT_B});
-});
+    public HotBProgramCycleViolation(List<DfsTraversalNode> counterExampleTrace, int cycleToIndex, BEvent event) {
+        super(counterExampleTrace);
+        this.cycleToIndex = cycleToIndex;
+        this.event = event;
+    }
 
-bp.registerBThread("blocker",function(){
-    bp.sync({block:EVT_B});
-});
+    @Override
+    public String decsribe() {
+        return "Hot cycle violation: returning to index " + getCycleToIndex() + " in the trace because of event " + event.toString();
+    }
 
-bp.registerBThread("not-helping",function(){
-    bp.sync({waitFor:EVT_A});
-    bp.sync({request:EVT_C});
-});
+    public int getCycleToIndex() {
+        return cycleToIndex;
+    }
+
+    public BEvent getCycleToEvent() {
+        return event;
+    }
+    
+}
