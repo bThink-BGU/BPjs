@@ -78,7 +78,9 @@ public class SyncStatementTempTest {
         
         runner.run();
         
-        assertEquals( recorder.isHotRecord, Arrays.asList(false, true, true, false));
+        assertEquals( Arrays.asList(false, true, true, false), 
+                      recorder.isHotRecord
+        );
 
     }
 }

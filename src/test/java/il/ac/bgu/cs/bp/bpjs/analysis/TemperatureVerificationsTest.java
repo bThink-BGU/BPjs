@@ -143,7 +143,7 @@ public class TemperatureVerificationsTest {
     
     public static void main(String[] args) {
         // run the hot cycle b-program, to see that it works.
-        final SingleResourceBProgram bprog = new SingleResourceBProgram("statementtemp/hotCycleExample.js");
+        final SingleResourceBProgram bprog = new SingleResourceBProgram("statementtemp/basicTempTest.js");
         BProgramRunner rnr = new BProgramRunner(bprog);
         
         rnr.addListener(new PrintBProgramRunnerListener());

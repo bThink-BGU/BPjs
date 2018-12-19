@@ -47,6 +47,7 @@ a link to this page somewhere in the documentation/system about section.
 ### 2018-12-19
 * :sparkles: There are two different hot cycle violation inspections: one inspects a hot loop at the b-thread level (default), and the other at the whole b-program level.
 * :arrow_up: More tests. 
+* :sparkles: Updated the docs to reflect the updates in verification features.
 
 ### 2018-12-15
 * :sparkles: More verification package updates: now differing between cycle inspections and trace inspections.
