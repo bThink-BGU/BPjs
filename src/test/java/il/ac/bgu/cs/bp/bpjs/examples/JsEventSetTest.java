@@ -5,7 +5,7 @@ package il.ac.bgu.cs.bp.bpjs.examples;
 
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
@@ -29,7 +29,7 @@ public class JsEventSetTest {
     
     @Test
     public void testRun() throws InterruptedException, URISyntaxException {
-        BProgramRunner bpr = new BProgramRunner(new SingleResourceBProgram("JsEventSet.js"));
+        BProgramRunner bpr = new BProgramRunner(new ResourceBProgram("JsEventSet.js"));
         bpr.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = bpr.addListener( new InMemoryEventLoggingListener() );
         bpr.run();

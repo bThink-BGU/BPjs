@@ -30,6 +30,10 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 import org.mozilla.javascript.ConsString;
 
+class TestEventA extends BEvent {}
+
+class TestEventB extends BEvent {}
+
 /**
  *
  * @author michael
@@ -90,4 +94,13 @@ public class BEventTest {
         assertEquals( expected, events );
     }
     
+    @Test
+    public void testMeaningfulAutoEventNames(){
+        assertEquals("TestEventA-1", new TestEventA().name);
+        assertEquals("TestEventA-2", new TestEventA().name);
+        assertEquals("TestEventA-3", new TestEventA().name);
+        assertEquals("TestEventB-1", new TestEventB().name);
+        assertEquals("TestEventB-2", new TestEventB().name);
+        assertEquals("TestEventB-3", new TestEventB().name);
+    }
 }

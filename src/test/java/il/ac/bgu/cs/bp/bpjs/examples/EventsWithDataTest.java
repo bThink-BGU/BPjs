@@ -5,7 +5,7 @@ package il.ac.bgu.cs.bp.bpjs.examples;
 
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
@@ -23,7 +23,7 @@ public class EventsWithDataTest {
 
     @Test
     public void testEventsWithData() throws Exception {
-        BProgram bpr = new SingleResourceBProgram( "EventsWithData.js", "programName", new SimpleEventSelectionStrategy(99l) );
+        BProgram bpr = new ResourceBProgram( "EventsWithData.js", "programName", new SimpleEventSelectionStrategy(99l) );
         BProgramRunner rnr = new BProgramRunner(bpr);
         rnr.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener events = rnr.addListener( new InMemoryEventLoggingListener() );

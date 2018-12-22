@@ -2,7 +2,7 @@ package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.analysis.eventpattern.EventPattern;
@@ -30,7 +30,7 @@ public class LoggingEventSelectionStrategyDecoratorTest {
         try (PrintWriter outWriter = new PrintWriter(strOut)) {
             LoggingEventSelectionStrategyDecorator sut = new LoggingEventSelectionStrategyDecorator(new SimpleEventSelectionStrategy(), outWriter);
             
-            SingleResourceBProgram bp = new SingleResourceBProgram("HotNCold.js");
+            ResourceBProgram bp = new ResourceBProgram("HotNCold.js");
             bp.setEventSelectionStrategy(sut);
             BProgramRunner runner = new BProgramRunner(bp);
             runner.addListener(new PrintBProgramRunnerListener() );

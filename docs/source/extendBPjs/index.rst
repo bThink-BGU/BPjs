@@ -7,8 +7,15 @@ Out of its proverbial box, BPjs enables "classic" behavioral programming: runnin
 
 .. tip:: If you develop an interesting or a useful extension, please consider making it available to others, e.g. by opening the source. Thanks!
 
+
 .. toctree::
     :maxdepth: 2
 
     implement-ess
     interact-with-context
+
+
+Sub-classing Events
+-------------------
+
+The built-in ``BEvent`` class can hold data in its name, and in a ``data`` field. However, sometimes the need arises for a more structured data storage, or one that's easier to create and read from the Java layer. To this end, it is possible to sub-class ``BEvent``. The only restriction about these sbu-classes is that they have to implement ``java.io.Serializable`` -- otherwise, verification would not work.

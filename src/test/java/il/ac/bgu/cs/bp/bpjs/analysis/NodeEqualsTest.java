@@ -7,7 +7,7 @@ import org.junit.Test;
 
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import java.util.concurrent.ExecutorService;
@@ -53,7 +53,7 @@ public class NodeEqualsTest {
 
     @Test
     public void test2() throws Exception {
-        final BProgram bprog = new SingleResourceBProgram("BPJSDiningPhil.js");
+        final BProgram bprog = new ResourceBProgram("BPJSDiningPhil.js");
         bprog.putInGlobalScope("PHILOSOPHER_COUNT", 5);
 
         String events[] = {"Pick1R", "Pick2R", "Pick3R", "Pick4R", "Pick5R"};

@@ -268,15 +268,6 @@ public class BProgramJsProxy extends SyncStatementBuilder
     }
     
     /**
-     * Loads a Javascript resource (a file that's included in the .jar).
-     *
-     * @param path absolute path of the resource in the .jar file.
-     */
-    public void loadJavascriptResource(String path) {
-        program.evaluateResource(path);
-    }
-    
-    /**
      * @return Returns the current time in milliseconds since 1/1/1970.
      */
     public long getTime() {

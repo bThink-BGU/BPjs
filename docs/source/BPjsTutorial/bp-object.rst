@@ -8,7 +8,7 @@ Another role ``bp`` holds is abstraction layer for values that change, such as r
 
 ``bp`` is implemented on the Java side by an object called ``il.ac.bgu.cs.bp.bpjs.bprogram.runtimeengine.jsproxy.BProgramJsProxy`` - look at its `JavaDoc`_ for full reference. Below are the noteworthy methods.
 
-.. _JavaDoc: http://javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/jsproxy/BProgramJsProxy.html
+.. _JavaDoc: http://javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/execution/jsproxy/BProgramJsProxy.html
 
 
 Methods of Note

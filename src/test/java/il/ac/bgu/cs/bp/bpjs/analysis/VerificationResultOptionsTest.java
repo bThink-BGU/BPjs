@@ -42,7 +42,7 @@ public class VerificationResultOptionsTest {
 
     @Test
     public void testOKProgram() throws Exception {
-        final SingleResourceBProgram bprog = new SingleResourceBProgram("DFSVerifierTests/VerificationResultOptions.js");
+        final ResourceBProgram bprog = new ResourceBProgram("DFSVerifierTests/VerificationResultOptions.js");
 
         bprog.putInGlobalScope("addWaiter", false);
         bprog.putInGlobalScope("createDeadlock", false);
@@ -56,7 +56,7 @@ public class VerificationResultOptionsTest {
 
     @Test
     public void testDeadlockedProgram() throws Exception {
-        final SingleResourceBProgram bprog = new SingleResourceBProgram("DFSVerifierTests/VerificationResultOptions.js");
+        final ResourceBProgram bprog = new ResourceBProgram("DFSVerifierTests/VerificationResultOptions.js");
 
         bprog.putInGlobalScope("addWaiter", false);
         bprog.putInGlobalScope("createDeadlock", true);
@@ -71,7 +71,7 @@ public class VerificationResultOptionsTest {
 
     @Test
     public void testViolatingProgram() throws Exception {
-        final SingleResourceBProgram bprog = new SingleResourceBProgram("DFSVerifierTests/VerificationResultOptions.js");
+        final ResourceBProgram bprog = new ResourceBProgram("DFSVerifierTests/VerificationResultOptions.js");
 
         bprog.putInGlobalScope("addWaiter", false);
         bprog.putInGlobalScope("createDeadlock", false);
@@ -89,7 +89,7 @@ public class VerificationResultOptionsTest {
 
     @Test
     public void testWaitingIsNotDeadlock() throws Exception {
-        final SingleResourceBProgram bprog = new SingleResourceBProgram("DFSVerifierTests/VerificationResultOptions.js");
+        final ResourceBProgram bprog = new ResourceBProgram("DFSVerifierTests/VerificationResultOptions.js");
 
         bprog.putInGlobalScope("addWaiter", true);
         bprog.putInGlobalScope("createDeadlock", false);
@@ -103,7 +103,7 @@ public class VerificationResultOptionsTest {
 
     @Test
     public void testImmediateAssert() throws Exception {
-        BProgram bprog = new SingleResourceBProgram("ImmediateAssert.js");
+        BProgram bprog = new ResourceBProgram("ImmediateAssert.js");
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         final VerificationResult res = vfr.verify(bprog);
 

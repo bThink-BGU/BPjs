@@ -25,7 +25,7 @@ package il.ac.bgu.cs.bp.bpjs.examples;
 
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
@@ -37,7 +37,7 @@ public class GetTimeTest {
  
     @Test
     public void test() throws InterruptedException {
-        BProgram sut = new SingleResourceBProgram("getTimeTest.js");
+        BProgram sut = new ResourceBProgram("getTimeTest.js");
         long timePre = System.currentTimeMillis();
         new BProgramRunner(sut).run();
         long timePost = System.currentTimeMillis();

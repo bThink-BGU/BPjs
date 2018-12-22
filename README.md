@@ -44,6 +44,13 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+### 2018-12-23
+* :put_litter_in_its_place: `BProgram` cannot evaluate resources anymore. This change also removes this ability from running JavaScript b-program. It made no sense anyway, and was not used.
+* :sparkles: `SingleResourceBProgram` can now accept multiple resources, and was thus renamed to `ResourceBProgram` (#60). (NOTE: this change breaks program that gave explicit names to
+               a `SingleResourceBProgram` in the constructor, as the argument for the name is now interpreted as a resource name. You can use `setName` to set the program name later.
+* :sparkles: Automatic event names include the name of the class and an index number.
+* :bug: Fixed broken links in the documentation.
+
 ### 2018-12-19
 * :sparkles: There are two different hot cycle violation inspections: one inspects a hot loop at the b-thread level (default), and the other at the whole b-program level.
 * :arrow_up: More tests. 

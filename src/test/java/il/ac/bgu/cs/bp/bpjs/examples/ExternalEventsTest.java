@@ -1,7 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.examples;
 
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
@@ -22,7 +22,7 @@ public class ExternalEventsTest {
         final BEvent in1a = new BEvent("in1a");
         final BEvent ext1 = new BEvent("ext1");
         final BEvent in1b = new BEvent("in1b");
-        final SingleResourceBProgram bprog = new SingleResourceBProgram("ExternalEvents.js");
+        final ResourceBProgram bprog = new ResourceBProgram("ExternalEvents.js");
         bprog.setEventSelectionStrategy(new LoggingEventSelectionStrategyDecorator(bprog.getEventSelectionStrategy()));
         final BProgramRunner sut = new BProgramRunner(bprog);
         sut.addListener(new PrintBProgramRunnerListener() );

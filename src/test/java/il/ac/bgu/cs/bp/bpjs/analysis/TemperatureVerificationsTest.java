@@ -29,7 +29,7 @@ import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotBProgramCycleViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotTerminationViolation;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.TreeSet;
@@ -46,7 +46,7 @@ public class TemperatureVerificationsTest {
     
     @Test
     public void testHotTermination() throws Exception{
-        final SingleResourceBProgram bprog = new SingleResourceBProgram("statementtemp/hotTerminationExample.js");
+        final ResourceBProgram bprog = new ResourceBProgram("statementtemp/hotTerminationExample.js");
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         vfr.addInspector(DfsInspections.HotTermination);
@@ -63,7 +63,7 @@ public class TemperatureVerificationsTest {
     
     @Test
     public void testHotBProgramCycle_onHotBThreadCycle() throws Exception {
-        final SingleResourceBProgram bprog = new SingleResourceBProgram("statementtemp/hotBThreadCycleExample.js");
+        final ResourceBProgram bprog = new ResourceBProgram("statementtemp/hotBThreadCycleExample.js");
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         // Adding the inspector means it will be the only inspector run, as the default is to run them all.
@@ -88,7 +88,7 @@ public class TemperatureVerificationsTest {
 
     @Test
     public void testHotBThreadCycle() throws Exception {
-        final SingleResourceBProgram bprog = new SingleResourceBProgram("statementtemp/hotBThreadCycleExample.js");
+        final ResourceBProgram bprog = new ResourceBProgram("statementtemp/hotBThreadCycleExample.js");
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         // Adding the inspector means it will be the only inspector run, as the default is to run them all.
@@ -114,7 +114,7 @@ public class TemperatureVerificationsTest {
     
     @Test
     public void testHotBProgramCycle_onHotBProgramCycle() throws Exception {
-        final SingleResourceBProgram bprog = new SingleResourceBProgram("statementtemp/hotBProgramCycleExample.js");
+        final ResourceBProgram bprog = new ResourceBProgram("statementtemp/hotBProgramCycleExample.js");
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         // Adding the inspector means it will be the only inspector run, as the default is to run them all.
@@ -131,7 +131,7 @@ public class TemperatureVerificationsTest {
     
     @Test
     public void testHotBThreadCycle_onHotBProgramCycle() throws Exception {
-        final SingleResourceBProgram bprog = new SingleResourceBProgram("statementtemp/hotBProgramCycleExample.js");
+        final ResourceBProgram bprog = new ResourceBProgram("statementtemp/hotBProgramCycleExample.js");
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         // Adding the inspector means it will be the only inspector run, as the default is to run them all.
@@ -143,7 +143,7 @@ public class TemperatureVerificationsTest {
     
     public static void main(String[] args) {
         // run the hot cycle b-program, to see that it works.
-        final SingleResourceBProgram bprog = new SingleResourceBProgram("statementtemp/basicTempTest.js");
+        final ResourceBProgram bprog = new ResourceBProgram("statementtemp/basicTempTest.js");
         BProgramRunner rnr = new BProgramRunner(bprog);
         
         rnr.addListener(new PrintBProgramRunnerListener());

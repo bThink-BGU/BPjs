@@ -24,7 +24,7 @@
 package il.ac.bgu.cs.bp.bpjs.execution;
 
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
@@ -36,7 +36,7 @@ public class NoBSyncTest {
     
     @Test
     public void test() throws InterruptedException {
-        BProgram sut = new SingleResourceBProgram("noBSyncs.js", "noBSyncs");
+        BProgram sut = new ResourceBProgram("noBSyncs.js");
         
         new BProgramRunner(sut).run();
         final Long actualValue = sut.getFromGlobalScope("shouldBe7", Long.class).get();

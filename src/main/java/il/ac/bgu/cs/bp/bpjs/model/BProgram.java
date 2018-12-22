@@ -133,22 +133,6 @@ public abstract class BProgram {
     }
 
     /**
-     * Loads a Javascript resource (a file that's included in the .jar).
-     *
-     * @param pathInJar path of the resource, relative to the class.
-     */
-    public void evaluateResource(String pathInJar) {
-        try (InputStream resource = Thread.currentThread().getContextClassLoader().getResourceAsStream(pathInJar)) {
-            if (resource == null) {
-                throw new RuntimeException("Resource '" + pathInJar + "' not found.");
-            }
-            evaluate(resource, pathInJar);
-        } catch (IOException ex) {
-            throw new RuntimeException("Error reading resource: '" + pathInJar + "': " + ex.getMessage(), ex);
-        }
-    }
-
-    /**
      * Adds more source code to be evaluated <em>after</em>
      * {@link #setupProgramScope(org.mozilla.javascript.Scriptable)} is called.
      * This method allows to programatically add code, e.g. for adding standard

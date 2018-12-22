@@ -28,7 +28,7 @@ import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import org.junit.Test;
 
 import static il.ac.bgu.cs.bp.bpjs.TestUtils.traceEventNamesString;
@@ -44,7 +44,7 @@ public class BProgramJsProxyTest {
     
     @Test
     public void randomProxyTest() throws InterruptedException {
-        BProgram sut = new SingleResourceBProgram("RandomProxy.js");
+        BProgram sut = new ResourceBProgram("RandomProxy.js");
         
         new BProgramRunner(sut).run();
         Double boolCount = sut.getFromGlobalScope("boolCount", Double.class).get();
@@ -60,7 +60,7 @@ public class BProgramJsProxyTest {
     @Test
     public void logLevelProxyTest() throws InterruptedException {
         
-        BProgram sut = new SingleResourceBProgram("RandomProxy.js");
+        BProgram sut = new ResourceBProgram("RandomProxy.js");
         
         new BProgramRunner(sut).run();
         String logLevel1 = sut.getFromGlobalScope("logLevel1", String.class).get();
@@ -72,7 +72,7 @@ public class BProgramJsProxyTest {
 
     @Test
     public void DeadlockSameThread() throws Exception{
-        BProgram bpr = new SingleResourceBProgram("bpsync-blockrequest.js");
+        BProgram bpr = new ResourceBProgram("bpsync-blockrequest.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
         VerificationResult res = sut.verify(bpr);
@@ -80,7 +80,7 @@ public class BProgramJsProxyTest {
         assertTrue(res.getViolation().get() instanceof DeadlockViolation);
         assertEquals("sampleEvent", traceEventNamesString(res.getViolation().get().getCounterExampleTrace(), ""));
         
-        BProgram bprPred = new SingleResourceBProgram("bpsync-blockrequestPredicate.js");
+        BProgram bprPred = new ResourceBProgram("bpsync-blockrequestPredicate.js");
         res = sut.verify(bprPred);
         assertTrue(res.isViolationFound());
         assertTrue(res.getViolation().get() instanceof DeadlockViolation);

@@ -14,7 +14,7 @@ public class StateStoreTests {
 
     @Test
     public void ForgetfulStore() throws Exception {
-        BProgram program = new SingleResourceBProgram("SnapshotTests/ABCDTrace.js");
+        BProgram program = new ResourceBProgram("SnapshotTests/ABCDTrace.js");
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvc");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         VisitedStateStore forgetful = new ForgetfulVisitedStateStore();
@@ -39,7 +39,7 @@ public class StateStoreTests {
     }
 
     private void TestAAABTraceStore(VisitedStateStore storeToUse) throws Exception {
-        BProgram program = new SingleResourceBProgram("SnapshotTests/ABCDTrace.js");
+        BProgram program = new ResourceBProgram("SnapshotTests/ABCDTrace.js");
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvc");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         DfsTraversalNode initial = DfsTraversalNode.getInitialNode(program, execSvc);
@@ -176,8 +176,8 @@ public class StateStoreTests {
         these two objects (by debugging) share program counter and frame index and should differ on variables only
      */
     private void testEqualRuns(VisitedStateStore storeToUse) throws Exception {
-        BProgram bprog = new SingleResourceBProgram("SnapshotTests/ABCDTrace.js");
-        BProgram bprog2 = new SingleResourceBProgram("SnapshotTests/ABCDTrace.js");
+        BProgram bprog = new ResourceBProgram("SnapshotTests/ABCDTrace.js");
+        BProgram bprog2 = new ResourceBProgram("SnapshotTests/ABCDTrace.js");
 
 
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvcEqualJSVar");

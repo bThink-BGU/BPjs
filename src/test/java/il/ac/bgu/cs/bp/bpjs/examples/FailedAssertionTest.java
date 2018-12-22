@@ -27,7 +27,7 @@ import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -43,7 +43,7 @@ public class FailedAssertionTest {
    
     @Test
     public void testAssertion() throws InterruptedException {
-        final SingleResourceBProgram bprog = new SingleResourceBProgram("FailedAssertionTest.js");
+        final ResourceBProgram bprog = new ResourceBProgram("FailedAssertionTest.js");
         BProgramRunner sut = new BProgramRunner(bprog);
         sut.addListener( new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
@@ -61,7 +61,7 @@ public class FailedAssertionTest {
     
      @Test
     public void testNoAssertion() throws InterruptedException {
-        final SingleResourceBProgram bprog = new SingleResourceBProgram("FailedAssertionTest.js");
+        final ResourceBProgram bprog = new ResourceBProgram("FailedAssertionTest.js");
         BProgramRunner sut = new BProgramRunner(bprog);
         sut.addListener( new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );

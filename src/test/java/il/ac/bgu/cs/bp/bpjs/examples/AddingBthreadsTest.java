@@ -1,7 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.examples;
 
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
@@ -24,7 +24,7 @@ public class AddingBthreadsTest {
         final BEvent kidADone = new BEvent("kidADone");
         final BEvent kidBDone = new BEvent("kidBDone");
         
-        BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("AddingBthreads.js"));
+        BProgramRunner sut = new BProgramRunner(new ResourceBProgram("AddingBthreads.js"));
         sut.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         

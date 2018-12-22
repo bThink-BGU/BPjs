@@ -49,7 +49,7 @@ public class BProgramTest {
 
     @Test
     public void testGlobalScopeAccessors()  {
-        BProgram sut = new SingleResourceBProgram("RandomProxy.js");
+        BProgram sut = new ResourceBProgram("RandomProxy.js");
 
         new BProgramRunner(sut).run();
 

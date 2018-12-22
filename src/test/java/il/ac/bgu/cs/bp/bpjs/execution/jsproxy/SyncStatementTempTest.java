@@ -28,7 +28,7 @@ import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.AbstractEventSelectionStrategyDecorator;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.EventSelectionStrategy;
@@ -65,7 +65,7 @@ public class SyncStatementTempTest {
     @Test
     public void basicTempTest() throws InterruptedException {
         
-        BProgram sut = new SingleResourceBProgram("statementtemp/basicTempTest.js");
+        BProgram sut = new ResourceBProgram("statementtemp/basicTempTest.js");
         final BProgramRunner runner = new BProgramRunner(sut);
         
         TemperatureLoggingESS recorder = sut.setEventSelectionStrategy(

@@ -2,7 +2,7 @@ package il.ac.bgu.cs.bp.bpjs.TicTacToe;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.BThreadSnapshotVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsInspections;
@@ -19,7 +19,7 @@ public class TicTacToeVerMain  {
 	public static void main(String[] args) throws InterruptedException {
 
 		// Create a program
-		BProgram bprog = new SingleResourceBProgram("BPJSTicTacToe.js");
+		BProgram bprog = new ResourceBProgram("BPJSTicTacToe.js");
 
 		bprog.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());
 		bprog.setWaitForExternalEvents(true);

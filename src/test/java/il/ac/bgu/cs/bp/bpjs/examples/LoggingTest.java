@@ -26,7 +26,7 @@ package il.ac.bgu.cs.bp.bpjs.examples;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BpLog;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
@@ -46,7 +46,7 @@ public class LoggingTest {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (PrintStream myOut = new PrintStream(baos)) {
             System.setOut(myOut);
-            new BProgramRunner( new SingleResourceBProgram("loggingTest.js")).run();
+            new BProgramRunner( new ResourceBProgram("loggingTest.js")).run();
             myOut.flush();
         }
         String result = baos.toString(StandardCharsets.UTF_8.name());

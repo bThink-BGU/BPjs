@@ -4,7 +4,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotIO;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
@@ -47,7 +47,7 @@ public class BProgramSyncSnapshotClonerTest {
     
     @Test
     public void testProgramIsOk() throws InterruptedException {
-        BProgramRunner bpr = new BProgramRunner(new SingleResourceBProgram("SnapshotTests/BProgramSyncSnapshotClonerTest.js"));
+        BProgramRunner bpr = new BProgramRunner(new ResourceBProgram("SnapshotTests/BProgramSyncSnapshotClonerTest.js"));
         bpr.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener events = bpr.addListener( new InMemoryEventLoggingListener() );
         
@@ -60,7 +60,7 @@ public class BProgramSyncSnapshotClonerTest {
     @Test
     public void testSerialization() throws Exception {
         System.out.println("\nSTART Serialization test");
-        BProgram bprog = new SingleResourceBProgram("SnapshotTests/BProgramSyncSnapshotClonerTest.js");
+        BProgram bprog = new ResourceBProgram("SnapshotTests/BProgramSyncSnapshotClonerTest.js");
         BProgramSyncSnapshot cur = bprog.setup();
         ExecutorService exSvc = ExecutorServiceMaker.makeWithName("test");
         cur = cur.start(exSvc);
@@ -79,7 +79,7 @@ public class BProgramSyncSnapshotClonerTest {
     @Test
     public void verifyProgram() throws Exception {
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-        BProgram bprog = new SingleResourceBProgram("SnapshotTests/BProgramSyncSnapshotClonerTest.js");
+        BProgram bprog = new ResourceBProgram("SnapshotTests/BProgramSyncSnapshotClonerTest.js");
         final VerificationResult res = vfr.verify(bprog);
         res.getViolation().ifPresent( vio->System.out.println("res = " + vio.getCounterExampleTrace()) );
         

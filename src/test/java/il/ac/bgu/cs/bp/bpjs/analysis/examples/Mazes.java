@@ -26,7 +26,7 @@ package il.ac.bgu.cs.bp.bpjs.analysis.examples;
 import il.ac.bgu.cs.bp.bpjs.analysis.BThreadSnapshotVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
@@ -70,7 +70,7 @@ public class Mazes {
     }
 
     public void run() throws InterruptedException {
-        SingleResourceBProgram bprog = prepareProgram();
+        ResourceBProgram bprog = prepareProgram();
         BProgramRunner rnr = new BProgramRunner(bprog);
         rnr.addListener(new PrintBProgramRunnerListener());
         rnr.run();
@@ -79,7 +79,7 @@ public class Mazes {
     }
 
     public void verify() throws InterruptedException {
-        SingleResourceBProgram bprog = prepareProgram();
+        ResourceBProgram bprog = prepareProgram();
         bprog.appendSource( Requirements.eventNotSelected(targetFoundEvent.getName()) );
         
         try {
@@ -123,9 +123,9 @@ public class Mazes {
         }
     }
 
-    private SingleResourceBProgram prepareProgram() {
+    private ResourceBProgram prepareProgram() {
         // Create a program
-        final SingleResourceBProgram bprog = new SingleResourceBProgram(implementation);
+        final ResourceBProgram bprog = new ResourceBProgram(implementation);
         bprog.putInGlobalScope("MAZE_NAME", mazeName);
         bprog.putInGlobalScope("TARGET_FOUND_EVENT", targetFoundEvent);
         return bprog;

@@ -2,15 +2,15 @@ package il.ac.bgu.cs.bp.bpjs.model;
 
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import java.util.Optional;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 import org.mozilla.javascript.ConsString;
-import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ScriptableObject;
 
 /**
  * A base class for events. Each event has a name and optional data, which is a
- * Javascript object.
+ * JavaScript object.
  *
  * For two events to be equal, their names and data have to match.
  *
@@ -20,7 +20,7 @@ import org.mozilla.javascript.ScriptableObject;
 @SuppressWarnings("serial")
 public class BEvent implements Comparable<BEvent>, EventSet, java.io.Serializable {
 
-    private static final AtomicInteger INSTANCE_ID_GEN = new AtomicInteger(0);
+    private static final ConcurrentHashMap<String,AtomicInteger> NAME_INDICES =new ConcurrentHashMap<>();
 
     /**
      * Name of the event. Public access, so that the Javascript code feels
@@ -48,7 +48,11 @@ public class BEvent implements Comparable<BEvent>, EventSet, java.io.Serializabl
     }
 
     public BEvent() {
-        this("BEvent-" + INSTANCE_ID_GEN.incrementAndGet());
+        String className[] = getClass().getCanonicalName().split("\\.");
+        String baseName = className[className.length-1];
+        int index = NAME_INDICES.computeIfAbsent(baseName, n->new AtomicInteger()).incrementAndGet();
+        name = baseName+"-"+index;
+        maybeData = null;
     }
 
     @Override
@@ -68,7 +72,7 @@ public class BEvent implements Comparable<BEvent>, EventSet, java.io.Serializabl
     }
     
     /**
-     * A Javascript accessor for the event's data. If you are using this method 
+     * A JavaScript accessor for the event's data. If you are using this method 
      * from Java code, you may want to consider using {@link #getDataField()}.
      * 
      * @return the event's data, or {@code null}.

@@ -27,7 +27,7 @@ import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -60,9 +60,9 @@ public class GeneralTest {
         
         boolean printResults = true;
         
-        Set<? extends Callable<String>> tasks = IntStream.rangeClosed(rangeStart, rangeEnd).mapToObj( i -> {
+        Set<? extends Callable<String>> tasks = IntStream.rangeClosed(rangeStart, rangeEnd).mapToObj(i -> {
             return (Callable<String>) () -> {
-                SingleResourceBProgram bprog = new SingleResourceBProgram("countingBProgram.js");
+                ResourceBProgram bprog = new ResourceBProgram("countingBProgram.js");
                 BProgramRunner rnr = new BProgramRunner(bprog);
                 AtomicReference<String> res = new AtomicReference<>("initial value of task " + i);
                 rnr.addListener( new BProgramRunnerListenerAdapter(){
