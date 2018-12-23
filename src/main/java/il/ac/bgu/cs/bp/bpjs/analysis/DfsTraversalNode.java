@@ -20,7 +20,7 @@ import java.util.concurrent.ExecutorService;
  * @author Reut
  * @author michael
  */
-public class Node {
+public class DfsTraversalNode {
 
     /**
      * Get the initial nod ofr a run of the passed {@code BPorgram}.
@@ -30,10 +30,10 @@ public class Node {
      * @return Initial node for the BProgram run
      * @throws Exception
      */
-    public static Node getInitialNode(BProgram bp, ExecutorService exSvc) throws Exception {
+    public static DfsTraversalNode getInitialNode(BProgram bp, ExecutorService exSvc) throws Exception {
         BProgramSyncSnapshot seed = bp.setup().start(exSvc);
 
-        return new Node(bp, seed, null);
+        return new DfsTraversalNode(bp, seed, null);
     }
 
     private final BProgramSyncSnapshot systemState;
@@ -42,7 +42,7 @@ public class Node {
     private final BEvent lastEvent;
     private final Iterator<BEvent> iterator;
 
-    protected Node(BProgram bp, BProgramSyncSnapshot systemState, BEvent e) {
+    protected DfsTraversalNode(BProgram bp, BProgramSyncSnapshot systemState, BEvent e) {
         this.bp = bp;
         this.systemState = systemState;
         this.lastEvent = e;
@@ -84,8 +84,8 @@ public class Node {
      * the program was at {@code this} node's state.
      * @throws InterruptedException
      */
-    public Node getNextNode(BEvent e, ExecutorService exSvc) throws Exception {
-        return new Node(bp, BProgramSyncSnapshotCloner.clone(systemState).triggerEvent(e, exSvc, Collections.emptySet()), e);
+    public DfsTraversalNode getNextNode(BEvent e, ExecutorService exSvc) throws Exception {
+        return new DfsTraversalNode(bp, BProgramSyncSnapshotCloner.clone(systemState).triggerEvent(e, exSvc, Collections.emptySet()), e);
     }
 
     /**
@@ -126,11 +126,11 @@ public class Node {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof Node)) {
+        if (!(obj instanceof DfsTraversalNode)) {
             return false;
         }
 
-        Node other = (Node) obj;
+        DfsTraversalNode other = (DfsTraversalNode) obj;
         if (!Objects.equals(lastEvent, other.getLastEvent())) {
             return false;
         }

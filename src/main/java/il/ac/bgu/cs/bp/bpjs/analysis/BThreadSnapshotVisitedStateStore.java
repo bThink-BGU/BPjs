@@ -23,7 +23,6 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
-import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -41,24 +40,19 @@ import java.util.Set;
 public class BThreadSnapshotVisitedStateStore implements VisitedStateStore {
     private final Set<Object> visited = new HashSet<>();
     
-
-    public BThreadSnapshotVisitedStateStore() {
-    }
-    
     @Override
-    public void store(Node nd) {
-        visited.add( extractStatus(nd) );
+    public void store(DfsTraversalNode nd) {
+        visited.add(extractStatus(nd));
     }
 
     @Override
-    public boolean isVisited(Node nd) {
+    public boolean isVisited(DfsTraversalNode nd) {
         return visited.contains( extractStatus(nd) );
     }   
     
-    private Object extractStatus( Node nd ) {
+    private Object extractStatus( DfsTraversalNode nd ) {
         return nd.getSystemState().getBThreadSnapshots();
     }
-
 
     @Override
     public void clear() {

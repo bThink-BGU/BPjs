@@ -28,10 +28,11 @@ import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import org.junit.Test;
 
 import static il.ac.bgu.cs.bp.bpjs.TestUtils.traceEventNamesString;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.DeadlockViolation;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
@@ -42,9 +43,8 @@ import static org.junit.Assert.assertTrue;
 public class BProgramJsProxyTest {
     
     @Test
-    public void randomProxyText() throws InterruptedException {
-        
-        BProgram sut = new SingleResourceBProgram("RandomProxy.js");
+    public void randomProxyTest() throws InterruptedException {
+        BProgram sut = new ResourceBProgram("RandomProxy.js");
         
         new BProgramRunner(sut).run();
         Double boolCount = sut.getFromGlobalScope("boolCount", Double.class).get();
@@ -55,13 +55,12 @@ public class BProgramJsProxyTest {
         
         Double floatCount = sut.getFromGlobalScope("floatCount", Double.class).get();
         assertEquals(500.0, floatCount, 100);
-
     }
 
     @Test
-    public void logLevelProxyText() throws InterruptedException {
+    public void logLevelProxyTest() throws InterruptedException {
         
-        BProgram sut = new SingleResourceBProgram("RandomProxy.js");
+        BProgram sut = new ResourceBProgram("RandomProxy.js");
         
         new BProgramRunner(sut).run();
         String logLevel1 = sut.getFromGlobalScope("logLevel1", String.class).get();
@@ -69,23 +68,22 @@ public class BProgramJsProxyTest {
         
         String logLevel2 = sut.getFromGlobalScope("logLevel2", String.class).get();
         assertEquals(BpLog.LogLevel.Warn.name(), logLevel2);
-        
-
     }
 
     @Test
     public void DeadlockSameThread() throws Exception{
-        BProgram bpr = new SingleResourceBProgram("bpsync-blockrequest.js");
+        BProgram bpr = new ResourceBProgram("bpsync-blockrequest.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
         VerificationResult res = sut.verify(bpr);
-        assertTrue(res.isCounterExampleFound());
-        assertEquals(VerificationResult.ViolationType.Deadlock, res.getViolationType());
-        assertEquals("sampleEvent", traceEventNamesString(res.getCounterExampleTrace(), ""));
-        BProgram bprPred = new SingleResourceBProgram("bpsync-blockrequestPredicate.js");
+        assertTrue(res.isViolationFound());
+        assertTrue(res.getViolation().get() instanceof DeadlockViolation);
+        assertEquals("sampleEvent", traceEventNamesString(res.getViolation().get().getCounterExampleTrace(), ""));
+        
+        BProgram bprPred = new ResourceBProgram("bpsync-blockrequestPredicate.js");
         res = sut.verify(bprPred);
-        assertTrue(res.isCounterExampleFound());
-        assertEquals(VerificationResult.ViolationType.Deadlock, res.getViolationType());
-        assertEquals("sampleEvent", traceEventNamesString(res.getCounterExampleTrace(), ""));
+        assertTrue(res.isViolationFound());
+        assertTrue(res.getViolation().get() instanceof DeadlockViolation);
+        assertEquals("sampleEvent", traceEventNamesString(res.getViolation().get().getCounterExampleTrace(), ""));
     }
 }

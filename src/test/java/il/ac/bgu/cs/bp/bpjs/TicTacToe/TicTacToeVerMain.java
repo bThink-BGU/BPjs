@@ -2,9 +2,10 @@ package il.ac.bgu.cs.bp.bpjs.TicTacToe;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.BThreadSnapshotVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsInspections;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
 
@@ -18,7 +19,7 @@ public class TicTacToeVerMain  {
 	public static void main(String[] args) throws InterruptedException {
 
 		// Create a program
-		BProgram bprog = new SingleResourceBProgram("BPJSTicTacToe.js");
+		BProgram bprog = new ResourceBProgram("BPJSTicTacToe.js");
 
 		bprog.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());
 		bprog.setWaitForExternalEvents(true);
@@ -41,7 +42,7 @@ public class TicTacToeVerMain  {
 //		bprog.appendSource(infiBThread);
         try {
             DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-            vfr.setDetectDeadlocks(false);
+            vfr.addInspector(DfsInspections.FailedAssertions);
 
             vfr.setMaxTraceLength(70);
 //            vfr.setDebugMode(true);
@@ -49,9 +50,11 @@ public class TicTacToeVerMain  {
             vfr.setProgressListener( new BriefPrintDfsVerifierListener() );
 
             final VerificationResult res = vfr.verify(bprog);
-            if (res.isCounterExampleFound()) {
+            if (res.isViolationFound()) {
                 System.out.println("Found a counterexample");
-                res.getCounterExampleTrace().forEach(nd -> System.out.println(" " + nd.getLastEvent()));
+                res.getViolation().get()
+                    .getCounterExampleTrace()
+                    .forEach(nd -> System.out.println(" " + nd.getLastEvent()));
 
             } else {
                 System.out.println("No counterexample found.");

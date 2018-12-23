@@ -28,13 +28,12 @@ import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.WrappedException;
 
 /**
- * Base class for BPrograms. Provides the context (Javascript scope, external
- * event queue, etc.) bthreads interact with while running. Concrete BProgram
+ * Base class for BPrograms. Provides the context (JavaScript scope, external
+ * event queue, etc.) b-threads interact with while running. Concrete BProgram
  * extend this class by implementing the
  * {@link #setupProgramScope(org.mozilla.javascript.Scriptable)} method.
  *
- * <p>
- * For creating a BProgram that uses a single Javascript file available in the
+ * For creating a BProgram that uses a single JavaScript file available in the
  * classpath, see {@link SingleResourceBProgram}. For creating them from a
  * hard-coded string, see {@link StringBProgram}.
  *
@@ -131,22 +130,6 @@ public abstract class BProgram {
     public BProgram(String aName, EventSelectionStrategy anEss) {
         name = aName;
         eventSelectionStrategy = anEss;
-    }
-
-    /**
-     * Loads a Javascript resource (a file that's included in the .jar).
-     *
-     * @param pathInJar path of the resource, relative to the class.
-     */
-    public void evaluateResource(String pathInJar) {
-        try (InputStream resource = Thread.currentThread().getContextClassLoader().getResourceAsStream(pathInJar)) {
-            if (resource == null) {
-                throw new RuntimeException("Resource '" + pathInJar + "' not found.");
-            }
-            evaluate(resource, pathInJar);
-        } catch (IOException ex) {
-            throw new RuntimeException("Error reading resource: '" + pathInJar + "': " + ex.getMessage(), ex);
-        }
     }
 
     /**
@@ -500,9 +483,16 @@ public abstract class BProgram {
         }
         return eventSelectionStrategy;
     }
-
-    public void setEventSelectionStrategy(EventSelectionStrategy eventSelectionStrategy) {
-        this.eventSelectionStrategy = eventSelectionStrategy;
+    
+    /**
+     * Sets the event selection strategy to be used.
+     * @param <T> Actual type of the strategy
+     * @param anEventSelectionStrategy the strategy
+     * @return the strategy (so it can be cleanly assigned to a variable).
+     */
+    public <T extends EventSelectionStrategy> T setEventSelectionStrategy(T anEventSelectionStrategy) {
+        eventSelectionStrategy = anEventSelectionStrategy;
+        return anEventSelectionStrategy;
     }
     
     public void setLogLevel( BpLog.LogLevel aLevel ) {

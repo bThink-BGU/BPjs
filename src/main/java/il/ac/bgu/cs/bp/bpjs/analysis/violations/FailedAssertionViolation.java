@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 michael.
+ * Copyright 2018 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,25 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.model;
+package il.ac.bgu.cs.bp.bpjs.analysis.violations;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
+import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
+import java.util.List;
 
 /**
  *
  * @author michael
  */
-public class SingleResourceBProgramTest {
+public class FailedAssertionViolation extends Violation {
     
-    @Test
-    public void testMissingResource() {
-        final String missingResourceName = "I'm not there";
-        try {
-            new SingleResourceBProgram(missingResourceName);
-        } catch ( IllegalArgumentException iae ) {
-            assertTrue(iae.getMessage().contains(missingResourceName));
-        }
+    private final FailedAssertion assertion;
+
+    public FailedAssertionViolation(FailedAssertion assertion, List<DfsTraversalNode> counterExampleTrace) {
+        super(counterExampleTrace);
+        this.assertion = assertion;
+    }
+
+    @Override
+    public String decsribe() {
+        return "Failed assertion on b-thread " +
+                assertion.getBThreadName() + ": " +
+                assertion.getMessage();
+    }
+
+    public FailedAssertion getFailedAssertion() {
+        return assertion;
+    }
+
+    @Override
+    public String toString() {
+        return "[FailedAssertionViolation assertion:" + assertion + ']';
     }
     
 }

@@ -41,7 +41,7 @@ public class BSyncDataPassingTest {
     
     @Test
     public void priorityDataTest_noBlocking() {
-        BProgram bp = new SingleResourceBProgram("BSyncDataPassingTest.js");
+        BProgram bp = new ResourceBProgram("BSyncDataPassingTest.js");
         bp.putInGlobalScope("block30", false);
         
         bp.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy());
@@ -60,7 +60,7 @@ public class BSyncDataPassingTest {
     
     @Test
     public void priorityDataTest_blocking() {
-        BProgram bp = new SingleResourceBProgram("BSyncDataPassingTest.js");
+        BProgram bp = new ResourceBProgram("BSyncDataPassingTest.js");
         bp.putInGlobalScope("block30", true);
         
         bp.setEventSelectionStrategy(new PrioritizedBSyncEventSelectionStrategy(17));

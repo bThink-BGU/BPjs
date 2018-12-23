@@ -44,6 +44,35 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+### 2018-12-23
+* :put_litter_in_its_place: `BProgram` cannot evaluate resources anymore. This change also removes this ability from running JavaScript b-program. It made no sense anyway, and was not used.
+* :sparkles: `SingleResourceBProgram` can now accept multiple resources, and was thus renamed to `ResourceBProgram` (#60). (NOTE: this change breaks program that gave explicit names to
+               a `SingleResourceBProgram` in the constructor, as the argument for the name is now interpreted as a resource name. You can use `setName` to set the program name later.
+* :sparkles: Automatic event names include the name of the class and an index number.
+* :bug: Fixed broken links in the documentation.
+
+### 2018-12-19
+* :sparkles: There are two different hot cycle violation inspections: one inspects a hot loop at the b-thread level (default), and the other at the whole b-program level.
+* :arrow_up: More tests. 
+* :sparkles: Updated the docs to reflect the updates in verification features.
+
+### 2018-12-15
+* :sparkles: More verification package updates: now differing between cycle inspections and trace inspections.
+* :sparkles: Detection of hot cycles. That is, we can verify liveness requirements. :tada: :tada: :tada:
+* :arrow_up: Better hash function for `BThreadSycSnapshot`.
+
+### 2018-12-15
+* :sparkles: Verification area gets some well-needed refactoring:
+    * Inspections get their own interface (so it's easier to add new ones)
+    * Common inspections no live in the `DfsVerificationInspections` utility class.
+    * The violations part of `VerificationResult` moved into `Violation` class. This allows much cleaner code for inspecting violation as as an open infrastructure for detecting new types of violations (#61).
+* :arrow_up: External Events are now part of the `equals` method of `BProgramSyncSnapshot`. 
+
+### 2018-12-14
+* :arrows_counterclockwise: Renamed `BSyncStatement` to `SyncStatement`, as we don't call it "bsync" anymore. Also updated the `toString` method, which still used the pre-historic `RWBStatement` term.
+* :sparkles: `SyncStatement`s can now be "hot".
+* :arrow_up: Improvements to `BProgram`'s API.
+
 ### 2018-11-25
 * :sparkles: `fork()` added (#57).
 

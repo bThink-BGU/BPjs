@@ -210,7 +210,7 @@ public class BProgramSyncSnapshot {
         return threadSnapshots;
     }
     
-    public Set<BSyncStatement> getStatements() {
+    public Set<SyncStatement> getStatements() {
         return getBThreadSnapshots().stream().map(BThreadSyncSnapshot::getBSyncStatement)
                 .collect(toSet());
     }
@@ -247,6 +247,18 @@ public class BProgramSyncSnapshot {
     
     public FailedAssertion getFailedAssertion() {
         return violationRecord.get();
+    }
+    
+    /**
+     * Returns {@code true} if any of the b-threads at this point is at a "hot"
+     * sync. Similar to the "hot cut" idiom in LSC.
+     * @return {@code true} is at least one of the b-threads is at a hot sync; {@code false} otherwise.
+     */
+    public boolean isHot() {
+        return getBThreadSnapshots().stream()
+                    .map(BThreadSyncSnapshot::getBSyncStatement)
+                    .filter(SyncStatement::isHot)
+                    .findAny().isPresent();
     }
     
     private BThreadSyncSnapshot safeGet(Future<BThreadSyncSnapshot> fbss) {
@@ -355,6 +367,10 @@ public class BProgramSyncSnapshot {
                 return false;
             }
         }
+        if ( ! getExternalEvents().equals(other.getExternalEvents()) ) {
+            return false;
+        }
+        // TODO 
         return Objects.equals(threadSnapshots, other.threadSnapshots);
     }
 }

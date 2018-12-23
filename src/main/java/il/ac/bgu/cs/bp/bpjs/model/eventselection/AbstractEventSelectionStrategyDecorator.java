@@ -24,15 +24,15 @@
 package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
+import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 /**
  * Base class for {@link EventSelectionStrategy} decorators.These allow
- modification/inspection of existing event selection strategies via 
- composition rather than subclassing.
+ * modification/inspection of existing event selection strategies via 
+ * composition rather than sub-classing.
  * 
  * @author michael
  * @param <ESS> The type of event selection strategy being decorated.
@@ -50,12 +50,12 @@ public abstract class AbstractEventSelectionStrategyDecorator<ESS extends EventS
     }
 
     @Override
-    public Set<BEvent> selectableEvents(Set<BSyncStatement> statements, List<BEvent> externalEvents) {
+    public Set<BEvent> selectableEvents(Set<SyncStatement> statements, List<BEvent> externalEvents) {
         return getDecorated().selectableEvents(statements, externalEvents);
     }
 
     @Override
-    public Optional<EventSelectionResult> select(Set<BSyncStatement> statements, List<BEvent> externalEvents, Set<BEvent> selectableEvents) {
+    public Optional<EventSelectionResult> select(Set<SyncStatement> statements, List<BEvent> externalEvents, Set<BEvent> selectableEvents) {
         return getDecorated().select(statements, externalEvents, selectableEvents);
     }
     

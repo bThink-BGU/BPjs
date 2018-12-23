@@ -24,7 +24,7 @@
 package il.ac.bgu.cs.bp.bpjs.examples;
 
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
@@ -46,7 +46,7 @@ public class DynamicBThreadAdditionTest {
     
     @Test
     public void testAddOnStart() throws InterruptedException {
-        SingleResourceBProgram bprog = new SingleResourceBProgram("dynamicBthreadAddition.js");
+        ResourceBProgram bprog = new ResourceBProgram("dynamicBthreadAddition.js");
         bprog.putInGlobalScope("ADD_ON_START", true);
         BProgramRunner sut = new BProgramRunner(bprog);
         sut.addListener(new PrintBProgramRunnerListener() );
@@ -59,7 +59,7 @@ public class DynamicBThreadAdditionTest {
     
     @Test
     public void testAddOnResume() throws InterruptedException {
-        SingleResourceBProgram bprog = new SingleResourceBProgram("dynamicBthreadAddition.js");
+        ResourceBProgram bprog = new ResourceBProgram("dynamicBthreadAddition.js");
         bprog.putInGlobalScope("ADD_ON_START", false);
         BProgramRunner sut = new BProgramRunner(bprog);
         

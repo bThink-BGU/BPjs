@@ -27,7 +27,7 @@ import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -54,7 +54,7 @@ public class BProgramRunnerTest {
     @Test
     public void testRun() {
 
-        BProgram bprog = new SingleResourceBProgram("HotNCold.js");
+        BProgram bprog = new ResourceBProgram("HotNCold.js");
         BProgramRunner sut = new BProgramRunner(bprog);
 
         sut.addListener(new PrintBProgramRunnerListener());
@@ -65,7 +65,7 @@ public class BProgramRunnerTest {
 
     @Test
     public void testImmediateAssert() {
-        BProgram bprog = new SingleResourceBProgram( "ImmediateAssert.js");
+        BProgram bprog = new ResourceBProgram( "ImmediateAssert.js");
         BProgramRunner runner = new BProgramRunner(bprog);
         runner.run();
         InMemoryEventLoggingListener listener = new InMemoryEventLoggingListener();

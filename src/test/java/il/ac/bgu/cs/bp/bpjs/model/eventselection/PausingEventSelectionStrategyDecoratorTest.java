@@ -25,7 +25,7 @@ package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class PausingEventSelectionStrategyDecoratorTest {
         try {
             long testStart = System.currentTimeMillis();
             
-            BProgramRunner runner = new BProgramRunner(new SingleResourceBProgram("HotNCold.js"));
+            BProgramRunner runner = new BProgramRunner(new ResourceBProgram("HotNCold.js"));
             runner.addListener( new PrintBProgramRunnerListener() );
             
             PausingEventSelectionStrategyDecorator sut =

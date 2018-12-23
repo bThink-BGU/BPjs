@@ -14,15 +14,15 @@ public class StateStoreTests {
 
     @Test
     public void ForgetfulStore() throws Exception {
-        BProgram program = new SingleResourceBProgram("SnapshotTests/ABCDTrace.js");
+        BProgram program = new ResourceBProgram("SnapshotTests/ABCDTrace.js");
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvc");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         VisitedStateStore forgetful = new ForgetfulVisitedStateStore();
-        Node initial = Node.getInitialNode(program, execSvc);
+        DfsTraversalNode initial = DfsTraversalNode.getInitialNode(program, execSvc);
         forgetful.store(initial);
         assertFalse(forgetful.isVisited(initial));
 
-        Node next = sut.getUnvisitedNextNode(initial, execSvc);
+        DfsTraversalNode next = sut.getUnvisitedNextNode(initial, execSvc);
         assertFalse(forgetful.isVisited(next));
     }
 
@@ -39,14 +39,14 @@ public class StateStoreTests {
     }
 
     private void TestAAABTraceStore(VisitedStateStore storeToUse) throws Exception {
-        BProgram program = new SingleResourceBProgram("SnapshotTests/ABCDTrace.js");
+        BProgram program = new ResourceBProgram("SnapshotTests/ABCDTrace.js");
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvc");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        Node initial = Node.getInitialNode(program, execSvc);
+        DfsTraversalNode initial = DfsTraversalNode.getInitialNode(program, execSvc);
         storeToUse.store(initial);
         assertTrue(storeToUse.isVisited(initial));
 
-        Node next = sut.getUnvisitedNextNode(initial, execSvc);
+        DfsTraversalNode next = sut.getUnvisitedNextNode(initial, execSvc);
         assertFalse(storeToUse.isVisited(next));
         storeToUse.store(next);
         assertTrue(storeToUse.isVisited(next));
@@ -79,13 +79,13 @@ public class StateStoreTests {
                 "});");
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvcDiiffJSVar");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        List<Node> snapshots = new ArrayList<>();
+        List<DfsTraversalNode> snapshots = new ArrayList<>();
 
-        Node initial = Node.getInitialNode(program, execSvc);
+        DfsTraversalNode initial = DfsTraversalNode.getInitialNode(program, execSvc);
         storeToUse.store(initial);
         snapshots.add(initial);
         assertTrue(storeToUse.isVisited(initial));
-        Node next = initial;
+        DfsTraversalNode next = initial;
         //Iteration 1,starts already at request state A
         for (int i = 0; i < 4; i++) {
             next = sut.getUnvisitedNextNode(next, execSvc);
@@ -128,13 +128,13 @@ public class StateStoreTests {
                 "});");
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvcEqualJSVar");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        List<Node> snapshots = new ArrayList<>();
+        List<DfsTraversalNode> snapshots = new ArrayList<>();
 
-        Node initial = Node.getInitialNode(program, execSvc);
+        DfsTraversalNode initial = DfsTraversalNode.getInitialNode(program, execSvc);
         storeToUse.store(initial);
         snapshots.add(initial);
         assertTrue(storeToUse.isVisited(initial));
-        Node next = initial;
+        DfsTraversalNode next = initial;
         //Iteration 1,starts already at request state A
         for (int i = 0; i < 4; i++) {
             next = sut.getUnvisitedNextNode(next, execSvc);
@@ -176,21 +176,21 @@ public class StateStoreTests {
         these two objects (by debugging) share program counter and frame index and should differ on variables only
      */
     private void testEqualRuns(VisitedStateStore storeToUse) throws Exception {
-        BProgram bprog = new SingleResourceBProgram("SnapshotTests/ABCDTrace.js");
-        BProgram bprog2 = new SingleResourceBProgram("SnapshotTests/ABCDTrace.js");
+        BProgram bprog = new ResourceBProgram("SnapshotTests/ABCDTrace.js");
+        BProgram bprog2 = new ResourceBProgram("SnapshotTests/ABCDTrace.js");
 
 
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvcEqualJSVar");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
 
-        Node initial1 = Node.getInitialNode(bprog, execSvc);
-        Node initial2 = Node.getInitialNode(bprog2, execSvc);
+        DfsTraversalNode initial1 = DfsTraversalNode.getInitialNode(bprog, execSvc);
+        DfsTraversalNode initial2 = DfsTraversalNode.getInitialNode(bprog2, execSvc);
 
         assertEquals(initial1,initial2);
 
 
-        Node next1 = initial1;
-        Node next2 = initial2;
+        DfsTraversalNode next1 = initial1;
+        DfsTraversalNode next2 = initial2;
         storeToUse.store(next1);
         assertTrue(storeToUse.isVisited(next2));
         for (int i = 0; i < 4; i++) {
@@ -225,7 +225,7 @@ public class StateStoreTests {
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvcEqualJSVar");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
 
-        Node next = Node.getInitialNode(bprog, execSvc);
+        DfsTraversalNode next = DfsTraversalNode.getInitialNode(bprog, execSvc);
         storeToUse.store(next);
         assertTrue(storeToUse.isVisited(next));
         //now we enter the loop and generate initial node

@@ -27,7 +27,7 @@ import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import java.util.Arrays;
 import java.util.HashSet;
 import static java.util.stream.Collectors.toSet;
@@ -42,7 +42,7 @@ public class ForkTest {
  
     @Test
     public void testFork() {
-        BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("bp-fork.js"));
+        BProgramRunner sut = new BProgramRunner(new ResourceBProgram("bp-fork.js"));
         sut.addListener( new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         

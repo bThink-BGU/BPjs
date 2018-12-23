@@ -26,7 +26,7 @@ package il.ac.bgu.cs.bp.bpjs.mains;
 import il.ac.bgu.cs.bp.bpjs.analysis.*;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 
 /**
  * This program runs the DFS verifier against the same maze using different
@@ -58,7 +58,7 @@ public class StateStorePerformanceComparison {
 
         // prepare verifier
         DfsBProgramVerifier verifier = new DfsBProgramVerifier();
-        verifier.setDetectDeadlocks(false);
+        verifier.addInspector(DfsInspections.FailedAssertions);
 
         // test
         verifier.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
@@ -72,7 +72,7 @@ public class StateStorePerformanceComparison {
 
     private static BProgram makeBProgram() {
         // prepare b-program
-        final BProgram bprog = new SingleResourceBProgram(IMPLEMENTATION);
+        final BProgram bprog = new ResourceBProgram(IMPLEMENTATION);
         bprog.putInGlobalScope("MAZE_NAME", MAZE_NAME);
         bprog.putInGlobalScope("TARGET_FOUND_EVENT", TARGET_FOUND_EVENT);
         bprog.appendSource(Requirements.eventNotSelected(TARGET_FOUND_EVENT.getName()));

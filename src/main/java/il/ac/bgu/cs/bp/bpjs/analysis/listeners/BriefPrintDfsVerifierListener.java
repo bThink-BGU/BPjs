@@ -23,7 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis.listeners;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.Node;
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import java.io.PrintStream;
 import java.util.List;
@@ -56,7 +56,7 @@ public class BriefPrintDfsVerifierListener implements DfsBProgramVerifier.Progre
     }
 
     @Override
-    public void maxTraceLengthHit(List<Node> trace, DfsBProgramVerifier v) {
+    public void maxTraceLengthHit(List<DfsTraversalNode> trace, DfsBProgramVerifier v) {
         out.println("/v/ " + v.getCurrentBProgram().getName() + ": hit max trace length.");
     }
 

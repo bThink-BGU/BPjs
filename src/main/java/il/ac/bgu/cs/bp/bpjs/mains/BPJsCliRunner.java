@@ -28,6 +28,7 @@ import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.HashVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
@@ -123,18 +124,20 @@ public class BPJsCliRunner {
                 println("Starting vberification");
                 VerificationResult res = vfr.verify(bpp);
                 println("Verification completed.");
-                if ( res.isVerifiedSuccessfully() ) {
+                
+                if ( ! res.getViolation().isPresent() ) {
                     println("No violations found");
+                    
                 } else {
-                    println("Violation type: " + res.getViolationType());
-                    println("Failed assertion: " + res.getFailedAssertion().getMessage() );
-                    println("     By b-thread: " + res.getFailedAssertion().getBThreadName());
-                    if ( res.isCounterExampleFound() ) {
-                        println("Counter example:");
-                        res.getCounterExampleTrace().stream()
-                            .skip(1) // the first node has no previsou event.
-                            .forEach(nd -> println(nd.getLastEvent().toString()));
-                    }
+                    Violation vio = res.getViolation().get();
+                    println("Found Violation:");
+                    println(vio.decsribe());
+                    
+                    println("Counter example trace:");
+                    vio.getCounterExampleTrace().stream()
+                        .skip(1) // the first node has no previsou event.
+                        .forEach(nd -> println(nd.getLastEvent().toString()));
+                    
                 }
                 println("General statistics:");
                 println(String.format("Time:\t%,d (msec)", res.getTimeMillies()));
@@ -159,8 +162,6 @@ public class BPJsCliRunner {
 
             bpr.run();            
         }
-        
-
     }
 
     /**

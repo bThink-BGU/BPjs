@@ -35,12 +35,12 @@ public class HashVisitedStateStore implements VisitedStateStore {
     private final Set<Long> visited = new TreeSet<>();
 
     @Override
-    public void store(Node nd) {
+    public void store(DfsTraversalNode nd) {
         visited.add( hash(nd.getSystemState().getBThreadSnapshots()) );
     }
 
     @Override
-    public boolean isVisited(Node nd) {
+    public boolean isVisited(DfsTraversalNode nd) {
         return visited.contains( hash(nd.getSystemState().getBThreadSnapshots()) );
     }
 

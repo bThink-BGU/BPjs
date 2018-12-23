@@ -66,7 +66,7 @@ Add BPjs to your classpath.
 
 Decide which ``BProgram`` subclass you need.
 
-  `BProgram`_ is an abstract class. Its concrete sub-classes differ on how they obtain their source code. `SingleResourceBProgram`_ reads the code from a resource included with the code (typically, a .js file bundled in the project's .jars). `StringBProgram`_, on the other hand, takes a Java String as source. Of course, ``BProgram`` can be directly extended as needed.
+  `BProgram`_ is an abstract class. Its concrete sub-classes differ on how they obtain their source code. `ResourceBProgram`_ reads the code from a resource included with the code (typically, a .js file bundled in the project's .jars). `StringBProgram`_, on the other hand, takes a Java String as source. Of course, ``BProgram`` can be directly extended as needed.
 
 Write the BPjs code.
 
@@ -103,11 +103,11 @@ All event selection strategies currently included with BPjs ignore external even
 
 
 .. _import directives: https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino/Scripting_Java
-.. _BProgram: javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/BProgram.html
-.. _SingleResourceBProgram: javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/SingleResourceBProgram.html
-.. _StringBProgram: javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/StringBProgram.html
-.. _putInGlobalScope: javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/BProgram.html#putInGlobalScope-java.lang.String-java.lang.Object-
-.. _enqueueExternalEvent: javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/BProgram.html#enqueueExternalEvent-il.ac.bgu.cs.bp.bpjs.events.BEvent-
+.. _BProgram: http://javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/model/BProgram.html
+.. _ResourceBProgram: http://javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/model/ResourceBProgram.html
+.. _StringBProgram: http://javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/model/StringBProgram.html
+.. _putInGlobalScope: http://javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/model/BProgram.html#putInGlobalScope-java.lang.String-java.lang.Object-
+.. _enqueueExternalEvent: http://javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/model/BProgram.html#enqueueExternalEvent-il.ac.bgu.cs.bp.bpjs.events.BEvent-
 .. _RunFile: https://github.com/bThink-BGU/BPjs/blob/develop/src/main/java/il/ac/bgu/cs/bp/bpjs/mains/RunFile.java
-.. _SimpleEventSelectionStrategy: javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/eventselection/SimpleEventSelectionStrategy.html
+.. _SimpleEventSelectionStrategy: http://javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/model/eventselection/SimpleEventSelectionStrategy.html
 .. _SampleBPjsProject: https://github.com/bThink-BGU/SampleBPjsProject

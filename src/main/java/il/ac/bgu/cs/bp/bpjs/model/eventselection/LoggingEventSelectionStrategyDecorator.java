@@ -23,7 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
-import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
+import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import java.io.PrintStream;
 import java.io.PrintWriter;
@@ -53,13 +53,13 @@ public class LoggingEventSelectionStrategyDecorator<ESS extends EventSelectionSt
     }
 
     @Override
-    public Set<BEvent> selectableEvents(Set<BSyncStatement> statements, List<BEvent> externalEvents) {
+    public Set<BEvent> selectableEvents(Set<SyncStatement> statements, List<BEvent> externalEvents) {
         final Set<BEvent> selectableEvents = getDecorated().selectableEvents(statements, externalEvents);
 
         out.println("== Choosing Selectable Events ==");
         out.println("BThread Sync Statements:");
         statements.forEach( stmt -> {
-            out.println("+ " + stmt.getBthread().getName() + ":");
+            out.println("+ " + stmt.getBthread().getName() + ":" + (stmt.isHot()?" HOT":""));
             out.println("    Request: " + stmt.getRequest());
             out.println("    WaitFor: " + stmt.getWaitFor());
             out.println("    Block: "   + stmt.getBlock());
@@ -80,7 +80,7 @@ public class LoggingEventSelectionStrategyDecorator<ESS extends EventSelectionSt
     }
 
     @Override
-    public Optional<EventSelectionResult> select(Set<BSyncStatement> statements, List<BEvent> externalEvents, Set<BEvent> selectableEvents) {
+    public Optional<EventSelectionResult> select(Set<SyncStatement> statements, List<BEvent> externalEvents, Set<BEvent> selectableEvents) {
         Optional<EventSelectionResult> selectedEvent = getDecorated().select(statements, externalEvents, selectableEvents);
         out.println("== Actual Event Selection ======");
         out.println( selectedEvent.toString() );

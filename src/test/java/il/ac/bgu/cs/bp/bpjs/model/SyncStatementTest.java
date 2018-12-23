@@ -35,7 +35,7 @@ import org.junit.Test;
  * 
  * @author michael
  */
-public class BSyncStatementTest {
+public class SyncStatementTest {
     
     private final BEvent eventOne = new BEvent("one");
     private final BEvent eventTwo = new BEvent("two");
@@ -44,7 +44,7 @@ public class BSyncStatementTest {
     
     @Test
     public void testEquals() {
-        BSyncStatement sut = BSyncStatement.make();
+        SyncStatement sut = SyncStatement.make();
         
         // Sanity
         assertTrue( sut.equals(sut) );
@@ -58,6 +58,28 @@ public class BSyncStatementTest {
         // different interrupt
         Assert.assertNotEquals( sut.interrupt(eventOne), sut.interrupt(eventTwo) );
         Assert.assertEquals( sut.interrupt(eventTri), sut.interrupt(eventTri) );
+    }
+    
+    @Test
+    public void testHotness() {
+        SyncStatement sut1 = SyncStatement.make();
+        
+        Assert.assertNotEquals( sut1, sut1.hot(true) );
+        Assert.assertEquals( sut1, sut1.hot(false) );
+        Assert.assertEquals(
+                sut1.request(eventOne).hot(true).waitFor(eventTwo),
+                sut1.waitFor(eventTwo).request(eventOne).hot(true) );
+        
+        Assert.assertNotEquals(
+                sut1.request(eventOne).hot(true).waitFor(eventTwo),
+                sut1.waitFor(eventTwo).request(eventOne) );
+    }
+    
+    @Test
+    public void testToStringHot() {
+        SyncStatement sut = SyncStatement.make();
+        assertFalse(sut.toString().contains("hot"));
+        assertTrue(sut.hot(true).toString().contains("hot"));
     }
     
 }

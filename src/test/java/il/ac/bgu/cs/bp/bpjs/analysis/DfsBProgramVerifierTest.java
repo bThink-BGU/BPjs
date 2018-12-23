@@ -27,7 +27,7 @@ import static il.ac.bgu.cs.bp.bpjs.TestUtils.eventNamesString;
 
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 
@@ -38,6 +38,8 @@ import static org.junit.Assert.*;
 
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.DeadlockViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.FailedAssertionViolation;
 
 /**
  * @author michael
@@ -46,19 +48,19 @@ public class DfsBProgramVerifierTest {
 
     @Test
     public void simpleAAABTrace_forgetfulStore() throws Exception {
-        BProgram program = new SingleResourceBProgram("DFSVerifierTests/AAABTrace.js");
+        BProgram program = new ResourceBProgram("DFSVerifierTests/AAABTrace.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setProgressListener(new BriefPrintDfsVerifierListener());
         program.appendSource(Requirements.eventNotSelected("B"));
         sut.setVisitedNodeStore(new ForgetfulVisitedStateStore());
         VerificationResult res = sut.verify(program);
-        assertTrue(res.isCounterExampleFound());
-        assertEquals("AAAB", traceEventNamesString(res.getCounterExampleTrace(), ""));
+        assertTrue(res.isViolationFound());
+        assertEquals("AAAB", traceEventNamesString(res, ""));
     }
 
     @Test
     public void simpleAAABTrace() throws Exception {
-        BProgram program = new SingleResourceBProgram("DFSVerifierTests/AAABTrace.js");
+        BProgram program = new ResourceBProgram("DFSVerifierTests/AAABTrace.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setDebugMode(true);
 
@@ -66,13 +68,13 @@ public class DfsBProgramVerifierTest {
         program.appendSource(Requirements.eventNotSelected("B"));
         sut.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
         VerificationResult res = sut.verify(program);
-        assertTrue(res.isCounterExampleFound());
-        assertEquals("AAAB", traceEventNamesString(res.getCounterExampleTrace(), ""));
+        assertTrue(res.isViolationFound());
+        assertEquals("AAAB", traceEventNamesString(res, ""));
     }
 
     @Test
     public void simpleAAABTrace_hashedNodeStore() throws Exception {
-        BProgram program = new SingleResourceBProgram("DFSVerifierTests/AAABTrace.js");
+        BProgram program = new ResourceBProgram("DFSVerifierTests/AAABTrace.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setDebugMode(true);
         sut.setProgressListener(new BriefPrintDfsVerifierListener());
@@ -80,8 +82,8 @@ public class DfsBProgramVerifierTest {
         VisitedStateStore stateStore = new HashVisitedStateStore();
         sut.setVisitedNodeStore(stateStore);
         VerificationResult res = sut.verify(program);
-        assertTrue(res.isCounterExampleFound());
-        assertEquals("AAAB", traceEventNamesString(res.getCounterExampleTrace(), ""));
+        assertTrue(res.isViolationFound());
+        assertEquals("AAAB", traceEventNamesString(res, ""));
         //Add trivial getter check
         VisitedStateStore retStore = sut.getVisitedNodeStore();
         assertSame(retStore, stateStore);
@@ -89,7 +91,7 @@ public class DfsBProgramVerifierTest {
 
     @Test
     public void testAAABRun() {
-        BProgram program = new SingleResourceBProgram("DFSVerifierTests/AAABTrace.js");
+        BProgram program = new ResourceBProgram("DFSVerifierTests/AAABTrace.js");
         BProgramRunner rnr = new BProgramRunner(program);
 
         rnr.addListener(new PrintBProgramRunnerListener());
@@ -102,29 +104,29 @@ public class DfsBProgramVerifierTest {
 
     @Test
     public void deadlockTrace() throws Exception {
-        BProgram program = new SingleResourceBProgram("DFSVerifierTests/deadlocking.js");
+        BProgram program = new ResourceBProgram("DFSVerifierTests/deadlocking.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setVisitedNodeStore(new ForgetfulVisitedStateStore());
         VerificationResult res = sut.verify(program);
-        assertTrue(res.isCounterExampleFound());
-        assertEquals(VerificationResult.ViolationType.Deadlock, res.getViolationType());
-        assertEquals("A", traceEventNamesString(res.getCounterExampleTrace(), ""));
+        
+        assertTrue(res.isViolationFound());
+        assertTrue(res.getViolation().get() instanceof DeadlockViolation);
+        assertEquals("A", traceEventNamesString(res, ""));
     }
 
     @Test
     public void testDeadlockSetting() throws Exception {
-        BProgram program = new SingleResourceBProgram("DFSVerifierTests/deadlocking.js");
+        BProgram program = new ResourceBProgram("DFSVerifierTests/deadlocking.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        sut.setDetectDeadlocks(false);
+        sut.addInspector(DfsInspections.FailedAssertions);
         VerificationResult res = sut.verify(program);
-        assertFalse(res.isCounterExampleFound());
-        assertEquals(VerificationResult.ViolationType.None, res.getViolationType());
+        assertFalse(res.isViolationFound());
     }
 
 
     @Test
     public void deadlockRun() {
-        BProgram program = new SingleResourceBProgram("DFSVerifierTests/deadlocking.js");
+        BProgram program = new ResourceBProgram("DFSVerifierTests/deadlocking.js");
         BProgramRunner rnr = new BProgramRunner(program);
 
         rnr.addListener(new PrintBProgramRunnerListener());
@@ -145,12 +147,11 @@ public class DfsBProgramVerifierTest {
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setIterationCountGap(1);
         sut.setProgressListener(new BriefPrintDfsVerifierListener());
-        sut.setDetectDeadlocks(false);
+        sut.addInspector(DfsInspections.FailedAssertions);
         VerificationResult res = sut.verify(bprog);
 
-        assertTrue(res.isVerifiedSuccessfully());
+        assertFalse(res.isViolationFound());
         assertEquals(3, res.getScannedStatesCount());
-        assertEquals(VerificationResult.ViolationType.None, res.getViolationType());
     }
 
     @Test(timeout = 2000)
@@ -166,7 +167,7 @@ public class DfsBProgramVerifierTest {
         sut.setDebugMode(true);
         VerificationResult res = sut.verify(bprog);
 
-        assertFalse(res.isCounterExampleFound());
+        assertFalse(res.isViolationFound());
         assertEquals(1, res.getScannedStatesCount());
     }
 
@@ -192,8 +193,8 @@ public class DfsBProgramVerifierTest {
         sut.setDebugMode(true);
         VerificationResult res = sut.verify(bprog);
 
-        assertTrue(res.isCounterExampleFound());
-        assertEquals(res.getViolationType(), VerificationResult.ViolationType.Deadlock);
+        assertTrue(res.isViolationFound());
+        assertTrue(res.getViolation().get() instanceof DeadlockViolation);
         assertEquals(10, res.getScannedStatesCount());
     }
 
@@ -218,8 +219,7 @@ public class DfsBProgramVerifierTest {
         sut.setDebugMode(true);
         VerificationResult res = sut.verify(bprog);
 
-        assertFalse(res.isCounterExampleFound());
-        assertEquals(res.getViolationType(), VerificationResult.ViolationType.None);
+        assertFalse(res.isViolationFound());
         assertEquals(10, res.getScannedStatesCount());
         assertEquals(10, res.getEdgesScanned()); //in this case only one option per state
 
@@ -254,8 +254,8 @@ public class DfsBProgramVerifierTest {
         sut.setDebugMode(true);
         VerificationResult res = sut.verify(bprog);
 
-        assertEquals(res.getViolationType(), VerificationResult.ViolationType.FailedAssertion);
-        assertTrue(res.isCounterExampleFound());
+        assertTrue(res.isViolationFound());
+        assertTrue(res.getViolation().get() instanceof FailedAssertionViolation);
         assertEquals(1, res.getScannedStatesCount());
         assertEquals(1, res.getEdgesScanned());
     }

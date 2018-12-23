@@ -2,7 +2,7 @@ package il.ac.bgu.cs.bp.bpjs.examples;
 
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.analysis.eventpattern.EventPattern;
@@ -16,7 +16,7 @@ public class NamedArgsHotNColdTest {
 
     @Test
     public void superStepTest() throws InterruptedException {
-        BProgramRunner sut = new BProgramRunner(new SingleResourceBProgram("NamedArgsHotNCold.js"));
+        BProgramRunner sut = new BProgramRunner(new ResourceBProgram("NamedArgsHotNCold.js"));
         sut.addListener(new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         

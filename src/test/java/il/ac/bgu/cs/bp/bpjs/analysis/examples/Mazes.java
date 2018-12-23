@@ -26,11 +26,12 @@ package il.ac.bgu.cs.bp.bpjs.analysis.examples;
 import il.ac.bgu.cs.bp.bpjs.analysis.BThreadSnapshotVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.analysis.Node;
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsInspections;
 import il.ac.bgu.cs.bp.bpjs.analysis.Requirements;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
@@ -69,7 +70,7 @@ public class Mazes {
     }
 
     public void run() throws InterruptedException {
-        SingleResourceBProgram bprog = prepareProgram();
+        ResourceBProgram bprog = prepareProgram();
         BProgramRunner rnr = new BProgramRunner(bprog);
         rnr.addListener(new PrintBProgramRunnerListener());
         rnr.run();
@@ -78,7 +79,7 @@ public class Mazes {
     }
 
     public void verify() throws InterruptedException {
-        SingleResourceBProgram bprog = prepareProgram();
+        ResourceBProgram bprog = prepareProgram();
         bprog.appendSource( Requirements.eventNotSelected(targetFoundEvent.getName()) );
         
         try {
@@ -89,14 +90,14 @@ public class Mazes {
             vfr.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
 //            vfr.setVisitedNodeStore(new ForgetfulVisitedStateStore());
             
-            vfr.setDetectDeadlocks(false); // prevent from detecting cases where we ust hit a wall.
+            vfr.addInspector(DfsInspections.FailedAssertions); // prevent from detecting cases where we ust hit a wall.
             final VerificationResult res = vfr.verify(bprog);
 
             char[][] maze = getMaze(bprog);
             printMaze(maze);
-            if (res.isCounterExampleFound()) {
+            if (res.isViolationFound()) {
                 System.out.println("Found a counterexample");
-                for (Node nd : res.getCounterExampleTrace()) {
+                for (DfsTraversalNode nd : res.getViolation().get().getCounterExampleTrace()) {
                     System.out.println(" " + nd.getLastEvent());
                     if (nd.getLastEvent() != null) {
                         String name = nd.getLastEvent().getName();
@@ -122,9 +123,9 @@ public class Mazes {
         }
     }
 
-    private SingleResourceBProgram prepareProgram() {
+    private ResourceBProgram prepareProgram() {
         // Create a program
-        final SingleResourceBProgram bprog = new SingleResourceBProgram(implementation);
+        final ResourceBProgram bprog = new ResourceBProgram(implementation);
         bprog.putInGlobalScope("MAZE_NAME", mazeName);
         bprog.putInGlobalScope("TARGET_FOUND_EVENT", targetFoundEvent);
         return bprog;

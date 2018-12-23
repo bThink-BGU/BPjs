@@ -25,7 +25,7 @@ package il.ac.bgu.cs.bp.bpjs.bprogramio;
 
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
-import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
+import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BThreadJsProxy;
@@ -216,7 +216,7 @@ public class BProgramSyncSnapshotIO {
             Scriptable btScope = (Scriptable) bssis.readObject();
             Function entryPoint = (Function) bssis.readObject();
             Function interruptHandler = (Function) bssis.readObject();
-            BSyncStatement stmt = (BSyncStatement) bssis.readObject();
+            SyncStatement stmt = (SyncStatement) bssis.readObject();
             Object cont = bssis.readObject();
             final BThreadSyncSnapshot bThreadSyncSnapshot = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, btScope, cont, stmt);
 

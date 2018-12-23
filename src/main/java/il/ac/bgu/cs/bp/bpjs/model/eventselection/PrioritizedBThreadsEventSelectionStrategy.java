@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.tuple.Pair;
 import org.mozilla.javascript.Context;
 
-import il.ac.bgu.cs.bp.bpjs.model.BSyncStatement;
+import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
@@ -45,7 +45,7 @@ public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSele
     }
     
     @Override
-    public Set<BEvent> selectableEvents(Set<BSyncStatement> statements, List<BEvent> externalEvents) {
+    public Set<BEvent> selectableEvents(Set<SyncStatement> statements, List<BEvent> externalEvents) {
         if ( statements.isEmpty() ) {
             // Corner case, not sure this is even possible.
             return externalEvents.isEmpty() ? emptySet() : singleton(externalEvents.get(0));
@@ -53,7 +53,7 @@ public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSele
         
         final EventSet blocked = ComposableEventSet.anyOf(statements.stream()
                 .filter( stmt -> stmt!=null )
-                .map( BSyncStatement::getBlock )
+                .map(SyncStatement::getBlock )
                 .filter( r -> r != EventSets.none )
                 .collect( toSet() ) );
         
@@ -88,7 +88,7 @@ public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSele
         }
     }
 
-    private Stream<Pair<BEvent, Integer>> eventsToPrioritizedPairs(BSyncStatement stmt) {
+    private Stream<Pair<BEvent, Integer>> eventsToPrioritizedPairs(SyncStatement stmt) {
         final Collection<? extends BEvent> request = stmt.getRequest();
         if ( request.isEmpty() ) return Stream.empty();
         Integer priority = getPriority(stmt.getBthread().getName());

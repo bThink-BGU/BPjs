@@ -3,7 +3,7 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotIO;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-import il.ac.bgu.cs.bp.bpjs.model.SingleResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -45,7 +45,7 @@ public class SnapshotBenchmarks {
         }
 
         static BProgram makeBProgram(String baseFile, Map<String, Object> init_values) {
-            final BProgram bprog = new SingleResourceBProgram(baseFile);
+            final BProgram bprog = new ResourceBProgram(baseFile);
             init_values.forEach(bprog::putInGlobalScope);
             StringBuilder name = new StringBuilder(bprog.getName());
             init_values.forEach((k, v) -> name.append(String.format("_%s_%s", k, v)));
@@ -61,7 +61,7 @@ public class SnapshotBenchmarks {
             BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(program);
             ArrayList<Integer> snapshotSizes = new ArrayList<>();
 
-            Node next = Node.getInitialNode(program, execSvc);
+            DfsTraversalNode next = DfsTraversalNode.getInitialNode(program, execSvc);
 
             //Iteration 1,starts already at request state A
             for (int i = 0; i < num_steps; i++) {
@@ -84,7 +84,7 @@ public class SnapshotBenchmarks {
                     BProgram prog = makeBProgram(programPath, valueMap);
                     return getVerification(vfr, prog);
                 } catch (Exception ex) {
-                    return new VerificationResult(VerificationResult.ViolationType.None, null, null);
+                    return new VerificationResult(null, 1000, 100, 100);
                 }
             }).toArray(VerificationResult[]::new);
 
@@ -259,7 +259,7 @@ public class SnapshotBenchmarks {
                     BProgram prog = makeBProgram(programPath, valueMap,strategy);
                     return getVerification(vfr, prog);
                 } catch (Exception ex) {
-                    return new VerificationResult(VerificationResult.ViolationType.None, null, null);
+                    return new VerificationResult(null, 0, 0, 0);
                 }
             }).toArray(VerificationResult[]::new);
         }

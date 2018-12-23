@@ -39,7 +39,6 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -52,7 +51,7 @@ public class BProgramSyncSnapshotTest {
 
     @Rule
     public final ExpectedException exception = ExpectedException.none();
-    private final List<BProgramRunnerListener> listeners = new ArrayList<>();
+    private final List<BProgramRunnerListener> listeners = Collections.emptyList();
 
     public BProgramSyncSnapshotTest() {
     }
@@ -81,6 +80,23 @@ public class BProgramSyncSnapshotTest {
         stepa.triggerEvent(event_a.getEvent(), execSvcA, listeners);
         exception.expect(IllegalStateException.class);
         stepa.triggerEvent(event_a.getEvent(), execSvcA, listeners);
+    }
+   
+    @Test
+    public void testHotnessDetection() throws InterruptedException {
+        BProgram bprog = new StringBProgram("bp.registerBThread(function(){\n" +
+                "        bp.sync({request:bp.Event(\"A\")});\n" +
+                "        bp.hot(true).sync({request:bp.Event(\"B\")});\n" +
+                "});");
+        BProgramSyncSnapshot setup = bprog.setup();
+        ExecutorService execSvcA = ExecutorServiceMaker.makeWithName("BProgramSnapshotTriggerTest");
+        BProgramSyncSnapshot bpss = setup.start(execSvcA);
+        assertFalse(bpss.isHot());
+        Set<BEvent> possibleEvents_a = bprog.getEventSelectionStrategy().selectableEvents(bpss.getStatements(), bpss.getExternalEvents());
+        EventSelectionResult event_a = bprog.getEventSelectionStrategy().select(bpss.getStatements(), bpss.getExternalEvents(), possibleEvents_a).get();
+        bpss = bpss.triggerEvent(event_a.getEvent(), execSvcA, listeners);
+        assertTrue(bpss.isHot());
+        
     }
 
     /*
@@ -148,7 +164,6 @@ public class BProgramSyncSnapshotTest {
      */
     @Test
     public void testEqualsSingleStepAssert() throws InterruptedException {
-        List<BProgramRunnerListener> listeners = Collections.emptyList();
         BProgram bprog1 = new StringBProgram("bp.registerBThread(function(){\n" +
                 "        bp.sync({request:bp.Event(\"A\")});\n" +
                 "        bp.sync({request:bp.Event(\"B\")});\n" +

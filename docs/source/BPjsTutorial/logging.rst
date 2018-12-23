@@ -38,8 +38,8 @@ The "event generator" creates four events, one for each logging level. The "even
 
 
 
-.. caution :: Later versions might integrate BPjs with a full-blown logging system, such as `logback`_ or `log4j2`_. Programs relying on the exact logging format may need to change once the logging is updated. If you need to write a program that relies on accurate interpretation a b-program life cycle and selected events, consider implementing a `BProgramListener`_.
+.. caution :: Later versions might integrate BPjs with a full-blown logging system, such as `logback`_ or `log4j2`_. Programs relying on the exact logging format may need to change once the logging is updated. If you need to write a program that relies on accurate interpretation a b-program life cycle and selected events, consider implementing a `BProgramRunnerListener`_.
 
 .. _logback: https://logback.qos.ch
 .. _log4j2: http://logging.apache.org/log4j/2.x/index.html
-.. _BProgramListener: javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/bprogram/runtimeengine/listeners/BProgramListener.html
+.. _BProgramRunnerListener: http://javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/execution/listeners/BProgramRunnerListener.html

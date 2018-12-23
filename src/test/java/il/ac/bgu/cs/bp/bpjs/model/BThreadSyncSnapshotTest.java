@@ -49,7 +49,7 @@ public class BThreadSyncSnapshotTest {
     @Test
 //    @Ignore("Shared state exists between different snapshots")
     public void testJSVarState() throws InterruptedException {
-        BProgram bprog = new SingleResourceBProgram("SnapshotTests/ABCDTrace.js");
+        BProgram bprog = new ResourceBProgram("SnapshotTests/ABCDTrace.js");
         BProgramSyncSnapshot setup = bprog.setup();
 
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("BProgramSnapshotEqualityTest");

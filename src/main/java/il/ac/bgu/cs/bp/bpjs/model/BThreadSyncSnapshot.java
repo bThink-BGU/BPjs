@@ -57,7 +57,7 @@ public class BThreadSyncSnapshot implements Serializable {
     /**
      * BSync statement of the BThread at the time of the snapshot.
      */
-    private BSyncStatement bSyncStatement;
+    private SyncStatement bSyncStatement;
     
     private transient ContinuationProgramState programState;
 
@@ -78,7 +78,7 @@ public class BThreadSyncSnapshot implements Serializable {
      * @param bSyncStatement
      */
     public BThreadSyncSnapshot(String name, Function entryPoint, Function interruptHandler, Scriptable scope,
-            Object continuation, BSyncStatement bSyncStatement) {
+            Object continuation, SyncStatement bSyncStatement) {
         this.name = name;
         this.entryPoint = entryPoint;
         this.interruptHandler = interruptHandler;
@@ -94,7 +94,7 @@ public class BThreadSyncSnapshot implements Serializable {
      * @param aStatement The BThread's statement for the next sync.
      * @return a copy of {@code this} with updated continuation and statement.
      */
-    public BThreadSyncSnapshot copyWith(Object aContinuation, BSyncStatement aStatement) {
+    public BThreadSyncSnapshot copyWith(Object aContinuation, SyncStatement aStatement) {
         BThreadSyncSnapshot retVal = new BThreadSyncSnapshot(name, entryPoint);
         retVal.continuation = aContinuation;
         retVal.setInterruptHandler(interruptHandler);
@@ -136,11 +136,11 @@ public class BThreadSyncSnapshot implements Serializable {
         
     }
 
-    public BSyncStatement getBSyncStatement() {
+    public SyncStatement getBSyncStatement() {
         return bSyncStatement;
     }
 
-    public void setBSyncStatement(BSyncStatement stmt) {
+    public void setBSyncStatement(SyncStatement stmt) {
         bSyncStatement = stmt;
         if (bSyncStatement.getBthread() != this) {
             bSyncStatement.setBthread(this);
@@ -161,7 +161,7 @@ public class BThreadSyncSnapshot implements Serializable {
 
     @Override
     public String toString() {
-        return "[BThreadSyncSnapshot: " + name + "]";
+        return "[BThreadSyncSnapshot: " + name + " @" + hashCode() + "]";
     }
 
     public Optional<Function> getInterrupt() {
@@ -193,7 +193,7 @@ public class BThreadSyncSnapshot implements Serializable {
         int result = 1;
         result = prime * result + Objects.hashCode(name.hashCode());
         if (continuation != null) {
-            result += getContinuationProgramState().hashCode();
+            result ^= getContinuationProgramState().hashCode();
         }
         return result;
     }

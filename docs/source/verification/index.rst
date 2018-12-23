@@ -2,12 +2,46 @@
 Verification
 ===============
 
-BPjs programs can be verified for conforming to a set of formal requirements. For example, it is possible to verify a b-program cannot get to a deadlock, or that a certain event is never selected. If, during verification, the verifier finds an example for violating the requirement being verified, it returns the trace of events that lead to the illegal situation. BPjs models are directly verified, meaning there's no model transformation involved.
+BPjs programs can be verified for conforming to a set of formal requirements. It is possible to verify both `safety`_ and `liveness`_ properties. As a safety example, BPjs can be used to verify that a b-program will never end up in a deadlock, or that a certain event could never be selected. As for liveness, BPjs can be used to verify that a certain event will happen eventually.
 
-BPjs models are verified using assertions. During execution, b-threads may call ``bp.ASSERT(cond, message)``. If ``cond`` evaluates to ``false``, the b-program is considered in violation of its requirements. Assertions can be used in runtime, but that's not their main goal. They are also used during traversal of the b-program (possibly infinite) state space.
+During the verification process, BPjs traverses a b-program's state-space using a depth-first algorithm (the depth can have an upper bound). Whenever it encounters a new state, it checks whether the new state, or the trace leading to it, violates a specification. Whenever it discovers a new cycle, it checks the cycle for violations.
 
-.. tip:: ``message`` is an optional parameter explaining, in human-readable, terms what went wrong.
+Verification is done directly on the JavaScript code. There is no model transformation involved.
 
+Verifying Safety Properties
+---------------------------
+
+BPjs models are verified for most safety properties using assertions. During execution, b-threads may call ``bp.ASSERT(cond, message)``. If ``cond`` evaluates to ``false``, the b-program is considered in violation of its requirements. This mechanism allows intuitive verification of requirements such as *while flying, the doors can't be opened*::
+
+  bp.registerBThread(function(){
+    while ( true ) {
+      bp.sync({waitFor:FLYING});
+      bp.sync({waitFor:DOOR_OPENED, interrupt:LANDED});
+      bp.ASSERT(false, "Can't open the doors when flying")"
+    }
+  });
+
+Assertions can be used with any boolean expression. They can be used at runtime too, where a false assertion causes a b-program to terminate.
+
+An interesting corner case for safety properties is deadlock detection. When in deadlock, none of the b-threads can advance. In particular, when a b-program is deadlocked, none of its b-threads can invoke a false assertion. Thus, deadlocks are detected using a specific inspector, and not using a b-thread.
+
+.. tip:: ``message`` is an optional parameter explaining, in human-readable terms, what went wrong.
+
+Verifying Liveness Properties
+-----------------------------
+
+Liveness properties require that "something good will happen eventually". In order to specify this, BPjs borrows the concept of "hot" locations from its ancestor, `Live Sequence Charts`_ (LSC). A b-thread can declare a ``sync`` as "hot", which means that it must eventually advance beyond it. For example, a requirement such as *any request must receive a response*, can be verified using the following b-thread::
+
+  bp.registerBThread(function(){
+    while ( true ) {
+      var req = bp.sync({waitFor:ANY_REQUEST});
+      bp.hot(true).sync({waitFor:responseFor(req)});
+    }
+  });
+
+The first ``bp.sync`` is a non-hot ("cold") sync, which means the writer of the b-thread is fine with that b-thread being stuck there forever (for example, if requests stop arriving). The second sync, on the other hand, is marked as hot (by calling ``bp.hot(true)`` before calling ``sync``). This means that the writer of the b-thread does not allow the b-thread to be stuck there forever; eventually, a response to the received request must be sent. During verification, if the verifier finds a trace where this b-thread does not advance beyond the second sync (either because of a loop or because the program terminates), it will report that trace as a violation.
+
+Liveness violations can span more than a single hot sync. In fact, when a b-thread can get into an infinite loop where all its sync points are hot, that loop is considered to be violating a liveness property.
 
 DFS over B-Program States
 =========================
@@ -33,8 +67,7 @@ The verifier performs a DFS (depth-first search) on the state space. This is of 
 
 A more in-depth discussion of verification in BPjs, including some techniques, can be found in the `BPjs paper`_ at arXiv.
 
-.. note:: Currently, only safety requirements are supported. Liveness requirements support is under active development.
-
+.. note:: It is possible to select which inspections are preformed during verification. A ``DfsBProgramVerifier`` holds a set of inspectors, which can be added to by calling its ``addInspector`` methods. If no inspectors are added, a default set will be used.
 
 From the Command Line
 ~~~~~~~~~~~~~~~~~~~~~
@@ -55,3 +88,6 @@ During normal execution (i.e. by a ``BProgramRunner``), failed assertion cause p
 
 
 .. _BPjs paper: https://export.arxiv.org/abs/1806.00842
+.. _safety: https://en.wikipedia.org/wiki/Safety_property
+.. _liveness: https://en.wikipedia.org/wiki/Liveness
+.. _Live Sequence Charts: http://wiki.weizmann.ac.il/playgo/index.php/Live_sequence_charts
