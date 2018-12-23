@@ -99,7 +99,7 @@ public class BProgramSyncSnapshot {
      * 
      * @param exSvc the executor service that will advance the threads.
      * @return A snapshot of the program at the first {@code bsync}.
-     * @throws java.lang.InterruptedException
+     * @throws java.lang.InterruptedException (since it's a blocking call)
      */
     public BProgramSyncSnapshot start( ExecutorService exSvc ) throws InterruptedException {
         Set<BThreadSyncSnapshot> nextRound = new HashSet<>(threadSnapshots.size());
@@ -120,9 +120,9 @@ public class BProgramSyncSnapshot {
      * Runs the program from the snapshot, triggering the passed event.
      * @param exSvc the executor service that will advance the threads.
      * @param anEvent the event selected.
-     * @param listeners 
+     * @param listeners will be informed in case of b-thread interrupts
      * @return A set of b-thread snapshots that should participate in the next cycle.
-     * @throws InterruptedException 
+     * @throws InterruptedException (since it's a blocking call)
      */
     public BProgramSyncSnapshot triggerEvent(BEvent anEvent, ExecutorService exSvc, Iterable<BProgramRunnerListener> listeners) throws InterruptedException {
         if (anEvent == null) throw new IllegalArgumentException("Cannot trigger a null event.");

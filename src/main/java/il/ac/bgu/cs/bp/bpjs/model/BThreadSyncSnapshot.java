@@ -70,12 +70,12 @@ public class BThreadSyncSnapshot implements Serializable {
      * Fully detailed constructor. Mostly useful for getting objects out of
      * serialized forms.
      *
-     * @param name
-     * @param entryPoint
-     * @param interruptHandler
-     * @param scope
-     * @param continuation
-     * @param bSyncStatement
+     * @param name              name of the b-thread
+     * @param entryPoint        function where the b-thread starts
+     * @param interruptHandler  function to handle interrupts (or {@code null}, mostly)
+     * @param scope             default top-level scope for the b-thread
+     * @param continuation      captured b-thread continuation
+     * @param bSyncStatement    current statement of the b-thread
      */
     public BThreadSyncSnapshot(String name, Function entryPoint, Function interruptHandler, Scriptable scope,
             Object continuation, SyncStatement bSyncStatement) {

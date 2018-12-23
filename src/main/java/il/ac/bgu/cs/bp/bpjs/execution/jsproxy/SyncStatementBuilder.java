@@ -23,13 +23,14 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 
+import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import org.mozilla.javascript.NativeObject;
 
 /**
  * A base class for gradually building {@link SyncStatement}s.
  * 
  * Implementation detail: We're using abstract class rather than interface, to 
- * allow for the {@link #synchronizationPoint(org.mozilla.javascript.NativeObject, boolean, java.lang.Object)}
+ * allow for the {@link #synchronizationPoint(org.mozilla.javascript.NativeObject, Boolean, java.lang.Object)}
  * method to be package-private.
  * 
  * @author michael

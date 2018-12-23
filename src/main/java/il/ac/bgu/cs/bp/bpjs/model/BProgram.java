@@ -34,7 +34,7 @@ import org.mozilla.javascript.WrappedException;
  * {@link #setupProgramScope(org.mozilla.javascript.Scriptable)} method.
  *
  * For creating a BProgram that uses a single JavaScript file available in the
- * classpath, see {@link SingleResourceBProgram}. For creating them from a
+ * classpath, see {@link ResourceBProgram}. For creating them from a
  * hard-coded string, see {@link StringBProgram}.
  *
  * @author michael
@@ -140,7 +140,7 @@ public abstract class BProgram {
      *
      * @throws IllegalStateException if the code is appended after the bprogram
      * started.
-     * @param source
+     * @param source JavaScript source to be added at the end of the current source.
      */
     public void appendSource(String source) {
         if (started) {
@@ -161,7 +161,7 @@ public abstract class BProgram {
      *
      * @throws IllegalStateException if the code is appended after the bprogram
      * started.
-     * @param source
+     * @param source JavaScript source to be added at the beginning of the current source.
      */
     public void prependSource(String source) {
         if (started) {
@@ -344,7 +344,7 @@ public abstract class BProgram {
      *
      * @return The event, or {@code null} in case the daemon mode is turned off
      * during the wait.
-     * @throws InterruptedException
+     * @throws InterruptedException (blocking call, we have to do this)
      */
     public BEvent takeExternalEvent() throws InterruptedException {
         BEvent next = recentlyEnqueuedExternalEvents.take();
@@ -363,7 +363,7 @@ public abstract class BProgram {
      * When set to {@code false}, when no events are available for selection,
      * the program terminates.
      *
-     * @param shouldWait
+     * @param shouldWait {@code true} causes the system to wait for external events. {@code false} causes it to not wait.
      */
     public void setWaitForExternalEvents(boolean shouldWait) {
         if (waitForExternalEvents && !shouldWait) {

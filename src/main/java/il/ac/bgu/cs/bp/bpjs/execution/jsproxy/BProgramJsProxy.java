@@ -134,7 +134,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
      * 
      * @param value The value of the assertion. When {@code false}, the program is declared in invalid state.
      * @param message Textual information about what caused the violation.
-     * @throws FailedAssertionException 
+     * @throws FailedAssertionException if {@code value} is false.
      */
     public void ASSERT( boolean value, String message ) throws FailedAssertionException {
         if ( ! value ) {

@@ -50,6 +50,7 @@ a link to this page somewhere in the documentation/system about section.
                a `SingleResourceBProgram` in the constructor, as the argument for the name is now interpreted as a resource name. You can use `setName` to set the program name later.
 * :sparkles: Automatic event names include the name of the class and an index number.
 * :bug: Fixed broken links in the documentation.
+* :arrow_up: Improved Javadocs.
 
 ### 2018-12-19
 * :sparkles: There are two different hot cycle violation inspections: one inspects a hot loop at the b-thread level (default), and the other at the whole b-program level.

@@ -23,12 +23,12 @@ import java.util.concurrent.ExecutorService;
 public class DfsTraversalNode {
 
     /**
-     * Get the initial nod ofr a run of the passed {@code BPorgram}.
+     * Get the initial nod for a run of the passed {@code BPorgram}.
      *
      * @param bp The {@link BProgram} being verified.
      * @param exSvc The executor service that will run the threads
      * @return Initial node for the BProgram run
-     * @throws Exception
+     * @throws Exception in case there's an error with the executed JavaScript code.
      */
     public static DfsTraversalNode getInitialNode(BProgram bp, ExecutorService exSvc) throws Exception {
         BProgramSyncSnapshot seed = bp.setup().start(exSvc);
@@ -78,11 +78,11 @@ public class DfsTraversalNode {
      * Get a Node object for each possible state of the system after triggering
      * the given event.
      *
-     * @param e
+     * @param e the selected event
      * @param exSvc The executor service that will run the threads
      * @return State of the BProgram after event {@code e} was selected while
      * the program was at {@code this} node's state.
-     * @throws InterruptedException
+     * @throws Exception  In case there's an error running the JavaScript code.
      */
     public DfsTraversalNode getNextNode(BEvent e, ExecutorService exSvc) throws Exception {
         return new DfsTraversalNode(bp, BProgramSyncSnapshotCloner.clone(systemState).triggerEvent(e, exSvc, Collections.emptySet()), e);

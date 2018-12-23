@@ -31,7 +31,20 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
 public class Requirements {
    
     /**
-     * A requirement that detects deadlocks (as in, no selectable events).
+     * Creates a b-thread that causes a false assertion when an event with a
+     * given name is selected.
+     * 
+     * Sample usage, adding a requirement that a {@code BEvent("crash")} is
+     * never selected: 
+     * <code>
+     * 
+     * BProgram bprog = ...
+     * bprog.appendSource( Requirements.eventNotSelected("crash") );
+     * 
+     * </code>
+     * 
+     * @param eventName The name of the selected event.
+     * @return Source code for the b-thread.
      */
     public static final String eventNotSelected( String eventName ) {
         return "bp.registerBThread('eventNotSelected-" + eventName + "', function(){ "
