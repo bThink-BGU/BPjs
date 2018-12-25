@@ -46,5 +46,19 @@ public class PrioritizedBSyncEventSelectionStrategyTest {
 		assertEquals(new HashSet<>(Arrays.asList(evt3)), 
 				sut.selectableEvents(stmts, Collections.emptyList()));
 	}
+    
+    @Test
+	public void testSelectableEvents_allBlocked() {
+		PrioritizedBSyncEventSelectionStrategy sut = new PrioritizedBSyncEventSelectionStrategy();
+
+		Set<SyncStatement> stmts = new HashSet<>();
+		stmts.add(SyncStatement.make().request(Arrays.asList(evt4)).block(evt1));
+		stmts.add(SyncStatement.make().request(Arrays.asList(evt1)).data(5).block(evt2));
+		stmts.add(SyncStatement.make().request(Arrays.asList(evt2)).data(1).block(evt3));
+		stmts.add(SyncStatement.make().request(Arrays.asList(evt3)).data(10).block(evt4));
+
+		assertEquals(Collections.emptySet(), 
+				sut.selectableEvents(stmts, Collections.emptyList()));
+	}
 
 }

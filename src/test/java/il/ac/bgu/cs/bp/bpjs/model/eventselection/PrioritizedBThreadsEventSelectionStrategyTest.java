@@ -67,6 +67,20 @@ public class PrioritizedBThreadsEventSelectionStrategyTest {
 	}
 	
     @Test	
+	public void testSelectableEvents_allBlocked() {
+		Set<SyncStatement> stmts = new HashSet<>();
+        
+        stmts.add(SyncStatement.make(bt("1")).request(Arrays.asList(EVT_1)).block(EVT_2));
+		stmts.add(SyncStatement.make(bt("2")).request(Arrays.asList(EVT_2)).block(EVT_3));
+		stmts.add(SyncStatement.make(bt("3")).request(Arrays.asList(EVT_3)).block(EVT_1));
+		
+        
+        assertEquals( Collections.emptySet(),
+				      sut.selectableEvents(stmts, Collections.emptyList()));
+	}
+	
+    
+    @Test	
 	public void testSelectableEvents_withBlocking_double() {
 		Set<SyncStatement> stmts = new HashSet<>();
         

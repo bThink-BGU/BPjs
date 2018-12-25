@@ -19,6 +19,7 @@ import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.stream.Stream;
 
@@ -69,6 +70,10 @@ public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSele
             Set<Pair<BEvent,Integer>> requestedAndNotBlockedWithPriorities = requested.stream()
                     .filter( req -> !blocked.contains(req.getLeft()) )
                     .collect( toSet() );
+            
+            if ( requestedAndNotBlockedWithPriorities.isEmpty() ) {
+                return Collections.emptySet();
+            }
             
             Integer highestPriority = requestedAndNotBlockedWithPriorities.stream()
                 .map(p -> p.getRight())
