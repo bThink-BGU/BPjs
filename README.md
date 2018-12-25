@@ -44,6 +44,8 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+* :sparkles: Removed dependencies (closes #69)
+
 ### 2018-12-23
 * :put_litter_in_its_place: `BProgram` cannot evaluate resources anymore. This change also removes this ability from running JavaScript b-program. It made no sense anyway, and was not used.
 * :sparkles: `SingleResourceBProgram` can now accept multiple resources, and was thus renamed to `ResourceBProgram` (#60). (NOTE: this change breaks program that gave explicit names to

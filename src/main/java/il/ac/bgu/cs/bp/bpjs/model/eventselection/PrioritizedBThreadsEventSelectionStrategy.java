@@ -1,5 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
+import il.ac.bgu.cs.bp.bpjs.internal.Pair;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toSet;
@@ -10,7 +11,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.mozilla.javascript.Context;
 
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
