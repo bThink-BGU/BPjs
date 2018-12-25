@@ -72,5 +72,11 @@ public class FailedAssertion implements java.io.Serializable {
         }
         return Objects.equals(this.bThreadName, other.bThreadName);
     }
+
+    @Override
+    public String toString() {
+        return "[FailedAssertion message:" + message + ", b-thread:" + bThreadName + ']';
+    }
+    
     
 }

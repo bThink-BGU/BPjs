@@ -25,6 +25,7 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.DeadlockViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.FailedAssertionViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import il.ac.bgu.cs.bp.bpjs.model.*;
 
 import static org.junit.Assert.assertEquals;
@@ -67,6 +68,7 @@ public class VerificationResultOptionsTest {
 
         assertTrue(res.isViolationFound());
         assertTrue(res.getViolation().get() instanceof DeadlockViolation);
+        assertTrue(res.getViolation().get().decsribe().contains("Deadlock"));
     }
 
     @Test
@@ -85,6 +87,11 @@ public class VerificationResultOptionsTest {
         
         FailedAssertion expectedAssert = new FailedAssertion("B happened", "assertor");
         assertEquals(expectedAssert, ((FailedAssertionViolation)res.getViolation().get()).getFailedAssertion());
+        
+        Violation violation = res.getViolation().get();
+        assertTrue(violation.decsribe().contains("B happened"));
+        assertTrue(violation.toString().contains("FailedAssertion"));
+        assertTrue(violation.toString().contains("B happened"));
     }
 
     @Test
