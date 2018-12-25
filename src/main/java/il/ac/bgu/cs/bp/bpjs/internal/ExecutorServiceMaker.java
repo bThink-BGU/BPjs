@@ -44,7 +44,7 @@ public abstract class ExecutorServiceMaker {
             retVal.setName(threadNameTemplate + "#" + threadCoutner.incrementAndGet() );
             return retVal;
         };
-        return Executors.newCachedThreadPool(tf);
+        return Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), tf);
     }
     
     private ExecutorServiceMaker(){

@@ -33,7 +33,6 @@ package il.ac.bgu.cs.bp.bpjs.bprogramio;
 public class StreamObjectStub implements java.io.Serializable {
     
     public static final StreamObjectStub BP_PROXY = new StreamObjectStub("bp-proxy");
-    public static final StreamObjectStub BT_PROXY = new StreamObjectStub("bt-proxy");
     
     private final String name;
 
@@ -61,7 +60,6 @@ public class StreamObjectStub implements java.io.Serializable {
     
     private Object readResolve() {
         if ( name.equals(BP_PROXY.name) ) return BP_PROXY;
-        if ( name.equals(BT_PROXY.name) ) return BT_PROXY;
         return this;
     }
     

@@ -293,10 +293,12 @@ public abstract class BProgram {
             // evaluate code in order
             if (prependedCode != null) {
                 prependedCode.forEach(s -> evaluate(s, "prependedCode"));
+                prependedCode = null;
             }
             setupProgramScope(programScope);
             if (appendedCode != null) {
                 appendedCode.forEach(s -> evaluate(s, "appendedCode"));
+                appendedCode = null;
             }
 
             // setup registered b-threads

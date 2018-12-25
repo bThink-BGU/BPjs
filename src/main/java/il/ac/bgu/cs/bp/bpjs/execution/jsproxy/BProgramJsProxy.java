@@ -45,6 +45,16 @@ import org.mozilla.javascript.NativeObject;
 public class BProgramJsProxy extends SyncStatementBuilder
                              implements java.io.Serializable {
     
+    private static final ThreadLocal<BThreadSyncSnapshot> CURRENT_BTHREAD = new ThreadLocal<>();
+    
+    
+    public static void setCurrentBThread( BThreadSyncSnapshot bss ) {
+        CURRENT_BTHREAD.set(bss);
+    }
+    
+    public static void clearCurrentBThread(){
+        CURRENT_BTHREAD.remove();
+    }
     
     private final BProgram program;
     
@@ -149,6 +159,11 @@ public class BProgramJsProxy extends SyncStatementBuilder
         throw capturedContinuation;
     }
     
+    
+    public void setInterruptHandler( Object aPossibleHandler ) {
+        CURRENT_BTHREAD.get().setInterruptHandler(
+                (aPossibleHandler instanceof Function) ? (Function) aPossibleHandler: null );
+    }
     
     ////////////////////////
     // sync ("bsync") related code

@@ -2,7 +2,7 @@
 
 bp.registerBThread("interrupted", function () {
     var testValue = "internalValue";
-    setInterruptHandler( function(evt){
+    bp.setInterruptHandler( function(evt){
        bp.enqueueExternalEvent(evt); 
        bp.enqueueExternalEvent(bp.Event(testValue)); 
     });

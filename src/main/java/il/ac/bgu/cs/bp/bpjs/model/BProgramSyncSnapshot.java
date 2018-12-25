@@ -6,7 +6,6 @@ import il.ac.bgu.cs.bp.bpjs.bprogramio.StreamObjectStub;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.StubProvider;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
-import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BThreadJsProxy;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.ResumeBThread;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.StartBThread;
 
@@ -60,18 +59,20 @@ public class BProgramSyncSnapshot {
      * A listener that populates the {@link #violationRecord} field, and 
      * shuts down the {@link ExecutorService} running the tasks.
      */
-    private class HaltOnAssertion implements BPEngineTask.Listener {
+    private static class HaltOnAssertion implements BPEngineTask.Listener {
         private final ExecutorService exSvc;
         private final BProgram bprogram;
+        private final AtomicReference<FailedAssertion> vioRec;
 
-        public HaltOnAssertion(ExecutorService exSvc, BProgram bprogram) {
+        public HaltOnAssertion(ExecutorService exSvc, BProgram bprogram, AtomicReference<FailedAssertion> aViolationRecord) {
             this.exSvc = exSvc;
             this.bprogram = bprogram;
+            vioRec = aViolationRecord;
         }
         
         @Override
         public void assertionFailed(FailedAssertion fa) {
-            violationRecord.compareAndSet(null, fa);
+            vioRec.compareAndSet(null, fa);
             exSvc.shutdownNow();
         }
 
@@ -103,13 +104,12 @@ public class BProgramSyncSnapshot {
      */
     public BProgramSyncSnapshot start( ExecutorService exSvc ) throws InterruptedException {
         Set<BThreadSyncSnapshot> nextRound = new HashSet<>(threadSnapshots.size());
-        BPEngineTask.Listener halter = new HaltOnAssertion(exSvc, bprog);
+        BPEngineTask.Listener halter = new HaltOnAssertion(exSvc, bprog, violationRecord);
         nextRound.addAll(exSvc.invokeAll(threadSnapshots.stream()
                                 .map(bt -> new StartBThread(bt, halter))
                                 .collect(toList())
                 ).stream().map(f -> safeGet(f) ).collect(toList())
         );
-        // FIXME test for assertion failures
         executeAllAddedBThreads(nextRound, exSvc, halter);
         List<BEvent> nextExternalEvents = new ArrayList<>(getExternalEvents());
         nextExternalEvents.addAll( bprog.drainEnqueuedExternalEvents() );
@@ -148,7 +148,7 @@ public class BProgramSyncSnapshot {
             Context.exit();
         }
         
-        BPEngineTask.Listener halter = new HaltOnAssertion(exSvc, bprog);
+        BPEngineTask.Listener halter = new HaltOnAssertion(exSvc, bprog, violationRecord);
         
         try {
             // add the run results of all those who advance this stage
@@ -195,7 +195,7 @@ public class BProgramSyncSnapshot {
                             try {
                                 ctxt.callFunctionWithContinuations(func, scope, new Object[]{anEvent});
                             } catch ( ContinuationPending ise ) {
-                                throw new BPjsRuntimeException("Cannot call bsync from a break-upon handler. Please consider pushing an external event.");
+                                throw new BPjsRuntimeException("Cannot call bsync or fork from a break-upon handler. Please consider pushing an external event.");
                             }
                         });
             });
@@ -298,15 +298,11 @@ public class BProgramSyncSnapshot {
         
         // read continuation
         Object cont=null;
-        final BThreadJsProxy btProxy = new BThreadJsProxy();
         final BProgramJsProxy bpProxy = new BProgramJsProxy(bprog);
 
         StubProvider stubPrv = (StreamObjectStub stub) -> {
             if (stub == StreamObjectStub.BP_PROXY) {
                 return bpProxy;
-            }
-            if (stub == StreamObjectStub.BT_PROXY) {
-                return btProxy;
             }
             throw new IllegalArgumentException("Unknown stub " + stub);
         };
@@ -328,7 +324,6 @@ public class BProgramSyncSnapshot {
             cont,
             null
         );
-        btProxy.setBThread(btss);
         
         // duplicate snapshot and register the copy with the b-program
         try {

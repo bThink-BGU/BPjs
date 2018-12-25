@@ -28,7 +28,6 @@ import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
-import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BThreadJsProxy;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
 import java.io.ByteArrayInputStream;
@@ -198,15 +197,11 @@ public class BProgramSyncSnapshotIO {
         String name = (String) sis.readObject();
         byte[] contBytes = (byte[]) sis.readObject();
 
-        final BThreadJsProxy btProxy = new BThreadJsProxy();
         final BProgramJsProxy bpProxy = new BProgramJsProxy(bprogram);
 
         StubProvider stubPrv = (StreamObjectStub stub) -> {
             if (stub == StreamObjectStub.BP_PROXY) {
                 return bpProxy;
-            }
-            if (stub == StreamObjectStub.BT_PROXY) {
-                return btProxy;
             }
             throw new IllegalArgumentException("Unknown stub " + stub);
         };
@@ -220,7 +215,6 @@ public class BProgramSyncSnapshotIO {
             Object cont = bssis.readObject();
             final BThreadSyncSnapshot bThreadSyncSnapshot = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, btScope, cont, stmt);
 
-            btProxy.setBThread(bThreadSyncSnapshot);
             return bThreadSyncSnapshot;
         }
 

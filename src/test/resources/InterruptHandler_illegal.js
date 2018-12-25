@@ -1,7 +1,7 @@
 /* global bp */
 
 bp.registerBThread(function () {
-    setInterruptHandler( function(evt){
+    bp.setInterruptHandler( function(evt){
        bp.sync({interrupt:bp.Event("boom")}); // Blows up, can't call bp.sync here.
     });
     bp.sync({interrupt:bp.Event("boom")});

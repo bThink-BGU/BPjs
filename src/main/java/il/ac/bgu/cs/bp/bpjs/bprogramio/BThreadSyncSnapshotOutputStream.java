@@ -23,9 +23,8 @@
  */
 package il.ac.bgu.cs.bp.bpjs.bprogramio;
 
-import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
-import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BThreadJsProxy;
+import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -50,11 +49,7 @@ public class BThreadSyncSnapshotOutputStream extends ScriptableOutputStream {
 
     @Override
     protected Object replaceObject(Object obj) throws IOException {
-        if ( obj instanceof BThreadJsProxy ) {
-            stubs.add(StreamObjectStub.BT_PROXY);
-            return StreamObjectStub.BT_PROXY;
-            
-        } else if ( obj instanceof BProgramJsProxy ) {
+        if ( obj instanceof BProgramJsProxy ) {
             stubs.add(StreamObjectStub.BP_PROXY);
             return StreamObjectStub.BP_PROXY;
             

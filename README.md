@@ -47,6 +47,9 @@ a link to this page somewhere in the documentation/system about section.
 * :sparkles: Removed dependencies (closes #69)
 * :bug:      fixed a crash in `PrioritizedBThreadsEventSelectionStrategy` when all the events were blocked (#70).
 * :sparkles: more tests
+* :sparkles: Cleanups
+* :arrows_counterclockwise: Using a fixed thread pool, rather than a cached one (so preventing cases where too many threads from running at once).
+* :put_litter_in_its_place: Setting interrupt handlers, the last BPjs task that was not under `bp` object, is now a `bp` method. So `setInterruptHandler` is now `bp.setInterruptHandler`.
 
 ### 2018-12-23
 * :put_litter_in_its_place: `BProgram` cannot evaluate resources anymore. This change also removes this ability from running JavaScript b-program. It made no sense anyway, and was not used.

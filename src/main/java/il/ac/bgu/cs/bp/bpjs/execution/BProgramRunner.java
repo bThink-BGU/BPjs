@@ -79,11 +79,10 @@ public class BProgramRunner implements Runnable {
             cur.getBThreadSnapshots().forEach(sn->listeners.forEach( l -> l.bthreadAdded(bprog, sn)) );
 
             // start it
-            listeners.forEach(l -> l.started(bprog));
-            cur = cur.start(execSvc);
-
             go.set(true);
             halted = false;
+            listeners.forEach(l -> l.started(bprog));
+            cur = cur.start(execSvc);
 
             if ( ! cur.isStateValid() ) {
                 failedAssertion = cur.getFailedAssertion();
@@ -93,11 +92,11 @@ public class BProgramRunner implements Runnable {
 
             // while snapshot not empty, select an event and get the next snapshot.
             while ( (!cur.noBThreadsLeft()) && go.get() ) {
-
+                                
                 // see which events are selectable
                 Set<BEvent> possibleEvents = bprog.getEventSelectionStrategy().selectableEvents(cur.getStatements(), cur.getExternalEvents());
                 if ( possibleEvents.isEmpty() ) {
-                    // Superstep done: No events available or selection.
+                    // Superstep done: No events available for selection.
                     
                     if ( bprog.isWaitForExternalEvents() ) {
                         listeners.forEach( l->l.superstepDone(bprog) );

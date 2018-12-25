@@ -1,6 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BThreadSyncSnapshotOutputStream;
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import java.util.concurrent.Callable;
@@ -48,6 +49,7 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
 
         Context jsContext = Context.enter();
         try {            
+            BProgramJsProxy.setCurrentBThread(bss);
             return callImpl( jsContext );
 
         } catch (ContinuationPending cbs) {
@@ -67,6 +69,7 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
             if (Context.getCurrentContext() != null) {
                 Context.exit();
             }
+            BProgramJsProxy.clearCurrentBThread();
         }
         
     }
@@ -84,7 +87,6 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
         
         if ( capturedStatement instanceof SyncStatement ) {
             final SyncStatement syncStatement = (SyncStatement) cbs.getApplicationState();
-            syncStatement.setBthread(bss);
             return bss.copyWith(cbs.getContinuation(), syncStatement);
             
         } else if ( capturedStatement instanceof ForkStatement ) {
@@ -105,21 +107,20 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
             }
             
             listener.addFork(forkStmt);
-            return continueParentOfFork(forkStmt, cbs, jsContext);
+            return continueParentOfFork(cbs, jsContext);
             
         } else {
             throw new IllegalStateException("Captured a statement of an unknown type: " + capturedStatement);
         }
     }
     
-    private BThreadSyncSnapshot continueParentOfFork( ForkStatement forkStmt, ContinuationPending cbs, Context jsContext){
+    private BThreadSyncSnapshot continueParentOfFork( ContinuationPending cbs, Context jsContext){
         try {
-            System.out.println("Fork: " + forkStmt);
             jsContext.resumeContinuation(cbs.getContinuation(), 
                 (Scriptable)cbs.getContinuation(), Undefined.instance);
             return null;
             
-        } catch (ContinuationPending cbs2) {
+        } catch ( ContinuationPending cbs2 ) {
             return handleContinuationPending(cbs2, jsContext);
            
         } catch ( WrappedException wfae ) {
