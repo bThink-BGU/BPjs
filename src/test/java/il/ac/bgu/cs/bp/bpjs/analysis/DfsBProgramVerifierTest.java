@@ -225,8 +225,8 @@ public class DfsBProgramVerifierTest {
 
     }
 
-    @Test(timeout = 3000)
-    public void tesJavaVariablesInBT() throws Exception {
+    @Test(timeout = 6000)
+    public void testJavaVariablesInBT() throws Exception {
         BProgram bprog = new StringBProgram( //
                 "bp.registerBThread('bt1', function(){" + //
                         "    while(true) \n" + //
