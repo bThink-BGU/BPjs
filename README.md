@@ -42,7 +42,7 @@ a link to this page somewhere in the documentation/system about section.
 * [Tutorial and Reference](http://bpjs.readthedocs.io/en/develop/)
 * [API Javadocs](http://www.javadoc.io/doc/com.github.bthink-bgu/BPjs/)
 
-## Change log for the BPjs library.
+## Change Log for the BPjs Library.
 
 ### 2018-12-26
 * :bug: Fixed an off-by-one error in the state count of the DFS verifier. Also, cleaned up some of its design.
