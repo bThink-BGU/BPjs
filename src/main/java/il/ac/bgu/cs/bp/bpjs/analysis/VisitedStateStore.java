@@ -32,4 +32,5 @@ public interface VisitedStateStore {
     void store( DfsTraversalNode nd );
     boolean isVisited( DfsTraversalNode nd );
     void clear();
+    long getVisitedStateCount();
 }

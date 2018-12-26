@@ -141,8 +141,8 @@ public class DfsBProgramVerifierTest {
     @Test
     public void testTwoSimpleBThreads() throws Exception {
         BProgram bprog = new StringBProgram(
-                "bp.registerBThread('bt1', function(){bp.sync({ request:[ bp.Event(\"STAM1\") ] });});"
-                        + "bp.registerBThread('bt2', function(){bp.sync({ request:[ bp.Event(\"STAM2\") ] });});");
+                "bp.registerBThread('bt1', function(){bp.sync({ request:[ bp.Event(\"STAM1\") ] });});" +
+                "bp.registerBThread('bt2', function(){bp.sync({ request:[ bp.Event(\"STAM2\") ] });});");
 
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setIterationCountGap(1);
@@ -151,7 +151,8 @@ public class DfsBProgramVerifierTest {
         VerificationResult res = sut.verify(bprog);
 
         assertFalse(res.isViolationFound());
-        assertEquals(3, res.getScannedStatesCount());
+        assertEquals(4, res.getScannedStatesCount());
+        assertEquals(4, res.getEdgesScanned());
     }
 
     @Test(timeout = 2000)
@@ -168,7 +169,7 @@ public class DfsBProgramVerifierTest {
         VerificationResult res = sut.verify(bprog);
 
         assertFalse(res.isViolationFound());
-        assertEquals(1, res.getScannedStatesCount());
+        assertEquals(2, res.getScannedStatesCount()); // loop unrolling
     }
 
     @Test(timeout = 2000)
@@ -195,23 +196,23 @@ public class DfsBProgramVerifierTest {
 
         assertTrue(res.isViolationFound());
         assertTrue(res.getViolation().get() instanceof DeadlockViolation);
-        assertEquals(10, res.getScannedStatesCount());
+        assertEquals(11, res.getScannedStatesCount());
     }
 
     
-//    @Test(timeout = 2000)
-    // Ignoring until the updated Rhino is released.
+    @Test(timeout = 2000)
     public void testVariablesEquailtyInBT() throws Exception {
         BProgram bprog = new StringBProgram( //
                 "bp.registerBThread('bt1', function(){" + //
-                        "    while(true) \n" + //
-                        "      for(var i=0; i<10; i++){\n" + //
-                        "         bp.sync({ waitFor:[ bp.Event(\"X\") ] });\n" + //
-                        "      }\n" + //
-                        "});\n" + "bp.registerBThread('bt2', function(){" + //
-                        "    while(true){\n" + //
-                        "       bp.sync({ request:[ bp.Event(\"X\") ] });\n" + //
-                        "}});\n");
+                "    bp.sync({ waitFor:[ bp.Event(\"X\") ] });\n" + // 1
+                "    bp.sync({ waitFor:[ bp.Event(\"X\") ] });\n" + // 2
+                "    bp.sync({ waitFor:[ bp.Event(\"X\") ] });\n" + // 3
+                "    bp.sync({ waitFor:[ bp.Event(\"X\") ] });\n" + // 4
+                "});\n" + 
+                "bp.registerBThread('bt2', function(){" + //
+                "    while(true){\n" + //
+                "       bp.sync({ request:[ bp.Event(\"X\") ] });\n" + //
+                "}});\n");
 
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setIterationCountGap(1);
@@ -220,8 +221,11 @@ public class DfsBProgramVerifierTest {
         VerificationResult res = sut.verify(bprog);
 
         assertFalse(res.isViolationFound());
-        assertEquals(10, res.getScannedStatesCount());
-        assertEquals(10, res.getEdgesScanned()); //in this case only one option per state
+        // 10 syncs while bt1 is alive, 1 sync per bt2's infinite loop alone.
+        assertEquals(5, res.getScannedStatesCount());
+        
+        // in this case only one option per state
+        assertEquals(5, res.getEdgesScanned()); 
 
     }
 
@@ -235,14 +239,14 @@ public class DfsBProgramVerifierTest {
                         "         if (i == 5) {bp.sync({ request:[ bp.Event(\"X\"+i) ] });}\n" + //
                         "      }\n" + //
                         "});\n" +
-                        "var x = bp.EventSet( \"X\", function(e){\r\n" +
+                        "var xs = bp.EventSet( \"X\", function(e){\r\n" +
                         "    return e.getName().startsWith(\"X\");\r\n" +
                         "} );\r\n" +
                         "" +
                         "bp.registerBThread('bt2', function(){" + //
                         "	 var lastE = {name:\"what\"};" + //
                         "    while(true) {\n" + //
-                        "       var e = bp.sync({ waitFor: x});\n" + //
+                        "       var e = bp.sync({ waitFor: xs});\n" + //
                         "		lastE = e;" + //
                         "       if( e.name == lastE.name) { bp.ASSERT(false,\"Poof\");} " + //
                         "}});\n"
@@ -256,7 +260,7 @@ public class DfsBProgramVerifierTest {
 
         assertTrue(res.isViolationFound());
         assertTrue(res.getViolation().get() instanceof FailedAssertionViolation);
-        assertEquals(1, res.getScannedStatesCount());
+        assertEquals(2, res.getScannedStatesCount());
         assertEquals(1, res.getEdgesScanned());
     }
 

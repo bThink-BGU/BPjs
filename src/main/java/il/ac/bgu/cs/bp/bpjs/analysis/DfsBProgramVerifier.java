@@ -83,7 +83,6 @@ public class DfsBProgramVerifier {
     }
     
     private long visitedEdgeCount;
-    private long visitedStatesCount;
     private VisitedStateStore visited = new BThreadSnapshotVisitedStateStore();
     private long maxTraceLength = DEFAULT_MAX_TRACE;
     private final List<DfsTraversalNode> currentPath = new ArrayList<>();
@@ -96,14 +95,16 @@ public class DfsBProgramVerifier {
 
     public VerificationResult verify(BProgram aBp) throws Exception {
         currentBProgram = aBp;
-        visitedStatesCount = 1;
         visitedEdgeCount = 0;
         currentPath.clear();
         visited.clear();
-        if ( traceInspectors.isEmpty() && cycleInspectors.isEmpty() ) { // in case no verifications were specified, use the defauls set.
+        
+        // in case no verifications were specified, use the defauls set.
+        if ( traceInspectors.isEmpty() && cycleInspectors.isEmpty() ) { 
             traceInspectors.addAll( DfsInspections.ALL_TRACE );
             cycleInspectors.add(DfsInspections.HotBThreadCycles );
         }
+        
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("DfsBProgramRunner-" + INSTANCE_COUNTER.incrementAndGet());
         long start = System.currentTimeMillis();
         listenerOpt.ifPresent(l -> l.started(this));
@@ -111,14 +112,12 @@ public class DfsBProgramVerifier {
         long end = System.currentTimeMillis();
         listenerOpt.ifPresent(l -> l.done(this));
         execSvc.shutdown();
-        return new VerificationResult(vio, end - start, visitedStatesCount, visitedEdgeCount);
+        return new VerificationResult(vio, end - start, visited.getVisitedStateCount(), visitedEdgeCount);
     }
 
     protected Violation dfsUsingStack(DfsTraversalNode aStartNode, ExecutorService execSvc) throws Exception {
         long iterationCount = 0;
-        visitedStatesCount = 0;
 
-        visited.store(aStartNode);
         push(aStartNode);
 
         while (!isPathEmpty()) {
@@ -156,12 +155,10 @@ public class DfsBProgramVerifier {
                         }
                     } else {
                         // go deeper 
-                        visited.store(nextNode);
                         if (isDebugMode()) {
                             System.out.println("-visiting: " + nextNode);
                         }
                         push(nextNode);
-                        visitedStatesCount++;
                     }
                 } catch (ViolatingCycleFoundException vcfe ) {
                     return vcfe.v;
@@ -169,7 +166,7 @@ public class DfsBProgramVerifier {
             }
 
             if (iterationCount % iterationCountGap == 0 && listenerOpt.isPresent()) {
-                listenerOpt.get().iterationCount(iterationCount, visitedStatesCount, this);
+                listenerOpt.get().iterationCount(iterationCount, visited.getVisitedStateCount(), this);
             }
         }
 
@@ -245,11 +242,12 @@ public class DfsBProgramVerifier {
 
     void printStatus(long iteration, List<DfsTraversalNode> path) {
         System.out.println("Iteration " + iteration);
-        System.out.println("  visited: " + visitedStatesCount);
+        System.out.println("  visited: " + visited.getVisitedStateCount());
         path.forEach(n -> System.out.println("  " + n.getLastEvent()));
     }
 
     private void push(DfsTraversalNode n) {
+        visited.store(n);
         currentPath.add(n);
     }
 

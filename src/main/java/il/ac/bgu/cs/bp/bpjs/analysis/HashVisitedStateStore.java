@@ -51,7 +51,12 @@ public class HashVisitedStateStore implements VisitedStateStore {
         }
         return hash;
     }
-
+    
+    @Override
+    public long getVisitedStateCount() {
+        return visited.size();
+    }
+    
     @Override
     public void clear() {
         visited.clear();

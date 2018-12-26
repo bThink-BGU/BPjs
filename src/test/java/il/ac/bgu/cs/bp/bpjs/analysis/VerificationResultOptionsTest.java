@@ -118,7 +118,7 @@ public class VerificationResultOptionsTest {
         assertTrue(res.getViolation().get() instanceof FailedAssertionViolation);
         FailedAssertion expected = new FailedAssertion("failRightAWay!", "forward");
         assertEquals(expected, ((FailedAssertionViolation)res.getViolation().get()).getFailedAssertion());
-        assertEquals(0, res.getScannedStatesCount());
+        assertEquals(1, res.getScannedStatesCount());
     }
 
 

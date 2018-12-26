@@ -58,6 +58,11 @@ public class BThreadSnapshotVisitedStateStore implements VisitedStateStore {
     public void clear() {
         visited.clear();
     }
+
+    @Override
+    public long getVisitedStateCount() {
+        return visited.size();
+    }
     
     @Override
     public String toString() {

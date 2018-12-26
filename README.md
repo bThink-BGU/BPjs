@@ -44,6 +44,10 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
+### 2018-12-25
+* :bug: Fixed an off-by-one error in the state count of the DFS verifier. Also, cleaned up some of its design.
+
+### 2018-12-24
 * :sparkles: Removed dependencies (closes #69)
 * :arrows_counterclockwise: Using a fixed thread pool, rather than a cached one (so preventing cases where too many threads from running at once).
 * :bug:      Fixed a HUGE memory leak. Huge.

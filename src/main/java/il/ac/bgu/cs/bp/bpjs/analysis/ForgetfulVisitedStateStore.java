@@ -32,10 +32,12 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
  * @author michael
  */
 public class ForgetfulVisitedStateStore implements VisitedStateStore {
-
+    
+    private long visitedCount=0;
+    
     @Override
     public void store(DfsTraversalNode nd) {
-        // ignore.
+        visitedCount++;
     }
 
     @Override
@@ -45,6 +47,13 @@ public class ForgetfulVisitedStateStore implements VisitedStateStore {
         
     @Override
     public void clear() {
-        // we're pretty much clearing all the time :-)
+        visitedCount=0;
     }
+
+    @Override
+    public long getVisitedStateCount() {
+        return visitedCount;
+    }
+    
+    
 }
