@@ -44,7 +44,7 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change log for the BPjs library.
 
-### 2018-12-25
+### 2018-12-26
 * :bug: Fixed an off-by-one error in the state count of the DFS verifier. Also, cleaned up some of its design.
 * :sparkles: More tests
 * :put_litter_in_its_place: Cleanup of `DfsBProgramVerifier`.
