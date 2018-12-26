@@ -204,10 +204,6 @@ public class DfsBProgramVerifier {
         return null;
     }
 
-    public long getVisitedEdgeCount() {
-        return visitedEdgeCount;
-    }
-
     public void setMaxTraceLength(long maxTraceLength) {
         this.maxTraceLength = maxTraceLength;
     }

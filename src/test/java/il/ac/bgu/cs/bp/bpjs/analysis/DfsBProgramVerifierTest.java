@@ -228,6 +228,32 @@ public class DfsBProgramVerifierTest {
         assertEquals(5, res.getEdgesScanned()); 
 
     }
+    
+     @Test(timeout = 2000)
+    public void testMaxTraceLength() throws Exception {
+        String source = "bp.registerBThread('bt1', function(){" + 
+                "    bp.sync({ request:[ bp.Event(\"X\") ] });\n" + 
+                "    bp.sync({ request:[ bp.Event(\"X\") ] });\n" + 
+                "    bp.sync({ request:[ bp.Event(\"X\") ] });\n" + 
+                "    bp.sync({ request:[ bp.Event(\"X\") ] });\n" + 
+                "    bp.sync({ request:[ bp.Event(\"X\") ] });\n" + 
+                "    bp.sync({ request:[ bp.Event(\"X\") ] });\n" + 
+                "    bp.ASSERT(false, \"\");" +
+                "});";
+        BProgram bprog = new StringBProgram(source);
+
+        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        sut.setIterationCountGap(1);
+        sut.setProgressListener(new BriefPrintDfsVerifierListener());
+        sut.setDebugMode(true);
+        VerificationResult res = sut.verify(bprog);
+        assertTrue(res.isViolationFound());
+        
+        sut.setMaxTraceLength(6);
+        res = sut.verify(new StringBProgram(source));
+        assertFalse(res.isViolationFound());
+
+    }
 
     @Test(timeout = 6000)
     public void testJavaVariablesInBT() throws Exception {

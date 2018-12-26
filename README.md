@@ -46,6 +46,8 @@ a link to this page somewhere in the documentation/system about section.
 
 ### 2018-12-25
 * :bug: Fixed an off-by-one error in the state count of the DFS verifier. Also, cleaned up some of its design.
+* :sparkles: More tests
+* :put_litter_in_its_place: Cleanup of `DfsBProgramVerifier`.
 
 ### 2018-12-24
 * :sparkles: Removed dependencies (closes #69)
