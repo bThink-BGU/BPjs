@@ -36,6 +36,7 @@ import java.util.TreeSet;
 import java.util.stream.Collectors;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toSet;
+import org.mozilla.javascript.Context;
 
 /**
  *
@@ -61,23 +62,30 @@ public class DeadlockViolation extends Violation {
             });
         });
         
-        // collect who blocked what
-        blockedBy = requestedBy.keySet().stream().map( evt -> Pair.of(
-                evt, 
-                last.getSystemState().getStatements().stream().filter(s->isBlocking(s,evt)).map(s->s.getBthread().getName()).collect(toSet()))
-        ).collect( Collectors.toMap(p->p.getLeft(), p->p.getRight(), (s1, s2)->{
-            Set<String> mergedSet = new TreeSet<>();
-            mergedSet.addAll(s1);
-            mergedSet.addAll(s2);
-            return mergedSet;
-        }) );
+        Context.enter();
+        try {
+            // collect who blocked what
+            blockedBy = requestedBy.keySet().stream().map( evt -> Pair.of(
+                    evt, 
+                    last.getSystemState().getStatements().stream().filter(s->isBlocking(s,evt)).map(s->s.getBthread().getName()).collect(toSet()))
+            ).collect( Collectors.toMap(p->p.getLeft(), p->p.getRight(), (s1, s2)->{
+                Set<String> mergedSet = new TreeSet<>();
+                mergedSet.addAll(s1);
+                mergedSet.addAll(s2);
+                return mergedSet;
+            }) );
+        } finally {
+            Context.exit();
+        }
         
         description = requestedBy.keySet().stream()
                 .map( evt -> {
                     return evt.toString() + " requested by:" + setToString(requestedBy.get(evt))
                         + " blocked by:" + setToString(blockedBy.get(evt));
                 }).sorted()
-                .collect(joining("\n"));;
+                .collect(joining("\n"));
+                
+                
     }
 
     private boolean isBlocking( SyncStatement stmt, BEvent evt ) {

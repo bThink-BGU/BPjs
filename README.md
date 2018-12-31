@@ -47,6 +47,7 @@ a link to this page somewhere in the documentation/system about section.
 ### 2018-12-31
 * :arrows_counterclockwise: Default depth limit for DfsBProgramVerifier raised from 100 to 1000.
 * :sparkles: Deadlock detection prints deadlock details: for each event, who requested it, and who blocked it.
+* :sparkles: New verification switch: `--liveness` checks for liveness properties only.
 
 ### 2018-12-26
 * :bug: Fixed an off-by-one error in the state count of the DFS verifier. Also, cleaned up some of its design.

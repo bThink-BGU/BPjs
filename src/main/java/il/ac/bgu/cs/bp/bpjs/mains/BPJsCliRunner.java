@@ -25,6 +25,7 @@ package il.ac.bgu.cs.bp.bpjs.mains;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.BThreadSnapshotVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsInspections;
 import il.ac.bgu.cs.bp.bpjs.analysis.HashVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
@@ -119,6 +120,11 @@ public class BPJsCliRunner {
             } else {
                 vfr.setVisitedNodeStore( new HashVisitedStateStore() );
             }
+            if ( switchPresent("--liveness", args) ) {
+                vfr.addInspector(DfsInspections.HotBProgramCycles);
+                vfr.addInspector(DfsInspections.HotBThreadCycles);
+                vfr.addInspector(DfsInspections.HotTermination);
+            }
             
             try {
                 println("Starting vberification");
@@ -135,7 +141,7 @@ public class BPJsCliRunner {
                     
                     println("Counter example trace:");
                     vio.getCounterExampleTrace().stream()
-                        .skip(1) // the first node has no previsou event.
+                        .skip(1) // the first node has no previous event.
                         .forEach(nd -> println(nd.getLastEvent().toString()));
                     
                 }

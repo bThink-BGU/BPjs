@@ -12,6 +12,8 @@ Switches:
    -v ("verbose")
         Print more data about the BProgram's status as synchronization points.
    --verify 
-        Verify the program, rather than execute it.
+        Verify the program, rather than execute it. Uses a default inspection set.
+   --liveness
+        Verify the b-program for liveness properties only. Only considered when --verify is present.
    --full-state-storage (verification only)
         Use full state storage, rather than a hashed one.

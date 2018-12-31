@@ -102,7 +102,6 @@ public class DfsBProgramVerifier {
         // in case no verifications were specified, use the defauls set.
         if ( traceInspectors.isEmpty() && cycleInspectors.isEmpty() ) { 
             traceInspectors.addAll( DfsInspections.ALL_TRACE );
-//            traceInspectors.add( DfsInspections.HotTermination );
             cycleInspectors.add(DfsInspections.HotBThreadCycles );
         }
         
