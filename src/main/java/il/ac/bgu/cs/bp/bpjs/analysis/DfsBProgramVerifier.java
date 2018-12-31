@@ -52,7 +52,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class DfsBProgramVerifier {
 
     private static final AtomicInteger INSTANCE_COUNTER = new AtomicInteger();
-    public final static long DEFAULT_MAX_TRACE = 100;
+    public final static long DEFAULT_MAX_TRACE = 1000;
 
     /**
      * Default number of iterations between invocation of
@@ -102,6 +102,7 @@ public class DfsBProgramVerifier {
         // in case no verifications were specified, use the defauls set.
         if ( traceInspectors.isEmpty() && cycleInspectors.isEmpty() ) { 
             traceInspectors.addAll( DfsInspections.ALL_TRACE );
+//            traceInspectors.add( DfsInspections.HotTermination );
             cycleInspectors.add(DfsInspections.HotBThreadCycles );
         }
         

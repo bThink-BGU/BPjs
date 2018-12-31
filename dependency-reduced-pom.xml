@@ -4,7 +4,7 @@
   <groupId>com.github.bthink-bgu</groupId>
   <artifactId>BPjs</artifactId>
   <name>BPjs</name>
-  <version>0.9.6</version>
+  <version>0.9.7-SNAPSHOT</version>
   <description>Provides a runtime for behavioral programs written in Javascript. It can 
         run stand-alone (from the commmandline) or be embedded in larger 
         JVM-based systems.</description>

@@ -11,7 +11,7 @@ This repository contains a javascript-based [BP](http://www.b-prog.org) library.
 #### License
 * BPjs is open sourced under the [MIT license](http://www.opensource.org/licenses/mit-license.php). If you use it in a system, please provide
 a link to this page somewhere in the documentation/system about section.
-* BPjs uses the Mozilla Rhino Javascript engine. Project page and source code can be found [here](https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino).
+* BPjs uses the Mozilla Rhino JavaScript engine. Project page and source code can be found [here](https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino).
 
 ---
 
@@ -43,6 +43,10 @@ a link to this page somewhere in the documentation/system about section.
 * [API Javadocs](http://www.javadoc.io/doc/com.github.bthink-bgu/BPjs/)
 
 ## Change Log for the BPjs Library.
+
+### 2018-12-31
+* :arrows_counterclockwise: Default depth limit for DfsBProgramVerifier raised from 100 to 1000.
+* :sparkles: Deadlock detection prints deadlock details: for each event, who requested it, and who blocked it.
 
 ### 2018-12-26
 * :bug: Fixed an off-by-one error in the state count of the DFS verifier. Also, cleaned up some of its design.

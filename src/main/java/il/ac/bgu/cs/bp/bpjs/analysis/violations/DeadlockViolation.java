@@ -24,21 +24,73 @@
 package il.ac.bgu.cs.bp.bpjs.analysis.violations;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
+import il.ac.bgu.cs.bp.bpjs.internal.Pair;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.stream.Collectors;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toSet;
 
 /**
  *
  * @author michael
  */
 public class DeadlockViolation extends Violation {
-
+    
+    private final String description;
+    
     public DeadlockViolation(List<DfsTraversalNode> counterExampleTrace) {
         super(counterExampleTrace);
+        DfsTraversalNode last = counterExampleTrace.get(counterExampleTrace.size()-1);
+        Map<BEvent, Set<String>> requestedBy = new HashMap<>();
+        Map<BEvent, Set<String>> blockedBy;
+        
+        // collect who requested what
+        last.getSystemState().getStatements().forEach( syncs -> {
+            syncs.getRequest().forEach( evt -> {
+                if ( ! requestedBy.containsKey(evt) ) {
+                    requestedBy.put(evt, new HashSet<>());
+                }
+                requestedBy.get(evt).add(syncs.getBthread().getName());
+            });
+        });
+        
+        // collect who blocked what
+        blockedBy = requestedBy.keySet().stream().map( evt -> Pair.of(
+                evt, 
+                last.getSystemState().getStatements().stream().filter(s->isBlocking(s,evt)).map(s->s.getBthread().getName()).collect(toSet()))
+        ).collect( Collectors.toMap(p->p.getLeft(), p->p.getRight(), (s1, s2)->{
+            Set<String> mergedSet = new TreeSet<>();
+            mergedSet.addAll(s1);
+            mergedSet.addAll(s2);
+            return mergedSet;
+        }) );
+        
+        description = requestedBy.keySet().stream()
+                .map( evt -> {
+                    return evt.toString() + " requested by:" + setToString(requestedBy.get(evt))
+                        + " blocked by:" + setToString(blockedBy.get(evt));
+                }).sorted()
+                .collect(joining("\n"));;
     }
 
+    private boolean isBlocking( SyncStatement stmt, BEvent evt ) {
+        return stmt.getBlock().contains(evt);
+    }
+    
+    private String setToString(Set<String> aSet){
+        return aSet.stream().sorted().collect( joining(",","{","}"));
+    }
+    
     @Override
     public String decsribe() {
-        return "Deadlock";
+        return "Deadlock: " + description;
     }
     
 }
