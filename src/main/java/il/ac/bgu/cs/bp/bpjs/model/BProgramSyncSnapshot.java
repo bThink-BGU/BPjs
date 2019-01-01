@@ -339,10 +339,7 @@ public class BProgramSyncSnapshot {
     
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((threadSnapshots == null) ? 0 : threadSnapshots.hashCode());
-        return result;
+        return Objects.hash( threadSnapshots, externalEvents );
     }
 
     @Override

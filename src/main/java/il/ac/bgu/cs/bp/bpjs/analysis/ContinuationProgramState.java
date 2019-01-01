@@ -29,6 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import org.mozilla.javascript.ConsString;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.NativeArray;
@@ -174,11 +175,10 @@ public class ContinuationProgramState {
     
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 31 * hash + programCounter;
-        hash = 31 * hash + frameIndex;
-        hash = 31 * hash + variables.hashCode();
-        return hash;
+        return Objects.hash(programCounter, frameIndex, 
+                                variables.entrySet().stream()
+                                           .map( es->Objects.hash(es.getKey(), es.getValue()) )
+                                           .collect( Collectors.reducing(0, (x,y)->x^y)) );
     }
 
     @Override

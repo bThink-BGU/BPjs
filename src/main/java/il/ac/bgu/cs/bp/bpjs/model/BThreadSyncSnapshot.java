@@ -36,7 +36,7 @@ public class BThreadSyncSnapshot implements Serializable {
     private Function interruptHandler = null;
 
     /**
-     * Scope for the JavaScript code execution.
+     * Top level scope for the JavaScript code execution.
      */
     private Scriptable scope;
 
@@ -89,7 +89,6 @@ public class BThreadSyncSnapshot implements Serializable {
         BThreadSyncSnapshot retVal = new BThreadSyncSnapshot(name, entryPoint);
         retVal.continuation = aContinuation;
         retVal.setInterruptHandler(interruptHandler);
-//        retVal.setupScope(ScriptableObject.getTopLevelScope(scope));
         retVal.scope = retVal.entryPoint;
         retVal.bSyncStatement = aStatement;
         aStatement.setBthread(retVal);
@@ -182,7 +181,7 @@ public class BThreadSyncSnapshot implements Serializable {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime * result + Objects.hashCode(name.hashCode());
+        result = prime * result + name.hashCode();
         if (continuation != null) {
             result ^= getContinuationProgramState().hashCode();
         }
