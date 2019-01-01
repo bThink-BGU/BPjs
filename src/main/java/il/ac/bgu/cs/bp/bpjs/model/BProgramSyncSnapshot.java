@@ -320,7 +320,6 @@ public class BProgramSyncSnapshot {
             "f" + FORK_NEXT_ID.incrementAndGet() + "$" + fkStmt.getForkingBThread().getName(),
             fkStmt.getForkingBThread().getEntryPoint(), 
             fkStmt.getForkingBThread().getInterrupt().orElse(null),
-            fkStmt.getForkingBThread().getScope(),
             cont,
             null
         );

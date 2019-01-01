@@ -244,7 +244,6 @@ public abstract class BProgram {
      * @param bt the BThread to be registered.
      */
     public void registerBThread(BThreadSyncSnapshot bt) {
-        bt.setupScope(programScope);
         recentlyRegisteredBthreads.add(bt);
         addBThreadCallback.ifPresent(cb -> cb.bthreadAdded(this, bt));
     }
@@ -300,9 +299,6 @@ public abstract class BProgram {
                 appendedCode.forEach(s -> evaluate(s, "appendedCode"));
                 appendedCode = null;
             }
-
-            // setup registered b-threads
-            bthreads.forEach(bt -> bt.setupScope(programScope));
 
         } catch (FailedAssertionException fae) {
             failedAssertion = new FailedAssertion(fae.getMessage(), "---init_code");

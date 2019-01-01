@@ -180,7 +180,6 @@ public class BProgramSyncSnapshotIO {
 
         ByteArrayOutputStream bthreadBytes = new ByteArrayOutputStream();
         try (BThreadSyncSnapshotOutputStream btos = new BThreadSyncSnapshotOutputStream(bthreadBytes, scope)) {
-            btos.writeObject(bss.getScope());
             btos.writeObject(bss.getEntryPoint());
             btos.writeObject(bss.getInterrupt().orElse(null));
             btos.writeObject(bss.getBSyncStatement());
@@ -208,12 +207,11 @@ public class BProgramSyncSnapshotIO {
 
         try (ByteArrayInputStream inBytes = new ByteArrayInputStream(contBytes);
             BThreadSyncSnapshotInputStream bssis = new BThreadSyncSnapshotInputStream(inBytes, scope, stubPrv)) {
-            Scriptable btScope = (Scriptable) bssis.readObject();
             Function entryPoint = (Function) bssis.readObject();
             Function interruptHandler = (Function) bssis.readObject();
             SyncStatement stmt = (SyncStatement) bssis.readObject();
             Object cont = bssis.readObject();
-            final BThreadSyncSnapshot bThreadSyncSnapshot = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, btScope, cont, stmt);
+            final BThreadSyncSnapshot bThreadSyncSnapshot = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, cont, stmt);
 
             return bThreadSyncSnapshot;
         }

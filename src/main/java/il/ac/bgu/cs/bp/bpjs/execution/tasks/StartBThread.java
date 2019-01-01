@@ -14,7 +14,7 @@ public class StartBThread extends BPEngineTask {
 
     @Override
     BThreadSyncSnapshot callImpl( Context jsContext ) {
-        jsContext.callFunctionWithContinuations(bss.getEntryPoint(), bss.getScope(), new Object[0]);
+        jsContext.callFunctionWithContinuations(bss.getEntryPoint(), bss.getEntryPoint(), new Object[0]);
         return null;
     }
    
