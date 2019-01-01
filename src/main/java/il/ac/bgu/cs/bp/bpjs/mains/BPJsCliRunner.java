@@ -190,12 +190,13 @@ public class BPJsCliRunner {
     }
     
     private static String keyForValue( String aKey, String args[] ) {
-        int idx = Arrays.asList(args).indexOf(aKey);
-        if ( idx > -1 && idx < args.length-2 ) {
-            return args[idx+1];
-        } else {
-            return null;
-        }
+       for ( int idx=0; idx<args.length; idx++ ) {
+           if ( args[idx].startsWith(aKey+"=") ) {
+               String[] comps = args[idx].split("=", 2);
+               return comps.length == 2 ? comps[1] : null;
+           }
+       }
+       return null;
     }
     
     private static void println(String template, String... params) {
