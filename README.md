@@ -45,9 +45,10 @@ a link to this page somewhere in the documentation/system about section.
 ## Change Log for the BPjs Library.
 
 ### 2019-01-01
-
-* :tada: Happy new year - 2018 changes moved [here](changelof-2018.md).
+* :sparkles: Commandline verifier accepts optional `--max-trace-length` parameter, that limits the trace length during verification.
+* :arrow_up: Removed the internal `scope` field from `BThreadSyncSnapshot`s. This cuts the size of the serialized form significantly.
 * :arrow_up: better hashing algorithm.
+* :tada: Happy new year - 2018 changes moved [here](changelof-2018.md).
 
 
 [Earlier Changes](changelog-2018.md)

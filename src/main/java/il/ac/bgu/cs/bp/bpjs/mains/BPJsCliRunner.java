@@ -43,6 +43,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -125,6 +126,17 @@ public class BPJsCliRunner {
                 vfr.addInspector(DfsInspections.HotBThreadCycles);
                 vfr.addInspector(DfsInspections.HotTermination);
             }
+            String maxDepthStr = keyForValue("--max-trace-length", args);
+            if ( maxDepthStr != null ) {
+                try {
+                    long maxDepth = Long.parseLong(maxDepthStr.trim());
+                    vfr.setMaxTraceLength(maxDepth);
+                } catch ( NumberFormatException nfe ) {
+                    println("Illegal max trace length value: '" + maxDepthStr + "'.");
+                    System.exit(-5);
+                }
+            }
+            println("Max trace length: " + vfr.getMaxTraceLength() );
             
             try {
                 println("Starting vberification");
@@ -176,7 +188,16 @@ public class BPJsCliRunner {
     private static boolean switchPresent(String aSwitch, String[] args) {
         return Arrays.stream(args).anyMatch(s -> s.trim().equals(aSwitch));
     }
-
+    
+    private static String keyForValue( String aKey, String args[] ) {
+        int idx = Arrays.asList(args).indexOf(aKey);
+        if ( idx > -1 && idx < args.length-2 ) {
+            return args[idx+1];
+        } else {
+            return null;
+        }
+    }
+    
     private static void println(String template, String... params) {
         print(template + "\n", params);
     }
