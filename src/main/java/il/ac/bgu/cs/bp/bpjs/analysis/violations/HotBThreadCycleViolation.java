@@ -53,7 +53,8 @@ public class HotBThreadCycleViolation extends Violation {
     public String decsribe() {
         return "Hot b-thread cycle violation: b-threads "
             + (bthreads.stream().collect(joining(" ,"))) 
-            + " can get to an infinite hot loop."; 
+            + " can get to an infinite hot loop. Cycle returns to index " + cycleToIndex
+                + " because of event " + event; 
     }
 
     public int getCycleToIndex() {

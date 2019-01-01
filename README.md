@@ -45,6 +45,7 @@ a link to this page somewhere in the documentation/system about section.
 ## Change Log for the BPjs Library.
 
 ### 2019-01-01
+* :arrow_up: Hot BThread Cycle now more informative (reporting event and index of return-to).
 * :sparkles: Commandline verifier accepts optional `--max-trace-length` parameter, that limits the trace length during verification.
 * :arrow_up: Removed the internal `scope` field from `BThreadSyncSnapshot`s. This cuts the size of the serialized form significantly.
 * :arrow_up: better hashing algorithm.
