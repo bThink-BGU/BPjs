@@ -47,9 +47,10 @@ public class FailedAssertionTest {
         BProgramRunner sut = new BProgramRunner(bprog);
         sut.addListener( new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
-        System.out.println("About to start program");
+        System.out.println("testAssertion: About to start program");
         bprog.putInGlobalScope("shouldFail", true);
         sut.run();
+        System.out.println("testAssertion: post-run");
         
         assertEquals( Arrays.asList("piff", "puff", "poof!"), eventLogger.eventNames() );
         assertTrue( sut.hasFailedAssertion() );
@@ -57,6 +58,7 @@ public class FailedAssertionTest {
         assertEquals("assertor", fa.getBThreadName());
         assertEquals("Poof has happened.", fa.getMessage());
         
+        System.out.println("testAssertion: done");
     }
     
      @Test
@@ -65,12 +67,14 @@ public class FailedAssertionTest {
         BProgramRunner sut = new BProgramRunner(bprog);
         sut.addListener( new PrintBProgramRunnerListener() );
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
-        System.out.println("About to start program");
+        System.out.println("testNoAssertion: About to start program");
         bprog.putInGlobalScope("shouldFail", false);
         sut.run();
+        System.out.println("testNoAssertion: post-run");
         
         assertEquals( Arrays.asList("piff", "puff", "poof!", "peff"), eventLogger.eventNames() );
         assertFalse( sut.hasFailedAssertion() );
+        System.out.println("testNoAssertion: done");
     }
     
 }

@@ -36,7 +36,8 @@ bp.registerBThread("violator", function(){
     bp.sync({request:bp.Event("puff")});
     bp.sync({request:bp.Event("poof!")});
     
-    //we should not get here, since the former event caused an assertion failure.
+    // if shouldFail is true, we should not get here, 
+    // since the former event caused an assertion failure.
     bp.sync({request:bp.Event("peff")}); 
    
 });
