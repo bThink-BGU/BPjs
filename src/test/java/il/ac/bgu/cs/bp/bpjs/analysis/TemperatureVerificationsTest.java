@@ -66,7 +66,7 @@ public class TemperatureVerificationsTest {
         final ResourceBProgram bprog = new ResourceBProgram("statementtemp/hotBThreadCycleExample.js");
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-        // Adding the inspector means it will be the only inspector run, as the default is to run them all.
+        // Adding the inspector means it will be the only inspector run, as the default set will not be used.
         vfr.addInspector(DfsInspections.HotBProgramCycles );
         final VerificationResult res = vfr.verify(bprog);
 

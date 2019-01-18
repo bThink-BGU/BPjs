@@ -169,7 +169,7 @@ public class DfsBProgramVerifierTest {
         VerificationResult res = sut.verify(bprog);
 
         assertFalse(res.isViolationFound());
-        assertEquals(2, res.getScannedStatesCount()); // loop unrolling
+        assertEquals(1, res.getScannedStatesCount()); 
     }
 
     @Test(timeout = 2000)

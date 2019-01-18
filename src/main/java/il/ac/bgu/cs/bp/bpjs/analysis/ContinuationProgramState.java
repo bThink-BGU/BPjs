@@ -72,7 +72,7 @@ public class ContinuationProgramState {
             Context.enter();
             while ( current != null ) {
                 for ( Object o : current.getIds() ) {
-                    if ( !variables.containsKey(o) && o != "bp" ) {
+                    if ( !variables.containsKey(o) && !o.equals("bp") ) {
                         Object variableContent = current.get(o);
                         if ( variableContent instanceof Undefined ) continue;
                         variables.put(o, collectJsValue(variableContent));
