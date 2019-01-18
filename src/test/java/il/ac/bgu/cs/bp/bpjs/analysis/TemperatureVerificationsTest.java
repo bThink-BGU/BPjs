@@ -29,6 +29,7 @@ import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotBProgramCycleViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotTerminationViolation;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import java.util.Arrays;
 import java.util.Collections;
@@ -85,7 +86,21 @@ public class TemperatureVerificationsTest {
         int expectedCycleToIndex = hcv.getCounterExampleTrace().size()-3;
         assertEquals(expectedCycleToIndex, hcv.getCycleToIndex() );
     }
+    
+    @Test
+    public void testHotBProgramCycle_withJsEventSets() throws Exception {
+        BProgram bprog = new ResourceBProgram("DFSVerifierTests/fruitRatio.js");
+        DfsBProgramVerifier vfr = new DfsBProgramVerifier();
+        // Adding the inspector means it will be the only inspector run, as the default set will not be used.
+        vfr.addInspector(DfsInspections.HotBProgramCycles);
+        vfr.setVisitedNodeStore( new BThreadSnapshotVisitedStateStore() );
+        final VerificationResult res = vfr.verify(bprog);
 
+        assertTrue(res.isViolationFound());
+        assertTrue(res.getViolation().get() instanceof HotBProgramCycleViolation);
+        
+    }
+    
     @Test
     public void testHotBThreadCycle() throws Exception {
         final ResourceBProgram bprog = new ResourceBProgram("statementtemp/hotBThreadCycleExample.js");

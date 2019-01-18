@@ -47,6 +47,9 @@ a link to this page somewhere in the documentation/system about section.
 ### 2019-01-18
 * :bug: Fixed a that cause equality tests of JS event sets to return false negatives.
 * :bug: The `bp` object no longer collected by the state comparators.
+* :sparkles: `BEvent` has a bit more informative `toString()` method, that can also look abit into the JavaScript objects (not a full JSON.stringify, since we don't want to deal with arbirtarily large strings for a simple toString op. Not to mention circular references and such).
+* :sparkles: `BEvent::hashCode` now hashes data the event might have.
+* :sparkles: `ScriptableUtils` got some new utility methods that dig a bit into `ScriptableObject`s. This makes BPjs better at handling events with JS data objects.
 
 ### 2019-01-01
 * :arrow_up: Hot BThread Cycle now more informative (reporting event and index of return-to).

@@ -23,6 +23,8 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
+import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -30,15 +32,40 @@ import java.util.Set;
  *
  * A {@link VisitedStateStore} that stores the state of the {@code BThread}s in the node.
  * Ignores the last event that led to this node.
- * 
- * Client code can specify to use a hash of the state instead of the state itself. This 
- * may create false positives on hash collisions, but would make the dearch run faster and 
- * consume less memory.
- * 
+ *
  * @author michael
  */
 public class BThreadSnapshotVisitedStateStore implements VisitedStateStore {
-    private final Set<Object> visited = new HashSet<>();
+    private final Set<Snapshot> visited = new HashSet<>();
+    
+    /**
+     * The item that's stored in {@link #visited}.
+     */
+    private static final class Snapshot {
+        final Set<BThreadSyncSnapshot> bthreads;
+        private final int hashCode;
+    
+        Snapshot( Set<BThreadSyncSnapshot> snapshots ){
+            bthreads = Collections.unmodifiableSet(snapshots);
+            hashCode = bthreads.hashCode();
+        }
+
+        @Override
+        public int hashCode() {
+            return hashCode;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null) return false;
+            if (getClass() != obj.getClass()) return false;
+            
+            final Snapshot other = (Snapshot) obj;
+            return (hashCode==other.hashCode)
+                    && bthreads.equals(other.bthreads);
+        }
+    }
     
     @Override
     public void store(DfsTraversalNode nd) {
@@ -50,8 +77,8 @@ public class BThreadSnapshotVisitedStateStore implements VisitedStateStore {
         return visited.contains( extractStatus(nd) );
     }   
     
-    private Object extractStatus( DfsTraversalNode nd ) {
-        return nd.getSystemState().getBThreadSnapshots();
+    private Snapshot extractStatus( DfsTraversalNode nd ) {
+        return new Snapshot(nd.getSystemState().getBThreadSnapshots());
     }
 
     @Override
