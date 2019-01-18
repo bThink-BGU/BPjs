@@ -27,7 +27,9 @@
 
 if ( shouldFail ) {
     bp.registerBThread("assertor", function(){
+        bp.log.info("Assertor: pre 'poof'");
         bp.sync({waitFor:bp.Event("poof!")});
+        bp.log.info("Assertor: After 'poof'");
         bp.ASSERT(false, "Poof has happened.");
     });
 }
