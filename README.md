@@ -24,7 +24,7 @@ a link to this page somewhere in the documentation/system about section.
     <dependency>
         <groupId>com.github.bthink-bgu</groupId>
         <artifactId>BPjs</artifactId>
-        <version>0.9.6</version>
+        <version>0.9.7</version>
     </dependency>
     ...
 </dependencies>
