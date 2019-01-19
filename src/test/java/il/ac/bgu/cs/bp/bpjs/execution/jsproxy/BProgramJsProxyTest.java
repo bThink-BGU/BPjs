@@ -33,7 +33,11 @@ import org.junit.Test;
 
 import static il.ac.bgu.cs.bp.bpjs.TestUtils.traceEventNamesString;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.DeadlockViolation;
+import java.util.HashMap;
+import java.util.Map;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 /**
@@ -69,7 +73,29 @@ public class BProgramJsProxyTest {
         String logLevel2 = sut.getFromGlobalScope("logLevel2", String.class).get();
         assertEquals(BpLog.LogLevel.Warn.name(), logLevel2);
     }
-
+    
+    @Test
+    public void testEquality() {
+        BProgram bprog = new ResourceBProgram("RandomProxy.js");
+        new BProgramRunner(bprog).run();
+        BProgramJsProxy sut1 = bprog.getFromGlobalScope("bp", BProgramJsProxy.class).get();
+        assertEquals( sut1, sut1 );
+        assertNotEquals(sut1, null);
+        assertNotEquals(sut1, "String");
+        
+        bprog = new ResourceBProgram("RandomProxy.js");
+        new BProgramRunner(bprog).run();
+        BProgramJsProxy sut2 = bprog.getFromGlobalScope("bp", BProgramJsProxy.class).get();
+        assertNotEquals( sut1, sut2 );
+        
+        Map<String, BProgramJsProxy> map = new HashMap<>();
+        map.put("sut1", sut1);
+        map.put("sut2", sut2);
+        
+        assertSame( sut1, map.get("sut1") );
+        assertSame( sut2, map.get("sut2") );
+    }
+    
     @Test
     public void DeadlockSameThread() throws Exception{
         BProgram bpr = new ResourceBProgram("bpsync-blockrequest.js");

@@ -259,6 +259,7 @@ public class DfsBProgramVerifierTest {
     public void testJavaVariablesInBT() throws Exception {
         BProgram bprog = new StringBProgram( //
                 "bp.registerBThread('bt1', function(){" + //
+                        "  var sampleArray=[1,2,3,4,5];\n" +
                         "    while(true) \n" + //
                         "      for(var i=0; i<10; i++){\n" + //
                         "         bp.sync({ request:[ bp.Event(\"X\"+i) ] });\n" + //

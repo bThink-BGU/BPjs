@@ -10,8 +10,11 @@ import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import java.util.Arrays;
 import static java.util.Collections.emptySet;
 import java.util.concurrent.ExecutorService;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 /*
@@ -59,7 +62,6 @@ public class BProgramSyncSnapshotClonerTest {
     
     @Test
     public void testSerialization() throws Exception {
-        System.out.println("\nSTART Serialization test");
         BProgram bprog = new ResourceBProgram("SnapshotTests/BProgramSyncSnapshotClonerTest.js");
         BProgramSyncSnapshot cur = bprog.setup();
         ExecutorService exSvc = ExecutorServiceMaker.makeWithName("test");
@@ -70,10 +72,26 @@ public class BProgramSyncSnapshotClonerTest {
                 emptySet());
         BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(bprog);
         byte[] out = io.serialize(cur);
-        System.out.println("de-serializing\n");
         io.deserialize(out);
-        System.out.println("END Serialization test\n");
+    }
+    
+    @Test
+    public void testSerializatioWithExternals() throws Exception {
+        BProgram bprog = new ResourceBProgram("SnapshotTests/BProgramSyncSnapshotClonerTest.js");
+        BProgramSyncSnapshot cur = bprog.setup();
+        ExecutorService exSvc = ExecutorServiceMaker.makeWithName("test");
+        bprog.enqueueExternalEvent(new BEvent("External1"));
+        bprog.enqueueExternalEvent(new BEvent("External2"));
+        cur = cur.start(exSvc);
+        cur.triggerEvent( 
+                cur.getStatements().stream().flatMap(s->s.getRequest().stream()).findFirst().get(),
+                exSvc,
+                emptySet());
+        BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(bprog);
+        byte[] out = io.serialize(cur);
+        BProgramSyncSnapshot deserialized = io.deserialize(out);
         
+        assertEquals( Arrays.asList(new BEvent("External1"), new BEvent("External2")), deserialized.getExternalEvents());
     }
     
     @Test

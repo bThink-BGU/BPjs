@@ -44,6 +44,9 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change Log for the BPjs Library.
 
+### 2019-01-19
+* :sparkles: More tests.
+
 ### 2019-01-18
 * :bug: Fixed a that cause equality tests of JS event sets to return false negatives.
 * :bug: The `bp` object no longer collected by the state comparators.
