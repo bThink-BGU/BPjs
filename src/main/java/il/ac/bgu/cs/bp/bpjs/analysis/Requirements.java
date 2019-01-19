@@ -53,8 +53,7 @@ public class Requirements {
             + "\n });";
     }
 
-    private Requirements(){
-        // prevent instantiation.
-    }
+    // prevent instantiation.
+    private Requirements(){}
     
 }

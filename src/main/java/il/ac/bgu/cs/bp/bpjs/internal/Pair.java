@@ -29,7 +29,7 @@ import java.util.Objects;
  * Utility class for pairs of stuff.
  * @author michael
  */
-public class Pair<L, R> {
+public final class Pair<L, R> {
     private final L left;
     private final R right;
     

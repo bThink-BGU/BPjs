@@ -80,4 +80,20 @@ public class PairTest {
         assertTrue(result.contains("Pair"));
     }
     
+    
+    @Test
+    public void testEquals() {
+        Pair lr1 = Pair.of("left", "right");
+        Pair lr2 = Pair.of("left", "right");
+        Pair lx = Pair.of("left", "x");
+        Pair xr = Pair.of("x", "right");
+        
+        assertEquals( lr1, lr1 );
+        assertEquals( lr1, lr2 );
+        assertNotEquals( lr1, lx );
+        assertNotEquals( lr1, xr );
+        assertNotEquals( lx, xr );
+        assertNotEquals( lr1, null );
+        assertNotEquals( lr1, "I'm a String" );
+    }
 }
