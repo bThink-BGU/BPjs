@@ -47,6 +47,7 @@ a link to this page somewhere in the documentation/system about section.
 ### 2019-01-19
 * :sparkles: More tests.
 * :arrow_up: `BriefPrintDfsVerifierListener` => `PrintDfsVerifierListener`, so that it's consistent with `PrintBProgramRunnerListener`.
+* :arrow_up: Incorporated the "BPjs Tips" file to the central documentation.
 
 ### 2019-02-03
 * :arrow_up: `VisitedStateStore` now stores *states*, not DFS nodes. So it's more reusable that way.
