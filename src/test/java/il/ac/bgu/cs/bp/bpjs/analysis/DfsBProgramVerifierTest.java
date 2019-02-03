@@ -37,7 +37,7 @@ import static il.ac.bgu.cs.bp.bpjs.TestUtils.traceEventNamesString;
 import static org.junit.Assert.*;
 
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
-import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
+import il.ac.bgu.cs.bp.bpjs.analysis.listeners.PrintDfsVerifierListener;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.DeadlockViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.FailedAssertionViolation;
 
@@ -50,7 +50,7 @@ public class DfsBProgramVerifierTest {
     public void simpleAAABTrace_forgetfulStore() throws Exception {
         BProgram program = new ResourceBProgram("DFSVerifierTests/AAABTrace.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        sut.setProgressListener(new BriefPrintDfsVerifierListener());
+        sut.setProgressListener(new PrintDfsVerifierListener());
         program.appendSource(Requirements.eventNotSelected("B"));
         sut.setVisitedNodeStore(new ForgetfulVisitedStateStore());
         VerificationResult res = sut.verify(program);
@@ -64,7 +64,7 @@ public class DfsBProgramVerifierTest {
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setDebugMode(true);
 
-        sut.setProgressListener(new BriefPrintDfsVerifierListener());
+        sut.setProgressListener(new PrintDfsVerifierListener());
         program.appendSource(Requirements.eventNotSelected("B"));
         sut.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
         VerificationResult res = sut.verify(program);
@@ -77,7 +77,7 @@ public class DfsBProgramVerifierTest {
         BProgram program = new ResourceBProgram("DFSVerifierTests/AAABTrace.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setDebugMode(true);
-        sut.setProgressListener(new BriefPrintDfsVerifierListener());
+        sut.setProgressListener(new PrintDfsVerifierListener());
         program.appendSource(Requirements.eventNotSelected("B"));
         VisitedStateStore stateStore = new HashVisitedStateStore();
         sut.setVisitedNodeStore(stateStore);
@@ -146,7 +146,7 @@ public class DfsBProgramVerifierTest {
 
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setIterationCountGap(1);
-        sut.setProgressListener(new BriefPrintDfsVerifierListener());
+        sut.setProgressListener(new PrintDfsVerifierListener());
         sut.addInspector(DfsInspections.FailedAssertions);
         VerificationResult res = sut.verify(bprog);
 
@@ -164,7 +164,7 @@ public class DfsBProgramVerifierTest {
 
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setIterationCountGap(1);
-        sut.setProgressListener(new BriefPrintDfsVerifierListener());
+        sut.setProgressListener(new PrintDfsVerifierListener());
         sut.setDebugMode(true);
         VerificationResult res = sut.verify(bprog);
 
@@ -190,7 +190,7 @@ public class DfsBProgramVerifierTest {
 
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setIterationCountGap(1);
-        sut.setProgressListener(new BriefPrintDfsVerifierListener());
+        sut.setProgressListener(new PrintDfsVerifierListener());
         sut.setDebugMode(true);
         VerificationResult res = sut.verify(bprog);
 
@@ -216,7 +216,7 @@ public class DfsBProgramVerifierTest {
 
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setIterationCountGap(1);
-        sut.setProgressListener(new BriefPrintDfsVerifierListener());
+        sut.setProgressListener(new PrintDfsVerifierListener());
         sut.setDebugMode(true);
         VerificationResult res = sut.verify(bprog);
 
@@ -244,7 +244,7 @@ public class DfsBProgramVerifierTest {
 
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setIterationCountGap(1);
-        sut.setProgressListener(new BriefPrintDfsVerifierListener());
+        sut.setProgressListener(new PrintDfsVerifierListener());
         sut.setDebugMode(true);
         VerificationResult res = sut.verify(bprog);
         assertTrue(res.isViolationFound());
@@ -281,7 +281,7 @@ public class DfsBProgramVerifierTest {
 
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setIterationCountGap(1);
-        sut.setProgressListener(new BriefPrintDfsVerifierListener());
+        sut.setProgressListener(new PrintDfsVerifierListener());
         sut.setDebugMode(true);
         VerificationResult res = sut.verify(bprog);
 

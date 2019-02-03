@@ -34,7 +34,7 @@ import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsInspections;
 import il.ac.bgu.cs.bp.bpjs.analysis.Requirements;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
-import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
+import il.ac.bgu.cs.bp.bpjs.analysis.listeners.PrintDfsVerifierListener;
 import java.util.stream.Collectors;
 import org.mozilla.javascript.NativeArray;
 
@@ -85,7 +85,7 @@ public class Mazes {
         try {
             DfsBProgramVerifier vfr = new DfsBProgramVerifier();
 
-            vfr.setProgressListener(new BriefPrintDfsVerifierListener());
+            vfr.setProgressListener(new PrintDfsVerifierListener());
             vfr.setIterationCountGap(10);
             vfr.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
 //            vfr.setVisitedNodeStore(new ForgetfulVisitedStateStore());

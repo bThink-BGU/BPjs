@@ -7,7 +7,7 @@ import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionS
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsInspections;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
-import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
+import il.ac.bgu.cs.bp.bpjs.analysis.listeners.PrintDfsVerifierListener;
 
 /**
  * Verification of the TicTacToe strategy.
@@ -47,7 +47,7 @@ public class TicTacToeVerMain  {
             vfr.setMaxTraceLength(70);
 //            vfr.setDebugMode(true);
             vfr.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
-            vfr.setProgressListener( new BriefPrintDfsVerifierListener() );
+            vfr.setProgressListener(new PrintDfsVerifierListener() );
 
             final VerificationResult res = vfr.verify(bprog);
             if (res.isViolationFound()) {

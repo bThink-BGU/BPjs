@@ -28,7 +28,7 @@ import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsInspections;
 import il.ac.bgu.cs.bp.bpjs.analysis.HashVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
-import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
+import il.ac.bgu.cs.bp.bpjs.analysis.listeners.PrintDfsVerifierListener;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
@@ -113,7 +113,7 @@ public class BPJsCliRunner {
             bpp.setEventSelectionStrategy(sess);
             DfsBProgramVerifier vfr = new DfsBProgramVerifier();
             vfr.setDebugMode( switchPresent("-v", args));
-            vfr.setProgressListener( new BriefPrintDfsVerifierListener() );
+            vfr.setProgressListener(new PrintDfsVerifierListener() );
             
             if ( switchPresent("--full-state-storage", args) ) {
                 println("Using full state storage");
@@ -139,7 +139,7 @@ public class BPJsCliRunner {
             println("Max trace length: " + vfr.getMaxTraceLength() );
             
             try {
-                println("Starting vberification");
+                println("Starting verification");
                 VerificationResult res = vfr.verify(bpp);
                 println("Verification completed.");
                 

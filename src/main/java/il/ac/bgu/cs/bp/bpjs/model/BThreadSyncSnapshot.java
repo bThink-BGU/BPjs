@@ -1,5 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.model;
 
+import il.ac.bgu.cs.bp.bpjs.model.internal.ContinuationProgramState;
 import java.io.Serializable;
 import java.util.Optional;
 
@@ -7,7 +8,6 @@ import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeContinuation;
 import org.mozilla.javascript.Scriptable;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.ContinuationProgramState;
 import java.util.Objects;
 
 /**

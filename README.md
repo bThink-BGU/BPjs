@@ -46,6 +46,7 @@ a link to this page somewhere in the documentation/system about section.
 
 ### 2019-01-19
 * :sparkles: More tests.
+* :arrow_up: `BriefPrintDfsVerifierListener` => `PrintDfsVerifierListener`, so that it's consistent with `PrintBProgramRunnerListener`.
 
 ### 2019-01-18
 * :bug: Fixed a that cause equality tests of JS event sets to return false negatives.

@@ -361,7 +361,6 @@ public class BProgramSyncSnapshot {
         if ( ! getExternalEvents().equals(other.getExternalEvents()) ) {
             return false;
         }
-        // TODO 
         return Objects.equals(threadSnapshots, other.threadSnapshots);
     }
 }

@@ -44,7 +44,7 @@ public class HotBProgramCycleViolation extends Violation {
 
     @Override
     public String decsribe() {
-        return "Hot cycle violation: returning to index " + getCycleToIndex() 
+        return "Hot b-program cycle violation: returning to index " + getCycleToIndex() 
                 + " in the trace because of event " + event.toString();
     }
 
