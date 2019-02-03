@@ -19,11 +19,11 @@ public class StateStoreTests {
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         VisitedStateStore forgetful = new ForgetfulVisitedStateStore();
         DfsTraversalNode initial = DfsTraversalNode.getInitialNode(program, execSvc);
-        forgetful.store(initial);
-        assertFalse(forgetful.isVisited(initial));
+        forgetful.store(initial.getSystemState());
+        assertFalse(forgetful.isVisited(initial.getSystemState()));
 
         DfsTraversalNode next = sut.getUnvisitedNextNode(initial, execSvc);
-        assertFalse(forgetful.isVisited(next));
+        assertFalse(forgetful.isVisited(next.getSystemState()));
     }
 
     @Test
@@ -43,17 +43,17 @@ public class StateStoreTests {
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvc");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         DfsTraversalNode initial = DfsTraversalNode.getInitialNode(program, execSvc);
-        storeToUse.store(initial);
-        assertTrue(storeToUse.isVisited(initial));
+        storeToUse.store(initial.getSystemState());
+        assertTrue(storeToUse.isVisited(initial.getSystemState()));
 
         DfsTraversalNode next = sut.getUnvisitedNextNode(initial, execSvc);
-        assertFalse(storeToUse.isVisited(next));
-        storeToUse.store(next);
-        assertTrue(storeToUse.isVisited(next));
-        assertTrue(storeToUse.isVisited(initial));
+        assertFalse(storeToUse.isVisited(next.getSystemState()));
+        storeToUse.store(next.getSystemState());
+        assertTrue(storeToUse.isVisited(next.getSystemState()));
+        assertTrue(storeToUse.isVisited(initial.getSystemState()));
         storeToUse.clear();
-        assertFalse(storeToUse.isVisited(next));
-        assertFalse(storeToUse.isVisited(initial));
+        assertFalse(storeToUse.isVisited(next.getSystemState()));
+        assertFalse(storeToUse.isVisited(initial.getSystemState()));
     }
 
     @Test
@@ -82,23 +82,23 @@ public class StateStoreTests {
         List<DfsTraversalNode> snapshots = new ArrayList<>();
 
         DfsTraversalNode initial = DfsTraversalNode.getInitialNode(program, execSvc);
-        storeToUse.store(initial);
+        storeToUse.store(initial.getSystemState());
         snapshots.add(initial);
-        assertTrue(storeToUse.isVisited(initial));
+        assertTrue(storeToUse.isVisited(initial.getSystemState()));
         DfsTraversalNode next = initial;
         //Iteration 1,starts already at request state A
         for (int i = 0; i < 4; i++) {
             next = sut.getUnvisitedNextNode(next, execSvc);
-            storeToUse.store(next);
+            storeToUse.store(next.getSystemState());
         }
         snapshots.add(next);
-        assertTrue(storeToUse.isVisited(next));
+        assertTrue(storeToUse.isVisited(next.getSystemState()));
         for (int i = 0; i < 4; i++) {
             next = sut.getUnvisitedNextNode(next, execSvc);
-            storeToUse.store(next);
+            storeToUse.store(next.getSystemState());
         }
         snapshots.add(next);
-        assertTrue(storeToUse.isVisited(next));
+        assertTrue(storeToUse.isVisited(next.getSystemState()));
         //now we want to compare specific states
         BProgramSyncSnapshot state1 = snapshots.get(1).getSystemState();
         BProgramSyncSnapshot state2 = snapshots.get(2).getSystemState();
@@ -131,24 +131,24 @@ public class StateStoreTests {
         List<DfsTraversalNode> snapshots = new ArrayList<>();
 
         DfsTraversalNode initial = DfsTraversalNode.getInitialNode(program, execSvc);
-        storeToUse.store(initial);
+        storeToUse.store(initial.getSystemState());
         snapshots.add(initial);
-        assertTrue(storeToUse.isVisited(initial));
+        assertTrue(storeToUse.isVisited(initial.getSystemState()));
         DfsTraversalNode next = initial;
         //Iteration 1,starts already at request state A
         for (int i = 0; i < 4; i++) {
             next = sut.getUnvisitedNextNode(next, execSvc);
-            storeToUse.store(next);
+            storeToUse.store(next.getSystemState());
         }
         snapshots.add(next);
-        assertTrue(storeToUse.isVisited(next));
+        assertTrue(storeToUse.isVisited(next.getSystemState()));
         for (int i = 0; i < 4; i++) {
             next = sut.getUnvisitedNextNode(next, execSvc);
-            assertTrue(storeToUse.isVisited(next));
-            storeToUse.store(next);
+            assertTrue(storeToUse.isVisited(next.getSystemState()));
+            storeToUse.store(next.getSystemState());
         }
         snapshots.add(next);
-        assertTrue(storeToUse.isVisited(next));
+        assertTrue(storeToUse.isVisited(next.getSystemState()));
         //now we want to compare specific
         BProgramSyncSnapshot state1 = snapshots.get(1).getSystemState();
         BProgramSyncSnapshot state2 = snapshots.get(2).getSystemState();
@@ -191,12 +191,12 @@ public class StateStoreTests {
 
         DfsTraversalNode next1 = initial1;
         DfsTraversalNode next2 = initial2;
-        storeToUse.store(next1);
-        assertTrue(storeToUse.isVisited(next2));
+        storeToUse.store(next1.getSystemState());
+        assertTrue(storeToUse.isVisited(next2.getSystemState()));
         for (int i = 0; i < 4; i++) {
             next1 = sut.getUnvisitedNextNode(next1, execSvc);
-            storeToUse.store(next1);
-            assertTrue(storeToUse.isVisited(next2));
+            storeToUse.store(next1.getSystemState());
+            assertTrue(storeToUse.isVisited(next2.getSystemState()));
         }
     }
 
@@ -226,22 +226,22 @@ public class StateStoreTests {
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
 
         DfsTraversalNode next = DfsTraversalNode.getInitialNode(bprog, execSvc);
-        storeToUse.store(next);
-        assertTrue(storeToUse.isVisited(next));
+        storeToUse.store(next.getSystemState());
+        assertTrue(storeToUse.isVisited(next.getSystemState()));
         //now we enter the loop and generate initial node
         //a is 7
         next = sut.getUnvisitedNextNode(next, execSvc);
-        assertFalse(storeToUse.isVisited(next));
-        storeToUse.store(next);
+        assertFalse(storeToUse.isVisited(next.getSystemState()));
+        storeToUse.store(next.getSystemState());
         //Now loop again, this should also not exist
         next = sut.getUnvisitedNextNode(next, execSvc);
         //a should be -536870912
-        assertFalse(storeToUse.isVisited(next));
-        storeToUse.store(next);
+        assertFalse(storeToUse.isVisited(next.getSystemState()));
+        storeToUse.store(next.getSystemState());
         //now a should be 7 again
         //and now we should see the node
         next = sut.getUnvisitedNextNode(next, execSvc);
-        assertTrue(storeToUse.isVisited(next));
+        assertTrue(storeToUse.isVisited(next.getSystemState()));
 
     }
 }

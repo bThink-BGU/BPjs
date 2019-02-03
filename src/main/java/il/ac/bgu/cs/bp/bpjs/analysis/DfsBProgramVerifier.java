@@ -178,7 +178,7 @@ public class DfsBProgramVerifier {
             final BEvent nextEvent = src.getEventIterator().next();
             DfsTraversalNode possibleNextNode = src.getNextNode(nextEvent, execSvc);
             visitedEdgeCount++;
-            if (visited.isVisited(possibleNextNode) ) {
+            if (visited.isVisited(possibleNextNode.getSystemState()) ) {
                 // Found a possible cycle
                 if ( !cycleInspectors.isEmpty() ) {
                     BProgramSyncSnapshot pns = possibleNextNode.getSystemState();
@@ -243,7 +243,7 @@ public class DfsBProgramVerifier {
     }
 
     private void push(DfsTraversalNode n) {
-        visited.store(n);
+        visited.store(n.getSystemState());
         currentPath.add(n);
     }
 

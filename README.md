@@ -48,6 +48,9 @@ a link to this page somewhere in the documentation/system about section.
 * :sparkles: More tests.
 * :arrow_up: `BriefPrintDfsVerifierListener` => `PrintDfsVerifierListener`, so that it's consistent with `PrintBProgramRunnerListener`.
 
+### 2019-02-03
+* :arrow_up: `VisitedStateStore` now stores *states*, not DFS nodes. So it's more reusable that way.
+
 ### 2019-01-18
 * :bug: Fixed a that cause equality tests of JS event sets to return false negatives.
 * :bug: The `bp` object no longer collected by the state comparators.
