@@ -2,7 +2,7 @@
 
 // Waits for three external events, handle each one. Then quits.
 
-bp.setDaemonMode( true );
+bp.setWaitForExternalEvents( true );
 
 var in1a = bp.Event("in1a");
 var in1b = bp.Event("in1b");
@@ -14,7 +14,7 @@ bp.registerBThread("handler", function() {
         bp.sync( {request:in1a} );
         bp.sync( {request:in1b} );
     }
-    bp.setDaemonMode( false );
+    bp.setWaitForExternalEvents( false );
 });
 
-var internalDaemonMode = bp.isDaemonMode();
+var internalWaitForExternalEvents = bp.isWaitForExternalEvents();
