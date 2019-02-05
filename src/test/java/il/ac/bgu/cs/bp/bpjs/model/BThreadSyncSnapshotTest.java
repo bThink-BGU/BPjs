@@ -58,14 +58,14 @@ public class BThreadSyncSnapshotTest {
         snapshots.add(step);
         //Iteration 1, starts already at request state A
         for (int i = 0; i < 4; i++) {
-            Set<BEvent> possibleEvents_a = bprog.getEventSelectionStrategy().selectableEvents(step.getStatements(), step.getExternalEvents());
-            EventSelectionResult event_a = bprog.getEventSelectionStrategy().select(step.getStatements(), step.getExternalEvents(), possibleEvents_a).get();
+            Set<BEvent> possibleEvents_a = bprog.getEventSelectionStrategy().selectableEvents(step);
+            EventSelectionResult event_a = bprog.getEventSelectionStrategy().select(step, possibleEvents_a).get();
             step = step.triggerEvent(event_a.getEvent(), execSvc, listeners);
         }
         snapshots.add(step);
         for (int i = 0; i < 4; i++) {
-            Set<BEvent> possibleEvents_a = bprog.getEventSelectionStrategy().selectableEvents(step.getStatements(), step.getExternalEvents());
-            EventSelectionResult event_a = bprog.getEventSelectionStrategy().select(step.getStatements(), step.getExternalEvents(), possibleEvents_a).get();
+            Set<BEvent> possibleEvents_a = bprog.getEventSelectionStrategy().selectableEvents(step);
+            EventSelectionResult event_a = bprog.getEventSelectionStrategy().select(step, possibleEvents_a).get();
             step = step.triggerEvent(event_a.getEvent(), execSvc, listeners);
         }
         snapshots.add(step);
@@ -86,8 +86,8 @@ public class BThreadSyncSnapshotTest {
         BProgramSyncSnapshot postSetup = bprog.setup();
         ExecutorService execSvcA = ExecutorServiceMaker.makeWithName("BProgramSnapshotTriggerTest");
         BProgramSyncSnapshot postSync1 = postSetup.start(execSvcA);
-        Set<BEvent> possibleEvents = bprog.getEventSelectionStrategy().selectableEvents(postSync1.getStatements(), postSync1.getExternalEvents());
-        EventSelectionResult esr = bprog.getEventSelectionStrategy().select(postSync1.getStatements(), postSync1.getExternalEvents(), possibleEvents).get();
+        Set<BEvent> possibleEvents = bprog.getEventSelectionStrategy().selectableEvents(postSync1);
+        EventSelectionResult esr = bprog.getEventSelectionStrategy().select(postSync1, possibleEvents).get();
         BProgramSyncSnapshot postSync2 = postSync1.triggerEvent(esr.getEvent(), execSvcA, listeners);
         assertNotEquals(postSync1.getBThreadSnapshots(), postSync2.getBThreadSnapshots());
 

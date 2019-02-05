@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 BGU-BPJS team.
+ * Copyright 2019 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,41 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.model.eventselection;
+package il.ac.bgu.cs.bp.bpjs.mocks;
 
-import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
-import java.util.Optional;
-import java.util.Set;
+import java.util.ArrayList;
 
 /**
- * Base class for {@link EventSelectionStrategy} decorators.These allow
- * modification/inspection of existing event selection strategies via 
- * composition rather than sub-classing.
- * 
+ *
  * @author michael
- * @param <ESS> The type of event selection strategy being decorated.
  */
-public abstract class AbstractEventSelectionStrategyDecorator<ESS extends EventSelectionStrategy> implements EventSelectionStrategy {
+public class MockBProgramSyncSnapshot extends BProgramSyncSnapshot {
     
-    protected final ESS decorated;
-
-    public AbstractEventSelectionStrategyDecorator(ESS decorated) {
-        this.decorated = decorated;
-    }
-    
-    public ESS getDecorated() {
-        return decorated;
-    }
-
-    @Override
-    public Set<BEvent> selectableEvents(BProgramSyncSnapshot bpss) {
-        return getDecorated().selectableEvents(bpss);
-    }
-
-    @Override
-    public Optional<EventSelectionResult> select(BProgramSyncSnapshot bpss, Set<BEvent> selectableEvents) {
-        return getDecorated().select(bpss, selectableEvents);
+    public MockBProgramSyncSnapshot(BProgramSyncSnapshot bpss) {
+        super(bpss.getBProgram(), bpss.getBThreadSnapshots(), new ArrayList<>(bpss.getExternalEvents()), bpss.getFailedAssertion());
     }
     
 }

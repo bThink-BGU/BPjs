@@ -81,7 +81,7 @@ public final class DfsInspections {
         if ( curNode.getSystemState().isHot() &&
             curNode.getSelectableEvents().isEmpty() ) {
             Set<String> hotlyTerminated = curNode.getSystemState().getBThreadSnapshots().stream()
-                .filter( s -> s.getBSyncStatement().isHot() ).map( s->s.getName() ).collect( toSet() );
+                .filter( s -> s.getSyncStatement().isHot() ).map( s->s.getName() ).collect( toSet() );
             return Optional.of( new HotTerminationViolation(hotlyTerminated, trace) );
         } else return Optional.empty();
     }; 
@@ -123,7 +123,7 @@ public final class DfsInspections {
         }
         
         private Set<String> getHotThreadNames( Set<BThreadSyncSnapshot> bts ) {
-            return bts.stream().filter( bt -> bt.getBSyncStatement().isHot() )
+            return bts.stream().filter( bt -> bt.getSyncStatement().isHot() )
                       .map( bt -> bt.getName() )
                       .collect( toSet() );
         }
@@ -139,7 +139,7 @@ public final class DfsInspections {
     // Utility methods.
     
     private static boolean hasRequestedEvents(BProgramSyncSnapshot bpss) {
-        return bpss.getBThreadSnapshots().stream().anyMatch(btss -> (!btss.getBSyncStatement().getRequest().isEmpty()));
+        return bpss.getBThreadSnapshots().stream().anyMatch(btss -> (!btss.getSyncStatement().getRequest().isEmpty()));
     }
     
     private static DfsTraversalNode peek(List<DfsTraversalNode> trace) {

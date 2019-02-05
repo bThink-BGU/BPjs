@@ -42,7 +42,7 @@ public interface DfsCycleInspection {
      * <code>
      * [a]-[b]-[c]-[d]--...
      *       \      |
-     *        +-----+
+     *        +-----+ (going from d back to b)
      * </code>
      * 
      * This methods will be called with trace={@code [a][b][c][d]} and 

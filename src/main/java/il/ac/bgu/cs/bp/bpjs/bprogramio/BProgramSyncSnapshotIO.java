@@ -181,7 +181,7 @@ public class BProgramSyncSnapshotIO {
         try (BThreadSyncSnapshotOutputStream btos = new BThreadSyncSnapshotOutputStream(bthreadBytes, scope)) {
             btos.writeObject(bss.getEntryPoint());
             btos.writeObject(bss.getInterrupt().orElse(null));
-            btos.writeObject(bss.getBSyncStatement());
+            btos.writeObject(bss.getSyncStatement());
 
             btos.writeObject(bss.getContinuation());
             btos.flush();

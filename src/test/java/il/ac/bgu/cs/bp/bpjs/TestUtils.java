@@ -26,8 +26,18 @@ package il.ac.bgu.cs.bp.bpjs;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
+import il.ac.bgu.cs.bp.bpjs.mocks.MockBProgramSyncSnapshot;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
+import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
+import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import static java.util.stream.Collectors.joining;
@@ -70,5 +80,17 @@ public abstract class TestUtils {
             System.out.println("Exception while calling safeGet:" + ex.getMessage());
             throw new RuntimeException(ex);
         }
+    }
+   
+    public static BProgramSyncSnapshot makeBPSS( BThreadSyncSnapshot... snapshots ) {
+        Set<BThreadSyncSnapshot> bts = new HashSet<>();
+        bts.addAll(Arrays.asList(snapshots));
+        return makeBPSS( bts );
+    }
+    
+    public static BProgramSyncSnapshot makeBPSS( Collection<BThreadSyncSnapshot> snapshots ) {
+        BProgram bprog = new StringBProgram("");
+        Set<BThreadSyncSnapshot> bts = new HashSet<>(snapshots);
+        return new MockBProgramSyncSnapshot(new BProgramSyncSnapshot(bprog, bts, Collections.emptyList(), null));
     }
 }

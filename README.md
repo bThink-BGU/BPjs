@@ -44,13 +44,20 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change Log for the BPjs Library.
 
+### 2019-02-04
+* :arrow_up: :tada: Event selection strategies now accept `BProgramSyncSnapshot`, rather than a set of sync statements and external events.
+
+### 2019-02-04
+* :sparkles: Testing infrastructure for execution traces.
+* :arrow_up: More terminology cleanups in the api (e.g. "bsync" converted to "sync")
+
+### 2019-02-03
+* :arrow_up: `VisitedStateStore` now stores *states*, not DFS nodes. So it's more reusable that way.
+
 ### 2019-01-19
 * :sparkles: More tests.
 * :arrow_up: `BriefPrintDfsVerifierListener` => `PrintDfsVerifierListener`, so that it's consistent with `PrintBProgramRunnerListener`.
 * :arrow_up: Incorporated the "BPjs Tips" file to the central documentation.
-
-### 2019-02-03
-* :arrow_up: `VisitedStateStore` now stores *states*, not DFS nodes. So it's more reusable that way.
 
 ### 2019-01-18
 * :bug: Fixed a that cause equality tests of JS event sets to return false negatives.

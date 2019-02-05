@@ -23,8 +23,11 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
+import il.ac.bgu.cs.bp.bpjs.TestUtils;
+import il.ac.bgu.cs.bp.bpjs.mocks.MockBThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -38,13 +41,10 @@ import org.junit.Test;
  */
 public class OrderedEventSelectionStrategyTest {
     
-    public OrderedEventSelectionStrategyTest() {
-    }
-    
-    private static final BEvent evt1 = new BEvent("evt1");
-    private static final BEvent evt2 = new BEvent("evt2");
-    private static final BEvent evt3 = new BEvent("evt3");
-    private static final BEvent evt4 = new BEvent("evt4");
+    private static final BEvent EVT_1 = new BEvent("evt1");
+    private static final BEvent EVT_2 = new BEvent("evt2");
+    private static final BEvent EVT_3 = new BEvent("evt3");
+    private static final BEvent EVT_4 = new BEvent("evt4");
     
     /**
      * Test of selectableEvents method, of class OrderedEventSelectionStrategy.
@@ -54,11 +54,12 @@ public class OrderedEventSelectionStrategyTest {
         
        OrderedEventSelectionStrategy sut = new OrderedEventSelectionStrategy();
        
-       Set<SyncStatement> stmts = new HashSet<>();
-       stmts.add(SyncStatement.make().request(Arrays.asList(evt1, evt2, evt3, evt4)));
-       stmts.add(SyncStatement.make().request(Arrays.asList(evt2, evt3, evt4)));
+       BProgramSyncSnapshot bpss = TestUtils.makeBPSS(
+           new MockBThreadSyncSnapshot(SyncStatement.make().request(Arrays.asList(EVT_1, EVT_2, EVT_3, EVT_4))),
+           new MockBThreadSyncSnapshot(SyncStatement.make().request(Arrays.asList(EVT_2, EVT_3, EVT_4)))
+       );
        
-       assertEquals( new HashSet<>(Arrays.asList(evt1, evt2)), sut.selectableEvents(stmts, Collections.emptyList()));
+       assertEquals( new HashSet<>(Arrays.asList(EVT_1, EVT_2)), sut.selectableEvents(bpss));
     }
 
     @Test
@@ -66,12 +67,13 @@ public class OrderedEventSelectionStrategyTest {
         
        OrderedEventSelectionStrategy sut = new OrderedEventSelectionStrategy();
        
-       Set<SyncStatement> stmts = new HashSet<>();
-       stmts.add(SyncStatement.make().request(Arrays.asList(evt1, evt2, evt3, evt4)));
-       stmts.add(SyncStatement.make().request(Arrays.asList(evt2, evt3, evt4)));
-       stmts.add(SyncStatement.make().request(Arrays.asList(evt3, evt4)).block(evt1));
+       BProgramSyncSnapshot bpss = TestUtils.makeBPSS(
+            new MockBThreadSyncSnapshot(SyncStatement.make().request(Arrays.asList(EVT_1, EVT_2, EVT_3, EVT_4))),
+            new MockBThreadSyncSnapshot(SyncStatement.make().request(Arrays.asList(EVT_2, EVT_3, EVT_4))),
+            new MockBThreadSyncSnapshot(SyncStatement.make().request(Arrays.asList(EVT_3, EVT_4)).block(EVT_1))
+       );
        
-       assertEquals( new HashSet<>(Arrays.asList(evt3, evt2)), sut.selectableEvents(stmts, Collections.emptyList()));
+       assertEquals( new HashSet<>(Arrays.asList(EVT_3, EVT_2)), sut.selectableEvents(bpss));
     }
     
 }

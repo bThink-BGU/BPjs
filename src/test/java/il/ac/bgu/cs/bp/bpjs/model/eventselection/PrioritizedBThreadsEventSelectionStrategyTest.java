@@ -1,16 +1,18 @@
 package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
+import il.ac.bgu.cs.bp.bpjs.TestUtils;
+import il.ac.bgu.cs.bp.bpjs.mocks.MockBThreadSyncSnapshot;
 import static org.junit.Assert.*;
 
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Set;
 import org.junit.Test;
 
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import org.junit.Before;
 
 public class PrioritizedBThreadsEventSelectionStrategyTest {
@@ -33,64 +35,61 @@ public class PrioritizedBThreadsEventSelectionStrategyTest {
     
 	@Test
 	public void testSelectableEvents_noBlocking() throws InterruptedException {
-		Set<SyncStatement> stmts = new HashSet<>();
-		stmts.add(SyncStatement.make(bt("1")).request(Arrays.asList(EVT_1)));
-		stmts.add(SyncStatement.make(bt("2")).request(Arrays.asList(EVT_2)));
-		stmts.add(SyncStatement.make(bt("3")).request(Arrays.asList(EVT_3)));
+        BProgramSyncSnapshot bpss = TestUtils.makeBPSS(
+            new MockBThreadSyncSnapshot("bt1", SyncStatement.make(bt("1")).request(Arrays.asList(EVT_1))),
+            new MockBThreadSyncSnapshot("bt2", SyncStatement.make(bt("2")).request(Arrays.asList(EVT_2))),
+            new MockBThreadSyncSnapshot("bt3", SyncStatement.make(bt("3")).request(Arrays.asList(EVT_3)))
+        );
 		
-		assertEquals(new HashSet<>(Arrays.asList(EVT_3)),
-				sut.selectableEvents(stmts, Collections.emptyList()));
+		assertEquals(new HashSet<>(Arrays.asList(EVT_3)), sut.selectableEvents(bpss));
 	}
 	
     @Test
 	public void testSelectableEvents_noBlocking_double() throws InterruptedException {
-		Set<SyncStatement> stmts = new HashSet<>();
-		stmts.add(SyncStatement.make(bt("1")).request(Arrays.asList(EVT_1)));
-		stmts.add(SyncStatement.make(bt("2")).request(Arrays.asList(EVT_2)));
-		stmts.add(SyncStatement.make(bt("2a")).request(Arrays.asList(EVT_2A)));
+		BProgramSyncSnapshot bpss = TestUtils.makeBPSS(
+            new MockBThreadSyncSnapshot("bt1", SyncStatement.make(bt("1")).request(Arrays.asList(EVT_1))),
+            new MockBThreadSyncSnapshot("bt2", SyncStatement.make(bt("2")).request(Arrays.asList(EVT_2))),
+            new MockBThreadSyncSnapshot("bt2a", SyncStatement.make(bt("2a")).request(Arrays.asList(EVT_2A)))
+        );
+        
 		
 		assertEquals(new HashSet<>(Arrays.asList(EVT_2, EVT_2A)),
-				sut.selectableEvents(stmts, Collections.emptyList()));
+				sut.selectableEvents(bpss));
 	}
 
 	@Test	
 	public void testSelectableEvents_withBlocking() {
-		Set<SyncStatement> stmts = new HashSet<>();
-        
-        stmts.add(SyncStatement.make(bt("1")).request(Arrays.asList(EVT_1)));
-		stmts.add(SyncStatement.make(bt("2")).request(Arrays.asList(EVT_2)).block(EVT_3));
-		stmts.add(SyncStatement.make(bt("3")).request(Arrays.asList(EVT_3)));
-		
+		BProgramSyncSnapshot bpss = TestUtils.makeBPSS(
+            new MockBThreadSyncSnapshot("bt1", SyncStatement.make(bt("1")).request(Arrays.asList(EVT_1))),
+            new MockBThreadSyncSnapshot("bt2", SyncStatement.make(bt("2")).request(Arrays.asList(EVT_2)).block(EVT_3)),
+            new MockBThreadSyncSnapshot("bt3", SyncStatement.make(bt("3")).request(Arrays.asList(EVT_3)))
+        );
         
         assertEquals(new HashSet<>(Arrays.asList(EVT_2)),
-				sut.selectableEvents(stmts, Collections.emptyList()));
+				sut.selectableEvents(bpss));
 	}
 	
     @Test	
 	public void testSelectableEvents_allBlocked() {
-		Set<SyncStatement> stmts = new HashSet<>();
-        
-        stmts.add(SyncStatement.make(bt("1")).request(Arrays.asList(EVT_1)).block(EVT_2));
-		stmts.add(SyncStatement.make(bt("2")).request(Arrays.asList(EVT_2)).block(EVT_3));
-		stmts.add(SyncStatement.make(bt("3")).request(Arrays.asList(EVT_3)).block(EVT_1));
+		BProgramSyncSnapshot bpss = TestUtils.makeBPSS(
+            new MockBThreadSyncSnapshot("bt1", SyncStatement.make(bt("1")).request(Arrays.asList(EVT_1)).block(EVT_2)),
+            new MockBThreadSyncSnapshot("bt2", SyncStatement.make(bt("2")).request(Arrays.asList(EVT_2)).block(EVT_3)),
+            new MockBThreadSyncSnapshot("bt3", SyncStatement.make(bt("3")).request(Arrays.asList(EVT_3)).block(EVT_1))
+        );
 		
-        
-        assertEquals( Collections.emptySet(),
-				      sut.selectableEvents(stmts, Collections.emptyList()));
+        assertEquals( Collections.emptySet(), sut.selectableEvents(bpss));
 	}
 	
-    
     @Test	
 	public void testSelectableEvents_withBlocking_double() {
-		Set<SyncStatement> stmts = new HashSet<>();
+		BProgramSyncSnapshot bpss = TestUtils.makeBPSS(
+            new MockBThreadSyncSnapshot("bt1",  SyncStatement.make(bt("1")).request(Arrays.asList(EVT_1))),
+            new MockBThreadSyncSnapshot("bt2",  SyncStatement.make(bt("2")).request(Arrays.asList(EVT_2))),
+            new MockBThreadSyncSnapshot("bt2a", SyncStatement.make(bt("2a")).request(Arrays.asList(EVT_2A))),
+            new MockBThreadSyncSnapshot("bt3",  SyncStatement.make(bt("3")).block(EVT_2A))
+        );
         
-        stmts.add(SyncStatement.make(bt("1")).request(Arrays.asList(EVT_1)));
-		stmts.add(SyncStatement.make(bt("2")).request(Arrays.asList(EVT_2)));
-		stmts.add(SyncStatement.make(bt("2a")).request(Arrays.asList(EVT_2A)));
-		stmts.add(SyncStatement.make(bt("3")).block(EVT_2A));
-        
-        assertEquals(new HashSet<>(Arrays.asList(EVT_2)),
-				sut.selectableEvents(stmts, Collections.emptyList()));
+        assertEquals(new HashSet<>(Arrays.asList(EVT_2)), sut.selectableEvents(bpss));
 	}
     
     @Test

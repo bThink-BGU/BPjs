@@ -142,7 +142,7 @@ public class BProgramSyncSnapshot {
             
             // Split threads to those that advance this round and those that sleep.
             threadSnapshots.forEach( snapshot -> {
-                (snapshot.getBSyncStatement().shouldWakeFor(anEvent) ? resumingThisRound : sleepingThisRound).add(snapshot);
+                (snapshot.getSyncStatement().shouldWakeFor(anEvent) ? resumingThisRound : sleepingThisRound).add(snapshot);
             });
         } finally {
             Context.exit();
@@ -183,7 +183,7 @@ public class BProgramSyncSnapshot {
 
     private void handleInterrupts(BEvent anEvent, Iterable<BProgramRunnerListener> listeners, BProgram bprog, Context ctxt) {
         Set<BThreadSyncSnapshot> interrupted = threadSnapshots.stream()
-                .filter(bt -> bt.getBSyncStatement().getInterrupt().contains(anEvent))
+                .filter(bt -> bt.getSyncStatement().getInterrupt().contains(anEvent))
                 .collect(toSet());
         if (!interrupted.isEmpty()) {
             threadSnapshots.removeAll(interrupted);
@@ -211,7 +211,7 @@ public class BProgramSyncSnapshot {
     }
     
     public Set<SyncStatement> getStatements() {
-        return getBThreadSnapshots().stream().map(BThreadSyncSnapshot::getBSyncStatement)
+        return getBThreadSnapshots().stream().map(BThreadSyncSnapshot::getSyncStatement)
                 .collect(toSet());
     }
     
@@ -256,7 +256,7 @@ public class BProgramSyncSnapshot {
      */
     public boolean isHot() {
         return getBThreadSnapshots().stream()
-                    .map(BThreadSyncSnapshot::getBSyncStatement)
+                    .map(BThreadSyncSnapshot::getSyncStatement)
                     .filter(SyncStatement::isHot)
                     .findAny().isPresent();
     }

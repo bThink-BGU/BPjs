@@ -56,13 +56,17 @@ import org.mozilla.javascript.UniqueTag;
  * @author michael
  */
 public class ContinuationProgramState {
-    private final Map<Object, Object> variables = new HashMap<>();
-    private int programCounter = -1;
-    private int frameIndex = -1;
+    protected final Map<Object, Object> variables = new HashMap<>();
+    protected int programCounter = -1;
+    protected int frameIndex = -1;
 
     public ContinuationProgramState( NativeContinuation nc ) {
         collectStatus(nc.getImplementation());
         collectScopeValues(nc);
+    }
+    
+    protected ContinuationProgramState(){
+        // extra C'tor for subclasses.
     }
     
     private void collectScopeValues(NativeContinuation nc ){
@@ -189,7 +193,7 @@ public class ContinuationProgramState {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if ( ! (obj instanceof ContinuationProgramState) ) {
             return false;
         }
         final ContinuationProgramState other = (ContinuationProgramState) obj;

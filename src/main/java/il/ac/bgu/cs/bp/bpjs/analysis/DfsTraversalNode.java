@@ -48,8 +48,7 @@ public class DfsTraversalNode {
         this.lastEvent = e;
 
         if (bp != null) {
-            selectableEvents = bp.getEventSelectionStrategy().selectableEvents(systemState.getStatements(),
-                    systemState.getExternalEvents());
+            selectableEvents = bp.getEventSelectionStrategy().selectableEvents(systemState);
             ArrayList<BEvent> eventOrdered = new ArrayList<>(selectableEvents);
             Collections.shuffle(eventOrdered);
             iterator = eventOrdered.iterator();
@@ -64,7 +63,7 @@ public class DfsTraversalNode {
 
         StringBuilder str = new StringBuilder();
         systemState.getBThreadSnapshots().forEach(
-                s -> str.append("\t").append(s.toString()).append(" {").append(s.getBSyncStatement()).append("} \n"));
+                s -> str.append("\t").append(s.toString()).append(" {").append(s.getSyncStatement()).append("} \n"));
 
         return str.toString();
     }

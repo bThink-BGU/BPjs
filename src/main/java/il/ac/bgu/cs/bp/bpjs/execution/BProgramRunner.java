@@ -94,7 +94,7 @@ public class BProgramRunner implements Runnable {
             while ( (!cur.noBThreadsLeft()) && go.get() ) {
                                 
                 // see which events are selectable
-                Set<BEvent> possibleEvents = bprog.getEventSelectionStrategy().selectableEvents(cur.getStatements(), cur.getExternalEvents());
+                Set<BEvent> possibleEvents = bprog.getEventSelectionStrategy().selectableEvents(cur);
                 if ( possibleEvents.isEmpty() ) {
                     // Superstep done: No events available for selection.
                     
@@ -115,7 +115,7 @@ public class BProgramRunner implements Runnable {
 
                 } else {
                     // we can select some events - select one and advance.
-                    Optional<EventSelectionResult> res = bprog.getEventSelectionStrategy().select(cur.getStatements(), cur.getExternalEvents(), possibleEvents);
+                    Optional<EventSelectionResult> res = bprog.getEventSelectionStrategy().select(cur, possibleEvents);
 
                     if ( res.isPresent() ) {
                         EventSelectionResult esr = res.get();

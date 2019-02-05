@@ -38,7 +38,7 @@ public class DiningPhilTest {
                 .sorted((s1, s2) -> s1.getName().compareTo(s2.getName()))
                 .forEach(s -> {
                     System.out.println(s.getName());
-                    System.out.println(s.getBSyncStatement());
+                    System.out.println(s.getSyncStatement());
                     System.out.println();
                 });
     }

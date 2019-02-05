@@ -88,11 +88,11 @@ public class BThreadSyncSnapshot implements Serializable {
         return retVal;
     }
 
-    public SyncStatement getBSyncStatement() {
+    public SyncStatement getSyncStatement() {
         return bSyncStatement;
     }
 
-    public void setBSyncStatement(SyncStatement stmt) {
+    public void setSyncStatement(SyncStatement stmt) {
         bSyncStatement = stmt;
         if (bSyncStatement.getBthread() != this) {
             bSyncStatement.setBthread(this);
