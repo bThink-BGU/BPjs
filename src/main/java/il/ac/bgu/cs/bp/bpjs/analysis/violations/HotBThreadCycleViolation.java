@@ -23,7 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis.violations;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
+import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import java.util.List;
 import java.util.Set;
@@ -38,14 +38,10 @@ import static java.util.stream.Collectors.joining;
  */
 public class HotBThreadCycleViolation extends Violation {
     
-    private final int cycleToIndex;
-    private final BEvent event;
     private final Set<String> bthreads;
     
-    public HotBThreadCycleViolation(List<DfsTraversalNode> counterExampleTrace, int cycleToIndex, BEvent event, Set<String> bthreads) {
-        super(counterExampleTrace);
-        this.cycleToIndex = cycleToIndex;
-        this.event = event;
+    public HotBThreadCycleViolation(ExecutionTrace trace, Set<String> bthreads) {
+        super(trace);
         this.bthreads = bthreads;
     }
     
@@ -53,16 +49,17 @@ public class HotBThreadCycleViolation extends Violation {
     public String decsribe() {
         return "Hot b-thread cycle violation: b-threads "
             + (bthreads.stream().collect(joining(" ,"))) 
-            + " can get to an infinite hot loop. Cycle returns to index " + cycleToIndex
-                + " because of event " + event; 
+            + " can get to an infinite hot loop. Cycle returns to index " + getCounterExampleTrace().getCycleToIndex()
+                + " because of event " + getCycleToEvent(); 
     }
 
     public int getCycleToIndex() {
-        return cycleToIndex;
+        return getCounterExampleTrace().getCycleToIndex();
     }
 
     public BEvent getCycleToEvent() {
-        return event;
+        List<ExecutionTrace.Entry> nds = getCounterExampleTrace().getNodes();
+        return nds.get(nds.size()-1).getEvent().get();
     }
 
     public Set<String> getBThreads() {

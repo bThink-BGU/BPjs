@@ -23,8 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis.violations;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
-import java.util.List;
+import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
 import java.util.Set;
 import static java.util.stream.Collectors.joining;
 
@@ -36,7 +35,7 @@ public class HotTerminationViolation extends Violation {
     
     private final Set<String> hotlyTerminated;
 
-    public HotTerminationViolation(Set<String> hotlyTerminated, List<DfsTraversalNode> counterExampleTrace) {
+    public HotTerminationViolation(Set<String> hotlyTerminated, ExecutionTrace counterExampleTrace) {
         super(counterExampleTrace);
         this.hotlyTerminated = hotlyTerminated;
     }

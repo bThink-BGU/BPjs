@@ -23,7 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis.violations;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
+import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import java.util.List;
 
@@ -33,27 +33,23 @@ import java.util.List;
  */
 public class HotBProgramCycleViolation extends Violation {
     
-    private final int cycleToIndex;
-    private final BEvent event;
-
-    public HotBProgramCycleViolation(List<DfsTraversalNode> counterExampleTrace, int cycleToIndex, BEvent event) {
-        super(counterExampleTrace);
-        this.cycleToIndex = cycleToIndex;
-        this.event = event;
+    public HotBProgramCycleViolation(ExecutionTrace trace) {
+        super(trace);
     }
 
     @Override
     public String decsribe() {
         return "Hot b-program cycle violation: returning to index " + getCycleToIndex() 
-                + " in the trace because of event " + event.toString();
+                + " in the trace because of event " + getCycleToEvent();
     }
 
     public int getCycleToIndex() {
-        return cycleToIndex;
+        return getCounterExampleTrace().getCycleToIndex();
     }
 
     public BEvent getCycleToEvent() {
-        return event;
+        List<ExecutionTrace.Entry> nodes = getCounterExampleTrace().getNodes();
+        return nodes.get(nodes.size()-1).getEvent().get();
     }
     
 }

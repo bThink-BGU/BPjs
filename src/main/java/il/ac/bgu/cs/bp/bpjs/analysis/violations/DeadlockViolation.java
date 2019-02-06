@@ -23,13 +23,13 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis.violations;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
+import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
 import il.ac.bgu.cs.bp.bpjs.internal.Pair;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
@@ -46,14 +46,14 @@ public class DeadlockViolation extends Violation {
     
     private final String description;
     
-    public DeadlockViolation(List<DfsTraversalNode> counterExampleTrace) {
+    public DeadlockViolation(ExecutionTrace counterExampleTrace) {
         super(counterExampleTrace);
-        DfsTraversalNode last = counterExampleTrace.get(counterExampleTrace.size()-1);
+        BProgramSyncSnapshot last = counterExampleTrace.getLastState();
         Map<BEvent, Set<String>> requestedBy = new HashMap<>();
         Map<BEvent, Set<String>> blockedBy;
         
         // collect who requested what
-        last.getSystemState().getStatements().forEach( syncs -> {
+        last.getStatements().forEach( syncs -> {
             syncs.getRequest().forEach( evt -> {
                 if ( ! requestedBy.containsKey(evt) ) {
                     requestedBy.put(evt, new HashSet<>());
@@ -67,7 +67,7 @@ public class DeadlockViolation extends Violation {
             // collect who blocked what
             blockedBy = requestedBy.keySet().stream().map( evt -> Pair.of(
                     evt, 
-                    last.getSystemState().getStatements().stream().filter(s->isBlocking(s,evt)).map(s->s.getBthread().getName()).collect(toSet()))
+                    last.getStatements().stream().filter(s->isBlocking(s,evt)).map(s->s.getBthread().getName()).collect(toSet()))
             ).collect( Collectors.toMap(p->p.getLeft(), p->p.getRight(), (s1, s2)->{
                 Set<String> mergedSet = new TreeSet<>();
                 mergedSet.addAll(s1);

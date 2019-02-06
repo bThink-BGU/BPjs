@@ -5,7 +5,8 @@ import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
-import il.ac.bgu.cs.bp.bpjs.analysis.DfsInspections;
+import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTraceInspection;
+import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTraceInspections;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.PrintDfsVerifierListener;
 
@@ -42,7 +43,7 @@ public class TicTacToeVerMain  {
 //		bprog.appendSource(infiBThread);
         try {
             DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-            vfr.addInspector(DfsInspections.FailedAssertions);
+            vfr.addInspection(ExecutionTraceInspections.FAILED_ASSERTIONS);
 
             vfr.setMaxTraceLength(70);
 //            vfr.setDebugMode(true);
@@ -54,7 +55,8 @@ public class TicTacToeVerMain  {
                 System.out.println("Found a counterexample");
                 res.getViolation().get()
                     .getCounterExampleTrace()
-                    .forEach(nd -> System.out.println(" " + nd.getLastEvent()));
+                    .getNodes()
+                    .forEach(nd -> System.out.println(" " + nd.getEvent()));
 
             } else {
                 System.out.println("No counterexample found.");

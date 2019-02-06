@@ -25,7 +25,7 @@ package il.ac.bgu.cs.bp.bpjs.mains;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.BThreadSnapshotVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
-import il.ac.bgu.cs.bp.bpjs.analysis.DfsInspections;
+import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTraceInspections;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotBProgramCycleViolation;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
@@ -33,6 +33,7 @@ import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import java.util.Objects;
+import java.util.Optional;
 import static java.util.stream.Collectors.joining;
 
 /**
@@ -58,7 +59,7 @@ public class CaseofTheHotFruitBProgram {
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         // Adding the inspector means it will be the only inspector run, as the default set will not be used.
-        vfr.addInspector(DfsInspections.HotBProgramCycles);
+        vfr.addInspection(ExecutionTraceInspections.HOT_BPROGRAM_CYCLES);
         vfr.setVisitedNodeStore( new BThreadSnapshotVisitedStateStore() );
         final VerificationResult res = vfr.verify(bprog);
 
@@ -68,9 +69,10 @@ public class CaseofTheHotFruitBProgram {
             System.out.println(v.decsribe());
             System.out.println("Trace:");
             HotBProgramCycleViolation hcv = (HotBProgramCycleViolation) v;
-            System.out.println(hcv.getCounterExampleTrace().stream()
-                                    .map(nd->nd.getLastEvent())
-                                    .map(e -> Objects.toString(e))
+            System.out.println(hcv.getCounterExampleTrace().getNodes().stream()
+                                    .map(nd->nd.getEvent())
+                                    .filter( Optional::isPresent )
+                                    .map(e -> Objects.toString(e.get()))
                                     .collect(joining("\n")));
             System.out.println("Cycle-to Index:" + hcv.getCycleToIndex());
             System.out.println("Cycle-to Event:" + hcv.getCycleToEvent());

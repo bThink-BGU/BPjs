@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 michael.
+ * Copyright 2019 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,14 +25,14 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.DeadlockViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.FailedAssertionViolation;
-import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotBThreadCycleViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotBProgramCycleViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotBThreadCycleViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotTerminationViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
-import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -41,72 +41,91 @@ import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
 /**
- *
- * A static collection of commonly used inspections. These objects can detect
- * problems in a b-program, during a DFS traversal of its state space.
  * 
- * @see DfsBProgramVerifier
+ * A static collection of commonly used inspections. These objects can detect
+ * problems in a b-program, during a traversal of its state space.
+ * 
  * @author michael
  */
-public final class DfsInspections {
-    
+public class ExecutionTraceInspections {
+        
     /**
      * Detects a deadlock in a b-program: where there are requested events, but
      * non of them is selectable.
      */
-    public static final DfsTraceInspection Deadlock = (List<DfsTraversalNode> trace) -> {
-        DfsTraversalNode curNode = peek(trace);
-        if (hasRequestedEvents(curNode.getSystemState()) &&
-            curNode.getSelectableEvents().isEmpty()) {
-            return Optional.of(new DeadlockViolation(trace));
-        } else return Optional.empty();
-    };
-    
+    public static final ExecutionTraceInspection DEADLOCKS = ExecutionTraceInspection.named(
+        "Deadlocks",
+        trace -> {
+            if ( trace.isCyclic() ) return Optional.empty(); 
+            BProgramSyncSnapshot curState = trace.getLastState();
+            if (hasRequestedEvents(curState) &&
+                trace.getBProgram().getEventSelectionStrategy().selectableEvents(curState).isEmpty()) {
+                return Optional.of(new DeadlockViolation(trace));
+            } else return Optional.empty();
+    });
+
     /**
      * Detects when a b-thread calls an assertion which evaluates to {@code false}.
-     */
-    public static final DfsTraceInspection FailedAssertions = (List<DfsTraversalNode> trace) -> {
-        DfsTraversalNode curNode = peek(trace);
-        if (!curNode.getSystemState().isStateValid()) {
-            return Optional.of(new FailedAssertionViolation(curNode.getSystemState().getFailedAssertion(), trace));
-        } else return Optional.empty();
-    };
-        
+     */    
+    public static final ExecutionTraceInspection FAILED_ASSERTIONS = ExecutionTraceInspection.named(
+        "Failed Assertions",
+        trace -> {
+            if ( trace.isCyclic() ) return Optional.empty(); 
+            BProgramSyncSnapshot curState = trace.getLastState();
+            if (!trace.getLastState().isStateValid()) {
+                return Optional.of(new FailedAssertionViolation(trace.getLastState().getFailedAssertion(), trace));
+            } else return Optional.empty();
+    });
+    
     /**
      * Detects a case where a b-program ends, while one of its b-threads is in a 
      * hot sync.
      */
-    public static final DfsTraceInspection HotTermination = (List<DfsTraversalNode> trace) -> {
-        DfsTraversalNode curNode = peek(trace);
-        if ( curNode.getSystemState().isHot() &&
-            curNode.getSelectableEvents().isEmpty() ) {
-            Set<String> hotlyTerminated = curNode.getSystemState().getBThreadSnapshots().stream()
-                .filter( s -> s.getSyncStatement().isHot() ).map( s->s.getName() ).collect( toSet() );
-            return Optional.of( new HotTerminationViolation(hotlyTerminated, trace) );
-        } else return Optional.empty();
-    }; 
+    public static final ExecutionTraceInspection HOT_TERMINATIONS = ExecutionTraceInspection.named(
+        "Hot Terminations",
+        trace -> {
+            if ( trace.isCyclic() ) return Optional.empty(); 
+            BProgramSyncSnapshot curState = trace.getLastState();
+            if ( curState.isHot() &&
+                trace.getBProgram().getEventSelectionStrategy().selectableEvents(curState).isEmpty() ) {
+                Set<String> hotlyTerminated = curState.getBThreadSnapshots().stream()
+                    .filter( s -> s.getSyncStatement().isHot() ).map( s->s.getName() ).collect( toSet() );
+                return Optional.of( new HotTerminationViolation(hotlyTerminated, trace) );
+            } else return Optional.empty();
+        }
+     ); 
     
     /**
      * Detects a case where a b-program can get into an infinite loop where, at 
      * each sync point, at least one of the b-threads is in a hot sync. This does
      * not mean that individually b-threads are hot all along the loop.
      */
-    public static final DfsCycleInspection HotBProgramCycles = (List<DfsTraversalNode> currentTrace, int cycleToIdx, BEvent event) -> {
-        if ( currentTrace.subList(cycleToIdx, currentTrace.size()).stream().allMatch(s -> s.getSystemState().isHot()) ){
-            return Optional.of(new HotBProgramCycleViolation(currentTrace, cycleToIdx, event));
-        } else return Optional.empty();
-    };
+    public static final ExecutionTraceInspection HOT_BPROGRAM_CYCLES = ExecutionTraceInspection.named(
+        "Hot B-Program Cycles",
+        trace -> {
+            if ( trace.isCyclic() &&
+                 trace.getFinalCycle().stream().allMatch(s -> s.getState().isHot()) ){
+                return Optional.of(new HotBProgramCycleViolation(trace));
+            } else return Optional.empty();
+        }
+    );
     
     /**
      * Detects a case where a b-thread can get into an infinite loop where all
      * its sync points are hot.
-     */
-    public static final DfsCycleInspection HotBThreadCycles = new DfsCycleInspection() {
+     */    
+    public static final ExecutionTraceInspection HOT_BTHREAD_CYCLES = new ExecutionTraceInspection(){
         @Override
-        public Optional<Violation> inspectCycle(List<DfsTraversalNode> currentTrace, int cycleToIdx, BEvent event) {
-            if ( peek(currentTrace).getSystemState().isHot() ) {
-                List<DfsTraversalNode> cycle = currentTrace.subList(cycleToIdx, currentTrace.size());
-                List<Set<String>> hots = cycle.stream().map( nd -> nd.getSystemState().getBThreadSnapshots() )
+        public String title() {
+            return "Hot B-Program Cycles";
+        }
+
+        @Override
+        public Optional<Violation> inspectTrace(ExecutionTrace trace) {
+            if ( trace.isCyclic() &&
+                  trace.getLastState().isHot() ) {
+                List<ExecutionTrace.Entry> cycle = trace.getFinalCycle();
+                List<Set<String>> hots = cycle.stream().map( nd -> nd.getState().getBThreadSnapshots() )
                                            .map( this::getHotThreadNames )
                                             .collect( toList() );
                 
@@ -117,41 +136,29 @@ public final class DfsInspections {
                 });
                 
                 return alwaysHotOpt.filter( ahs -> ahs.size()>0 )
-                    .map( alwaysHots -> new HotBThreadCycleViolation(currentTrace, cycleToIdx, event, alwaysHots) );
+                    .map( alwaysHots -> new HotBThreadCycleViolation(trace, alwaysHots) );
                     
             } else return Optional.empty();
         }
         
-        private Set<String> getHotThreadNames( Set<BThreadSyncSnapshot> bts ) {
+         private Set<String> getHotThreadNames( Set<BThreadSyncSnapshot> bts ) {
             return bts.stream().filter( bt -> bt.getSyncStatement().isHot() )
                       .map( bt -> bt.getName() )
                       .collect( toSet() );
         }
     };
+                
     
-    public static final List<DfsTraceInspection> ALL_TRACE = Arrays.asList(
-        DfsInspections.Deadlock,
-        DfsInspections.FailedAssertions,
-        DfsInspections.HotTermination
-    );
-            
+    static final Set<ExecutionTraceInspection> DEFAULT_SET = Collections.unmodifiableSet( 
+        new HashSet<ExecutionTraceInspection>(
+            Arrays.asList(
+                DEADLOCKS, FAILED_ASSERTIONS, HOT_TERMINATIONS, HOT_BTHREAD_CYCLES
+    )));
+    
     /////////////////////////
     // Utility methods.
     
     private static boolean hasRequestedEvents(BProgramSyncSnapshot bpss) {
         return bpss.getBThreadSnapshots().stream().anyMatch(btss -> (!btss.getSyncStatement().getRequest().isEmpty()));
     }
-    
-    private static DfsTraversalNode peek(List<DfsTraversalNode> trace) {
-        return trace.isEmpty() ? null : trace.get(trace.size()-1);
-    }
-    
-
-    // / Utility methods.
-    /////////////////////////
-    
-    
-    // Prevent instantiation.
-    private DfsInspections(){}
-    
 }

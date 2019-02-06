@@ -23,9 +23,8 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis.violations;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
+import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
 import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
-import java.util.List;
 
 /**
  *
@@ -35,7 +34,7 @@ public class FailedAssertionViolation extends Violation {
     
     private final FailedAssertion assertion;
 
-    public FailedAssertionViolation(FailedAssertion assertion, List<DfsTraversalNode> counterExampleTrace) {
+    public FailedAssertionViolation(FailedAssertion assertion, ExecutionTrace counterExampleTrace) {
         super(counterExampleTrace);
         this.assertion = assertion;
     }

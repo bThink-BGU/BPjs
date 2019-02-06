@@ -1,10 +1,10 @@
 package il.ac.bgu.cs.bp.bpjs.analysis.examples;
 
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
-import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
+import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
-import java.util.List;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import static org.junit.Assert.fail;
 import org.junit.Test;
 
@@ -29,12 +29,13 @@ public class DiningPhilTest {
 
     private static void printCounterExample(VerificationResult res) {
         System.out.println("Found a counterexample");
-        final List<DfsTraversalNode> trace = res.getViolation().get().getCounterExampleTrace();
-        trace.forEach(nd -> System.out.println(" " + nd.getLastEvent()));
+        final ExecutionTrace trace = res.getViolation().get().getCounterExampleTrace();
+        trace.getNodes().forEach(nd -> System.out.println(" " + nd.getEvent()));
         
-        DfsTraversalNode last = trace.get(trace.size() - 1);
-        System.out.println("selectableEvents: " + last.getSelectableEvents());
-        last.getSystemState().getBThreadSnapshots().stream()
+        BProgramSyncSnapshot last = trace.getLastState();
+        System.out.println("selectableEvents: " + trace.getBProgram().getEventSelectionStrategy()
+                    .selectableEvents(last));
+        last.getBThreadSnapshots().stream()
                 .sorted((s1, s2) -> s1.getName().compareTo(s2.getName()))
                 .forEach(s -> {
                     System.out.println(s.getName());

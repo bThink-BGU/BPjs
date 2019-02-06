@@ -24,7 +24,7 @@
 package il.ac.bgu.cs.bp.bpjs;
 
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
+import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.mocks.MockBProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
@@ -36,7 +36,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -59,10 +59,11 @@ public abstract class TestUtils {
         return res.getViolation().map(v->traceEventNamesString(v.getCounterExampleTrace(), delimiter)).orElse("");
     }
     
-    public static String traceEventNamesString( List<DfsTraversalNode> trace, String delimiter ) {
-        return trace.stream()
-                    .map(DfsTraversalNode::getLastEvent)
-                    .filter(Objects::nonNull)
+    public static String traceEventNamesString( ExecutionTrace trace, String delimiter ) {
+        return trace.getNodes().stream()
+                    .map(ExecutionTrace.Entry::getEvent)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
                     .map(BEvent::getName)
                     .collect(joining(delimiter));
     }

@@ -23,8 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis.violations;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
-import java.util.List;
+import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
 
 /**
  *
@@ -34,9 +33,9 @@ import java.util.List;
  */
 public abstract class Violation {
 
-    private List<DfsTraversalNode> counterExampleTrace;
+    private ExecutionTrace counterExampleTrace;
 
-    public Violation(List<DfsTraversalNode> counterExampleTrace) {
+    public Violation(ExecutionTrace counterExampleTrace) {
         this.counterExampleTrace = counterExampleTrace;
     }
     
@@ -48,11 +47,11 @@ public abstract class Violation {
      */
     public abstract String decsribe();
 
-    public List<DfsTraversalNode> getCounterExampleTrace() {
+    public ExecutionTrace getCounterExampleTrace() {
         return counterExampleTrace;
     }
 
-    public void setCounterExampleTrace(List<DfsTraversalNode> counterExampleTrace) {
+    public void setCounterExampleTrace(ExecutionTrace counterExampleTrace) {
         this.counterExampleTrace = counterExampleTrace;
     }
     

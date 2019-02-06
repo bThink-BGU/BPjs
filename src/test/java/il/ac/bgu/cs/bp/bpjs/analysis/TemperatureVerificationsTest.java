@@ -50,7 +50,7 @@ public class TemperatureVerificationsTest {
         final ResourceBProgram bprog = new ResourceBProgram("statementtemp/hotTerminationExample.js");
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-        vfr.addInspector(DfsInspections.HotTermination);
+        vfr.addInspection(ExecutionTraceInspections.HOT_TERMINATIONS);
         final VerificationResult res = vfr.verify(bprog);
 
         assertTrue(res.isViolationFound());
@@ -68,7 +68,7 @@ public class TemperatureVerificationsTest {
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         // Adding the inspector means it will be the only inspector run, as the default set will not be used.
-        vfr.addInspector(DfsInspections.HotBProgramCycles );
+        vfr.addInspection(ExecutionTraceInspections.HOT_BPROGRAM_CYCLES);
         final VerificationResult res = vfr.verify(bprog);
 
         assertTrue(res.isViolationFound());
@@ -83,7 +83,7 @@ public class TemperatureVerificationsTest {
         
         // The expected index is the length of the path, minus the cycle length 
         // (which is 3 in our case) plus 1.
-        int expectedCycleToIndex = hcv.getCounterExampleTrace().size()-3;
+        int expectedCycleToIndex = hcv.getCounterExampleTrace().getStateCount()-3;
         assertEquals(expectedCycleToIndex, hcv.getCycleToIndex() );
     }
     
@@ -92,7 +92,7 @@ public class TemperatureVerificationsTest {
         BProgram bprog = new ResourceBProgram("DFSVerifierTests/fruitRatio.js");
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         // Adding the inspector means it will be the only inspector run, as the default set will not be used.
-        vfr.addInspector(DfsInspections.HotBProgramCycles);
+        vfr.addInspection(ExecutionTraceInspections.HOT_BPROGRAM_CYCLES);
         vfr.setVisitedNodeStore( new BThreadSnapshotVisitedStateStore() );
         final VerificationResult res = vfr.verify(bprog);
 
@@ -107,7 +107,7 @@ public class TemperatureVerificationsTest {
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         // Adding the inspector means it will be the only inspector run, as the default is to run them all.
-        vfr.addInspector(DfsInspections.HotBThreadCycles );
+        vfr.addInspection(ExecutionTraceInspections.HOT_BTHREAD_CYCLES);
         final VerificationResult res = vfr.verify(bprog);
 
         assertTrue(res.isViolationFound());
@@ -123,7 +123,7 @@ public class TemperatureVerificationsTest {
         
         // The expected index is the length of the path, minus the cycle length 
         // (which is 3 in our case) plus 1.
-        int expectedCycleToIndex = htv.getCounterExampleTrace().size()-3;
+        int expectedCycleToIndex = htv.getCounterExampleTrace().getStateCount()-3;
         assertEquals(expectedCycleToIndex, htv.getCycleToIndex() );
     }
     
@@ -133,14 +133,14 @@ public class TemperatureVerificationsTest {
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         // Adding the inspector means it will be the only inspector run, as the default is to run them all.
-        vfr.addInspector(DfsInspections.HotBProgramCycles );
+        vfr.addInspection(ExecutionTraceInspections.HOT_BPROGRAM_CYCLES);
         final VerificationResult res = vfr.verify(bprog);
 
         assertTrue(res.isViolationFound());
         assertTrue(res.getViolation().get() instanceof HotBProgramCycleViolation);
         HotBProgramCycleViolation hcv = (HotBProgramCycleViolation) res.getViolation().get();
         assertEquals( "e", hcv.getCycleToEvent().getName() );
-        int expectedCycleToIndex = hcv.getCounterExampleTrace().size()-3;
+        int expectedCycleToIndex = hcv.getCounterExampleTrace().getStateCount()-3;
         assertEquals(expectedCycleToIndex, hcv.getCycleToIndex() );
     }
     
@@ -150,7 +150,7 @@ public class TemperatureVerificationsTest {
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         // Adding the inspector means it will be the only inspector run, as the default is to run them all.
-        vfr.addInspector(DfsInspections.HotBThreadCycles );
+        vfr.addInspection(ExecutionTraceInspections.HOT_BTHREAD_CYCLES);
         final VerificationResult res = vfr.verify(bprog);
 
         assertFalse(res.isViolationFound());

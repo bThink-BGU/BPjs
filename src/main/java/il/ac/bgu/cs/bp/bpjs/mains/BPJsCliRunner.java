@@ -25,7 +25,7 @@ package il.ac.bgu.cs.bp.bpjs.mains;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.BThreadSnapshotVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
-import il.ac.bgu.cs.bp.bpjs.analysis.DfsInspections;
+import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTraceInspections;
 import il.ac.bgu.cs.bp.bpjs.analysis.HashVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.PrintDfsVerifierListener;
@@ -43,8 +43,8 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.mozilla.javascript.EvaluatorException;
@@ -122,9 +122,9 @@ public class BPJsCliRunner {
                 vfr.setVisitedNodeStore( new HashVisitedStateStore() );
             }
             if ( switchPresent("--liveness", args) ) {
-                vfr.addInspector(DfsInspections.HotBProgramCycles);
-                vfr.addInspector(DfsInspections.HotBThreadCycles);
-                vfr.addInspector(DfsInspections.HotTermination);
+                vfr.addInspection(ExecutionTraceInspections.HOT_BPROGRAM_CYCLES);
+                vfr.addInspection(ExecutionTraceInspections.HOT_BTHREAD_CYCLES);
+                vfr.addInspection(ExecutionTraceInspections.HOT_TERMINATIONS);
             }
             String maxDepthStr = keyForValue("--max-trace-length", args);
             if ( maxDepthStr != null ) {
@@ -152,9 +152,11 @@ public class BPJsCliRunner {
                     println(vio.decsribe());
                     
                     println("Counter example trace:");
-                    vio.getCounterExampleTrace().stream()
-                        .skip(1) // the first node has no previous event.
-                        .forEach(nd -> println(nd.getLastEvent().toString()));
+                    vio.getCounterExampleTrace().getNodes().stream()
+                        .map( n -> n.getEvent() )
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .forEach(evt -> println(evt.toString()));
                     
                 }
                 println("General statistics:");
