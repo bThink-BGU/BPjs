@@ -47,6 +47,7 @@ a link to this page somewhere in the documentation/system about section.
 ### 2019-02-06
 * :arrow_up::arrow_up::sparkles: Verification areas refactored and generalized towards code reuse. Inspectors and traces are now general, and do not assume they were created from the DFS verifier.
 * :arrow_up: More tests.
+* :bug: Fixed a corner case where b-programs with immediate failed assertions would still attempt running certain machines.
 
 ### 2019-02-05
 * :arrow_up: :tada: Event selection strategies now accept `BProgramSyncSnapshot`, rather than a set of sync statements and external events.

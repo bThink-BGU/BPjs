@@ -282,7 +282,8 @@ public class BProgramSyncSnapshot {
         // if any new bthreads are added, run and add their result
         Set<BThreadSyncSnapshot> addedBThreads = bprog.drainRecentlyRegisteredBthreads();
         Set<ForkStatement> addedForks = bprog.drainRecentlyAddedForks();
-        while ( ! (addedBThreads.isEmpty() && addedForks.isEmpty()) ) {
+        while ( ((!addedBThreads.isEmpty()) || (!addedForks.isEmpty())) 
+                && !exSvc.isShutdown() ) {
             Stream<BPEngineTask> threadStream = addedBThreads.stream()
                 .map(bt -> new StartBThread(bt, listener));
             Stream<BPEngineTask> forkStream = addedForks.stream().flatMap( f -> convertToTasks(f, listener) );
