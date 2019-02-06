@@ -149,7 +149,7 @@ public class ExecutionTraceInspections {
     };
                 
     
-    static final Set<ExecutionTraceInspection> DEFAULT_SET = Collections.unmodifiableSet( 
+    public static final Set<ExecutionTraceInspection> DEFAULT_SET = Collections.unmodifiableSet( 
         new HashSet<ExecutionTraceInspection>(
             Arrays.asList(
                 DEADLOCKS, FAILED_ASSERTIONS, HOT_TERMINATIONS, HOT_BTHREAD_CYCLES

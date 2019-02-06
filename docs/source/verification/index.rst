@@ -72,9 +72,11 @@ A more in-depth discussion of verification in BPjs, including some techniques, c
 From the Command Line
 ~~~~~~~~~~~~~~~~~~~~~
 
-To verify a b-program from the commandline, simply add the ``--verify`` switch. Use ``--full-state-storage`` to force the verification to use the full state data when determining whether a state was visited (requires more memory).
+To verify a b-program from the commandline, simply add the ``--verify`` switch. Use ``--full-state-storage`` to force the verification to use the full state data when determining whether a state was visited (requires more memory). To concentrate on liveness violations, add the ``--liveness`` switch. To limit the (possibly infinite) depth of the scan, use ``--mac-trace-length``.
 
   $ java -jar bpjs.jar --verify hello-possibly-broken-world.js
+  $ java -jar bpjs.jar --verify --full-state-storage hello-possibly-broken-world.js
+  $ java -jar bpjs.jar --verify --liveness --full-state-storage hello-possibly-broken-world.js
 
 
 Assertions During Runtime

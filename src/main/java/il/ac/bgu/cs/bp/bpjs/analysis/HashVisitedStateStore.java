@@ -46,9 +46,9 @@ public class HashVisitedStateStore implements VisitedStateStore {
     }
 
     private long hash( Set<BThreadSyncSnapshot> snapshots ) {
-        long hash = 0;
+        long hash = 1;
         for ( BThreadSyncSnapshot snp : snapshots ) {
-            hash = hash ^ snp.getContinuationProgramState().hashCode();
+            hash = hash * snp.getContinuationProgramState().hashCode();// * (snp.getName().hashCode()+1);
         }
         return hash;
     }

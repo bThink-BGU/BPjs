@@ -138,15 +138,18 @@ public class BPJsCliRunner {
             }
             println("Max trace length: " + vfr.getMaxTraceLength() );
             
+            if ( vfr.getInspections().isEmpty() ) {
+                ExecutionTraceInspections.DEFAULT_SET.forEach(vfr::addInspection);
+            }
+            println("Inspections:");
+            vfr.getInspections().forEach( ins -> println( " * " + ins.title()));
+            
             try {
                 println("Starting verification");
                 VerificationResult res = vfr.verify(bpp);
                 println("Verification completed.");
                 
-                if ( ! res.getViolation().isPresent() ) {
-                    println("No violations found");
-                    
-                } else {
+                if ( res.getViolation().isPresent() ) {
                     Violation vio = res.getViolation().get();
                     println("Found Violation:");
                     println(vio.decsribe());
@@ -157,8 +160,11 @@ public class BPJsCliRunner {
                         .filter(Optional::isPresent)
                         .map(Optional::get)
                         .forEach(evt -> println(evt.toString()));
-                    
+
+                } else {
+                    println("No violations found");
                 }
+                
                 println("General statistics:");
                 println(String.format("Time:\t%,d (msec)", res.getTimeMillies()));
                 println(String.format("States scanned:\t%,d", res.getScannedStatesCount()));

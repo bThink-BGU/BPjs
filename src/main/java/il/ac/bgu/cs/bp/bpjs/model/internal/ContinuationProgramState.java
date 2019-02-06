@@ -179,10 +179,10 @@ public class ContinuationProgramState {
     
     @Override
     public int hashCode() {
-        return Objects.hash(programCounter, frameIndex, 
-                                variables.entrySet().stream()
+        return 37 * (programCounter+1) * (frameIndex+1) *
+                                (variables.entrySet().stream()
                                            .map( es->Objects.hash(es.getKey(), es.getValue()) )
-                                           .collect( Collectors.reducing(0, (x,y)->x^y)) );
+                                           .collect( Collectors.reducing(0, (x,y)->x*y))+1);
     }
 
     @Override
