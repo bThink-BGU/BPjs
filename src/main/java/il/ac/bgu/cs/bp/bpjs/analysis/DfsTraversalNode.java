@@ -29,6 +29,7 @@ public class DfsTraversalNode {
      * @param exSvc The executor service that will run the threads
      * @return Initial node for the BProgram run
      * @throws Exception in case there's an error with the executed JavaScript code.
+     * @deprecated Use the inside code, this whole class might be going away soon.
      */
     public static DfsTraversalNode getInitialNode(BProgram bp, ExecutorService exSvc) throws Exception {
         BProgramSyncSnapshot seed = bp.setup().start(exSvc);
