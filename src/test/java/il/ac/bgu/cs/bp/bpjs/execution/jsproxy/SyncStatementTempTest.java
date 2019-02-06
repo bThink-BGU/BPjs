@@ -28,6 +28,7 @@ import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.AbstractEventSelectionStrategyDecorator;
@@ -55,9 +56,9 @@ public class SyncStatementTempTest {
         }
 
         @Override
-        public Set<BEvent> selectableEvents(Set<SyncStatement> statements, List<BEvent> externalEvents) {
-            isHotRecord.add(statements.stream().filter(SyncStatement::isHot).findAny().isPresent());
-            return decorated.selectableEvents(statements, externalEvents);
+        public Set<BEvent> selectableEvents(BProgramSyncSnapshot bpss) {
+            isHotRecord.add(bpss.getStatements().stream().filter(SyncStatement::isHot).findAny().isPresent());
+            return decorated.selectableEvents(bpss);
         }
         
     }

@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import java.util.Set;
 import java.util.TreeSet;
@@ -35,19 +36,19 @@ public class HashVisitedStateStore implements VisitedStateStore {
     private final Set<Long> visited = new TreeSet<>();
 
     @Override
-    public void store(DfsTraversalNode nd) {
-        visited.add( hash(nd.getSystemState().getBThreadSnapshots()) );
+    public void store(BProgramSyncSnapshot bss) {
+        visited.add( hash(bss.getBThreadSnapshots()) );
     }
 
     @Override
-    public boolean isVisited(DfsTraversalNode nd) {
-        return visited.contains( hash(nd.getSystemState().getBThreadSnapshots()) );
+    public boolean isVisited(BProgramSyncSnapshot bss) {
+        return visited.contains( hash(bss.getBThreadSnapshots()) );
     }
 
     private long hash( Set<BThreadSyncSnapshot> snapshots ) {
-        long hash = 0;
+        long hash = 1;
         for ( BThreadSyncSnapshot snp : snapshots ) {
-            hash = hash ^ snp.getContinuationProgramState().hashCode();
+            hash = hash * snp.getContinuationProgramState().hashCode();// * (snp.getName().hashCode()+1);
         }
         return hash;
     }

@@ -29,12 +29,12 @@ import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
-import il.ac.bgu.cs.bp.bpjs.analysis.DfsInspections;
+import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
+import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTraceInspections;
 import il.ac.bgu.cs.bp.bpjs.analysis.Requirements;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
-import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
+import il.ac.bgu.cs.bp.bpjs.analysis.listeners.PrintDfsVerifierListener;
 import java.util.stream.Collectors;
 import org.mozilla.javascript.NativeArray;
 
@@ -85,22 +85,22 @@ public class Mazes {
         try {
             DfsBProgramVerifier vfr = new DfsBProgramVerifier();
 
-            vfr.setProgressListener(new BriefPrintDfsVerifierListener());
+            vfr.setProgressListener(new PrintDfsVerifierListener());
             vfr.setIterationCountGap(10);
             vfr.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
 //            vfr.setVisitedNodeStore(new ForgetfulVisitedStateStore());
             
-            vfr.addInspector(DfsInspections.FailedAssertions); // prevent from detecting cases where we ust hit a wall.
+            vfr.addInspection(ExecutionTraceInspections.FAILED_ASSERTIONS); // We only want failed assertions, deadlocks are OK here, in the greateer program(!)
             final VerificationResult res = vfr.verify(bprog);
 
             char[][] maze = getMaze(bprog);
             printMaze(maze);
             if (res.isViolationFound()) {
                 System.out.println("Found a counterexample");
-                for (DfsTraversalNode nd : res.getViolation().get().getCounterExampleTrace()) {
-                    System.out.println(" " + nd.getLastEvent());
-                    if (nd.getLastEvent() != null) {
-                        String name = nd.getLastEvent().getName();
+                for (ExecutionTrace.Entry nd : res.getViolation().get().getCounterExampleTrace().getNodes()) {
+                    System.out.println(" " + nd.getEvent());
+                    nd.getEvent().ifPresent( e -> {
+                        String name = e.getName();
                         if (name.startsWith("Enter")) {
                             String loc = name.split("\\(")[1].replace(")", "").trim();
                             String coord[] = loc.split(",");
@@ -108,7 +108,7 @@ public class Mazes {
                             int row = Integer.parseInt(coord[1]);
                             maze[row][col] = '•';
                         }
-                    }
+                    });
                 }
                 printMaze(maze);
 

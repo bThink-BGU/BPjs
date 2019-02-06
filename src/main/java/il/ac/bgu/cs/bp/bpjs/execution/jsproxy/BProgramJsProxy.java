@@ -274,11 +274,11 @@ public class BProgramJsProxy extends SyncStatementBuilder
      * @param newDaemonMode {@code true} for making {@code this} a daemon; 
      *                      {@code false} otherwise.
      */
-    public void setDaemonMode( boolean newDaemonMode ) {
+    public void setWaitForExternalEvents( boolean newDaemonMode ) {
         program.setWaitForExternalEvents( newDaemonMode );
     }
     
-    public boolean isDaemonMode() {
+    public boolean isWaitForExternalEvents() {
         return program.isWaitForExternalEvents();
     }
     

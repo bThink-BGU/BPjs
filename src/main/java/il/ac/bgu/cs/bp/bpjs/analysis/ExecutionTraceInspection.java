@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 michael.
+ * Copyright 2019 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,35 +24,47 @@
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
-import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import java.util.List;
 import java.util.Optional;
+import java.util.function.Function;
 
 /**
- *
- * a DFS inspection that verifies cycles in the b-program state graph.
+ * A single inspection, detects violations in {@link ExecutionTrace}s.
  * 
  * @author michael
  */
-public interface DfsCycleInspection {
-     /**
-     * Inspects a cycle in the program graph for possible violations.
-     * 
-     * For example, in the following graph:
-     * <code>
-     * [a]-[b]-[c]-[d]--...
-     *       \      |
-     *        +-----+
-     * </code>
-     * 
-     * This methods will be called with trace={@code [a][b][c][d]} and 
-     * cycleToIdx={@code 1}.
-     * 
-     * @param currentTrace Program trace up to this point.
-     * @param cycleToIdx   The index of the node in the trace where the cycle returns
-     * @param event        The event leading to the cycle at index {@code cycleToIdx}, from the end of {@code currentTrace}.
+public interface ExecutionTraceInspection {
+    
+    /**
+     * Utility method for composing inspections on the fly.
+     * @param aTitle title of the inspection
+     * @param f actual inspection function
+     * @return an inspection with the title and implementation passed.
+     */
+    static ExecutionTraceInspection named(String aTitle, Function<ExecutionTrace,Optional<Violation>> f ) {
+        return new ExecutionTraceInspection() {
+            @Override
+            public String title() {
+                return aTitle;
+            }
+
+            @Override
+            public Optional<Violation> inspectTrace(ExecutionTrace aTrace) {
+                return f.apply(aTrace);
+            }
+        };
+    }
+    
+    /**
+     * A human-readable title, used for listing and logs.
+     * @return inspection title.
+     */
+    String title();
+    
+    /**
+     * Inspects a trace for violations.
+     * @param aTrace The trace of the b-program execution. May be cyclic.
      * @return A non-empty optional with the violation details, or an empty 
      *         optional, if everything is fine.
      */
-    Optional<Violation> inspectCycle( List<DfsTraversalNode> currentTrace, int cycleToIdx, BEvent event);
+    Optional<Violation> inspectTrace( ExecutionTrace aTrace );
 }

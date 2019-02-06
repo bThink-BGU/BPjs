@@ -36,7 +36,7 @@ public class ExternalEventsDaemonTest {
         
         sut.run();
         
-        assertTrue( sut.getBProgram().getFromGlobalScope("internalDaemonMode", Boolean.class).get() );
+        assertTrue( sut.getBProgram().getFromGlobalScope("internalWaitForExternalEvents", Boolean.class).get() );
         
         eventLogger.getEvents().forEach(e->System.out.println(e) );
         

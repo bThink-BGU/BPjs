@@ -23,14 +23,16 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
+
 /**
  * Objects that know which states were already visited.
  * 
  * @author michael
  */
 public interface VisitedStateStore {
-    void store( DfsTraversalNode nd );
-    boolean isVisited( DfsTraversalNode nd );
+    void store( BProgramSyncSnapshot bpss );
+    boolean isVisited( BProgramSyncSnapshot bpss );
     void clear();
     long getVisitedStateCount();
 }

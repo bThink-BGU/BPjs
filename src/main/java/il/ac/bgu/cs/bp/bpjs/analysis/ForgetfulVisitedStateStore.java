@@ -23,6 +23,8 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
+
 /**
  * A VisitedNodeStore that does not remember any visited node. When the program 
  * search graph is a tree, ensures that all the nodes are visited. When the program
@@ -36,12 +38,12 @@ public class ForgetfulVisitedStateStore implements VisitedStateStore {
     private long visitedCount=0;
     
     @Override
-    public void store(DfsTraversalNode nd) {
+    public void store(BProgramSyncSnapshot bss) {
         visitedCount++;
     }
 
     @Override
-    public boolean isVisited(DfsTraversalNode nd) {
+    public boolean isVisited(BProgramSyncSnapshot bss) {
         return false;
     }
         

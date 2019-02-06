@@ -2,6 +2,7 @@ package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
@@ -19,25 +20,32 @@ import java.util.Set;
 public interface EventSelectionStrategy {
 
     /**
-     * Creates the set of selectable events, given the {@link SyncStatement}s from 
-     * all participating BThreads.
-     * @param statements statements of all participating BThreads.
-     * @param externalEvents events queued by external processes.
+     * Creates the set of selectable events, given a b-program's
+     * synchronization point.
+     * 
+     * @param bpss a {@link BProgram} at a synchronization point.
      * @return A set of events that may be selected for execution.
      */
-    Set<BEvent> selectableEvents(Set<SyncStatement> statements, List<BEvent> externalEvents);
+    Set<BEvent> selectableEvents(BProgramSyncSnapshot bpss);
     
     /**
      * Selects an event for execution from the parameter {@code selectableEvents},
      * or returns {@link Optional#empty()} in case no suitable event is found.
      * 
-     * @param statements statements of all participating BThreads.
-     * @param externalEvents events queued by external processes.
-     * @param selectableEvents A set of events to select from
+     * The {@code selectableEvents} set is Normally the set of
+     * events returned by {@code this}' {@link #selectableEvents(il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot)}
+     * method on the previous call on the same synchronization point. This is
+     * an optimization that allows most strategies to select events only once
+     * per synchronization point. 
+     * 
+     * <strong>In normal BP, the selected event (if any) has
+     * to be a member of {@code selectableEvents}.</strong>
+     * 
+     * @param bpss a {@link BProgram} at a synchronization point.
+     * @param selectableEvents A set of events to select from. 
      * @return An event selection result, or no result.
      */
-    Optional<EventSelectionResult> select(Set<SyncStatement> statements, 
-                                          List<BEvent> externalEvents,
+    Optional<EventSelectionResult> select(BProgramSyncSnapshot bpss,
                                           Set<BEvent> selectableEvents );
     
 }

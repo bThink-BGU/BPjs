@@ -45,7 +45,8 @@ import org.mozilla.javascript.NativeContinuation;
 import org.mozilla.javascript.ScriptRuntime;
 
 /**
- * Playing around with continuations.
+ * Playing around with Rhino continuations. This file is for technical tests,
+ * and can be safely ignored by anyone not doing anything Rhino-related.
  *
  * @author michael
  */

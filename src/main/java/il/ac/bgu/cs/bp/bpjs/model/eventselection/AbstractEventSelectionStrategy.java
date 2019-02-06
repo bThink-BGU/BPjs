@@ -25,6 +25,7 @@ package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import java.util.ArrayList;
 import static java.util.Collections.singleton;
@@ -65,18 +66,17 @@ public abstract class AbstractEventSelectionStrategy implements EventSelectionSt
     /**
      * Randomly select an event from {@code selectableEvents}, or a non-blocked event from {@code externalEvents}, in case {@code selectableEvents} is empty.
      * 
-     * @param statements       Statements at the current {@code bsync}.
-     * @param externalEvents   List of events that are not requested by b-threads (at least, not directly).
+     * @param bpss a b-program at synchronization point.
      * @param selectableEvents Set of events that can be selected.
      * @return An optional event selection result.
      */
     @Override
-    public Optional<EventSelectionResult> select(Set<SyncStatement> statements, List<BEvent> externalEvents, Set<BEvent> selectableEvents) {
+    public Optional<EventSelectionResult> select(BProgramSyncSnapshot bpss, Set<BEvent> selectableEvents) {
         if (selectableEvents.isEmpty()) {
             return Optional.empty();
         }
         BEvent chosen = new ArrayList<>(selectableEvents).get(rnd.nextInt(selectableEvents.size()));
-        Set<BEvent> requested = statements.stream()
+        Set<BEvent> requested = bpss.getStatements().stream()
                                           .filter((SyncStatement stmt) -> stmt != null)
                                           .flatMap((SyncStatement stmt) -> stmt.getRequest().stream())
                                           .collect(Collectors.toSet());
@@ -85,7 +85,7 @@ public abstract class AbstractEventSelectionStrategy implements EventSelectionSt
             return Optional.of(new EventSelectionResult(chosen));
         } else {
             // that was an external event, need to find the first index
-            return Optional.of(new EventSelectionResult(chosen, singleton(externalEvents.indexOf(chosen))));
+            return Optional.of(new EventSelectionResult(chosen, singleton(bpss.getExternalEvents().indexOf(chosen))));
         }
     }
 

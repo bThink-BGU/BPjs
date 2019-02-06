@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import java.util.Collections;
 import java.util.HashSet;
@@ -45,8 +46,8 @@ public class BThreadSnapshotVisitedStateStore implements VisitedStateStore {
         final Set<BThreadSyncSnapshot> bthreads;
         private final int hashCode;
     
-        Snapshot( Set<BThreadSyncSnapshot> snapshots ){
-            bthreads = Collections.unmodifiableSet(snapshots);
+        Snapshot( BProgramSyncSnapshot bpss ){
+            bthreads = Collections.unmodifiableSet(bpss.getBThreadSnapshots());
             hashCode = bthreads.hashCode();
         }
 
@@ -68,19 +69,15 @@ public class BThreadSnapshotVisitedStateStore implements VisitedStateStore {
     }
     
     @Override
-    public void store(DfsTraversalNode nd) {
-        visited.add(extractStatus(nd));
+    public void store(BProgramSyncSnapshot bss) {
+        visited.add(new Snapshot(bss));
     }
 
     @Override
-    public boolean isVisited(DfsTraversalNode nd) {
-        return visited.contains( extractStatus(nd) );
+    public boolean isVisited(BProgramSyncSnapshot bss) {
+        return visited.contains(new Snapshot(bss));
     }   
     
-    private Snapshot extractStatus( DfsTraversalNode nd ) {
-        return new Snapshot(nd.getSystemState().getBThreadSnapshots());
-    }
-
     @Override
     public void clear() {
         visited.clear();

@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 michael.
+ * Copyright 2019 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,22 +21,19 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis;
+package il.ac.bgu.cs.bp.bpjs.mocks;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
-import java.util.List;
-import java.util.Optional;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
+import java.util.ArrayList;
 
 /**
- * A class inspecting a b-program trace during DFS.
+ *
  * @author michael
  */
-public interface DfsTraceInspection {
-    /**
-     * Inspects the current trace for violations.
-     * @param currentTrace The trace of the b-program, up to the current point.
-     * @return A non-empty optional with the violation details, or an empty 
-     *         optional, if everything is fine.
-     */
-    Optional<Violation> inspectTrace( List<DfsTraversalNode> currentTrace );
+public class MockBProgramSyncSnapshot extends BProgramSyncSnapshot {
+    
+    public MockBProgramSyncSnapshot(BProgramSyncSnapshot bpss) {
+        super(bpss.getBProgram(), bpss.getBThreadSnapshots(), new ArrayList<>(bpss.getExternalEvents()), bpss.getFailedAssertion());
+    }
+    
 }

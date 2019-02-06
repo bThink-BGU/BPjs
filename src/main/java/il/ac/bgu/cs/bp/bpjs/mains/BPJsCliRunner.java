@@ -25,10 +25,10 @@ package il.ac.bgu.cs.bp.bpjs.mains;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.BThreadSnapshotVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
-import il.ac.bgu.cs.bp.bpjs.analysis.DfsInspections;
+import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTraceInspections;
 import il.ac.bgu.cs.bp.bpjs.analysis.HashVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
-import il.ac.bgu.cs.bp.bpjs.analysis.listeners.BriefPrintDfsVerifierListener;
+import il.ac.bgu.cs.bp.bpjs.analysis.listeners.PrintDfsVerifierListener;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
@@ -43,8 +43,8 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.mozilla.javascript.EvaluatorException;
@@ -113,7 +113,7 @@ public class BPJsCliRunner {
             bpp.setEventSelectionStrategy(sess);
             DfsBProgramVerifier vfr = new DfsBProgramVerifier();
             vfr.setDebugMode( switchPresent("-v", args));
-            vfr.setProgressListener( new BriefPrintDfsVerifierListener() );
+            vfr.setProgressListener(new PrintDfsVerifierListener() );
             
             if ( switchPresent("--full-state-storage", args) ) {
                 println("Using full state storage");
@@ -122,9 +122,9 @@ public class BPJsCliRunner {
                 vfr.setVisitedNodeStore( new HashVisitedStateStore() );
             }
             if ( switchPresent("--liveness", args) ) {
-                vfr.addInspector(DfsInspections.HotBProgramCycles);
-                vfr.addInspector(DfsInspections.HotBThreadCycles);
-                vfr.addInspector(DfsInspections.HotTermination);
+                vfr.addInspection(ExecutionTraceInspections.HOT_BPROGRAM_CYCLES);
+                vfr.addInspection(ExecutionTraceInspections.HOT_BTHREAD_CYCLES);
+                vfr.addInspection(ExecutionTraceInspections.HOT_TERMINATIONS);
             }
             String maxDepthStr = keyForValue("--max-trace-length", args);
             if ( maxDepthStr != null ) {
@@ -138,25 +138,33 @@ public class BPJsCliRunner {
             }
             println("Max trace length: " + vfr.getMaxTraceLength() );
             
+            if ( vfr.getInspections().isEmpty() ) {
+                ExecutionTraceInspections.DEFAULT_SET.forEach(vfr::addInspection);
+            }
+            println("Inspections:");
+            vfr.getInspections().forEach( ins -> println( " * " + ins.title()));
+            
             try {
-                println("Starting vberification");
+                println("Starting verification");
                 VerificationResult res = vfr.verify(bpp);
                 println("Verification completed.");
                 
-                if ( ! res.getViolation().isPresent() ) {
-                    println("No violations found");
-                    
-                } else {
+                if ( res.getViolation().isPresent() ) {
                     Violation vio = res.getViolation().get();
                     println("Found Violation:");
                     println(vio.decsribe());
                     
                     println("Counter example trace:");
-                    vio.getCounterExampleTrace().stream()
-                        .skip(1) // the first node has no previous event.
-                        .forEach(nd -> println(nd.getLastEvent().toString()));
-                    
+                    vio.getCounterExampleTrace().getNodes().stream()
+                        .map( n -> n.getEvent() )
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
+                        .forEach(evt -> println(evt.toString()));
+
+                } else {
+                    println("No violations found");
                 }
+                
                 println("General statistics:");
                 println(String.format("Time:\t%,d (msec)", res.getTimeMillies()));
                 println(String.format("States scanned:\t%,d", res.getScannedStatesCount()));

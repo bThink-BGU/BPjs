@@ -81,7 +81,7 @@ At Runtime
 * If the host Java program will push external events to the b-program, make the b-program wait for these events by calling ``bprog.setWaitForExternalEvents(true)``.
 * Instantiate a ``BProgramRunner`` object, and supply it with the ``BProgram`` instance.
 * Add listeners to the runner.
-* In the common case when the program needs to wait for external events (such as GUI interactions), set the ``isDaemon`` property of the ``BProgram`` to ``true``.
+* In the common case when the program needs to wait for external events (such as GUI interactions), set the ``isWaitForExternalEvents`` property of the ``BProgram`` to ``true``.
 * Call ``BProgramRunner::start()``.
 
 The BProgram will start running. Life-cycle and behavioral events will be passed to the listener objects. In case the host application would like to push an external event to the embedded b-program (e.g. because of a network request, or a user click), it should use the ``BProgram``'s `enqueueExternalEvent`_ method.
@@ -98,8 +98,7 @@ External Events vs. Internal Events
 
 There is no difference between external and internal events -- both are instances of the Java ``BEvent`` class, or a subclass of it. However, there may be a difference in how these events are treated by the event selection strategy. External events are made available to the strategy using an "external event queue". An event selection strategy may choose to ignore this queue whenever it can choose an event requested by a b-thread. But a strategy can also decide to choose an event from the queue even when there are internal events that are requested and not blocked.
 
-All event selection strategies currently included with BPjs ignore external events when there are choosable internal ones. This choice makes the system easier to reason about, as it gets to complete its reaction to one external event before it starts reacting to a new one. But this does not *have* to be the case.
-
+All event selection strategies currently included with BPjs ignore external events when there are internal ones available for selection. This choice makes the system easier to reason about, as it gets to complete its reaction to one external event before it starts reacting to a new one. But this does not *have* to be the case.
 
 
 .. _import directives: https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino/Scripting_Java

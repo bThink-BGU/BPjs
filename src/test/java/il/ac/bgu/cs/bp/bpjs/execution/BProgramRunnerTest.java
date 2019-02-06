@@ -65,14 +65,14 @@ public class BProgramRunnerTest {
     public void testImmediateAssert() {
         BProgram bprog = new ResourceBProgram( "ImmediateAssert.js");
         BProgramRunner runner = new BProgramRunner(bprog);
-        runner.run();
         InMemoryEventLoggingListener listener = new InMemoryEventLoggingListener();
         runner.addListener(listener);
+        
+        runner.run();
+        
         FailedAssertion expected = new FailedAssertion("failRightAWay!", "forward");
         assertEquals(expected, runner.getFailedAssertion());
         assertEquals(0, listener.getEvents().size());
-
-
     }
 
 

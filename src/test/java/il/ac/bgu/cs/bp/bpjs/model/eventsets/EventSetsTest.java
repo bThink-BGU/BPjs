@@ -34,20 +34,47 @@ import org.junit.Test;
  */
 public class EventSetsTest {
     
-    public EventSetsTest() {
-    }
+    private static final BEvent EVT_1 = new BEvent("EVT_1");
+    private static final BEvent EVT_2 = new BEvent("EVT_2");
+    private static final BEvent EVT_3 = new BEvent("EVT_3");
+    private static final BEvent EVT_4 = new BEvent("EVT_4");
+    private static final BEvent EVT_4_SAME = new BEvent("EVT_4");
 
     /**
      * Test of allExcept method, of class EventSets.
      */
     @Test
     public void testAllExcept() {
-        BEvent evtIn  = new BEvent("In");
-        BEvent evtOut = new BEvent("Out");
-        EventSet es = EventSets.allExcept(evtOut);
+        EventSet es = EventSets.allExcept(EVT_4);
         
-        assertFalse( es.contains(evtOut) );
-        assertTrue( es.contains(evtIn) );
+        assertFalse( es.contains(EVT_4) );
+        assertFalse( es.contains(EVT_4_SAME) );
+        assertTrue( es.contains(EVT_1) );
+        assertTrue( es.contains(EVT_2) );
+        assertTrue( es.contains(EVT_3) );
+        
+        assertTrue( es.toString().contains(EVT_4.getName()) );
+    }
+    
+    @Test
+    public void testAll() {
+        assertTrue( EventSets.all.contains(EVT_1) );
+        assertTrue( EventSets.all.contains(EVT_2) );
+        assertTrue( EventSets.all.contains(EVT_3) );
+        assertTrue( EventSets.all.contains(EVT_4) );
+        assertTrue( EventSets.all.contains(EVT_4_SAME) );
+        assertTrue( EventSets.all.toString().contains("All") );
+    }
+    
+    @Test
+    public void testNone() {
+        // OK, quite anecdotal, but still.
+        assertFalse( EventSets.none.contains(EVT_1) );
+        assertFalse( EventSets.none.contains(EVT_2) );
+        assertFalse( EventSets.none.contains(EVT_3) );
+        assertFalse( EventSets.none.contains(EVT_4) );
+        assertFalse( EventSets.none.contains(EVT_4_SAME) );
+        assertTrue( EventSets.none.toString().contains("none") );
     }
     
 }

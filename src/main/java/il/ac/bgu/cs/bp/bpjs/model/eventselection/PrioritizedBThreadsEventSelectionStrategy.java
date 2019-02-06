@@ -6,7 +6,6 @@ import static java.util.Collections.singleton;
 import static java.util.stream.Collectors.toSet;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -15,12 +14,14 @@ import org.mozilla.javascript.Context;
 
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Stream;
 
 /**
@@ -46,7 +47,10 @@ public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSele
     }
     
     @Override
-    public Set<BEvent> selectableEvents(Set<SyncStatement> statements, List<BEvent> externalEvents) {
+    public Set<BEvent> selectableEvents(BProgramSyncSnapshot bpss) {
+        Set<SyncStatement> statements = bpss.getStatements();
+        List<BEvent> externalEvents = bpss.getExternalEvents();
+        
         if ( statements.isEmpty() ) {
             // Corner case, not sure this is even possible.
             return externalEvents.isEmpty() ? emptySet() : singleton(externalEvents.get(0));

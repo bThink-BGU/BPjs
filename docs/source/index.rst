@@ -46,6 +46,7 @@ Topics:
    extendBPjs/index
    glossary
    examples
+   tips
 
 
 

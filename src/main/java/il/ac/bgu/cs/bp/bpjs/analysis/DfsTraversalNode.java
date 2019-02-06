@@ -29,6 +29,7 @@ public class DfsTraversalNode {
      * @param exSvc The executor service that will run the threads
      * @return Initial node for the BProgram run
      * @throws Exception in case there's an error with the executed JavaScript code.
+     * @deprecated Use the inside code, this whole class might be going away soon.
      */
     public static DfsTraversalNode getInitialNode(BProgram bp, ExecutorService exSvc) throws Exception {
         BProgramSyncSnapshot seed = bp.setup().start(exSvc);
@@ -48,8 +49,7 @@ public class DfsTraversalNode {
         this.lastEvent = e;
 
         if (bp != null) {
-            selectableEvents = bp.getEventSelectionStrategy().selectableEvents(systemState.getStatements(),
-                    systemState.getExternalEvents());
+            selectableEvents = bp.getEventSelectionStrategy().selectableEvents(systemState);
             ArrayList<BEvent> eventOrdered = new ArrayList<>(selectableEvents);
             Collections.shuffle(eventOrdered);
             iterator = eventOrdered.iterator();
@@ -64,7 +64,7 @@ public class DfsTraversalNode {
 
         StringBuilder str = new StringBuilder();
         systemState.getBThreadSnapshots().forEach(
-                s -> str.append("\t").append(s.toString()).append(" {").append(s.getBSyncStatement()).append("} \n"));
+                s -> str.append("\t").append(s.toString()).append(" {").append(s.getSyncStatement()).append("} \n"));
 
         return str.toString();
     }

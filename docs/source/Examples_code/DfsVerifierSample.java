@@ -4,6 +4,7 @@ DfsBProgramVerifier vrf = new DfsBProgramVerifier();           // ... and a veri
 vrf.setProgressListener(new BriefPrintDfsVerifierListener());  // add a listener to print progress
 VerificationResult res = vrf.verify(program);                  // this might take a while
 
-res.isCounterExampleFound();  // true iff a counter example was found
-res.getViolationType();       // Failed assertion, or a deadlock
-res.getCounterExampleTrace(); // trace of events leading to the violation.
+res.isViolationFound();  // true iff a counter example was found
+res.getViolation();      // an Optional<Violation>
+res.getViolation().ifPresent( v -> v.getCounterExampleTrace() );
+     // ExecutionTrace leading to the violation.

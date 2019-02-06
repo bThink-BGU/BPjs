@@ -32,15 +32,15 @@ import java.util.List;
  * Logs the state of the verifier with short, not too-detailed messages.
  * @author michael
  */
-public class BriefPrintDfsVerifierListener implements DfsBProgramVerifier.ProgressListener {
+public class PrintDfsVerifierListener implements DfsBProgramVerifier.ProgressListener {
     
     private final PrintStream out;
 
-    public BriefPrintDfsVerifierListener(PrintStream out) {
+    public PrintDfsVerifierListener(PrintStream out) {
         this.out = out;
     }
 
-    public BriefPrintDfsVerifierListener() {
+    public PrintDfsVerifierListener() {
         this(System.out);
     }
 

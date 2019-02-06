@@ -23,11 +23,10 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
-import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import java.io.PrintStream;
 import java.io.PrintWriter;
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -53,19 +52,19 @@ public class LoggingEventSelectionStrategyDecorator<ESS extends EventSelectionSt
     }
 
     @Override
-    public Set<BEvent> selectableEvents(Set<SyncStatement> statements, List<BEvent> externalEvents) {
-        final Set<BEvent> selectableEvents = getDecorated().selectableEvents(statements, externalEvents);
+    public Set<BEvent> selectableEvents(BProgramSyncSnapshot bpss) {
+        final Set<BEvent> selectableEvents = getDecorated().selectableEvents(bpss);
 
         out.println("== Choosing Selectable Events ==");
         out.println("BThread Sync Statements:");
-        statements.forEach( stmt -> {
+        bpss.getStatements().forEach( stmt -> {
             out.println("+ " + stmt.getBthread().getName() + ":" + (stmt.isHot()?" HOT":""));
             out.println("    Request: " + stmt.getRequest());
             out.println("    WaitFor: " + stmt.getWaitFor());
             out.println("    Block: "   + stmt.getBlock());
             out.println("    Interrupt: " + stmt.getInterrupt());
         });
-        out.println("+ ExternalEvents: " + externalEvents);
+        out.println("+ ExternalEvents: " + bpss.getExternalEvents());
         
         out.println("-- Selectable Events -----------");
         if ( selectableEvents.isEmpty() ){
@@ -80,8 +79,8 @@ public class LoggingEventSelectionStrategyDecorator<ESS extends EventSelectionSt
     }
 
     @Override
-    public Optional<EventSelectionResult> select(Set<SyncStatement> statements, List<BEvent> externalEvents, Set<BEvent> selectableEvents) {
-        Optional<EventSelectionResult> selectedEvent = getDecorated().select(statements, externalEvents, selectableEvents);
+    public Optional<EventSelectionResult> select(BProgramSyncSnapshot bpss, Set<BEvent> selectableEvents) {
+        Optional<EventSelectionResult> selectedEvent = getDecorated().select(bpss, selectableEvents);
         out.println("== Actual Event Selection ======");
         out.println( selectedEvent.toString() );
         out.println("================================");

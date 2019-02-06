@@ -1,4 +1,4 @@
-# BPjs: A Javascript-based Behavioral Programming Runtime.
+# BPjs: A JavaScript-based Behavioral Programming Runtime.
 
 This repository contains a javascript-based [BP](http://www.b-prog.org) library.
 
@@ -24,7 +24,7 @@ a link to this page somewhere in the documentation/system about section.
     <dependency>
         <groupId>com.github.bthink-bgu</groupId>
         <artifactId>BPjs</artifactId>
-        <version>0.9.7</version>
+        <version>0.9.8</version>
     </dependency>
     ...
 </dependencies>
@@ -44,8 +44,28 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change Log for the BPjs Library.
 
+### 2019-02-06
+* :arrow_up::arrow_up::sparkles: Verification areas refactored and generalized towards code reuse. Inspectors and traces are now general, and do not assume they were created from the DFS verifier.
+* :arrow_up: Improved state hashing algorithm in the hash-based visited state storage.
+* :arrow_up: Updated documentation of the verification parts.
+* :arrow_up: More tests.
+* :arrow_up: Updated maven compiler plugin.
+* :bug: Fixed a corner case where b-programs with immediate failed assertions would still attempt running certain machines.
+
+### 2019-02-05
+* :arrow_up: :tada: Event selection strategies now accept `BProgramSyncSnapshot`, rather than a set of sync statements and external events.
+
+### 2019-02-04
+* :sparkles: Testing infrastructure for execution traces.
+* :arrow_up: More terminology cleanups in the api (e.g. "bsync" converted to "sync")
+
+### 2019-02-03
+* :arrow_up: `VisitedStateStore` now stores *states*, not DFS nodes. So it's more reusable that way.
+
 ### 2019-01-19
 * :sparkles: More tests.
+* :arrow_up: `BriefPrintDfsVerifierListener` => `PrintDfsVerifierListener`, so that it's consistent with `PrintBProgramRunnerListener`.
+* :arrow_up: Incorporated the "BPjs Tips" file to the central documentation.
 
 ### 2019-01-18
 * :bug: Fixed a that cause equality tests of JS event sets to return false negatives.

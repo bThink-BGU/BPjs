@@ -9,7 +9,7 @@ class BProgramRunner {
 
 abstract class BProgram {
     - source
-    + isDaemon:boolean
+    + isWaitForExternalEvents:boolean
     + globalScope
     enqueueExternalEvent(e)
 

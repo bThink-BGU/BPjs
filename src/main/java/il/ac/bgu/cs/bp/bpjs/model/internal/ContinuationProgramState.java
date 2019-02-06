@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis;
+package il.ac.bgu.cs.bp.bpjs.model.internal;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -56,13 +56,17 @@ import org.mozilla.javascript.UniqueTag;
  * @author michael
  */
 public class ContinuationProgramState {
-    private final Map<Object, Object> variables = new HashMap<>();
-    private int programCounter = -1;
-    private int frameIndex = -1;
+    protected final Map<Object, Object> variables = new HashMap<>();
+    protected int programCounter = -1;
+    protected int frameIndex = -1;
 
     public ContinuationProgramState( NativeContinuation nc ) {
         collectStatus(nc.getImplementation());
         collectScopeValues(nc);
+    }
+    
+    protected ContinuationProgramState(){
+        // extra C'tor for subclasses.
     }
     
     private void collectScopeValues(NativeContinuation nc ){
@@ -175,10 +179,10 @@ public class ContinuationProgramState {
     
     @Override
     public int hashCode() {
-        return Objects.hash(programCounter, frameIndex, 
-                                variables.entrySet().stream()
+        return 37 * (programCounter+1) * (frameIndex+1) *
+                                (variables.entrySet().stream()
                                            .map( es->Objects.hash(es.getKey(), es.getValue()) )
-                                           .collect( Collectors.reducing(0, (x,y)->x^y)) );
+                                           .collect( Collectors.reducing(0, (x,y)->x*y))+1);
     }
 
     @Override
@@ -189,7 +193,7 @@ public class ContinuationProgramState {
         if (obj == null) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
+        if ( ! (obj instanceof ContinuationProgramState) ) {
             return false;
         }
         final ContinuationProgramState other = (ContinuationProgramState) obj;

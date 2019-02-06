@@ -24,8 +24,7 @@
 package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
-import java.util.List;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import java.util.Optional;
 import java.util.Set;
 
@@ -50,13 +49,13 @@ public abstract class AbstractEventSelectionStrategyDecorator<ESS extends EventS
     }
 
     @Override
-    public Set<BEvent> selectableEvents(Set<SyncStatement> statements, List<BEvent> externalEvents) {
-        return getDecorated().selectableEvents(statements, externalEvents);
+    public Set<BEvent> selectableEvents(BProgramSyncSnapshot bpss) {
+        return getDecorated().selectableEvents(bpss);
     }
 
     @Override
-    public Optional<EventSelectionResult> select(Set<SyncStatement> statements, List<BEvent> externalEvents, Set<BEvent> selectableEvents) {
-        return getDecorated().select(statements, externalEvents, selectableEvents);
+    public Optional<EventSelectionResult> select(BProgramSyncSnapshot bpss, Set<BEvent> selectableEvents) {
+        return getDecorated().select(bpss, selectableEvents);
     }
     
 }

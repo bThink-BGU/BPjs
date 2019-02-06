@@ -58,7 +58,7 @@ public class StateStorePerformanceComparison {
 
         // prepare verifier
         DfsBProgramVerifier verifier = new DfsBProgramVerifier();
-        verifier.addInspector(DfsInspections.FailedAssertions);
+        verifier.addInspection(ExecutionTraceInspections.FAILED_ASSERTIONS);
 
         // test
         verifier.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
@@ -85,7 +85,9 @@ public class StateStorePerformanceComparison {
         for (int i = 0; i < HEAT_UP_ITERATIONS; i++) {
             vfr.verify(makeBProgram());
         }
+        System.out.println("Iterating");
         for (int i = 0; i < ITERATIONS; i++) {
+            System.out.println(" " + i + " of " + ITERATIONS );
             VerificationResult res = vfr.verify(makeBProgram());
             System.out.println(res.getTimeMillies());
         }
