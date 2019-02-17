@@ -32,6 +32,7 @@ import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import static java.util.Collections.emptySet;
 import java.util.concurrent.ExecutorService;
+import org.junit.After;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.Before;
@@ -314,5 +315,10 @@ public class ContinuationProgramStateTest {
     @Before
     public void setup() {
         exSvc = ExecutorServiceMaker.makeWithName("Test");
+    }
+    
+    @After
+    public void teardown() {
+        exSvc.shutdown();
     }
 }

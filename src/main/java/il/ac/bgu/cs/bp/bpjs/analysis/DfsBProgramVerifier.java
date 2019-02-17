@@ -38,6 +38,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
+import static java.util.stream.Collectors.toSet;
 
 /**
  * Takes a {@link BProgram}, and verifies that it does not run into false
@@ -63,14 +64,48 @@ public class DfsBProgramVerifier {
      * A listener to the progress of the DFS state scanning.
      */
     public static interface ProgressListener {
+        
+        /**
+         * Verifier {@code vfr} started a verification process.
+         * @param vfr the verifier
+         */
+        void started(DfsBProgramVerifier vfr);
 
-        void started(DfsBProgramVerifier v);
-
-        void iterationCount(long count, long statesHit, DfsBProgramVerifier v);
-
-        void maxTraceLengthHit(List<DfsTraversalNode> trace, DfsBProgramVerifier v);
-
-        void done(DfsBProgramVerifier v);
+        /**
+         * A periodical call to update progress.
+         * @param count count of iterations.
+         * @param statesHit count of states found.
+         * @param vfr the verifier
+         * @see DfsBProgramVerifier#setIterationCountGap(long) 
+         */
+        void iterationCount(long count, long statesHit, DfsBProgramVerifier vfr);
+        
+        /**
+         * Verifier {@code vfr} hit the max trace length, and now pops its
+         * iteration stack.
+         * @param aTrace The trace the verifier examined when it hit the length limit.
+         * @param vfr The verifier.
+         * @see DfsBProgramVerifier#setMaxTraceLength(long) 
+         */
+        void maxTraceLengthHit(List<DfsTraversalNode> aTrace, DfsBProgramVerifier vfr);
+        
+        /**
+         * Verifier {@code vfr} reports a found violation. It is up to the listener
+         * to decide whether to continue the verification process and find more 
+         * violations, or to terminate and return the current violation to the 
+         * caller.
+         * 
+         * @param aViolation the violation found
+         * @param vfr the verifier that found the violation
+         * @return {@code true} for the verifier to continue the search, {@code false} otherwise.
+         */
+        boolean violationFound( Violation aViolation, DfsBProgramVerifier vfr );
+        
+        /**
+         * The verifier {@code vfr} has finished the verification process.
+         * @param vfr 
+         */
+        void done(DfsBProgramVerifier vfr);
     }
     
     private static class ViolatingCycleFoundException extends Exception{
@@ -81,11 +116,28 @@ public class DfsBProgramVerifier {
         }
     }
     
+    /**
+     * A "null object" progress listener instance. Stops verification at the 
+     * first violation found. Otherwise does nothing.
+     */
+    private static final ProgressListener NULL_PROGRESS_LISTENER = new ProgressListener() {
+        @Override public void started(DfsBProgramVerifier vfr) {}
+        @Override public void iterationCount(long count, long statesHit, DfsBProgramVerifier vfr) {}
+        @Override public void maxTraceLengthHit(List<DfsTraversalNode> aTrace, DfsBProgramVerifier vfr) {}
+        @Override public void done(DfsBProgramVerifier vfr) {}
+
+        @Override
+        public boolean violationFound(Violation aViolation, DfsBProgramVerifier vfr) {
+            return false;
+        }
+    };
+        
+    
     private long visitedEdgeCount;
     private VisitedStateStore visited = new BThreadSnapshotVisitedStateStore();
     private long maxTraceLength = DEFAULT_MAX_TRACE;
     private final List<DfsTraversalNode> currentPath = new ArrayList<>();
-    private Optional<ProgressListener> listenerOpt = Optional.empty();
+    private ProgressListener listener;
     private long iterationCountGap = DEFAULT_ITERATION_COUNT_GAP;
     private BProgram currentBProgram;
     private boolean debugMode = false;
@@ -93,6 +145,9 @@ public class DfsBProgramVerifier {
     private ArrayExecutionTrace trace;
 
     public VerificationResult verify(BProgram aBp) throws Exception {
+        if ( listener == null ) {
+            listener = NULL_PROGRESS_LISTENER;
+        }
         currentBProgram = aBp;
         visitedEdgeCount = 0;
         currentPath.clear();
@@ -106,11 +161,11 @@ public class DfsBProgramVerifier {
         
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("DfsBProgramRunner-" + INSTANCE_COUNTER.incrementAndGet());
         long start = System.currentTimeMillis();
-        listenerOpt.ifPresent(l -> l.started(this));
+        listener.started(this);
         Violation vio = dfsUsingStack(new DfsTraversalNode(currentBProgram, currentBProgram.setup().start(execSvc), null), execSvc);
         long end = System.currentTimeMillis();
-        listenerOpt.ifPresent(l -> l.done(this));
         execSvc.shutdown();
+        listener.done(this);
         return new VerificationResult(vio, end - start, visited.getVisitedStateCount(), visitedEdgeCount);
     }
 
@@ -120,52 +175,64 @@ public class DfsBProgramVerifier {
         push(aStartNode);
 
         while (!isPathEmpty()) {
+            boolean tryToGoDeeper = true;
+            
             if (debugMode) {
-                printStatus(iterationCount, Collections.unmodifiableList(currentPath));
+                printStatus(iterationCount, currentPath);
             }
 
             DfsTraversalNode curNode = peek();
             if (curNode != null) {
-                Optional<Violation> res = inspections.stream()
+                Set<Violation> res = inspections.stream()
                         .map(v->v.inspectTrace(trace))
                         .filter(o->o.isPresent()).map(Optional::get)
-                        .findAny();
-                if ( res.isPresent() ) {
-                    return res.get();
+                        .collect(toSet());
+                if ( res.size() > 0  ) {
+                    for ( Violation v : res ) {
+                        if ( ! listener.violationFound(v, this) ) {
+                            return v;
+                        }
+                    }
+                    if (isDebugMode()) {
+                        System.out.println("-pop! (violation)-");
+                    }
+                    pop();
+                    tryToGoDeeper = false;
                 }
             }
+            
             iterationCount++;
 
-            if (pathLength() == maxTraceLength) {
-                if (listenerOpt.isPresent()) {
-                    listenerOpt.get().maxTraceLengthHit(currentPath, this);
-                }
-                // fold stack;
-                pop();
+            if ( tryToGoDeeper ) {
+                if (pathLength() == maxTraceLength) {
+                    // fold stack;
+                    listener.maxTraceLengthHit(currentPath, this);
+                    pop();
 
-            } else {
-                try {
-                    DfsTraversalNode nextNode = getUnvisitedNextNode(curNode, execSvc);
-                    if (nextNode == null) {
-                        // fold stack, retry next iteration;
-                        pop();
-                        if (isDebugMode()) {
-                            System.out.println("-pop!-");
+                } else {
+                    try {
+                        DfsTraversalNode nextNode = getUnvisitedNextNode(curNode, execSvc);
+                        if (nextNode == null) {
+                            // fold stack, retry next iteration;
+                            if (isDebugMode()) {
+                                System.out.println("-pop!-");
+                            }
+                            pop();
+                        } else {
+                            // go deeper 
+                            if (isDebugMode()) {
+                                System.out.println("-visiting: " + nextNode);
+                            }
+                            push(nextNode);
                         }
-                    } else {
-                        // go deeper 
-                        if (isDebugMode()) {
-                            System.out.println("-visiting: " + nextNode);
-                        }
-                        push(nextNode);
+                    } catch (ViolatingCycleFoundException vcfe ) {
+                        return vcfe.v;
                     }
-                } catch (ViolatingCycleFoundException vcfe ) {
-                    return vcfe.v;
                 }
             }
-
-            if (iterationCount % iterationCountGap == 0 && listenerOpt.isPresent()) {
-                listenerOpt.get().iterationCount(iterationCount, visited.getVisitedStateCount(), this);
+            
+            if ( iterationCount % iterationCountGap == 0 ) {
+                listener.iterationCount(iterationCount, visited.getVisitedStateCount(), this);
             }
         }
 
@@ -186,11 +253,13 @@ public class DfsBProgramVerifier {
                     if ( pns.equals(nd.getSystemState()) ) {
                         // found an actual cycle
                         trace.cycleTo(nextEvent, idx);
-                        Optional<Violation> res = inspections.stream().map(i->i.inspectTrace(trace))
-                            .filter(o->o.isPresent()).map(Optional::get)
-                            .findAny();
-                        if ( res.isPresent() ) {
-                            throw new ViolatingCycleFoundException(res.get());
+                        Set<Violation> res = inspections.stream().map(i->i.inspectTrace(trace))
+                            .filter(o->o.isPresent()).map(Optional::get).collect(toSet());
+
+                        for ( Violation v : res ) {
+                            if ( ! listener.violationFound(v, this)) {
+                                throw new ViolatingCycleFoundException(v);
+                            }
                         }
                     }
                 }                    
@@ -219,7 +288,7 @@ public class DfsBProgramVerifier {
     }
 
     public void setProgressListener(ProgressListener pl) {
-        listenerOpt = Optional.of(pl);
+        listener = (pl != null) ? pl : NULL_PROGRESS_LISTENER;
     }
 
     public void setIterationCountGap(long iterationCountGap) {

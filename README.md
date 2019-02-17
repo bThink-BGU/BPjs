@@ -24,7 +24,7 @@ a link to this page somewhere in the documentation/system about section.
     <dependency>
         <groupId>com.github.bthink-bgu</groupId>
         <artifactId>BPjs</artifactId>
-        <version>0.9.8</version>
+        <version>0.9.9</version>
     </dependency>
     ...
 </dependencies>
@@ -43,6 +43,11 @@ a link to this page somewhere in the documentation/system about section.
 * [API Javadocs](http://www.javadoc.io/doc/com.github.bthink-bgu/BPjs/)
 
 ## Change Log for the BPjs Library.
+
+### 2019-02-18
+* :sparkles: Detection of multiple violations/general program space traversal: `DFSBProgramVerifier` can continue its traversal of b-program state space after a violation was detected.
+* :arrow_up: Tests clean up after their executor services.
+* :arrow_up: More tests
 
 ### 2019-02-06
 * :arrow_up::arrow_up::sparkles: Verification areas refactored and generalized towards code reuse. Inspectors and traces are now general, and do not assume they were created from the DFS verifier.

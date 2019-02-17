@@ -80,6 +80,7 @@ public class BProgramSyncSnapshotTest {
         stepa.triggerEvent(event_a.getEvent(), execSvcA, listeners);
         exception.expect(IllegalStateException.class);
         stepa.triggerEvent(event_a.getEvent(), execSvcA, listeners);
+        execSvcA.shutdown();
     }
    
     @Test
@@ -96,7 +97,7 @@ public class BProgramSyncSnapshotTest {
         EventSelectionResult event_a = bprog.getEventSelectionStrategy().select(bpss, possibleEvents_a).get();
         bpss = bpss.triggerEvent(event_a.getEvent(), execSvcA, listeners);
         assertTrue(bpss.isHot());
-        
+        execSvcA.shutdown();
     }
 
     /*
@@ -156,6 +157,8 @@ public class BProgramSyncSnapshotTest {
         assertNotEquals(step3a, step2a);
         assertNotEquals(step3b, step2a);
         assertTrue(step3a.noBThreadsLeft());
+        execSvcA.shutdown();
+        execSvcB.shutdown();
     }
 
 
@@ -215,6 +218,7 @@ public class BProgramSyncSnapshotTest {
         assertNotEquals(postSync2_2, postSync1_1);
         assertNotEquals(postSync2_2, postSync2_1);
 
-
+        execSvcA.shutdown();
+        execSvcB.shutdown();
     }
 }

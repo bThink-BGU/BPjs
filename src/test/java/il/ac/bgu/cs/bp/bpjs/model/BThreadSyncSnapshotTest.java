@@ -72,6 +72,8 @@ public class BThreadSyncSnapshotTest {
         // snapshots[1] is after the first loop iteration, snapshots[2] is after the second loop iteration.
         //  They should differ in loop index.
         assertNotEquals(snapshots.get(1).getBThreadSnapshots(), snapshots.get(2).getBThreadSnapshots());
+        
+        execSvc.shutdown();
     }
 
     @Test
@@ -90,7 +92,7 @@ public class BThreadSyncSnapshotTest {
         EventSelectionResult esr = bprog.getEventSelectionStrategy().select(postSync1, possibleEvents).get();
         BProgramSyncSnapshot postSync2 = postSync1.triggerEvent(esr.getEvent(), execSvcA, listeners);
         assertNotEquals(postSync1.getBThreadSnapshots(), postSync2.getBThreadSnapshots());
-
+        execSvcA.shutdown();;
     }
 
 

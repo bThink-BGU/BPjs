@@ -25,6 +25,7 @@ package il.ac.bgu.cs.bp.bpjs.analysis.listeners;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import java.io.PrintStream;
 import java.util.List;
 
@@ -63,6 +64,12 @@ public class PrintDfsVerifierListener implements DfsBProgramVerifier.ProgressLis
     @Override
     public void done(DfsBProgramVerifier v) {
         out.println("/v/ verification of " + v.getCurrentBProgram().getName() + " done");
+    }
+
+    @Override
+    public boolean violationFound(Violation aViolation, DfsBProgramVerifier vfr) {
+        out.println("/v/ Violation found: " + aViolation.decsribe() );
+        return false;
     }
     
 }

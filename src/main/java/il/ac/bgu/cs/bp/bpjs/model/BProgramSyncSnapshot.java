@@ -56,16 +56,13 @@ public class BProgramSyncSnapshot {
     private boolean triggered=false;
     
     /**
-     * A listener that populates the {@link #violationRecord} field, and 
-     * shuts down the {@link ExecutorService} running the tasks.
+     * A listener that populates the {@link #violationRecord} field.
      */
-    private static class HaltOnAssertion implements BPEngineTask.Listener {
-        private final ExecutorService exSvc;
+    private static class ViolationRecorder implements BPEngineTask.Listener {
         private final BProgram bprogram;
         private final AtomicReference<FailedAssertion> vioRec;
 
-        public HaltOnAssertion(ExecutorService exSvc, BProgram bprogram, AtomicReference<FailedAssertion> aViolationRecord) {
-            this.exSvc = exSvc;
+        public ViolationRecorder(BProgram bprogram, AtomicReference<FailedAssertion> aViolationRecord) {
             this.bprogram = bprogram;
             vioRec = aViolationRecord;
         }
@@ -73,7 +70,6 @@ public class BProgramSyncSnapshot {
         @Override
         public void assertionFailed(FailedAssertion fa) {
             vioRec.compareAndSet(null, fa);
-            exSvc.shutdownNow();
         }
 
         @Override
@@ -104,7 +100,7 @@ public class BProgramSyncSnapshot {
      */
     public BProgramSyncSnapshot start( ExecutorService exSvc ) throws InterruptedException {
         Set<BThreadSyncSnapshot> nextRound = new HashSet<>(threadSnapshots.size());
-        BPEngineTask.Listener halter = new HaltOnAssertion(exSvc, bprog, violationRecord);
+        BPEngineTask.Listener halter = new ViolationRecorder(bprog, violationRecord);
         nextRound.addAll(exSvc.invokeAll(threadSnapshots.stream()
                                 .map(bt -> new StartBThread(bt, halter))
                                 .collect(toList())
@@ -148,7 +144,7 @@ public class BProgramSyncSnapshot {
             Context.exit();
         }
         
-        BPEngineTask.Listener halter = new HaltOnAssertion(exSvc, bprog, violationRecord);
+        BPEngineTask.Listener halter = new ViolationRecorder(bprog, violationRecord);
         
         try {
             // add the run results of all those who advance this stage
