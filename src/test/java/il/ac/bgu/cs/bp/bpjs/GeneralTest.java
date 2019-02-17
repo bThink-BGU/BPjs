@@ -116,6 +116,8 @@ public class GeneralTest {
             actualFinalEventNames.stream().sorted().forEach( System.out::println );
         }
         
+        svc.shutdown();
+        
     }
     
 }

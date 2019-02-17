@@ -41,6 +41,7 @@ import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import org.mozilla.javascript.NativeContinuation;
 import org.mozilla.javascript.ScriptRuntime;
 
@@ -70,9 +71,10 @@ public class ContinuationGames {
         
         // Run the top-level code (b-threads are registered but not yet run)
         BProgramSyncSnapshot cur = bprog.setup();
+        ExecutorService execSvc = ExecutorServiceMaker.makeWithName("TEST");
         
         // Run to first bp.sync
-        cur = cur.start( ExecutorServiceMaker.makeWithName("TEST"));
+        cur = cur.start(execSvc);
         
         // Get a snapshot
         final BThreadSyncSnapshot snapshot = cur.getBThreadSnapshots().iterator().next();
@@ -80,7 +82,6 @@ public class ContinuationGames {
         
         // Serialize snapshot
         byte[] serializedContinuationAndScope = null;
-        Object bp = null;
         try {
             Context ctxt = Context.enter(); // need Javascript environment for this, even though we're not executing code per se.
             
@@ -91,7 +92,6 @@ public class ContinuationGames {
             for ( Scriptable sc=scope; sc!=null; sc = sc.getParentScope() ) {
                 System.out.println("SCOPE START");
                 if ( sc.has("bp", sc) ) {
-                    bp = sc.get("bp", sc);
                     sc.delete("bp");
                     System.out.println("bp deleted.");
                 }
@@ -111,6 +111,7 @@ public class ContinuationGames {
             }
             System.out.println("Seriazlied to " + serializedContinuationAndScope.length + " bytes.");
         } finally {
+            execSvc.shutdown();
             Context.exit();
         }
         

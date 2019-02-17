@@ -33,7 +33,7 @@ import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
  */
 public abstract class Violation {
 
-    private ExecutionTrace counterExampleTrace;
+    private final ExecutionTrace counterExampleTrace;
 
     public Violation(ExecutionTrace counterExampleTrace) {
         this.counterExampleTrace = counterExampleTrace;
@@ -50,10 +50,5 @@ public abstract class Violation {
     public ExecutionTrace getCounterExampleTrace() {
         return counterExampleTrace;
     }
-
-    public void setCounterExampleTrace(ExecutionTrace counterExampleTrace) {
-        this.counterExampleTrace = counterExampleTrace;
-    }
-    
     
 }

@@ -73,6 +73,7 @@ public class BProgramSyncSnapshotClonerTest {
         BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(bprog);
         byte[] out = io.serialize(cur);
         io.deserialize(out);
+        exSvc.shutdown();
     }
     
     @Test
@@ -92,6 +93,7 @@ public class BProgramSyncSnapshotClonerTest {
         BProgramSyncSnapshot deserialized = io.deserialize(out);
         
         assertEquals( Arrays.asList(new BEvent("External1"), new BEvent("External2")), deserialized.getExternalEvents());
+        exSvc.shutdown();
     }
     
     @Test

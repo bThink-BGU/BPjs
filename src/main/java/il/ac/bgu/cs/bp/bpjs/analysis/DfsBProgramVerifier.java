@@ -25,7 +25,6 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;

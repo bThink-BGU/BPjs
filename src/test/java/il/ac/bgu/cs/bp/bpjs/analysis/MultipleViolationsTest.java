@@ -25,7 +25,9 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.Assert.assertEquals;
@@ -44,6 +46,7 @@ public class MultipleViolationsTest {
         final ResourceBProgram bprog = new ResourceBProgram("DFSVerifierTests/MultipleFailedAssertions.js");
         AtomicInteger violationCount = new AtomicInteger();
         AtomicBoolean maxLengthHit = new AtomicBoolean(false);
+        final Set<Violation> violations = new HashSet<>();
         
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         vfr.setMaxTraceLength(6);
@@ -62,6 +65,7 @@ public class MultipleViolationsTest {
             public boolean violationFound(Violation aViolation, DfsBProgramVerifier vfr) {
                 int num = violationCount.incrementAndGet();
                 System.out.println("Violation " + num + ": " + aViolation.decsribe() );
+                violations.add(aViolation);
                 return true;
             }
 
@@ -72,7 +76,11 @@ public class MultipleViolationsTest {
 
         assertFalse( res.isViolationFound() );
         assertEquals( 3, violationCount.get() );
+        assertEquals( 3, violations.size() );
         assertTrue( maxLengthHit.get() );
+        Violation v = violations.iterator().next();
+        assertFalse( v.equals(null) );
+        assertFalse( v.equals("Not a Violation") );
     }
     
     @Test

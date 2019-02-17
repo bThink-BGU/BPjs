@@ -45,6 +45,17 @@ import il.ac.bgu.cs.bp.bpjs.analysis.violations.FailedAssertionViolation;
  * @author michael
  */
 public class DfsBProgramVerifierTest {
+    
+    @Test
+    public void sanity() throws Exception {
+        BProgram program = new ResourceBProgram("DFSVerifierTests/AAABTrace.js");
+        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        sut.setDebugMode(true);
+        sut.setMaxTraceLength(3);
+        sut.setIterationCountGap(1);
+        sut.verify(program);
+        assertEquals( ExecutionTraceInspections.DEFAULT_SET, sut.getInspections() );
+    }
 
     @Test
     public void simpleAAABTrace_forgetfulStore() throws Exception {

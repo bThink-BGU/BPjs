@@ -24,6 +24,8 @@ public class StateStoreTests {
 
         DfsTraversalNode next = sut.getUnvisitedNextNode(initial, execSvc);
         assertFalse(forgetful.isVisited(next.getSystemState()));
+        
+        execSvc.shutdown();
     }
 
     @Test
@@ -54,6 +56,7 @@ public class StateStoreTests {
         storeToUse.clear();
         assertFalse(storeToUse.isVisited(next.getSystemState()));
         assertFalse(storeToUse.isVisited(initial.getSystemState()));
+        execSvc.shutdown();
     }
 
     @Test
@@ -103,6 +106,7 @@ public class StateStoreTests {
         BProgramSyncSnapshot state1 = snapshots.get(1).getSystemState();
         BProgramSyncSnapshot state2 = snapshots.get(2).getSystemState();
         assertNotEquals(state1, state2);
+        execSvc.shutdown();
     }
 
     @Test
@@ -153,6 +157,7 @@ public class StateStoreTests {
         BProgramSyncSnapshot state1 = snapshots.get(1).getSystemState();
         BProgramSyncSnapshot state2 = snapshots.get(2).getSystemState();
         assertEquals(state1, state2);
+        execSvc.shutdown();
     }
 
     /*
@@ -198,6 +203,7 @@ public class StateStoreTests {
             storeToUse.store(next1.getSystemState());
             assertTrue(storeToUse.isVisited(next2.getSystemState()));
         }
+        execSvc.shutdown();
     }
 
     @Test
@@ -242,7 +248,7 @@ public class StateStoreTests {
         //and now we should see the node
         next = sut.getUnvisitedNextNode(next, execSvc);
         assertTrue(storeToUse.isVisited(next.getSystemState()));
-
+        execSvc.shutdown();
     }
 }
 

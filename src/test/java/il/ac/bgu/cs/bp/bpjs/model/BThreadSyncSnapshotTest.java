@@ -92,7 +92,7 @@ public class BThreadSyncSnapshotTest {
         EventSelectionResult esr = bprog.getEventSelectionStrategy().select(postSync1, possibleEvents).get();
         BProgramSyncSnapshot postSync2 = postSync1.triggerEvent(esr.getEvent(), execSvcA, listeners);
         assertNotEquals(postSync1.getBThreadSnapshots(), postSync2.getBThreadSnapshots());
-        execSvcA.shutdown();;
+        execSvcA.shutdown();
     }
 
 

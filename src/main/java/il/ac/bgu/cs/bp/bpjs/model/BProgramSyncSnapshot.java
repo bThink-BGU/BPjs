@@ -145,36 +145,30 @@ public class BProgramSyncSnapshot {
         }
         
         BPEngineTask.Listener halter = new ViolationRecorder(bprog, violationRecord);
+
+        // add the run results of all those who advance this stage
+        nextRound.addAll(exSvc.invokeAll(
+                            resumingThisRound.stream()
+                                             .map(bt -> new ResumeBThread(bt, anEvent, halter))
+                                             .collect(toList())
+                ).stream().map(f -> safeGet(f)).filter(Objects::nonNull).collect(toList())
+        );
+
+        // inform listeners which b-threads completed
+        Set<String> nextRoundIds = nextRound.stream().map(t->t.getName()).collect(toSet());
+        resumingThisRound.stream()
+                .filter(t->!nextRoundIds.contains(t.getName()))
+                .forEach(t->listeners.forEach(l->l.bthreadDone(bprog, t)));
+
+        executeAllAddedBThreads(nextRound, exSvc, halter);
+        nextExternalEvents.addAll( bprog.drainEnqueuedExternalEvents() );
+
+        // carry over BThreads that did not advance this round to next round.
+        nextRound.addAll(sleepingThisRound);
+
+
+        return new BProgramSyncSnapshot(bprog, nextRound, nextExternalEvents, violationRecord.get());
         
-        try {
-            // add the run results of all those who advance this stage
-            nextRound.addAll(exSvc.invokeAll(
-                                resumingThisRound.stream()
-                                                 .map(bt -> new ResumeBThread(bt, anEvent, halter))
-                                                 .collect(toList())
-                    ).stream().map(f -> safeGet(f)).filter(Objects::nonNull).collect(toList())
-            );
-
-            // inform listeners which b-threads completed
-            Set<String> nextRoundIds = nextRound.stream().map(t->t.getName()).collect(toSet());
-            resumingThisRound.stream()
-                    .filter(t->!nextRoundIds.contains(t.getName()))
-                    .forEach(t->listeners.forEach(l->l.bthreadDone(bprog, t)));
-
-            executeAllAddedBThreads(nextRound, exSvc, halter);
-            nextExternalEvents.addAll( bprog.drainEnqueuedExternalEvents() );
-
-            // carry over BThreads that did not advance this round to next round.
-            nextRound.addAll(sleepingThisRound);
-
-
-            return new BProgramSyncSnapshot(bprog, nextRound, nextExternalEvents, violationRecord.get());
-        
-        } catch ( RejectedExecutionException ree ) {
-            // The executor thread pool must have been shut down, e.g. due to program violation.
-            return new BProgramSyncSnapshot(bprog, Collections.emptySet(), nextExternalEvents, violationRecord.get());
-            
-        }
     }
 
     private void handleInterrupts(BEvent anEvent, Iterable<BProgramRunnerListener> listeners, BProgram bprog, Context ctxt) {

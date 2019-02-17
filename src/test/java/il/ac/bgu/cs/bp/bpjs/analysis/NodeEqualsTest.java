@@ -11,6 +11,7 @@ import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import java.util.concurrent.ExecutorService;
+import org.junit.After;
 import org.junit.Before;
 
 public class NodeEqualsTest {
@@ -95,5 +96,10 @@ public class NodeEqualsTest {
     @Before
     public void setup() {
         exSvc = ExecutorServiceMaker.makeWithName("Test");
+    }
+    
+    @After
+    public void teardown() {
+        exSvc.shutdown();
     }
 }
