@@ -4,7 +4,7 @@
   <groupId>com.github.bthink-bgu</groupId>
   <artifactId>BPjs</artifactId>
   <name>BPjs</name>
-  <version>0.9.8</version>
+  <version>0.9.9</version>
   <description>Provides a runtime for behavioral programs written in Javascript. It can 
         run stand-alone (from the commmandline) or be embedded in larger 
         JVM-based systems.</description>
@@ -171,82 +171,10 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>org.seleniumhq.selenium</groupId>
-      <artifactId>selenium-java</artifactId>
-      <version>2.44.0</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>selenium-chrome-driver</artifactId>
-          <groupId>org.seleniumhq.selenium</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>selenium-htmlunit-driver</artifactId>
-          <groupId>org.seleniumhq.selenium</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>selenium-firefox-driver</artifactId>
-          <groupId>org.seleniumhq.selenium</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>selenium-ie-driver</artifactId>
-          <groupId>org.seleniumhq.selenium</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>selenium-safari-driver</artifactId>
-          <groupId>org.seleniumhq.selenium</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>selenium-support</artifactId>
-          <groupId>org.seleniumhq.selenium</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>webbit</artifactId>
-          <groupId>org.webbitserver</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-csv</artifactId>
       <version>1.5</version>
       <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.opera</groupId>
-      <artifactId>operadriver</artifactId>
-      <version>1.5</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>selenium-remote-driver</artifactId>
-          <groupId>org.seleniumhq.selenium</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>operalaunchers</artifactId>
-          <groupId>com.opera</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>protobuf-java</artifactId>
-          <groupId>com.google.protobuf</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>guava</artifactId>
-          <groupId>com.google.guava</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>commons-jxpath</artifactId>
-          <groupId>commons-jxpath</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>commons-exec</artifactId>
-          <groupId>org.apache.commons</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>ini4j</artifactId>
-          <groupId>org.ini4j</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
   </dependencies>
   <distributionManagement>
@@ -260,8 +188,8 @@
     </snapshotRepository>
   </distributionManagement>
   <properties>
-    <exec.mainClass>il.ac.bgu.cs.bp.bpjs.mains.BPJsCliRunner</exec.mainClass>
     <java.version>1.8</java.version>
+    <exec.mainClass>il.ac.bgu.cs.bp.bpjs.mains.BPJsCliRunner</exec.mainClass>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 </project>
