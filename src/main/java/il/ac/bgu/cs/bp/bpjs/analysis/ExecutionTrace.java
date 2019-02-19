@@ -124,6 +124,16 @@ public interface ExecutionTrace {
     BProgramSyncSnapshot getLastState();
     
     /**
+     * Returns the last event in the node list. For non-cyclic traces, that would
+     * be the last event to happen before the current state. In cyclic traces, 
+     * this would be the event that causes the b-program to get back to a state
+     * already in the trace, thereby closing the cycle.
+     * 
+     * @return the last event to happen in the node list.
+     */
+    BEvent getLastEvent();
+    
+    /**
      * Ordered list of all nodes in the state. In case of cycles, the last node
      * in the list is the last before returning to a previously visited node.
      * 

@@ -63,7 +63,12 @@ public class ArrayExecutionTrace implements ExecutionTrace {
     public BProgramSyncSnapshot getLastState() {
         return stack.get(stack.size()-1).getState();
     }
-
+    
+    @Override
+    public BEvent getLastEvent() {
+        return stack.get(stack.size()-(isCyclic()?1:2)).getEvent().get();
+    }
+    
     @Override
     public List<Entry> getNodes() {
         return Collections.unmodifiableList(stack);
