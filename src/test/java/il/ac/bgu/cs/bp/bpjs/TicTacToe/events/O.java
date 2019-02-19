@@ -17,9 +17,6 @@ public class O extends Move {
 		this.priority=priority;
 	}
 
-	/**
-	 * @see tictactoe.events.Move#displayString()
-	 */
 	@Override
 	public String displayString() {
 		return "O";
@@ -28,4 +25,19 @@ public class O extends Move {
 	public void priority(int p) {
 		priority=p;
 	}
+    
+   @Override
+   public boolean equals( Object other ) {
+       if ( other == this ) return true;
+       if ( other == null ) return false;
+       if ( other instanceof O ) { 
+           O otherO = (O) other;
+           return otherO.priority == this.priority && super.equals(other);
+       } else return false;
+   }
+   
+   @Override
+   public int hashCode() { 
+       return super.hashCode()*(priority+1);
+   }
 }

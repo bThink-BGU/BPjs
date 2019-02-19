@@ -5,7 +5,6 @@ import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.PrioritizedBSyncEventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
-import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTraceInspection;
 import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTraceInspections;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.PrintDfsVerifierListener;
@@ -15,7 +14,7 @@ import il.ac.bgu.cs.bp.bpjs.analysis.listeners.PrintDfsVerifierListener;
  * 
  * @author reututy
  */
-public class TicTacToeVerMain  {
+public class TicTacToeVerificationMain  {
 
 	public static void main(String[] args) throws InterruptedException {
 

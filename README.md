@@ -44,6 +44,11 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change Log for the BPjs Library.
 
+### 2019-02-10
+* :arrow_up: Updated the Tic-Tac-Toe code.
+* :put_litter_in_its_place: Removed dependencies from `pom.xml`
+* :arrow_up: Updated versions of dependencies in `pom.xml`.
+
 ### 2019-02-18
 * :arrow_up: More tests
 

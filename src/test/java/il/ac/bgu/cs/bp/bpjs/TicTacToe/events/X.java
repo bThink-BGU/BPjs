@@ -6,19 +6,27 @@ package il.ac.bgu.cs.bp.bpjs.TicTacToe.events;
 @SuppressWarnings("serial")
 public class X extends Move {
 
-	/**
-	 * Constructor.
-	 */
 	public X(int row, int col) {
 		super(row, col, "X");
 	}
 
-	/**
-	 * @see tictactoe.events.Move#displayString()
-	 */
 	@Override
 	public String displayString() {
 		return "X";
 	}
+    
+      @Override
+   public boolean equals( Object other ) {
+       if ( other == this ) return true;
+       if ( other == null ) return false;
+       if ( other instanceof X ) { 
+           return super.equals(other);
+       } else return false;
+   }
+   
+   @Override
+   public int hashCode() { 
+       return super.hashCode();
+   }
 
 }

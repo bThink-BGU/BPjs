@@ -1,7 +1,5 @@
 package il.ac.bgu.cs.bp.bpjs.TicTacToe.events;
 
-import org.apache.commons.lang3.NotImplementedException;
-
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 
 /**
@@ -23,7 +21,7 @@ public class Move extends BEvent {
 	 * event.
 	 */
 	public String displayString() {
-		throw new NotImplementedException(name);
+		return "[Move row:" + row + " col:" + col + "]"; 
 	}
 
 	/*
@@ -44,10 +42,15 @@ public class Move extends BEvent {
 		if (col != other.col) {
 			return false;
 		}
-		if (row != other.row) {
-			return false;
-		}
-		return true;
+		return row == other.row;
 	}
 
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 23 * hash + this.row;
+        hash = 23 * hash + this.col;
+        return hash;
+    }
+    
 }
