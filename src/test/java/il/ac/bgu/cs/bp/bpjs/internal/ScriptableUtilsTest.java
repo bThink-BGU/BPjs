@@ -51,10 +51,10 @@ public class ScriptableUtilsTest {
             Scriptable tlScope = curCtx.initStandardObjects(importer);
             Object scopeObj = curCtx.evaluateString(
                 tlScope,
-                "15", 
+                "var a={}; a", 
                 "", 1, null);
             Scriptable aScope = (Scriptable)scopeObj;
-            String expResult = "15";
+            String expResult = "{}";
             String result = ScriptableUtils.toString(aScope);
             assertEquals(expResult, result);
         } finally {
