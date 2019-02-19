@@ -110,7 +110,7 @@ public class ScriptableUtils {
      */
     public static int jsHash(Object jsObj) {
         if (jsObj == null) {
-            return 0;
+            return 1;
         }
         
         // Concatenated strings in Rhino have a different type. We need to manually
@@ -119,7 +119,6 @@ public class ScriptableUtils {
             return jsObj.toString().hashCode();
         }
 
-        // established: o1 and o2 are non-null and of the same class.
         return (jsObj instanceof ScriptableObject)
                 ? jsScriptableObjectHashCode((ScriptableObject) jsObj)
                 : jsObj.hashCode();

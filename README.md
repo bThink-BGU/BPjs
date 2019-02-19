@@ -45,6 +45,9 @@ a link to this page somewhere in the documentation/system about section.
 ## Change Log for the BPjs Library.
 
 ### 2019-02-18
+* :arrow_up: More tests
+
+### 2019-02-18
 * :sparkles: Detection of multiple violations/general program space traversal: `DFSBProgramVerifier` can continue its traversal of b-program state space after a violation was detected.
 * :arrow_up: Tests clean up after their executor services.
 * :arrow_up: More tests

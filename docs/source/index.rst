@@ -15,8 +15,8 @@ Here you can learn about :doc:`writing <BPjsTutorial/index>` and :doc:`executing
 :doc:`embedding <embed-bpjs>` BPjs programs in larger Java systems (or any JVM-based systems, really),
 and extending and modifying BPjs' behavior.
 
-What Do You Want to Do
-----------------------
+What's Here 
+-----------
 
 * **Learn Behavioral Programming:** If you are new to Behavioral Programming (that's alright, it's a fairly new concept), you're invited to read the :doc:`quick intro <BPjsTutorial/index>`.
 * **Use BPjs from a console/commandline:** see :ref:`Running BPjs from the Commandline <running_cmd_line>`.

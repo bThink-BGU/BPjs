@@ -11,13 +11,15 @@ Verification is done directly on the JavaScript code. There is no model transfor
 Verifying Safety Properties
 ---------------------------
 
-BPjs models are verified for most safety properties using assertions. During execution, b-threads may call ``bp.ASSERT(cond, message)``. If ``cond`` evaluates to ``false``, the b-program is considered in violation of its requirements. This mechanism allows intuitive verification of requirements such as *while flying, the doors can't be opened*::
+BPjs models are verified for most safety properties using assertions. During execution, b-threads may call ``bp.ASSERT(cond, message)``. If ``cond`` evaluates to ``false``, the b-program is considered in violation of its requirements. This mechanism allows intuitive verification of requirements such as *while flying, the doors can't be opened*:
+
+.. code-block:: JavaScript 
 
   bp.registerBThread(function(){
     while ( true ) {
       bp.sync({waitFor:FLYING});
       bp.sync({waitFor:DOOR_OPENED, interrupt:LANDED});
-      bp.ASSERT(false, "Can't open the doors when flying")"
+      bp.ASSERT(false, "Can't open the doors when flying");
     }
   });
 
@@ -72,7 +74,9 @@ A more in-depth discussion of verification in BPjs, including some techniques, c
 From the Command Line
 ~~~~~~~~~~~~~~~~~~~~~
 
-To verify a b-program from the commandline, simply add the ``--verify`` switch. Use ``--full-state-storage`` to force the verification to use the full state data when determining whether a state was visited (requires more memory). To concentrate on liveness violations, add the ``--liveness`` switch. To limit the (possibly infinite) depth of the scan, use ``--mac-trace-length``.
+To verify a b-program from the commandline, simply add the ``--verify`` switch. Use ``--full-state-storage`` to force the verification to use the full state data when determining whether a state was visited (requires more memory). To concentrate on liveness violations, add the ``--liveness`` switch. To limit the (possibly infinite) depth of the scan, use ``--mac-trace-length``:
+
+.. code-block:: bash
 
   $ java -jar bpjs.jar --verify hello-possibly-broken-world.js
   $ java -jar bpjs.jar --verify --full-state-storage hello-possibly-broken-world.js
