@@ -173,15 +173,13 @@ public class SyncStatement implements java.io.Serializable {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
+        if (obj == this) return true;
+        if (obj == null) return false;
+        
         if (! (obj instanceof SyncStatement)) {
             return false;
         }
+        
         final SyncStatement other = (SyncStatement) obj;
         if ( this.isHot() != other.isHot() ) {
             return false;

@@ -43,7 +43,7 @@ public class BThreadSyncSnapshot implements Serializable {
     /**
      * BSync statement of the BThread at the time of the snapshot.
      */
-    private SyncStatement bSyncStatement;
+    private SyncStatement syncStatement;
     
     private transient ContinuationProgramState programState;
 
@@ -68,7 +68,7 @@ public class BThreadSyncSnapshot implements Serializable {
         this.entryPoint = entryPoint;
         this.interruptHandler = interruptHandler;
         this.continuation = continuation;
-        this.bSyncStatement = bSyncStatement;
+        this.syncStatement = bSyncStatement;
     }
 
     /**
@@ -82,20 +82,20 @@ public class BThreadSyncSnapshot implements Serializable {
         BThreadSyncSnapshot retVal = new BThreadSyncSnapshot(name, entryPoint);
         retVal.continuation = aContinuation;
         retVal.setInterruptHandler(interruptHandler);
-        retVal.bSyncStatement = aStatement;
+        retVal.syncStatement = aStatement;
         aStatement.setBthread(retVal);
 
         return retVal;
     }
 
     public SyncStatement getSyncStatement() {
-        return bSyncStatement;
+        return syncStatement;
     }
 
     public void setSyncStatement(SyncStatement stmt) {
-        bSyncStatement = stmt;
-        if (bSyncStatement.getBthread() != this) {
-            bSyncStatement.setBthread(this);
+        syncStatement = stmt;
+        if (syncStatement.getBthread() != this) {
+            syncStatement.setBthread(this);
         }
     }
 
@@ -142,7 +142,7 @@ public class BThreadSyncSnapshot implements Serializable {
     @Override
     public int hashCode() {
         final int prime = 31;
-        int result = prime * name.hashCode();
+        int result = prime * Objects.hash(name, syncStatement);
         if (continuation != null) {
             result ^= getContinuationProgramState().hashCode();
         }
@@ -166,7 +166,9 @@ public class BThreadSyncSnapshot implements Serializable {
         if (!Objects.equals(getName(), other.getName())) {
             return false;
         }
-
+        if ( ! Objects.equals(syncStatement,other.getSyncStatement()) ) {
+            return false;
+        }
         if (continuation == null) {
             return (other.continuation == null);
 

@@ -24,7 +24,11 @@ public final class EventSets {
 
         @Override
         public String toString() {
-            return ("{AllEvents}");
+            return ("{all}");
+        }
+        
+        private Object readResolve() {
+            return all;
         }
     };
     
@@ -42,19 +46,10 @@ public final class EventSets {
         public String toString() {
             return "{none}";
         }
+        
+        private Object readResolve() {
+            return none;
+        }
     };
     
-    public final static EventSet allExcept( EventSet es ) {
-        return new EventSet(){
-            @Override
-            public boolean contains(BEvent event) {
-                return ! es.contains(event);
-            }
-            
-            @Override
-            public String toString() {
-                return "{ all except " + es.toString() + "}";
-            }
-        };
-    }
 }

@@ -108,7 +108,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
     }
     
     public EventSet allExcept( EventSet es ) {
-        return EventSets.allExcept(es);
+        return ComposableEventSet.not(es);
     }
     
     /**

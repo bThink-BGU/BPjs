@@ -24,6 +24,13 @@
 package il.ac.bgu.cs.bp.bpjs.model.eventsets;
 
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.util.Arrays;
+import java.util.List;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -39,22 +46,6 @@ public class EventSetsTest {
     private static final BEvent EVT_3 = new BEvent("EVT_3");
     private static final BEvent EVT_4 = new BEvent("EVT_4");
     private static final BEvent EVT_4_SAME = new BEvent("EVT_4");
-
-    /**
-     * Test of allExcept method, of class EventSets.
-     */
-    @Test
-    public void testAllExcept() {
-        EventSet es = EventSets.allExcept(EVT_4);
-        
-        assertFalse( es.contains(EVT_4) );
-        assertFalse( es.contains(EVT_4_SAME) );
-        assertTrue( es.contains(EVT_1) );
-        assertTrue( es.contains(EVT_2) );
-        assertTrue( es.contains(EVT_3) );
-        
-        assertTrue( es.toString().contains(EVT_4.getName()) );
-    }
     
     @Test
     public void testAll() {
@@ -63,7 +54,7 @@ public class EventSetsTest {
         assertTrue( EventSets.all.contains(EVT_3) );
         assertTrue( EventSets.all.contains(EVT_4) );
         assertTrue( EventSets.all.contains(EVT_4_SAME) );
-        assertTrue( EventSets.all.toString().contains("All") );
+        assertTrue( EventSets.all.toString().contains("all") );
     }
     
     @Test
@@ -77,4 +68,26 @@ public class EventSetsTest {
         assertTrue( EventSets.none.toString().contains("none") );
     }
     
+    @Test
+    public void testSerialization() throws IOException, ClassNotFoundException {
+        List<EventSet> original = Arrays.asList(EventSets.all, EventSets.none);
+        byte[] byteArr;
+        try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
+               ObjectOutputStream outs = new ObjectOutputStream(bytes)) {
+            outs.writeObject(original);
+            outs.flush();
+            bytes.flush();
+            byteArr = bytes.toByteArray();
+        }
+        
+        List<EventSet> deSerialized;
+        try( ByteArrayInputStream inByteStr = new ByteArrayInputStream(byteArr);
+            ObjectInputStream inObjStream = new ObjectInputStream(inByteStr) ) {
+            deSerialized = (List<EventSet>) inObjStream.readObject();
+        }
+        
+        assertTrue( deSerialized.get(0) == original.get(0) );
+        assertTrue( deSerialized.get(1) == original.get(1) );
+        
+    }
 }
