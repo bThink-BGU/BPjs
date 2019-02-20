@@ -172,61 +172,43 @@ public class DfsBProgramVerifier {
         long iterationCount = 0;
 
         push(aStartNode);
-
+        Violation v = inspectCurrentTrace();
+        if ( v != null ) return v;
+                            
         while (!isPathEmpty()) {
-            boolean tryToGoDeeper = true;
+            iterationCount++;
             
             if (debugMode) {
                 printStatus(iterationCount, currentPath);
             }
 
-            DfsTraversalNode curNode = peek();
-            if (curNode != null) {
-                Set<Violation> res = inspections.stream()
-                        .map(v->v.inspectTrace(trace))
-                        .filter(o->o.isPresent()).map(Optional::get)
-                        .collect(toSet());
-                if ( res.size() > 0  ) {
-                    for ( Violation v : res ) {
-                        if ( ! listener.violationFound(v, this) ) {
-                            return v;
-                        }
-                    }
-                    if (isDebugMode()) {
-                        System.out.println("-pop! (violation)-");
-                    }
-                    pop();
-                    tryToGoDeeper = false;
-                }
-            }
-            
-            iterationCount++;
+            DfsTraversalNode curNode = peek();            
 
-            if ( tryToGoDeeper ) {
-                if (pathLength() == maxTraceLength) {
-                    // fold stack;
-                    listener.maxTraceLengthHit(currentPath, this);
-                    pop();
+            if (pathLength() == maxTraceLength) {
+                // fold stack;
+                listener.maxTraceLengthHit(currentPath, this);
+                pop();
 
-                } else {
-                    try {
-                        DfsTraversalNode nextNode = getUnvisitedNextNode(curNode, execSvc);
-                        if (nextNode == null) {
-                            // fold stack, retry next iteration;
-                            if (isDebugMode()) {
-                                System.out.println("-pop!-");
-                            }
-                            pop();
-                        } else {
-                            // go deeper 
-                            if (isDebugMode()) {
-                                System.out.println("-visiting: " + nextNode);
-                            }
-                            push(nextNode);
+            } else {
+                try {
+                    DfsTraversalNode nextNode = getUnvisitedNextNode(curNode, execSvc);
+                    if (nextNode == null) {
+                        // fold stack, retry next iteration;
+                        if (isDebugMode()) {
+                            System.out.println("-pop!-");
                         }
-                    } catch (ViolatingCycleFoundException vcfe ) {
-                        return vcfe.v;
+                        pop();
+                    } else {
+                        // go deeper 
+                        if (isDebugMode()) {
+                            System.out.println("-visiting: " + nextNode);
+                        }
+                        push(nextNode);
+                        v = inspectCurrentTrace();
+                        if ( v != null ) return v;
                     }
+                } catch (ViolatingCycleFoundException vcfe ) {
+                    return vcfe.v;
                 }
             }
             
@@ -307,7 +289,26 @@ public class DfsBProgramVerifier {
         System.out.println("  visited: " + visited.getVisitedStateCount());
         path.forEach(n -> System.out.println("  " + n.getLastEvent()));
     }
-
+    
+    private Violation inspectCurrentTrace() {
+        Set<Violation> res = inspections.stream()
+                                    .map(v->v.inspectTrace(trace))
+                                    .filter(o->o.isPresent()).map(Optional::get)
+                                    .collect(toSet());
+        if ( res.size() > 0  ) {
+            for ( Violation v : res ) {
+                if ( ! listener.violationFound(v, this) ) {
+                    return v;
+                }
+            }
+            if (isDebugMode()) {
+                System.out.println("-pop! (violation)-");
+            }
+            pop();
+        }
+        return null;
+    }
+    
     private void push(DfsTraversalNode n) {
         visited.store(n.getSystemState());
         currentPath.add(n);
