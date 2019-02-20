@@ -28,9 +28,7 @@ import il.ac.bgu.cs.bp.bpjs.execution.tasks.BPEngineTask;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.StartFork;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Collections;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
@@ -329,7 +327,7 @@ public class BProgramSyncSnapshot {
     
     @Override
     public int hashCode() {
-        return Objects.hash( threadSnapshots, externalEvents );
+        return threadSnapshots.hashCode() ^ externalEvents.hashCode() ;
     }
 
     @Override

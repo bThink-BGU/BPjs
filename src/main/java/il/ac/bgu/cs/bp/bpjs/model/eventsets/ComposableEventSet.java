@@ -171,5 +171,19 @@ public abstract class ComposableEventSet implements EventSet {
 				return "(" + ifce.toString() +") nand (" + ComposableEventSet.this.toString() +")";
 			}};
 	}
-
+    
+    
+    @Override
+    public boolean equals( Object o ) {
+        if ( o == this ) return true;
+        if ( o == null ) return false;
+        if ( o instanceof ComposableEventSet ) {
+            return toString().equals(o.toString());
+        } else return false;
+    }
+    
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
+    }
 }

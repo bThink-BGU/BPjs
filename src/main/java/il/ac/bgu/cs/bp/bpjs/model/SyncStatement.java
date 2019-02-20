@@ -167,9 +167,8 @@ public class SyncStatement implements java.io.Serializable {
 
     @Override
     public int hashCode() {
-        int hash = 3;
-        hash = 31 * hash + Objects.hashCode(this.request);
-        return hash;
+        return Objects.hash(getRequest(), getWaitFor(), getBlock(),
+                            getInterrupt(), getData(), isHot());
     }
 
     @Override

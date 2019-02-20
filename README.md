@@ -45,6 +45,7 @@ a link to this page somewhere in the documentation/system about section.
 ## Change Log for the BPjs Library.
 
 ### 2019-02-10
+* :arrow_up: Improved hash functions for `SyncStatement`s and `ComposableEventSet`s.
 * :arrow_up: `ExecutionTrace`s can now return the last event, in addition to returning the last state.
 * :arrow_up: More tests.
 
