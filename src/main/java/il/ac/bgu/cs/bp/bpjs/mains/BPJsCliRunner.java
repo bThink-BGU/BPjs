@@ -213,9 +213,9 @@ public class BPJsCliRunner {
 
     private static void print(String template, String... params) {
         if (params.length == 0) {
-            System.out.print("# " + template);
+            System.out.print(template);
         } else {
-            System.out.printf("# " + template, (Object[]) params);
+            System.out.printf(template, (Object[]) params);
         }
     }
 

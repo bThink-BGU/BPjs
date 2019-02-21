@@ -327,7 +327,7 @@ public class BProgramSyncSnapshot {
     
     @Override
     public int hashCode() {
-        return threadSnapshots.hashCode() ^ externalEvents.hashCode() ;
+        return Objects.hash(threadSnapshots, externalEvents);
     }
 
     @Override

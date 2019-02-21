@@ -45,6 +45,9 @@ a link to this page somewhere in the documentation/system about section.
 ## Change Log for the BPjs Library.
 
 ### 2019-02-10
+* :arrow_up: Improved hash functions for `ContinuationProgramState` (affects b-thread sync snapshots as well).
+
+### 2019-02-10
 * :bug: Instances of the constant sets class `EventSets` now cannot be duplicated even when they are serialized.
 * :bug: Fixed a bug in the verifier, where inspections were invoked twice.
 * :arrow_up: Improved hash functions for `SyncStatement`s and `ComposableEventSet`s.
