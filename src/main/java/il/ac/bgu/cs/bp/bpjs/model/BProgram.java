@@ -77,7 +77,7 @@ public abstract class BProgram {
     private final BlockingQueue<BEvent> recentlyEnqueuedExternalEvents = new LinkedBlockingQueue<>();
 
     /**
-     * BThreads added between bsyncs are added here.
+     * BThreads added between syncs are added here.
      */
     private final BlockingQueue<BThreadSyncSnapshot> recentlyRegisteredBthreads = new LinkedBlockingDeque<>();
     

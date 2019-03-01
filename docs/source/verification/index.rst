@@ -74,7 +74,7 @@ A more in-depth discussion of verification in BPjs, including some techniques, c
 From the Command Line
 ~~~~~~~~~~~~~~~~~~~~~
 
-To verify a b-program from the commandline, simply add the ``--verify`` switch. Use ``--full-state-storage`` to force the verification to use the full state data when determining whether a state was visited (requires more memory). To concentrate on liveness violations, add the ``--liveness`` switch. To limit the (possibly infinite) depth of the scan, use ``--mac-trace-length``:
+To verify a b-program from the commandline, simply add the ``--verify`` switch. Use ``--full-state-storage`` to force the verification to use the full state data when determining whether a state was visited (requires more memory). To concentrate on liveness violations, add the ``--liveness`` switch. To limit the (possibly infinite) depth of the scan, use ``--max-trace-length``:
 
 .. code-block:: bash
 
