@@ -6,11 +6,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import static java.util.stream.Collectors.joining;
-import java.util.stream.Stream;
-import org.mozilla.javascript.ConsString;
 import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
 
 /**
  * A base class for events. Each event has a name and optional data, which is a

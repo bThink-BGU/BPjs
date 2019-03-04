@@ -3,6 +3,9 @@ package il.ac.bgu.cs.bp.bpjs.model.eventsets;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+import static java.util.stream.Collectors.joining;
 
 
 /**
@@ -24,6 +27,111 @@ import java.util.Collection;
  */
 public abstract class ComposableEventSet implements EventSet {
 	
+    public static final class Not extends ComposableEventSet {
+        private final EventSet negated;
+
+        public Not(EventSet negated) {
+            this.negated = negated;
+        }
+        
+        @Override
+        public boolean contains(BEvent event) {
+            return ! negated.contains(event);
+        }
+
+        @Override
+        public String toString() {
+            return "not(" + negated.toString() +")";
+        }
+    
+        @Override
+        public int hashCode(){
+            return 17*negated.hashCode();
+        }
+        
+        @Override
+        public boolean equals( Object other ) {
+            if ( this == other ) return true;
+            if ( this == null ) return false;
+            if ( other instanceof Not ) {
+                return ((Not)other).negated.equals(negated);
+            } else {
+                return false;
+            }
+        }
+    }
+    
+    public static final class AnyOf extends ComposableEventSet {
+        private final Set<EventSet> events;
+
+        public AnyOf(Set<EventSet> events) {
+            this.events = events;
+        }
+        
+        @Override
+        public boolean contains(BEvent event) {
+            return events.stream().anyMatch( es->es.contains(event) );
+        }
+
+        @Override
+        public String toString() {
+            return "anyOf(" + events.stream().map(es->es.toString())
+                                        .sorted().collect( joining(",")) +")";
+        }
+    
+        @Override
+        public int hashCode(){
+            return 17*events.hashCode();
+        }
+        
+        @Override
+        public boolean equals( Object other ) {
+            if ( this == other ) return true;
+            if ( this == null ) return false;
+            if ( other instanceof AnyOf ) {
+                return ((AnyOf)other).events.equals(events);
+            } else {
+                return false;
+            }
+        }
+    }
+    
+    public static final class AllOf extends ComposableEventSet {
+        private final Set<EventSet> events;
+
+        public AllOf(Set<EventSet> events) {
+            this.events = events;
+        }
+        
+        @Override
+        public boolean contains(BEvent event) {
+            return events.stream().allMatch( es->es.contains(event) );
+        }
+
+        @Override
+        public String toString() {
+            return "allOf(" + events.stream().map(es->es.toString())
+                                        .sorted().collect( joining(",")) +")";
+        }
+    
+        @Override
+        public int hashCode(){
+            return 19*events.hashCode();
+        }
+        
+        @Override
+        public boolean equals( Object other ) {
+            if ( this == other ) return true;
+            if ( this == null ) return false;
+            if ( other instanceof AllOf ) {
+                return ((AllOf)other).events.equals(events);
+            } else {
+                return false;
+            }
+        }
+    }
+    
+    
 	public static ComposableEventSet theEventSet( final EventSet ifce ) {
         if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
 		if ( ifce instanceof ComposableEventSet ) {
@@ -44,90 +152,37 @@ public abstract class ComposableEventSet implements EventSet {
 	
 	public static ComposableEventSet not( final EventSet ifce ) {
         if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
-		return new ComposableEventSet() {
-			@Override
-			public boolean contains(BEvent event) {
-				return ! ifce.contains(event);
-			}
-			@Override
-			public String toString() {
-				return "not(" + ifce.toString() +")";
-			}};
+		return new Not(ifce);
 	}
 	
     public static ComposableEventSet anyOf( final Collection<EventSet> ifces) {
         if ( ifces==null ) throw new IllegalArgumentException("eventset collection cannot be null");
-		return new ComposableEventSet() {
-			@Override
-			public boolean contains(BEvent event) {
-                return ifces.stream().anyMatch(ifce->ifce.contains(event) );
-			}
-			@Override
-			public String toString() {
-				return "anyOf(" + Arrays.asList(ifces).toString() +")";
-			}};
+		return new AnyOf( new HashSet<>(ifces) );
 	}
     
 	public static ComposableEventSet anyOf( final EventSet... ifces) {
         if ( ifces==null ) throw new IllegalArgumentException("eventset collection cannot be null");
-		return new ComposableEventSet() {
-			@Override
-			public boolean contains(BEvent event) {
-				for ( EventSet ifce : ifces ) {
-					if ( ifce.contains(event) ) return true;
-				}
-				return false;
-			}
-			@Override
-			public String toString() {
-				return "anyOf(" + Arrays.asList(ifces).toString() +")";
-			}};
+		return new AnyOf( new HashSet<>(Arrays.asList(ifces)) );
 	}
 	
-	public static ComposableEventSet allOf( final EventSet... ifces) {
+	public static ComposableEventSet allOf( final Collection<EventSet> ifces) {
         if ( ifces==null ) throw new IllegalArgumentException("eventset collection cannot be null");
-		return new ComposableEventSet() {
-			@Override
-			public boolean contains(BEvent event) {
-				for ( EventSet ifce : ifces ) {
-					if ( ! ifce.contains(event) ) return false;
-				}
-				return true;
-			}
-			@Override
-			public String toString() {
-				return "allOf(" + Arrays.asList(ifces).toString() +")";
-			}};
+		return new AllOf(new HashSet<>(ifces));
+	}
+    
+    public static ComposableEventSet allOf( final EventSet... ifces) {
+        if ( ifces==null ) throw new IllegalArgumentException("eventset collection cannot be null");
+		return new AllOf(new HashSet<>(Arrays.asList(ifces)));
 	}
 	
 	public ComposableEventSet and( final EventSet ifce ) {
         if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
-		return new ComposableEventSet() {
-			@Override
-			public boolean contains(BEvent event) {
-				return ifce.contains(event) && ComposableEventSet.this.contains(event);
-			}
-			
-			@Override
-			public String toString() {
-				return "(" + ifce.toString() +") and (" + ComposableEventSet.this.toString() +")";
-			}
-		
-		};
+		return new AllOf(makeSet(this, ifce));
 	}
 	
 	public ComposableEventSet or( final EventSet ifce ) {
         if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
-		return new ComposableEventSet() {
-			@Override
-			public boolean contains(BEvent event) {
-				return ifce.contains(event) || ComposableEventSet.this.contains(event);
-			}
-			
-			@Override
-			public String toString() {
-				return "(" + ifce.toString() +") or (" + ComposableEventSet.this.toString() +")";
-			}};
+		return new AnyOf( makeSet(this, ifce) );
 	}
 	
 	public ComposableEventSet xor( final EventSet ifce ) {
@@ -172,6 +227,13 @@ public abstract class ComposableEventSet implements EventSet {
 			}};
 	}
     
+    
+    private static Set<EventSet> makeSet( ComposableEventSet es1, EventSet es2 ) {
+        Set<EventSet> retVal = new HashSet<>(2);
+        retVal.add(es1);
+        retVal.add(es2);
+        return retVal;
+    }
     
     @Override
     public boolean equals( Object o ) {

@@ -44,6 +44,9 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change Log for the BPjs Library.
 
+### 2019-03-05
+* :arrow_up: `ComposableEventSet` refactored to have `equals` and `hashCode` that can hold during verification.
+
 ### 2019-02-10
 * :arrow_up: Improved hash functions for `ContinuationProgramState` (affects b-thread sync snapshots as well).
 

@@ -197,7 +197,11 @@ public class DfsBProgramVerifier {
                         if (isDebugMode()) {
                             System.out.println("-pop!-");
                         }
-                        pop();
+                        DfsTraversalNode p = pop();
+                        if ( p.getEventIterator().hasNext() ) {
+                            throw new IllegalStateException("Still having some events to traverse: " + p.getEventIterator().next() );
+                        }
+                        
                     } else {
                         // go deeper 
                         if (isDebugMode()) {
@@ -225,9 +229,10 @@ public class DfsBProgramVerifier {
             final BEvent nextEvent = src.getEventIterator().next();
             DfsTraversalNode possibleNextNode = src.getNextNode(nextEvent, execSvc);
             visitedEdgeCount++;
-            if (visited.isVisited(possibleNextNode.getSystemState()) ) {
+            
+            BProgramSyncSnapshot pns = possibleNextNode.getSystemState();
+            if (visited.isVisited(pns) ) {
                 // Found a possible cycle                
-                BProgramSyncSnapshot pns = possibleNextNode.getSystemState();
                 
                 for ( int idx=0; idx<currentPath.size(); idx++) {
                     DfsTraversalNode nd = currentPath.get(idx);
@@ -319,9 +324,10 @@ public class DfsBProgramVerifier {
         }
     }
 
-    private void pop() {
-        currentPath.remove(currentPath.size() - 1);
+    private DfsTraversalNode pop() {
+        DfsTraversalNode popped = currentPath.remove(currentPath.size() - 1);
         trace.pop();
+        return popped;
     }
 
     private int pathLength() {
