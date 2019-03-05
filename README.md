@@ -46,7 +46,14 @@ a link to this page somewhere in the documentation/system about section.
 
 ### 2019-03-05
 * :sparkles: Serious makeover for the composable event suite. Users can no compose event sets using `or`,`and`, and `not` (and even `xor`, `nor` and `nand`) and get semantically correct sets that support verification.
+  for example, this works:
+```java
+EventSet sutA = theEventSet(E_A).or(E_B).and( theEventSet(E_B).or(E_C) );
+EventSet sutB = theEventSet(E_C).or(E_B).and( theEventSet(E_B).or(E_A) );
+assertEquals( sutA, sutB );
+```
 * :arrow_up: `ComposableEventSet` refactored to have `equals` and `hashCode` that can hold during verification.
+* :arrow_up: More tests.
 
 ### 2019-02-10
 * :arrow_up: Improved hash functions for `ContinuationProgramState` (affects b-thread sync snapshots as well).

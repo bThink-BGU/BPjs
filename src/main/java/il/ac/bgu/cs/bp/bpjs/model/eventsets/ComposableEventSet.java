@@ -171,7 +171,7 @@ public abstract class ComposableEventSet implements EventSet {
         public ComposableEventSet and( EventSet ifce ) {
             if ( ifce instanceof AllOf ) {
                 return new AllOf( 
-                    Stream.concat(events.stream(), ((AnyOf)ifce).events.stream())
+                    Stream.concat(events.stream(), ((AllOf)ifce).events.stream())
                           .collect( toSet() ));
             } else if ( ifce instanceof EventSet ) {
                 return new AllOf( 
@@ -251,7 +251,7 @@ public abstract class ComposableEventSet implements EventSet {
 	
 	public static ComposableEventSet not( final EventSet ifce ) {
         if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
-		return (ifce instanceof Not) ? theEventSet(((Not)ifce).negated) : new Not(ifce);
+		return (ifce instanceof Not) ? theEventSet(((Not)ifce).negated) : new Not(w(ifce));
 	}
 	
     public static ComposableEventSet anyOf( final Collection<EventSet> ifces) {
