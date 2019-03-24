@@ -46,7 +46,7 @@ public class TicTacToeVerificationMain  {
 
             vfr.setMaxTraceLength(70);
 //            vfr.setDebugMode(true);
-            vfr.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
+            vfr.setVisitedStateStore(new BThreadSnapshotVisitedStateStore());
             vfr.setProgressListener(new PrintDfsVerifierListener() );
 
             final VerificationResult res = vfr.verify(bprog);

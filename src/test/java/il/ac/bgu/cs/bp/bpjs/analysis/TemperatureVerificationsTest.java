@@ -93,7 +93,7 @@ public class TemperatureVerificationsTest {
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         // Adding the inspector means it will be the only inspector run, as the default set will not be used.
         vfr.addInspection(ExecutionTraceInspections.HOT_BPROGRAM_CYCLES);
-        vfr.setVisitedNodeStore( new BThreadSnapshotVisitedStateStore() );
+        vfr.setVisitedStateStore( new BThreadSnapshotVisitedStateStore() );
         final VerificationResult res = vfr.verify(bprog);
 
         assertTrue(res.isViolationFound());

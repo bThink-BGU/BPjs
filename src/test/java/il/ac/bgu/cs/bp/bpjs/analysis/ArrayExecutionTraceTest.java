@@ -26,15 +26,8 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
 import static il.ac.bgu.cs.bp.bpjs.TestUtils.makeBPSS;
 import il.ac.bgu.cs.bp.bpjs.mocks.MockBThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
-import java.util.List;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 

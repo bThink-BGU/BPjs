@@ -152,9 +152,9 @@ public class SnapshotBenchmarks {
                 System.gc();
                 snapshotSet[i] = getStateSizes(makeBProgram(IMPLEMENTATION, valueMap), NUM_STEPS);
                 System.gc();
-                verifier.setVisitedNodeStore(store);
+                verifier.setVisitedStateStore(store);
                 verificationTimes[i] = getVerification(verifier, IMPLEMENTATION, valueMap, ITERATIONS);
-                verifier.setVisitedNodeStore(storeHash);
+                verifier.setVisitedStateStore(storeHash);
                 verificationTimesHash[i] = getVerification(verifier, IMPLEMENTATION, valueMap, ITERATIONS);
                 System.gc();
 
@@ -229,9 +229,9 @@ public class SnapshotBenchmarks {
                 System.gc();
                 snapshotSet[i] = getStateSizes(makeBProgram(IMPLEMENTATION, valueMap, strategy), NUM_STEPS);
                 System.gc();
-                verifier.setVisitedNodeStore(store);
+                verifier.setVisitedStateStore(store);
                 verificationTimes[i] = getVerificationTime(verifier, IMPLEMENTATION, valueMap, ITERATIONS, strategy);
-                verifier.setVisitedNodeStore(storeHash);
+                verifier.setVisitedStateStore(storeHash);
                 verificationTimesHash[i] = getVerificationTime(verifier, IMPLEMENTATION, valueMap, ITERATIONS, strategy);
                 System.gc();
 
@@ -252,7 +252,7 @@ public class SnapshotBenchmarks {
         }
 
         static VerificationResult[] getVerificationTime(DfsBProgramVerifier vfr, String programPath, Map<String, Object> valueMap, int iteration_count, EventSelectionStrategy strategy) {
-            String res = String.format("Measuring Verification time with %s store", vfr.getVisitedNodeStore().getClass().getName());
+            String res = String.format("Measuring Verification time with %s store", vfr.getVisitedStateStore().getClass().getName());
             LOGGER.info(res);
             return LongStream.range(0, iteration_count).mapToObj(i -> {
                 try {

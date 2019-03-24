@@ -62,7 +62,7 @@ public class VerificationResult {
         return statesScanned;
     }
 
-    public long getEdgesScanned() {
+    public long getScannedEdgesCount() {
         return edgesScanned;
     }
 

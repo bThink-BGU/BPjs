@@ -44,6 +44,9 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change Log for the BPjs Library.
 
+### 2019-03-10
+* :put_litter_in_its_place: Code cleanup.
+
 ### 2019-03-05
 * :sparkles: Serious makeover for the composable event suite. Users can no compose event sets using `or`,`and`, and `not` (and even `xor`, `nor` and `nand`) and get semantically correct sets that support verification.
   for example, this works:

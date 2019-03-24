@@ -61,11 +61,11 @@ public class StateStorePerformanceComparison {
         verifier.addInspection(ExecutionTraceInspections.FAILED_ASSERTIONS);
 
         // test
-        verifier.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
+        verifier.setVisitedStateStore(new BThreadSnapshotVisitedStateStore());
         runVerifier(verifier);
-        verifier.setVisitedNodeStore(new HashVisitedStateStore());
+        verifier.setVisitedStateStore(new HashVisitedStateStore());
         runVerifier(verifier);
-        verifier.setVisitedNodeStore(new ForgetfulVisitedStateStore());
+        verifier.setVisitedStateStore(new ForgetfulVisitedStateStore());
         runVerifier(verifier);
 
     }
@@ -80,7 +80,7 @@ public class StateStorePerformanceComparison {
     }
 
     private static void runVerifier(DfsBProgramVerifier vfr) throws Exception {
-        System.out.println("Testing " + vfr.getVisitedNodeStore());
+        System.out.println("Testing " + vfr.getVisitedStateStore());
         System.out.println("Heating up");
         for (int i = 0; i < HEAT_UP_ITERATIONS; i++) {
             vfr.verify(makeBProgram());
