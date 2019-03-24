@@ -117,9 +117,9 @@ public class BPJsCliRunner {
             
             if ( switchPresent("--full-state-storage", args) ) {
                 println("Using full state storage");
-                vfr.setVisitedNodeStore( new BThreadSnapshotVisitedStateStore() );
+                vfr.setVisitedStateStore( new BThreadSnapshotVisitedStateStore() );
             } else {
-                vfr.setVisitedNodeStore( new HashVisitedStateStore() );
+                vfr.setVisitedStateStore( new HashVisitedStateStore() );
             }
             if ( switchPresent("--liveness", args) ) {
                 vfr.addInspection(ExecutionTraceInspections.HOT_BPROGRAM_CYCLES);

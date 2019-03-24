@@ -49,6 +49,7 @@ public class BProgramSyncSnapshot {
     private final List<BEvent> externalEvents;
     private final BProgram bprog;
     private final AtomicReference<FailedAssertion> violationRecord = new AtomicReference<>();
+    private transient int hashCodeCache = Integer.MIN_VALUE;
     
     /** A flag to ensure the snapshot is only triggered once. */
     private boolean triggered=false;
@@ -327,7 +328,10 @@ public class BProgramSyncSnapshot {
     
     @Override
     public int hashCode() {
-        return Objects.hash(threadSnapshots, externalEvents);
+        if ( hashCodeCache == Integer.MIN_VALUE  ) {
+            hashCodeCache = Objects.hash(threadSnapshots, externalEvents);
+        }
+        return hashCodeCache;
     }
 
     @Override

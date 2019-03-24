@@ -87,8 +87,8 @@ public class Mazes {
 
             vfr.setProgressListener(new PrintDfsVerifierListener());
             vfr.setIterationCountGap(10);
-            vfr.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
-//            vfr.setVisitedNodeStore(new ForgetfulVisitedStateStore());
+            vfr.setVisitedStateStore(new BThreadSnapshotVisitedStateStore());
+//            vfr.setVisitedStateStore(new ForgetfulVisitedStateStore());
             
             vfr.addInspection(ExecutionTraceInspections.FAILED_ASSERTIONS); // We only want failed assertions, deadlocks are OK here, in the greateer program(!)
             final VerificationResult res = vfr.verify(bprog);

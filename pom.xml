@@ -5,15 +5,15 @@
 
     <groupId>com.github.bthink-bgu</groupId>
     <artifactId>BPjs</artifactId>
-    <version>0.10.1</version>
+    <version>0.10.2</version>
     <packaging>jar</packaging>
 
     <name>BPjs</name>
     <url>https://github.com/bThink-BGU/</url>
     <description>
-        Provides a runtime for behavioral programs written in Javascript. It can 
-        run stand-alone (from the commmandline) or be embedded in larger 
-        JVM-based systems.
+        Provides runtime and analysis for behavioral programs written in 
+        JavaScript. It can run stand-alone (from the commmandline) or be 
+        embedded in larger JVM-based systems.
     </description>
 
     <licenses>
@@ -132,6 +132,18 @@
                 </executions>
             </plugin>
             <!-- / Code Coverage -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.1</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>il.ac.bgu.cs.bp.bpjs.mains.BPJsCliRunner</mainClass>
+                        </manifest>
+                    </archive>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>

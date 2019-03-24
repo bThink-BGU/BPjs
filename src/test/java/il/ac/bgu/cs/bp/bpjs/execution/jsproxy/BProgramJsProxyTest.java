@@ -100,7 +100,7 @@ public class BProgramJsProxyTest {
     public void DeadlockSameThread() throws Exception{
         BProgram bpr = new ResourceBProgram("bpsync-blockrequest.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        sut.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
+        sut.setVisitedStateStore(new BThreadSnapshotVisitedStateStore());
         VerificationResult res = sut.verify(bpr);
         assertTrue(res.isViolationFound());
         assertTrue(res.getViolation().get() instanceof DeadlockViolation);

@@ -1,6 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.model.eventsets;
 
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import java.io.ObjectStreamException;
 
 /**
  * Utility class for commonly used event sets.
@@ -27,7 +28,7 @@ public final class EventSets {
             return ("{all}");
         }
         
-        private Object readResolve() {
+        private Object readResolve() throws ObjectStreamException {
             return all;
         }
     };
@@ -47,7 +48,7 @@ public final class EventSets {
             return "{none}";
         }
         
-        private Object readResolve() {
+        private Object readResolve() throws ObjectStreamException {
             return none;
         }
     };

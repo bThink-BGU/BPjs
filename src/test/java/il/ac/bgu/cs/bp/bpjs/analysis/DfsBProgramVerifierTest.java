@@ -63,7 +63,7 @@ public class DfsBProgramVerifierTest {
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setProgressListener(new PrintDfsVerifierListener());
         program.appendSource(Requirements.eventNotSelected("B"));
-        sut.setVisitedNodeStore(new ForgetfulVisitedStateStore());
+        sut.setVisitedStateStore(new ForgetfulVisitedStateStore());
         VerificationResult res = sut.verify(program);
         assertTrue(res.isViolationFound());
         assertEquals("AAAB", traceEventNamesString(res, ""));
@@ -77,7 +77,7 @@ public class DfsBProgramVerifierTest {
 
         sut.setProgressListener(new PrintDfsVerifierListener());
         program.appendSource(Requirements.eventNotSelected("B"));
-        sut.setVisitedNodeStore(new BThreadSnapshotVisitedStateStore());
+        sut.setVisitedStateStore(new BThreadSnapshotVisitedStateStore());
         VerificationResult res = sut.verify(program);
         assertTrue(res.isViolationFound());
         assertEquals("AAAB", traceEventNamesString(res, ""));
@@ -91,12 +91,12 @@ public class DfsBProgramVerifierTest {
         sut.setProgressListener(new PrintDfsVerifierListener());
         program.appendSource(Requirements.eventNotSelected("B"));
         VisitedStateStore stateStore = new HashVisitedStateStore();
-        sut.setVisitedNodeStore(stateStore);
+        sut.setVisitedStateStore(stateStore);
         VerificationResult res = sut.verify(program);
         assertTrue(res.isViolationFound());
         assertEquals("AAAB", traceEventNamesString(res, ""));
         //Add trivial getter check
-        VisitedStateStore retStore = sut.getVisitedNodeStore();
+        VisitedStateStore retStore = sut.getVisitedStateStore();
         assertSame(retStore, stateStore);
     }
 
@@ -117,7 +117,7 @@ public class DfsBProgramVerifierTest {
     public void deadlockTrace() throws Exception {
         BProgram program = new ResourceBProgram("DFSVerifierTests/deadlocking.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        sut.setVisitedNodeStore(new ForgetfulVisitedStateStore());
+        sut.setVisitedStateStore(new ForgetfulVisitedStateStore());
         VerificationResult res = sut.verify(program);
         
         assertTrue(res.isViolationFound());
@@ -163,7 +163,7 @@ public class DfsBProgramVerifierTest {
 
         assertFalse(res.isViolationFound());
         assertEquals(4, res.getScannedStatesCount());
-        assertEquals(4, res.getEdgesScanned());
+        assertEquals(4, res.getScannedEdgesCount());
     }
 
     @Test(timeout = 2000)
@@ -236,7 +236,7 @@ public class DfsBProgramVerifierTest {
         assertEquals(5, res.getScannedStatesCount());
         
         // in this case only one option per state
-        assertEquals(5, res.getEdgesScanned()); 
+        assertEquals(5, res.getScannedEdgesCount()); 
 
     }
     
@@ -299,7 +299,7 @@ public class DfsBProgramVerifierTest {
         assertTrue(res.isViolationFound());
         assertTrue(res.getViolation().get() instanceof FailedAssertionViolation);
         assertEquals(2, res.getScannedStatesCount());
-        assertEquals(1, res.getEdgesScanned());
+        assertEquals(1, res.getScannedEdgesCount());
     }
 
 }

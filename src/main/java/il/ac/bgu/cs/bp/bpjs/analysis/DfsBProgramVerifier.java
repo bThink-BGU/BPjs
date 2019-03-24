@@ -265,11 +265,11 @@ public class DfsBProgramVerifier {
         return maxTraceLength;
     }
 
-    public void setVisitedNodeStore(VisitedStateStore aVisitedNodeStore) {
-        visited = aVisitedNodeStore;
+    public void setVisitedStateStore(VisitedStateStore aVisitedStateStore) {
+        visited = aVisitedStateStore;
     }
 
-    public VisitedStateStore getVisitedNodeStore() {
+    public VisitedStateStore getVisitedStateStore() {
         return visited;
     }
 
