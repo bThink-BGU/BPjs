@@ -23,7 +23,9 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.JsErrorViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
+import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,7 +88,7 @@ public class DfsBProgramVerifier {
          * @param vfr The verifier.
          * @see DfsBProgramVerifier#setMaxTraceLength(long) 
          */
-        void maxTraceLengthHit(List<DfsTraversalNode> aTrace, DfsBProgramVerifier vfr);
+        void maxTraceLengthHit(ExecutionTrace aTrace, DfsBProgramVerifier vfr);
         
         /**
          * Verifier {@code vfr} reports a found violation. It is up to the listener
@@ -107,10 +109,10 @@ public class DfsBProgramVerifier {
         void done(DfsBProgramVerifier vfr);
     }
     
-    private static class ViolatingCycleFoundException extends Exception{
+    private static class ViolatingPathFoundException extends Exception {
         final Violation v;
 
-        public ViolatingCycleFoundException(Violation v) {
+        public ViolatingPathFoundException(Violation v) {
             this.v = v;
         }
     }
@@ -122,7 +124,7 @@ public class DfsBProgramVerifier {
     private static final ProgressListener NULL_PROGRESS_LISTENER = new ProgressListener() {
         @Override public void started(DfsBProgramVerifier vfr) {}
         @Override public void iterationCount(long count, long statesHit, DfsBProgramVerifier vfr) {}
-        @Override public void maxTraceLengthHit(List<DfsTraversalNode> aTrace, DfsBProgramVerifier vfr) {}
+        @Override public void maxTraceLengthHit(ExecutionTrace aTrace, DfsBProgramVerifier vfr) {}
         @Override public void done(DfsBProgramVerifier vfr) {}
 
         @Override
@@ -186,7 +188,7 @@ public class DfsBProgramVerifier {
 
             if (pathLength() == maxTraceLength) {
                 // fold stack;
-                listener.maxTraceLengthHit(currentPath, this);
+                listener.maxTraceLengthHit(trace, this);
                 pop();
 
             } else {
@@ -211,7 +213,7 @@ public class DfsBProgramVerifier {
                         v = inspectCurrentTrace();
                         if ( v != null ) return v;
                     }
-                } catch (ViolatingCycleFoundException vcfe ) {
+                } catch (ViolatingPathFoundException vcfe ) {
                     return vcfe.v;
                 }
             }
@@ -224,34 +226,59 @@ public class DfsBProgramVerifier {
         return null;
     }
 
-    protected DfsTraversalNode getUnvisitedNextNode(DfsTraversalNode src, ExecutorService execSvc) throws ViolatingCycleFoundException, Exception {
+    protected DfsTraversalNode getUnvisitedNextNode(DfsTraversalNode src, ExecutorService execSvc) 
+        throws ViolatingPathFoundException{
         while (src.getEventIterator().hasNext()) {
             final BEvent nextEvent = src.getEventIterator().next();
-            DfsTraversalNode possibleNextNode = src.getNextNode(nextEvent, execSvc);
-            visitedEdgeCount++;
-            
-            BProgramSyncSnapshot pns = possibleNextNode.getSystemState();
-            if (visited.isVisited(pns) ) {
-                // Found a possible cycle                
-                
-                for ( int idx=0; idx<currentPath.size(); idx++) {
-                    DfsTraversalNode nd = currentPath.get(idx);
-                    if ( pns.equals(nd.getSystemState()) ) {
-                        // found an actual cycle
-                        trace.cycleTo(nextEvent, idx);
-                        Set<Violation> res = inspections.stream().map(i->i.inspectTrace(trace))
-                            .filter(o->o.isPresent()).map(Optional::get).collect(toSet());
+            try {
+                DfsTraversalNode possibleNextNode = src.getNextNode(nextEvent, execSvc);
+                visitedEdgeCount++;
 
-                        for ( Violation v : res ) {
-                            if ( ! listener.violationFound(v, this)) {
-                                throw new ViolatingCycleFoundException(v);
+                BProgramSyncSnapshot pns = possibleNextNode.getSystemState();
+                if (visited.isVisited(pns) ) {
+                    boolean cycleFound = false;
+                    for ( int idx=0; idx<currentPath.size() && !cycleFound; idx++) {
+                        // Was this a cycle?
+                        DfsTraversalNode nd = currentPath.get(idx);
+                        if ( pns.equals(nd.getSystemState()) ) {
+                            // found an actual cycle
+                            cycleFound = true;
+                            trace.cycleTo(nextEvent, idx);
+                            Set<Violation> res = inspections.stream().map(i->i.inspectTrace(trace))
+                                .filter(o->o.isPresent()).map(Optional::get).collect(toSet());
+
+                            for ( Violation v : res ) {
+                                if ( ! listener.violationFound(v, this)) {
+                                    throw new ViolatingPathFoundException(v);
+                                }
                             }
                         }
                     }
-                }                    
-            } else {
-                // advance to this newly discovered node
-                return possibleNextNode;
+                    if ( ! cycleFound ) {
+                        // revisiting a state from a different path. Quickly inspect the path and contnue.
+                        trace.advance(nextEvent, pns);
+                        Set<Violation> res = inspections.stream().map(i->i.inspectTrace(trace))
+                                .filter(o->o.isPresent()).map(Optional::get).collect(toSet());
+                        if ( res.size() > 0  ) {
+                            for ( Violation v : res ) {
+                                if ( ! listener.violationFound(v, this) ) {
+                                    throw new ViolatingPathFoundException(v);
+                                }
+                            }
+                        }
+                        trace.pop();
+                    }
+                } else {
+                    // advance to this newly discovered node
+                    return possibleNextNode;
+                }
+            } catch ( BPjsRuntimeException bprte ) {
+                trace.advance(nextEvent, null);
+                Violation jsev = new JsErrorViolation(trace, bprte);
+                if ( ! listener.violationFound(jsev, this) ) {
+                    throw new ViolatingPathFoundException(jsev);
+                }
+                trace.pop();
             }
         }
         return null;

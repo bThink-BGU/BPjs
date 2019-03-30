@@ -166,7 +166,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
     }
     
     ////////////////////////
-    // sync ("bsync") related code
+    // sync ("bp.sync") related code
     
     @Override
     public void sync( NativeObject jsRWB, Object data ) {

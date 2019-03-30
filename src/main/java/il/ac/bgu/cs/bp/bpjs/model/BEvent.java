@@ -130,7 +130,7 @@ public class BEvent implements Comparable<BEvent>, EventSet, java.io.Serializabl
 
     @Override
     public int hashCode() {
-        return name.hashCode() ^ getDataField().map(ScriptableUtils::jsHash).orElse(0);
+        return 19*name.hashCode() ^ getDataField().map(ScriptableUtils::jsHash).orElse(0);
     }
 
     @Override

@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model.internal;
 
+import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -178,14 +179,19 @@ public class ContinuationProgramState {
     }
     
     @Override
-    public int hashCode() {
-        return 37*programCounter 
-               + frameIndex 
-               + variables.entrySet().stream()
-                          .map( es->Objects.hash(es.getKey(), es.getValue()) )
-                          .collect( Collectors.reducing(0, (x,y)->x+y) );
+    public int hashCode() {       
+        return hashCode("");
     }
 
+    public int hashCode(String btName) {       
+        String prefix = btName+"!";
+        return 37 * (programCounter + frameIndex +
+	                                variables.entrySet().stream()
+	                                           .map( es-> (prefix+es.getKey()).hashCode()*ScriptableUtils.jsHash(es.getValue()) )  
+	                                           .collect( Collectors.reducing(1, (x,y)->x+y)));
+    }
+
+    
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {

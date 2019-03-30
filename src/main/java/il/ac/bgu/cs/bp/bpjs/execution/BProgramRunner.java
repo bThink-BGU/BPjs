@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution;
 
+import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
@@ -147,7 +148,8 @@ public class BProgramRunner implements Runnable {
             } else {
                 listeners.forEach(l->l.ended(bprog));
             }
-            
+        } catch ( BPjsRuntimeException bre ) {
+            listeners.forEach( l -> l.error(bprog, bre));
         } catch (InterruptedException itr) {
             System.err.println("BProgramRunner interrupted: " + itr.getMessage() );
             

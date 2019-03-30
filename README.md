@@ -44,6 +44,19 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change Log for the BPjs Library.
 
+### 2019-03-30
+* :arrow_up: Improved state hashing
+* :arrow_up: More tests for the verifier
+* :sparkles: Proper JavaScript error reporting at runtime (e.g. invoking methods of `null`). (#52)
+* :sparkles: Proper JavaScript error reporting at for verification. To this end, a new violation, `JSErrorViolation`, was added. (#79)
+* :arrow_up: Updated error message when calling `bp.sync` from a non-b-thread context.
+
+### 2019-03-29
+* :bug: Fixed a bug in the verifier, where a non-cyclic path ending in a visited node is not inspected.
+* :bug: Hash code fixes.
+* :arrow_up: Interface cleanups in the DfsBProgramVerifier: some method exposed the internal DFS nodes, and now they don't do that anymore.
+* :arrow_up: More tests
+
 ### 2019-03-10
 * :put_litter_in_its_place: Code cleanup.
 
