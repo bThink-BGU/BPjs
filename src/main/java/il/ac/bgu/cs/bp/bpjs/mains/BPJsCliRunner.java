@@ -168,6 +168,7 @@ public class BPJsCliRunner {
                 println("General statistics:");
                 println(String.format("Time:\t%,d (msec)", res.getTimeMillies()));
                 println(String.format("States scanned:\t%,d", res.getScannedStatesCount()));
+                println(String.format("Edges scanned:\t%,d", res.getScannedEdgesCount()));
                                     
                 
             } catch ( Exception e ) {

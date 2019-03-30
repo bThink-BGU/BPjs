@@ -12,8 +12,10 @@ import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.JsEventSet;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
 import java.net.URISyntaxException;
 import java.util.Arrays;
+import java.util.concurrent.atomic.AtomicBoolean;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -37,15 +39,32 @@ public class JsEventSetTest {
         assertEquals(Arrays.asList(new BEvent("1stEvent"), new BEvent("2ndEvent")), eventLogger.getEvents() );
     }
     
-    @Test(expected=BPjsRuntimeException.class)
+    @Test
     public void testNullPredicate() throws InterruptedException, URISyntaxException {
-        new BProgramRunner(new StringBProgram("var es=bp.EventSet('bad',null);")).run();
+        BProgramRunner sut = new BProgramRunner(new StringBProgram("var es=bp.EventSet('bad',null);"));
+        
+        final AtomicBoolean errorCalled = new AtomicBoolean();
+        final AtomicBoolean errorMadeSense = new AtomicBoolean();
+        
+        sut.addListener( new BProgramRunnerListenerAdapter() {
+            @Override
+            public void error(BProgram bp, Exception ex) {
+                errorCalled.set(true);
+                System.out.println("null predicate" + ex.getMessage());
+                errorMadeSense.set(ex.getMessage().toLowerCase().contains("be a function"));
+            }
+        });
+
+        sut.run();
+        
+        assertTrue( errorCalled.get() );
+        assertTrue( errorMadeSense.get() );
     }
     
     
-    @Test(expected=BPjsRuntimeException.class)
+    @Test
     public void testBadPredicate() throws InterruptedException, URISyntaxException {
-        new BProgramRunner(new StringBProgram(
+        BProgramRunner sut = new BProgramRunner(new StringBProgram(
                   "var es=bp.EventSet('bad',function(e){return 1;});\n"
                 + "bp.registerBThread('a',function(){\n"
                 + "  bp.sync({request:bp.Event('X')});"
@@ -53,7 +72,24 @@ public class JsEventSetTest {
                 + "bp.registerBThread('b',function(){\n"
                 + "  bp.sync({waitFor:es});\n"
                 + "});"
-        )).run();
+        ));
+ 
+        final AtomicBoolean errorCalled = new AtomicBoolean();
+        final AtomicBoolean errorMadeSense = new AtomicBoolean();
+        
+        sut.addListener( new BProgramRunnerListenerAdapter() {
+            @Override
+            public void error(BProgram bp, Exception ex) {
+                errorCalled.set(true);
+                System.out.println("Bad predicate:" + ex.getMessage());
+                errorMadeSense.set(ex.getMessage().toLowerCase().contains("boolean"));
+            }
+        });
+
+        sut.run();
+        
+        assertTrue( errorCalled.get() );
+        assertTrue( errorMadeSense.get() );
     }
     
     @Test

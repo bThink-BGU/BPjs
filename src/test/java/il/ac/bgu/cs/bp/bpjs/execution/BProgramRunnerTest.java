@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution;
 
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
@@ -89,6 +90,40 @@ public class BProgramRunnerTest {
         String exName = bprog.getFromGlobalScope("exName", String.class).get();
         assertTrue("Java executor name is wrong (got:'" + exName + "')",
                 exName.startsWith("BProgramRunner-"));
+    }
+    
+    
+    @Test
+    public void testErrorReport() {
+        BProgram bprog = new StringBProgram(
+              "bp.registerBThread( function(){\n"
+            + "  bp.sync({request:bp.Event(\"A\")});\n"
+            + "  bp.sync({request:bp.Event(\"A\")});\n"
+            + "  bp.sync({request:bp.Event(\"A\")});\n"
+            + "  var myNullVar;\n"
+            + "  myNullVar.isNullAndSoThisInvocationShouldCrash();\n"
+            + "  bp.sync({request:bp.Event(\"A\")});\n"
+            + "});"
+        );
+        
+        BProgramRunner sut = new BProgramRunner(bprog);
+        final AtomicBoolean errorCalled = new AtomicBoolean();
+        final AtomicBoolean errorMadeSense = new AtomicBoolean();
+        
+        sut.addListener( new BProgramRunnerListenerAdapter() {
+            @Override
+            public void error(BProgram bp, Exception ex) {
+                errorCalled.set(true);
+                System.out.println(ex.getMessage());
+                System.out.println(ex.getCause().getMessage());
+                errorMadeSense.set(ex.getMessage().contains("isNullAndSoThisInvocationShouldCrash"));
+            }
+        });
+
+        sut.run();
+        
+        assertTrue( errorCalled.get() );
+        assertTrue( errorMadeSense.get() );
     }
     
     @Test(timeout=3000)

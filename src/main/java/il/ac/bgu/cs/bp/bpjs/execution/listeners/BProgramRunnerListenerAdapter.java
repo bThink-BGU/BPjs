@@ -65,5 +65,10 @@ public abstract class BProgramRunnerListenerAdapter implements BProgramRunnerLis
 
     @Override
     public void halted(BProgram bp) {}
-    
+
+    @Override
+    public void error(BProgram bp, Exception ex) {
+        BProgramRunnerListener.super.error(bp, ex); 
+    }
+
 }

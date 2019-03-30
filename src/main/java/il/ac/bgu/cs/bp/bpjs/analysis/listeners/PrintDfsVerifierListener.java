@@ -23,11 +23,10 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis.listeners;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.DfsTraversalNode;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
+import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import java.io.PrintStream;
-import java.util.List;
 
 /**
  * Logs the state of the verifier with short, not too-detailed messages.
@@ -57,7 +56,7 @@ public class PrintDfsVerifierListener implements DfsBProgramVerifier.ProgressLis
     }
 
     @Override
-    public void maxTraceLengthHit(List<DfsTraversalNode> trace, DfsBProgramVerifier v) {
+    public void maxTraceLengthHit(ExecutionTrace trace, DfsBProgramVerifier v) {
         out.println("/v/ " + v.getCurrentBProgram().getName() + ": hit max trace length.");
     }
 

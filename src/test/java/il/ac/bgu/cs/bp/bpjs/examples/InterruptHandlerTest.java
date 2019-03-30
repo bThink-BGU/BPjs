@@ -7,8 +7,11 @@ import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.analysis.eventpattern.EventPattern;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
-import org.junit.Test;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import java.util.concurrent.atomic.AtomicBoolean;
 import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 import static org.junit.Assert.fail;
 
 /**
@@ -33,14 +36,27 @@ public class InterruptHandlerTest {
         assertTrue( expected.matches(eventLogger.getEvents()) );
     }
     
-    @Test(expected=BPjsRuntimeException.class)
+    @Test
     public void illegalBsyncTest() throws InterruptedException {
         BProgramRunner sut = new BProgramRunner(new ResourceBProgram("InterruptHandler_illegal.js") );
         sut.addListener(new PrintBProgramRunnerListener() );
         
+        final AtomicBoolean errorCalled = new AtomicBoolean();
+        final AtomicBoolean errorMadeSense = new AtomicBoolean();
+        
+        sut.addListener( new BProgramRunnerListenerAdapter() {
+            @Override
+            public void error(BProgram bp, Exception ex) {
+                errorCalled.set(true);
+                System.out.println(ex.getMessage());
+                errorMadeSense.set(ex.getMessage().contains("Cannot call bp.sync"));
+            }
+        });
+
         sut.run();
         
-        fail("Program should have terminated in error.");
+        assertTrue( errorCalled.get() );
+        assertTrue( errorMadeSense.get() );
     }
 
 }

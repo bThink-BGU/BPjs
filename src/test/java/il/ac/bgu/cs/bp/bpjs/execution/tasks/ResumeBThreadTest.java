@@ -1,6 +1,3 @@
-/*
- *  (C) Michael Bar-Sinai
- */
 package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;

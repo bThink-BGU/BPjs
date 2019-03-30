@@ -57,7 +57,7 @@ public class MultipleViolationsTest {
             @Override public void iterationCount(long count, long statesHit, DfsBProgramVerifier vfr) {}
 
             @Override
-            public void maxTraceLengthHit(List<DfsTraversalNode> aTrace, DfsBProgramVerifier vfr) {
+            public void maxTraceLengthHit(ExecutionTrace aTrace, DfsBProgramVerifier vfr) {
                 maxLengthHit.set(true);
             }
 
@@ -99,7 +99,7 @@ public class MultipleViolationsTest {
             @Override public void iterationCount(long count, long statesHit, DfsBProgramVerifier vfr) {}
 
             @Override
-            public void maxTraceLengthHit(List<DfsTraversalNode> aTrace, DfsBProgramVerifier vfr) {
+            public void maxTraceLengthHit(ExecutionTrace aTrace, DfsBProgramVerifier vfr) {
                 maxLengthHit.set(true);
             }
 
@@ -133,7 +133,7 @@ public class MultipleViolationsTest {
             @Override public void iterationCount(long count, long statesHit, DfsBProgramVerifier vfr) {}
 
             @Override
-            public void maxTraceLengthHit(List<DfsTraversalNode> aTrace, DfsBProgramVerifier vfr) {}
+            public void maxTraceLengthHit(ExecutionTrace aTrace, DfsBProgramVerifier vfr) {}
 
             @Override
             public boolean violationFound(Violation aViolation, DfsBProgramVerifier vfr) {

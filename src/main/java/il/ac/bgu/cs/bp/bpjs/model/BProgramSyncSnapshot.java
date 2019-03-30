@@ -14,24 +14,25 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContinuationPending;
-import org.mozilla.javascript.Scriptable;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.BPEngineTask;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.StartFork;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.stream.Stream;
+import org.mozilla.javascript.ContinuationPending;
+import org.mozilla.javascript.EcmaError;
+import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 
 /**
@@ -49,7 +50,7 @@ public class BProgramSyncSnapshot {
     private final List<BEvent> externalEvents;
     private final BProgram bprog;
     private final AtomicReference<FailedAssertion> violationRecord = new AtomicReference<>();
-    private transient int hashCodeCache = Integer.MIN_VALUE;
+    private int hashCodeCache = Integer.MIN_VALUE;
     
     /** A flag to ensure the snapshot is only triggered once. */
     private boolean triggered=false;
@@ -91,10 +92,10 @@ public class BProgramSyncSnapshot {
 
     /**
      * Starts the BProgram - runs all the registered b-threads to their first 
-     * {@code bsync}. 
+     * {@code bp.sync}. 
      * 
      * @param exSvc the executor service that will advance the threads.
-     * @return A snapshot of the program at the first {@code bsync}.
+     * @return A snapshot of the program at the first {@code bp.sync}.
      * @throws java.lang.InterruptedException (since it's a blocking call)
      */
     public BProgramSyncSnapshot start( ExecutorService exSvc ) throws InterruptedException {
@@ -119,7 +120,7 @@ public class BProgramSyncSnapshot {
      * @return A set of b-thread snapshots that should participate in the next cycle.
      * @throws InterruptedException (since it's a blocking call)
      */
-    public BProgramSyncSnapshot triggerEvent(BEvent anEvent, ExecutorService exSvc, Iterable<BProgramRunnerListener> listeners) throws InterruptedException {
+    public BProgramSyncSnapshot triggerEvent(BEvent anEvent, ExecutorService exSvc, Iterable<BProgramRunnerListener> listeners) throws InterruptedException, BPjsRuntimeException {
         if (anEvent == null) throw new IllegalArgumentException("Cannot trigger a null event.");
         if ( triggered ) {
             throw new IllegalStateException("A BProgramSyncSnapshot is not allowed to be triggered twice.");
@@ -146,20 +147,33 @@ public class BProgramSyncSnapshot {
         BPEngineTask.Listener halter = new ViolationRecorder(bprog, violationRecord);
 
         // add the run results of all those who advance this stage
-        nextRound.addAll(exSvc.invokeAll(
-                            resumingThisRound.stream()
-                                             .map(bt -> new ResumeBThread(bt, anEvent, halter))
-                                             .collect(toList())
-                ).stream().map(f -> safeGet(f)).filter(Objects::nonNull).collect(toList())
-        );
+        try {
+            nextRound.addAll(exSvc.invokeAll(
+                                resumingThisRound.stream()
+                                                 .map(bt -> new ResumeBThread(bt, anEvent, halter))
+                                                 .collect(toList())
+                    ).stream().map(f -> safeGet(f)).filter(Objects::nonNull).collect(toList())
+            );
 
-        // inform listeners which b-threads completed
-        Set<String> nextRoundIds = nextRound.stream().map(t->t.getName()).collect(toSet());
-        resumingThisRound.stream()
-                .filter(t->!nextRoundIds.contains(t.getName()))
-                .forEach(t->listeners.forEach(l->l.bthreadDone(bprog, t)));
+            // inform listeners which b-threads completed
+            Set<String> nextRoundIds = nextRound.stream().map(t->t.getName()).collect(toSet());
+            resumingThisRound.stream()
+                    .filter(t->!nextRoundIds.contains(t.getName()))
+                    .forEach(t->listeners.forEach(l->l.bthreadDone(bprog, t)));
 
-        executeAllAddedBThreads(nextRound, exSvc, halter);
+            executeAllAddedBThreads(nextRound, exSvc, halter);
+        
+        } catch ( RuntimeException re ) {
+            Throwable cause = re;
+            while ( cause.getCause() != null ) {
+                cause = cause.getCause();
+            }
+            if ( cause instanceof BPjsRuntimeException ) {
+                throw (BPjsRuntimeException)cause;
+            } else if ( cause instanceof EcmaError ) {
+                throw new BPjsRuntimeException("JavaScript Error: " + cause.getMessage(), cause );
+            } else throw re;
+        }
         nextExternalEvents.addAll( bprog.drainEnqueuedExternalEvents() );
 
         // carry over BThreads that did not advance this round to next round.
@@ -184,7 +198,7 @@ public class BProgramSyncSnapshot {
                             try {
                                 ctxt.callFunctionWithContinuations(func, scope, new Object[]{anEvent});
                             } catch ( ContinuationPending ise ) {
-                                throw new BPjsRuntimeException("Cannot call bsync or fork from a break-upon handler. Please consider pushing an external event.");
+                                throw new BPjsRuntimeException("Cannot call bp.sync or fork from a break-upon handler. Please consider pushing an external event.");
                             }
                         });
             });
@@ -329,7 +343,7 @@ public class BProgramSyncSnapshot {
     @Override
     public int hashCode() {
         if ( hashCodeCache == Integer.MIN_VALUE  ) {
-            hashCodeCache = Objects.hash(threadSnapshots, externalEvents);
+            hashCodeCache = (threadSnapshots.hashCode()+1) * (externalEvents.hashCode()+1);
         }
         return hashCodeCache;
     }
@@ -353,6 +367,10 @@ public class BProgramSyncSnapshot {
         }
         if ( ! getExternalEvents().equals(other.getExternalEvents()) ) {
             return false;
+        }
+        // optimization: non-equality by hash code - if we have one.
+        if ( hashCodeCache != Integer.MIN_VALUE && other.hashCodeCache != Integer.MIN_VALUE ) {
+            if ( hashCodeCache != other.hashCodeCache ) return false;
         }
         return Objects.equals(threadSnapshots, other.threadSnapshots);
     }

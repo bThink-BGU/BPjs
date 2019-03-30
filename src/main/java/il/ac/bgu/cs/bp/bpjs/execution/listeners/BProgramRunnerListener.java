@@ -80,6 +80,18 @@ public interface BProgramRunnerListener {
     void eventSelected( BProgram bp, BEvent theEvent );
     
     /**
+     * Called when the b-program code makes an error, e.g. attempts to invoke
+     * methods on {@code null}.
+     * @param bp the offending b-program
+     * @param ex the exception that was thrown because of the offense.
+     */
+    default void error( BProgram bp, Exception ex ) {
+        System.err.println("JavaScript Error during program execution: " + ex.getMessage() );
+        System.err.println("Trace: ");
+        ex.printStackTrace(System.err);
+    }
+    
+    /**
      * Called when the b-program was halted.
      * @param bp the b-program that was halted.
      */

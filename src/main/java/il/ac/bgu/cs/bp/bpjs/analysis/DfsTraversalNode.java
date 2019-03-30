@@ -1,6 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotCloner;
+import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
@@ -82,10 +83,14 @@ public class DfsTraversalNode {
      * @param exSvc The executor service that will run the threads
      * @return State of the BProgram after event {@code e} was selected while
      * the program was at {@code this} node's state.
-     * @throws Exception  In case there's an error running the JavaScript code.
+     * @throws BPjsRuntimeException  In case there's an error running the JavaScript code.
      */
-    public DfsTraversalNode getNextNode(BEvent e, ExecutorService exSvc) throws Exception {
-        return new DfsTraversalNode(bp, BProgramSyncSnapshotCloner.clone(systemState).triggerEvent(e, exSvc, Collections.emptySet()), e);
+    public DfsTraversalNode getNextNode(BEvent e, ExecutorService exSvc) throws BPjsRuntimeException {
+        try {
+            return new DfsTraversalNode(bp, BProgramSyncSnapshotCloner.clone(systemState).triggerEvent(e, exSvc, Collections.emptySet()), e);
+        } catch ( InterruptedException ie ) {
+            throw new BPjsRuntimeException("Thread interrupted during event invocaiton", ie);
+        }
     }
 
     /**

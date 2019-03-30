@@ -40,6 +40,16 @@ import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.PrintDfsVerifierListener;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.DeadlockViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.FailedAssertionViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.JsErrorViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
+import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicBoolean;
+import static java.util.stream.Collectors.joining;
 
 /**
  * @author michael
@@ -301,5 +311,195 @@ public class DfsBProgramVerifierTest {
         assertEquals(2, res.getScannedStatesCount());
         assertEquals(1, res.getScannedEdgesCount());
     }
+    
+    
+    /**
+     * Running this transition system. State 3 should be arrived at twice.
+     *           +-»B1»--+
+     *           |       |
+     * -»1--»A»--2       3--»C»----+
+     *   |       |       |         |
+     *   |       +-»B2»--+         |
+     *   +------------«------------+       
+     * 
+     * event trace "AB1-" is the result of execution
+     * 
+     * -»1-»A»-2-»B1»-3
+     * 
+     * Whose stack is:
+     * 
+     * +---+----+---+
+     * |1,A|2,B1|3,-|
+     * +---+----+---+
+     * 
+     * With C selected, we get to 
+     * 
+     * +---+----+---+
+     * |1,A|2,B1|3,C| + cycleTo 0
+     * +---+----+---+
+     * 
+     * @throws Exception 
+     */
+    @Test
+    public void testDoublePathDiscovery() throws Exception {
+        BProgram bprog = new StringBProgram( //
+                "bp.registerBThread(\"round\", function(){\n" +
+                "    while( true ) {\n" +
+                "        bp.sync({request:bp.Event(\"A\")});\n" +
+                "        bp.sync({waitFor:[bp.Event(\"B1\"), bp.Event(\"B2\")]});\n" +
+                "        bp.sync({request:bp.Event(\"C\")});\n" +
+                "    }\n" +
+                "});\n" +
+                "\n" +
+                "bp.registerBThread(\"round-s1\", function(){\n" +
+                "    while( true ) {\n" +
+                "        bp.sync({waitFor:bp.Event(\"A\")});\n" +
+                "        bp.sync({request:bp.Event(\"B1\"), waitFor:bp.Event(\"B2\")});\n" +
+                "    }\n" +
+                "});\n" +
+                "\n" +
+                "bp.registerBThread(\"round-s2\", function(){\n" +
+                "    while( true ) {\n" +
+                "        bp.sync({waitFor:bp.Event(\"A\")});\n" +
+                "        bp.sync({request:bp.Event(\"B2\"), waitFor:bp.Event(\"B1\")});\n" +
+                "    }\n" +
+                "});");
 
+        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        
+        final Set<String> foundTraces = new HashSet<>();
+        sut.addInspection( ExecutionTraceInspection.named("DFS trace captures", et->{
+            String eventTrace = et.getNodes().stream()
+                .map( n->n.getEvent() )
+                .map( o->o.map(BEvent::getName).orElse("-") )
+                .collect( joining("") );
+            System.out.println("eventTrace = " + eventTrace);
+            foundTraces.add(eventTrace);
+            return Optional.empty();
+        }));
+        
+        sut.setProgressListener(new PrintDfsVerifierListener());
+        VerificationResult res = sut.verify(bprog);
+
+        assertEquals(3, res.getScannedStatesCount());
+        assertEquals(4, res.getScannedEdgesCount());
+        
+        Set<String> expected1 = new TreeSet<>(Arrays.asList("-","A-","AB1-","AB1C", "AB2-"));
+        Set<String> expected2 = new TreeSet<>(Arrays.asList("-","A-","AB2-","AB2C", "AB1-"));
+        String eventTraces = foundTraces.stream().sorted().collect( joining(", ") );
+        
+        assertTrue("Traces don't match expected: " + eventTraces,
+                    foundTraces.equals(expected1) || foundTraces.equals(expected2) );
+        
+        System.out.println("Event traces: " + eventTraces);
+    }
+
+    /**
+     * Program graph is same as above, but state "3" is duplicated since a b-thread
+     * holds the last event that happened in a variable.
+     *
+     *   +------------«------------+        
+     *   |                         | 
+     *   v       +-»B1»--3'---»C»--+
+     *   |       |       
+     * -»1--»A»--2       
+     *   |       |                
+     *   ^       +-»B2»--3''--»C»--+
+     *   |                         |
+     *   +------------«------------+       
+     * 
+     * 
+     * 
+     * @throws Exception 
+     */
+    @Test
+    public void testDoublePathWithVariablesDiscovery() throws Exception {
+        BProgram bprog = new StringBProgram("doubleWithVar", //
+                "bp.registerBThread(\"round\", function(){\n" +
+                "    var le=null;\n" + 
+                "    while( true ) {\n" +
+                "        bp.sync({request:bp.Event(\"A\")});\n" +
+                "        le = bp.sync({waitFor:[bp.Event(\"B1\"), bp.Event(\"B2\")]});\n" +
+                "        bp.sync({request:bp.Event(\"C\")});\n" +
+                "        le=null;\n " +
+                "    }\n" +
+                "});\n" +
+                "\n" +
+                "bp.registerBThread(\"round-s1\", function(){\n" +
+                "    while( true ) {\n" +
+                "        bp.sync({waitFor:bp.Event(\"A\")});\n" +
+                "        bp.sync({request:bp.Event(\"B1\"), waitFor:bp.Event(\"B2\")});\n" +
+                "    }\n" +
+                "});\n" +
+                "\n" +
+                "bp.registerBThread(\"round-s2\", function(){\n" +
+                "    while( true ) {\n" +
+                "        bp.sync({waitFor:bp.Event(\"A\")});\n" +
+                "        bp.sync({request:bp.Event(\"B2\"), waitFor:bp.Event(\"B1\")});\n" +
+                "    }\n" +
+                "});");
+
+        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        
+        final Set<String> foundTraces = new HashSet<>();
+        sut.addInspection( ExecutionTraceInspection.named("DFS trace captures", et->{
+            String eventTrace = et.getNodes().stream()
+                .map( n->n.getEvent() )
+                .map( o->o.map(BEvent::getName).orElse("-") )
+                .collect( joining("") );
+            System.out.println("eventTrace = " + eventTrace);
+            foundTraces.add(eventTrace);
+            return Optional.empty();
+        }));
+        sut.setVisitedStateStore( new HashVisitedStateStore() );
+        sut.setProgressListener(new PrintDfsVerifierListener());
+        VerificationResult res = sut.verify(bprog);
+
+        assertEquals(4, res.getScannedStatesCount());
+        assertEquals(5, res.getScannedEdgesCount());
+        
+        Set<String> expectedTraces = new TreeSet<>(Arrays.asList("-","A-","AB1-","AB1C","AB2-","AB2C"));
+        
+        assertEquals("Traces don't match expected: " + foundTraces, expectedTraces, foundTraces );
+        
+    }
+    
+    @Test
+    public void testJavaScriptError() throws Exception {
+        BProgram bprog = new StringBProgram(
+              "bp.registerBThread( function(){\n"
+            + "  bp.sync({request:bp.Event(\"A\")});\n"
+            + "  bp.sync({request:bp.Event(\"A\")});\n"
+            + "  bp.sync({request:bp.Event(\"A\")});\n"
+            + "  var myNullVar;\n"
+            + "  myNullVar.isNullAndSoThisInvocationShouldCrash();\n"
+            + "  bp.sync({request:bp.Event(\"A\")});\n"
+            + "});"
+        );
+        
+        final AtomicBoolean errorCalled = new AtomicBoolean();
+        final AtomicBoolean errorMadeSense = new AtomicBoolean();
+        
+        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        sut.setProgressListener(new DfsBProgramVerifier.ProgressListener() {
+            @Override public void started(DfsBProgramVerifier vfr) {}
+            @Override public void iterationCount(long count, long statesHit, DfsBProgramVerifier vfr) {}
+            @Override public void maxTraceLengthHit(ExecutionTrace aTrace, DfsBProgramVerifier vfr) {}
+            @Override public void done(DfsBProgramVerifier vfr) {}
+
+            @Override
+            public boolean violationFound(Violation aViolation, DfsBProgramVerifier vfr) {
+                errorCalled.set(aViolation instanceof JsErrorViolation );
+                JsErrorViolation jsev = (JsErrorViolation) aViolation;
+                errorMadeSense.set(jsev.decsribe().contains("isNullAndSoThisInvocationShouldCrash"));
+                System.out.println(jsev.getThrownException().getMessage());
+                return true;
+            }
+        });
+        
+        sut.verify( bprog );
+        
+        assertTrue( errorCalled.get() );
+        assertTrue( errorMadeSense.get() );
+    }
 }
