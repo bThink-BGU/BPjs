@@ -24,7 +24,7 @@ a link to this page somewhere in the documentation/system about section.
     <dependency>
         <groupId>com.github.bthink-bgu</groupId>
         <artifactId>BPjs</artifactId>
-        <version>0.10.0</version>
+        <version>0.10.4</version>
     </dependency>
     ...
 </dependencies>
@@ -43,6 +43,9 @@ a link to this page somewhere in the documentation/system about section.
 * [API Javadocs](http://www.javadoc.io/doc/com.github.bthink-bgu/BPjs/)
 
 ## Change Log for the BPjs Library.
+
+### 2019-08-23
+* :arrow_up: Improved and updated documentation.
 
 ### 2019-03-30
 * :arrow_up: Improved state hashing

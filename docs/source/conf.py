@@ -31,7 +31,7 @@ import shlex
 # ones.
 extensions = [
     'sphinx.ext.todo',
-    'sphinx.ext.pngmath',
+    # 'sphinx.ext.pngmath',
 ]
 
 # Add any paths that contain templates here, relative to this directory.
@@ -50,7 +50,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = u'BPjs'
-copyright = u'2018, the BPjs Team, Computer Science Department, Ben Gurion University of the Negev, Israel'
+copyright = u'2019, the BPjs Team, Computer Science Department, Faculty of Natural Sciences,, Ben Gurion University of the Negev, Israel'
 author = u'BPjs Team'
 
 # The version info for the project you're documenting, acts as replacement for
