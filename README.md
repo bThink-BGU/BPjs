@@ -45,7 +45,8 @@ a link to this page somewhere in the documentation/system about section.
 ## Change Log for the BPjs Library.
 
 ### 2019-08-23
-* :arrow_up: Improved and updated documentation.
+* :arrow_up: Improved and updated documentation, especially regarding analysis, verification, and general top-level views (life cycle, classes, packages).
+* :arrow_up: Improved tests package structure, so that it's less confusing.
 
 ### 2019-03-30
 * :arrow_up: Improved state hashing

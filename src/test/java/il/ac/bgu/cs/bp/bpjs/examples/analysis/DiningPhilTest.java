@@ -1,4 +1,4 @@
-package il.ac.bgu.cs.bp.bpjs.analysis.examples;
+package il.ac.bgu.cs.bp.bpjs.examples.analysis;
 
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;

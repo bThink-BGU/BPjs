@@ -1,4 +1,4 @@
-package il.ac.bgu.cs.bp.bpjs.examples;
+package il.ac.bgu.cs.bp.bpjs.execution;
 
 import static org.junit.Assert.assertTrue;
 
