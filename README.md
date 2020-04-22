@@ -51,6 +51,8 @@ a link to this page somewhere in the documentation/system about section.
 * :arrow_up: Synchronization statements are created more efficiently.
 * :bug: `ComposableEventSet` checks arguments on creation, so that it can't be instantiated with `null` events (this later causes NPEs).
 * :bug: `PrioritizedBThread` ESS fixed ([#70](https://github.com/bThink-BGU/BPjs/issues/70).
+* :put_litter_in_its_place: Various small code clean-ups.
+* :put_litter_in_its_place: Removed extraneous dependencies from `pom.xml`
 
 [Earlier Changes](changelog-2019.md)
 

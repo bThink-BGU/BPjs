@@ -38,7 +38,7 @@ public class BThreadSyncSnapshot implements Serializable {
     /**
      * Continuation of the code.
      */
-    private Object continuation;
+    private NativeContinuation continuation;
 
     /**
      * BSync statement of the BThread at the time of the snapshot.
@@ -67,7 +67,7 @@ public class BThreadSyncSnapshot implements Serializable {
         this.name = name;
         this.entryPoint = entryPoint;
         this.interruptHandler = interruptHandler;
-        this.continuation = continuation;
+        this.continuation = (NativeContinuation)continuation;
         this.syncStatement = bSyncStatement;
     }
 
@@ -80,7 +80,7 @@ public class BThreadSyncSnapshot implements Serializable {
      */
     public BThreadSyncSnapshot copyWith(Object aContinuation, SyncStatement aStatement) {
         BThreadSyncSnapshot retVal = new BThreadSyncSnapshot(name, entryPoint);
-        retVal.continuation = aContinuation;
+        retVal.continuation = (NativeContinuation)aContinuation;
         retVal.setInterruptHandler(interruptHandler);
         retVal.syncStatement = aStatement;
         aStatement.setBthread(retVal);
@@ -125,7 +125,7 @@ public class BThreadSyncSnapshot implements Serializable {
     }
 
     public Scriptable getScope() {
-        return (continuation!=null) ? (Scriptable)continuation : entryPoint;
+        return (continuation!=null) ? continuation : entryPoint;
     }
 
     public Function getEntryPoint() {
@@ -134,7 +134,7 @@ public class BThreadSyncSnapshot implements Serializable {
     
     public ContinuationProgramState getContinuationProgramState() {
         if ( programState == null ) {
-            programState = new ContinuationProgramState((NativeContinuation) continuation);
+            programState = new ContinuationProgramState(continuation);
         }
         return programState;
     }
