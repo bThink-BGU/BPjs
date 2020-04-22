@@ -62,13 +62,5 @@ public class MockBThreadSyncSnapshot extends BThreadSyncSnapshot {
     public MockBThreadSyncSnapshot(SyncStatement stmt ) {
         this( "mock-btss_" + NEXT_ID.incrementAndGet(), stmt );
     }
-
-    @Override
-    public ContinuationProgramState getContinuationProgramState() {
-        return super.getContinuationProgramState();
-    }
-    
-   
-    
     
 }

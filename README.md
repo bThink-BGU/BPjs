@@ -48,8 +48,9 @@ a link to this page somewhere in the documentation/system about section.
 * :arrow_up: Updated to use Rhino 1.7.12
 * :arrow_up: :tada: Can use ES6 syntax, such as `let` and `const`.
     * No arrow functions yet, there are some issues with continuations and arrow functions.
-* :bug: `ComposableEventSet` checks arguments on creation, so that it can't be instantiated with `null` events (this later causes NPEs).
 * :arrow_up: Synchronization statements are created more efficiently.
+* :bug: `ComposableEventSet` checks arguments on creation, so that it can't be instantiated with `null` events (this later causes NPEs).
+* :bug: `PrioritizedBThread` ESS fixed ([#70](https://github.com/bThink-BGU/BPjs/issues/70).
 
 [Earlier Changes](changelog-2019.md)
 
