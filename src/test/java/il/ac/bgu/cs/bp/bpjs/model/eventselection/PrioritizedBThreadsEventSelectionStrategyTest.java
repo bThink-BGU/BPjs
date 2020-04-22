@@ -13,6 +13,7 @@ import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
+import static il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet.anyOf;
 import org.junit.Before;
 
 public class PrioritizedBThreadsEventSelectionStrategyTest {
@@ -21,6 +22,7 @@ public class PrioritizedBThreadsEventSelectionStrategyTest {
 	private static final BEvent EVT_2 = new BEvent("evt2");
 	private static final BEvent EVT_2A = new BEvent("evt2a");
 	private static final BEvent EVT_3 = new BEvent("evt3");
+	private static final BEvent EVT_X = new BEvent("externalEvent");
     
 	PrioritizedBThreadsEventSelectionStrategy sut;
     
@@ -91,6 +93,33 @@ public class PrioritizedBThreadsEventSelectionStrategyTest {
         
         assertEquals(new HashSet<>(Arrays.asList(EVT_2)), sut.selectableEvents(bpss));
 	}
+    
+    @Test	
+	public void testSelectableEvents_withExternals_allBlocked() {
+		BProgramSyncSnapshot bpss = TestUtils.makeBPSS(
+            new MockBThreadSyncSnapshot("bt1",  SyncStatement.make(bt("1")).request(Arrays.asList(EVT_1))),
+            new MockBThreadSyncSnapshot("bt2",  SyncStatement.make(bt("2")).request(Arrays.asList(EVT_2))),
+            new MockBThreadSyncSnapshot("bt3",  SyncStatement.make(bt("3")).block(anyOf(EVT_1, EVT_2)))
+        );
+        
+        bpss.getExternalEvents().add(EVT_X);
+        
+        assertEquals(new HashSet<>(Arrays.asList(EVT_X)), sut.selectableEvents(bpss));
+	}
+    
+    @Test	
+	public void testSelectableEvents_withExternals_internalAvailable() {
+		BProgramSyncSnapshot bpss = TestUtils.makeBPSS(
+            new MockBThreadSyncSnapshot("bt1",  SyncStatement.make(bt("1")).request(Arrays.asList(EVT_1))),
+            new MockBThreadSyncSnapshot("bt2",  SyncStatement.make(bt("2")).request(Arrays.asList(EVT_2))),
+            new MockBThreadSyncSnapshot("bt3",  SyncStatement.make(bt("3")).block(anyOf(EVT_1)))
+        );
+        
+        bpss.getExternalEvents().add(EVT_X);
+        
+        assertEquals(new HashSet<>(Arrays.asList(EVT_2)), sut.selectableEvents(bpss));
+	}
+    
     
     @Test
     public void testPriorityNumbers() { 

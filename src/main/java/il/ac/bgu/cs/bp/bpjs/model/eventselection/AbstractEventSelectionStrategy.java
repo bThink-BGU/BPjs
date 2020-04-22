@@ -29,7 +29,6 @@ import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import java.util.ArrayList;
 import static java.util.Collections.singleton;
-import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.Set;
