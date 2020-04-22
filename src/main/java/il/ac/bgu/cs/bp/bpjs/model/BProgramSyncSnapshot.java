@@ -129,7 +129,6 @@ public class BProgramSyncSnapshot {
         
         Set<BThreadSyncSnapshot> resumingThisRound = new HashSet<>(threadSnapshots.size());
         Set<BThreadSyncSnapshot> sleepingThisRound = new HashSet<>(threadSnapshots.size());
-        Set<BThreadSyncSnapshot> nextRound = new HashSet<>(threadSnapshots.size());
         List<BEvent> nextExternalEvents = new ArrayList<>(getExternalEvents());
         try {
             Context ctxt = Context.enter();
@@ -147,6 +146,7 @@ public class BProgramSyncSnapshot {
         BPEngineTask.Listener halter = new ViolationRecorder(bprog, violationRecord);
 
         // add the run results of all those who advance this stage
+        Set<BThreadSyncSnapshot> nextRound = new HashSet<>(threadSnapshots.size());
         try {
             nextRound.addAll(exSvc.invokeAll(
                                 resumingThisRound.stream()

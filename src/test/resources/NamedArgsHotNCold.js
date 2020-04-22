@@ -1,7 +1,7 @@
 /* global bp, noEvents, emptySet  */
 
-var coldEvent = bp.Event("coldEvent");
-var hotEvent = bp.Event("hotEvent");
+let coldEvent = bp.Event("coldEvent");
+const hotEvent = bp.Event("hotEvent");
 
 bp.registerBThread("HotBt", function () {
   // request hotEvent three times, in different verbosities.
@@ -13,7 +13,7 @@ bp.registerBThread("HotBt", function () {
     bp.sync({ request: hotEvent });
 });
 
-bp.registerBThread("ColdBt", function () {
+bp.registerBThread("ColdBt", function(){
   bp.sync({request:coldEvent});
   bp.sync({request:[coldEvent]});
   bp.sync({request:coldEvent});
