@@ -53,9 +53,7 @@ function addStick(i) {
   bp.registerBThread("[](pickup -> <>Released)", function() {
     while (true) {
       bp.sync({waitFor: pickMe});
-      var reqRef = bp.setHot("Stick " + i + " was picked up but never released"); // <-- the string is optional
-      bp.sync({waitFor: releaseMe})
-      bp.setCold(refRef);
+      bp.hot(true).sync({waitFor: releaseMe})
     }
   });
 
@@ -92,9 +90,7 @@ function addPhil(philNum) {
   bp.registerBThread("NoStarvation", function() {
     while (true) {
       bp.sync({waitFor:bp.Event(i+"-is-hungry")});
-      var reqRef = bp.setHot( i + " is hungry, but never got to eat.");
-      bp.sync({waitFor:bp.Event(i+"-eats")});
-      bp.setCold(reqRef);
+      bp.hot(true).sync({waitFor:bp.Event(i+"-eats")});
     }
   });
 };

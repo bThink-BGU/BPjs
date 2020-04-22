@@ -64,8 +64,8 @@ public class ScriptableUtils {
      *
      * <em>DOES NOT DEAL WITH CIRCULAR REFERENCES!</em>
      *
-     * @param o1
-     * @param o2
+     * @param o1 first operand for comparison
+     * @param o2 second operand for comparison
      * @return {@code true} iff both objects are recursively equal
      */
     public static boolean jsEquals(Object o1, Object o2) {
@@ -105,8 +105,8 @@ public class ScriptableUtils {
      *
      * <em>DOES NOT DEAL WITH CIRCULAR REFERENCES!</em>
      *
-     * @param jsObj
-     * @return {@code o1}'s hash code.
+     * @param jsObj The JavaScript object to calculate the hash of.
+     * @return {@code jsObj}'s hash code.
      */
     public static int jsHash(Object jsObj) {
         if (jsObj == null) {

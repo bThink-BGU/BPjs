@@ -1,7 +1,6 @@
-package il.ac.bgu.cs.bp.bpjs.examples;
+package il.ac.bgu.cs.bp.bpjs.execution;
 
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
@@ -26,7 +25,8 @@ public class NamedArgsHotNColdTest {
         final BEvent hotEvent = new BEvent("hotEvent");
         final BEvent coldEvent = new BEvent("coldEvent");
         final BEvent allDoneEvent = new BEvent("allDone");
-        EventPattern expected = new EventPattern().append(coldEvent).append(hotEvent)
+        EventPattern expected = new EventPattern()
+                .append(coldEvent).append(hotEvent)
                 .append(coldEvent).append(hotEvent)
                 .append(coldEvent).append(hotEvent)
                 .append(allDoneEvent);

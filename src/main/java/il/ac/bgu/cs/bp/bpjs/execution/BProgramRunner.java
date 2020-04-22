@@ -122,7 +122,7 @@ public class BProgramRunner implements Runnable {
                         EventSelectionResult esr = res.get();
 
                         if ( ! esr.getIndicesToRemove().isEmpty() ) {
-                            // the event selection affcted the external event queue.
+                            // the event selection affected the external event queue.
                             List<BEvent> updatedExternals = new ArrayList<>(cur.getExternalEvents());
                             esr.getIndicesToRemove().stream().sorted(reverseOrder())
                                 .forEach( idxObj -> updatedExternals.remove(idxObj.intValue()) );

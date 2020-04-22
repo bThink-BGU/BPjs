@@ -33,6 +33,7 @@ public abstract class ComposableEventSet implements EventSet {
         private final EventSet wrappedEvent;
 
         Wrapped(EventSet wrappedEvent) {
+            if ( wrappedEvent == null ) throw new IllegalArgumentException("Cannot instantiate 'Wrapped' with null event.");
             this.wrappedEvent = wrappedEvent;
         }
         
@@ -77,6 +78,7 @@ public abstract class ComposableEventSet implements EventSet {
         private final EventSet negated;
 
         Not(EventSet negated) {
+            if ( negated == null ) throw new IllegalArgumentException("Cannot instantiate 'Not' with null event.");
             this.negated = negated;
         }
         
@@ -111,6 +113,7 @@ public abstract class ComposableEventSet implements EventSet {
         private final Set<EventSet> events;
 
         AnyOf(Set<EventSet> events) {
+            if ( events == null ) throw new IllegalArgumentException("Cannot instantiate 'AnyOf' with null event set.");
             this.events = events;
         }
         
@@ -159,6 +162,7 @@ public abstract class ComposableEventSet implements EventSet {
         private final Set<EventSet> events;
 
         AllOf(Set<EventSet> events) {
+            if ( events == null ) throw new IllegalArgumentException("Cannot instantiate 'AllOf' with null event set.");
             this.events = events;
         }
         
@@ -207,6 +211,8 @@ public abstract class ComposableEventSet implements EventSet {
         private final EventSet a, b;
         
         Xor( EventSet anA, EventSet aB ){
+            if ( anA == null ) throw new IllegalArgumentException("Cannot instantiate 'Xor' with null first parameter.");
+            if ( aB == null ) throw new IllegalArgumentException("Cannot instantiate 'Xor' with null second parameter.");
             a = anA;
             b = aB;
         }

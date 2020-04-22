@@ -202,10 +202,9 @@ public class BProgramJsProxy extends SyncStatementBuilder
                 stmt = stmt.request((BEvent)req);
             } else if ( req instanceof NativeArray ) {
                 NativeArray arr = (NativeArray) req;
-                stmt = stmt.request(
-                        Arrays.asList( arr.getIndexIds() ).stream()
-                              .map( i -> (BEvent)arr.get(i) )
-                              .collect( toList() ));
+                stmt = stmt.request(arr.getIndexIds().stream()
+                                       .map( i -> (BEvent)arr.get(i) )
+                                       .collect( toList() ));
             } 
         }
 
@@ -237,7 +236,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
                 throw new RuntimeException("EventSet Array contains null sets.");
             }
             return ComposableEventSet.anyOf(
-              Arrays.asList(arr.getIndexIds()).stream()
+                arr.getIndexIds().stream()
                     .map( i ->(EventSet)arr.get(i) )
                     .collect( toSet() ) );
         } else {

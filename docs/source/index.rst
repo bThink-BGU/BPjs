@@ -40,6 +40,8 @@ Topics:
 
    install-bpjs
    BPjsTutorial/index
+   b-program-lifecycle
+   BPjs-class-structure
    execute-bpjs
    embed-bpjs
    verification/index

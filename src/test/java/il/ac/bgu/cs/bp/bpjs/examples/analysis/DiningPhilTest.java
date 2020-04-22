@@ -1,4 +1,4 @@
-package il.ac.bgu.cs.bp.bpjs.analysis.examples;
+package il.ac.bgu.cs.bp.bpjs.examples.analysis;
 
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
@@ -53,7 +53,7 @@ public class DiningPhilTest {
             DfsBProgramVerifier vfr = new DfsBProgramVerifier();
             vfr.setMaxTraceLength(50);
             final VerificationResult res = vfr.verify(bprog);
-
+            
             System.out.printf("Scanned %,d states\n", res.getScannedStatesCount());
             System.out.printf("Time: %,d milliseconds\n", res.getTimeMillies());
 

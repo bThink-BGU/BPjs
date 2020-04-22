@@ -19,7 +19,6 @@ import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Stream;
@@ -76,7 +75,7 @@ public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSele
                     .collect( toSet() );
             
             if ( requestedAndNotBlockedWithPriorities.isEmpty() ) {
-                return Collections.emptySet();
+                return getNonBlocked(externalEvents, blocked); // No internal events requested, defer to externals.
             }
             
             Integer highestPriority = requestedAndNotBlockedWithPriorities.stream()
@@ -89,14 +88,18 @@ public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSele
             	.collect(toSet());
 
             return requestedAndNotBlocked.isEmpty() ?
-                    externalEvents.stream().filter( e->!blocked.contains(e) ) // No internal events requested, defer to externals.
-                                  .findFirst().map( e->singleton(e) ).orElse(emptySet())
+                    getNonBlocked(externalEvents, blocked) // No internal events requested, defer to externals.
                     : requestedAndNotBlocked;
         } finally {
             Context.exit();
         }
     }
-
+    
+    private Set<BEvent> getNonBlocked(Collection<BEvent> eventList, EventSet blocked ) {
+        return eventList.stream().filter( e->!blocked.contains(e) ) 
+                                  .findFirst().map( e->singleton(e) ).orElse(emptySet());
+    }
+    
     private Stream<Pair<BEvent, Integer>> eventsToPrioritizedPairs(SyncStatement stmt) {
         final Collection<? extends BEvent> request = stmt.getRequest();
         if ( request.isEmpty() ) return Stream.empty();

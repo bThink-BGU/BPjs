@@ -287,6 +287,7 @@ public abstract class BProgram {
         try {
             Context cx = ContextFactory.getGlobal().enterContext();
             cx.setOptimizationLevel(-1); // must use interpreter mode
+            cx.setLanguageVersion( Context.VERSION_ES6);
             initProgramScope(cx);
 
             // evaluate code in order

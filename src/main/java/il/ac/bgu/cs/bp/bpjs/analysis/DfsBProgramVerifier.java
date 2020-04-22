@@ -104,7 +104,7 @@ public class DfsBProgramVerifier {
         
         /**
          * The verifier {@code vfr} has finished the verification process.
-         * @param vfr 
+         * @param vfr the verifier that found the violation
          */
         void done(DfsBProgramVerifier vfr);
     }
