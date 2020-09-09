@@ -9,7 +9,7 @@ import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.RhinoException;
 
 /**
- * Thrown when Javascript code fails to evaluate.
+ * Thrown when JavaScript code fails to evaluate.
  * 
  * @author michael
  */

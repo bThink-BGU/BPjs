@@ -255,7 +255,7 @@ public class DfsBProgramVerifier {
                         }
                     }
                     if ( ! cycleFound ) {
-                        // revisiting a state from a different path. Quickly inspect the path and contnue.
+                        // revisiting a state from a different path. Quickly inspect the path and continue.
                         trace.advance(nextEvent, pns);
                         Set<Violation> res = inspections.stream().map(i->i.inspectTrace(trace))
                                 .filter(o->o.isPresent()).map(Optional::get).collect(toSet());

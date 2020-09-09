@@ -5,7 +5,7 @@
 
     <groupId>com.github.bthink-bgu</groupId>
     <artifactId>BPjs</artifactId>
-    <version>0.10.5-SNAPSHOT</version>
+    <version>0.10.6-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>BPjs</name>
@@ -40,7 +40,7 @@
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <java.version>1.8</java.version>
+        <java.version>11</java.version>
         <exec.mainClass>il.ac.bgu.cs.bp.bpjs.mains.BPJsCliRunner</exec.mainClass>
     </properties>
 
@@ -59,7 +59,7 @@
         <dependency>
             <groupId>org.mozilla</groupId>
             <artifactId>rhino</artifactId>
-            <version>1.7.12</version>
+            <version>1.7.13</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -88,8 +88,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.8.1</version>
                 <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
+                    <source>11</source>
+                    <target>11</target>
                 </configuration>
             </plugin>
         
