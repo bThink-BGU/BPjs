@@ -1,7 +1,7 @@
-/* 
+/*
  * The MIT License
  *
- * Copyright 2018 michael.
+ * Copyright 2020 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,59 +21,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package il.ac.bgu.cs.bp.bpjs.analysis.violations;
 
+import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
+import java.util.Set;
+import static java.util.stream.Collectors.joining;
 
-/* global bp */
-
-/*
- * The general state-space for the stuck b-thread is this (H) - hot
+/**
  * 
- * <code>
- *    a    b    c    d 
- * ( )->(H)->(P)->(H)->( )-X
- *       |         |e
- *       +--<--<---+ 
- * </code>
+ * A violation where a set of b-threads can get into an infinite loop where,
+ * at east sync point, at least one of them is hot.
  * 
- * P: The "main" b-thread is not hot, but another b-thread is.
- *       
+ * @author michael
  */
-
-var a = bp.Event("a");
-var b = bp.Event("b");
-var c = bp.Event("c");
-var d = bp.Event("d");
-var e = bp.Event("e");
-
-bp.registerBThread("main", function(){
-    bp.sync({request:a});
-    while ( true ) {
-        bp.hot(true).sync({request:b});
-        bp.sync({request:c});
-        var evt=bp.hot(true).sync({waitFor:[d,e]});
-        if ( evt.name == "d" ) {
-            return;
-        }
+public class HotRunViolation extends LivenessViolation {
+    
+    private final Set<String> bThreadNames;
+    
+    public HotRunViolation(ExecutionTrace counterExampleTrace, Set<String> someBThreadNames) {
+        super(counterExampleTrace);
+        bThreadNames = someBThreadNames;
     }
-});
 
-bp.registerBThread("b-requires-c", function(){
-    while ( true ) {
-        bp.sync({waitFor:b});
-        bp.hot(true).sync({waitFor:c});
+    @Override
+    public String decsribe() {
+        return String.format("Hot run of b-threads {%s}: returning to index %d in the trace because of event %s", 
+            bThreadNames.stream().sorted().collect(joining(", ")),
+            getCycleToIndex(),
+            getCycleToEvent()
+        );
     }
-});
 
-bp.registerBThread("requesting-d", function(){
-    while ( true ) {
-        bp.sync({waitFor:c});
-        bp.sync({request:d, waitFor:e});
+    public Set<String> getBThreadNames() {
+        return bThreadNames;
     }
-});
 
-bp.registerBThread("requesting-e", function(){
-    while ( true ) {
-        bp.sync({waitFor:c});
-        bp.sync({request:e, waitFor:d});
-    }
-});
+}

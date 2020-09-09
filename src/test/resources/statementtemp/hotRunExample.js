@@ -1,7 +1,7 @@
-/*
+/* 
  * The MIT License
  *
- * Copyright 2018 michael.
+ * Copyright 2020 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,35 +21,51 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis.violations;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
-import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import java.util.List;
+/* global bp */
 
-/**
- *
- * @author michael
+/* 
+ 
+ ->( )-a->(A)-b->(B)-c->(C)-+
+           ^                |
+           +-------a--------+
+ 
+ bthreads:
+  A=>B: hot at state A // "A is always followed by B", [](A -> O(<>B)
+  B=>C: hot at state B
+  C=>A: hot at state C
+  cold: always cool, progresses this show
  */
-public class HotBProgramCycleViolation extends Violation {
-    
-    public HotBProgramCycleViolation(ExecutionTrace trace) {
-        super(trace);
-    }
 
-    @Override
-    public String decsribe() {
-        return "Hot b-program run violation: returning to index " + getCycleToIndex() 
-                + " in the trace because of event " + getCycleToEvent();
-    }
+const a = bp.Event("a");
+const b = bp.Event("b");
+const c = bp.Event("c");
 
-    public int getCycleToIndex() {
-        return getCounterExampleTrace().getCycleToIndex();
+bp.registerBThread("cold", function(){
+    while ( true ) {
+        bp.sync({request:a});
+        bp.sync({request:b});
+        bp.sync({request:c});
     }
+});
 
-    public BEvent getCycleToEvent() {
-        List<ExecutionTrace.Entry> nodes = getCounterExampleTrace().getNodes();
-        return nodes.get(nodes.size()-1).getEvent().get();
+bp.registerBThread("A=>B", function(){
+    while ( true ) {
+        bp.sync({waitFor:a});
+        bp.hot(true).sync({waitFor:b});
     }
-    
-}
+});
+
+bp.registerBThread("B=>C", function(){
+    while ( true ) {
+        bp.sync({waitFor:b});
+        bp.hot(true).sync({waitFor:c});
+    }
+});
+
+bp.registerBThread("C=>A", function(){
+    while ( true ) {
+        bp.sync({waitFor:c});
+        bp.hot(true).sync({waitFor:a});
+    }
+});

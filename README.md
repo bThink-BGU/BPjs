@@ -44,6 +44,11 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change Log for the BPjs Library.
 
+### 2020-08-09
+* :arrow_up: Updated to use Rhino 1.7.13
+* :arrow_up: Updated to Java 11
+* :put_litter_in_its_place: Code and documentation clean-ups.
+
 ### 2020-04-22
 * :arrow_up: Updated to use Rhino 1.7.12
 * :arrow_up: :tada: Can use ES6 syntax, such as `let` and `const`.

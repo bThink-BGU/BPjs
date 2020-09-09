@@ -122,8 +122,8 @@ public class BPJsCliRunner {
                 vfr.setVisitedStateStore( new HashVisitedStateStore() );
             }
             if ( switchPresent("--liveness", args) ) {
-                vfr.addInspection(ExecutionTraceInspections.HOT_BPROGRAM_CYCLES);
-                vfr.addInspection(ExecutionTraceInspections.HOT_BTHREAD_CYCLES);
+                vfr.addInspection(ExecutionTraceInspections.HOT_SYSTEM);
+                vfr.addInspection(ExecutionTraceInspections.HOT_BTHREADS);
                 vfr.addInspection(ExecutionTraceInspections.HOT_TERMINATIONS);
             }
             String maxDepthStr = keyForValue("--max-trace-length", args);

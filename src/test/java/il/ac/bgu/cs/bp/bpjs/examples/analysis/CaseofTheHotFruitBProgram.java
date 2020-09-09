@@ -27,7 +27,7 @@ import il.ac.bgu.cs.bp.bpjs.analysis.BThreadSnapshotVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTraceInspections;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
-import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotBProgramCycleViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotSystemViolation;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
@@ -59,16 +59,16 @@ public class CaseofTheHotFruitBProgram {
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         // Adding the inspector means it will be the only inspector run, as the default set will not be used.
-        vfr.addInspection(ExecutionTraceInspections.HOT_BPROGRAM_CYCLES);
+        vfr.addInspection(ExecutionTraceInspections.HOT_SYSTEM);
         vfr.setVisitedStateStore( new BThreadSnapshotVisitedStateStore() );
         final VerificationResult res = vfr.verify(bprog);
 
         System.out.println("Violation found: " + res.isViolationFound());
         System.out.println("Visited state count: " + res.getScannedStatesCount());
-        res.getViolation().ifPresent( v -> {
+        res.getViolation().ifPresent(v -> {
             System.out.println(v.decsribe());
             System.out.println("Trace:");
-            HotBProgramCycleViolation hcv = (HotBProgramCycleViolation) v;
+            HotSystemViolation hcv = (HotSystemViolation) v;
             System.out.println(hcv.getCounterExampleTrace().getNodes().stream()
                                     .map(nd->nd.getEvent())
                                     .filter( Optional::isPresent )

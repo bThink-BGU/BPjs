@@ -28,7 +28,9 @@ import java.util.Set;
 import static java.util.stream.Collectors.joining;
 
 /**
- *
+ * A violation that occurs when a b-program terminates while at least one of its 
+ * b-threads is hot.
+ * 
  * @author michael
  */
 public class HotTerminationViolation extends Violation {

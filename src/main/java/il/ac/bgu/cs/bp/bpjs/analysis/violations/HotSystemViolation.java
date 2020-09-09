@@ -1,4 +1,4 @@
-/* 
+/*
  * The MIT License
  *
  * Copyright 2018 michael.
@@ -21,59 +21,26 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+package il.ac.bgu.cs.bp.bpjs.analysis.violations;
 
+import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
 
-/* global bp */
-
-/*
- * The general state-space for the stuck b-thread is this (H) - hot
+/**
+ * A violation where a b-program can get into a cycle where, at each sync point,
+ * at least one of its b-thread is hot.
  * 
- * <code>
- *    a    b    c    d 
- * ( )->(H)->(P)->(H)->( )-X
- *       |         |e
- *       +--<--<---+ 
- * </code>
- * 
- * P: The "main" b-thread is not hot, but another b-thread is.
- *       
+ * @author michael
  */
-
-var a = bp.Event("a");
-var b = bp.Event("b");
-var c = bp.Event("c");
-var d = bp.Event("d");
-var e = bp.Event("e");
-
-bp.registerBThread("main", function(){
-    bp.sync({request:a});
-    while ( true ) {
-        bp.hot(true).sync({request:b});
-        bp.sync({request:c});
-        var evt=bp.hot(true).sync({waitFor:[d,e]});
-        if ( evt.name == "d" ) {
-            return;
-        }
+public class HotSystemViolation extends LivenessViolation {
+    
+    public HotSystemViolation(ExecutionTrace trace) {
+        super(trace);
     }
-});
 
-bp.registerBThread("b-requires-c", function(){
-    while ( true ) {
-        bp.sync({waitFor:b});
-        bp.hot(true).sync({waitFor:c});
+    @Override
+    public String decsribe() {
+        return "Hot System violation: returning to index " + getCycleToIndex() 
+                + " in the trace because of event " + getCycleToEvent();
     }
-});
-
-bp.registerBThread("requesting-d", function(){
-    while ( true ) {
-        bp.sync({waitFor:c});
-        bp.sync({request:d, waitFor:e});
-    }
-});
-
-bp.registerBThread("requesting-e", function(){
-    while ( true ) {
-        bp.sync({waitFor:c});
-        bp.sync({request:e, waitFor:d});
-    }
-});
+    
+}
