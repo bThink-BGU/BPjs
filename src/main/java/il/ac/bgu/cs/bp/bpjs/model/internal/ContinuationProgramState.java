@@ -163,10 +163,6 @@ public class ContinuationProgramState {
             return obj;
             
         } else {
-            String cn = jsValue.getClass().getCanonicalName();
-            if ( !cn.startsWith("java.") && (!cn.startsWith("il.ac.bgu")) ) {
-                System.out.println("collectJsValue: blind translation to java: " + jsValue + " (" + jsValue.getClass() + ")");
-            }
             return jsValue;
         }
         

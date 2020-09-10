@@ -46,6 +46,7 @@ a link to this page somewhere in the documentation/system about section.
 
 ### 2020-08-10
 * :put_litter_in_its_place: Unification of some simple event sets, e.g. `[es1]` is identical to `es1`, `[]` to `bp.none`, etc.
+* :put_litter_in_its_place: Removed some printouts.
 
 ### 2020-08-09
 * :arrow_up: Updated to use Rhino 1.7.13
