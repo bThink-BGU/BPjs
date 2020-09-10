@@ -216,7 +216,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
                  .interrupt( interruptSet )
                       .data( data );
         boolean hasCollision = stmt.getRequest().stream().anyMatch(blockSet::contains);
-        if (hasCollision) {
+        if ( hasCollision ) {
             System.err.println("Warning: B-thread is blocking an event it is also requesting, this may lead to a deadlock.");
         }
         
@@ -232,9 +232,14 @@ public class BProgramJsProxy extends SyncStatementBuilder
         
         } else if ( jsObject instanceof NativeArray ) {
             NativeArray arr = (NativeArray) jsObject;
+            if ( arr.isEmpty() ) return EventSets.none;
+            
             if ( Stream.of(arr.getIds()).anyMatch( id -> arr.get(id)==null) ) {
                 throw new RuntimeException("EventSet Array contains null sets.");
             }
+            
+            if ( arr.getLength() == 1 ) return (EventSet)arr.get(0);
+            
             return ComposableEventSet.anyOf(
                 arr.getIndexIds().stream()
                     .map( i ->(EventSet)arr.get(i) )
