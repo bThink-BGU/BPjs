@@ -49,7 +49,7 @@ a link to this page somewhere in the documentation/system about section.
 * :arrow_up: Updated to Java 11
 * :sparkle: A new type of violation: hot run, which looks at hot runs of a subset of a b-program b-threads. 
     Previously, BPjs supported all b-threads ("hot system run") or just a single one ("hot b-thread run").
-* :part_alteration_mark: Liveness verification parts now aligned semantically with current theory.
+* :part_alternation_mark: Liveness verification parts now aligned semantically with current theory.
 * :put_litter_in_its_place: Code and documentation clean-ups.
 
 ### 2020-04-22
@@ -67,7 +67,7 @@ a link to this page somewhere in the documentation/system about section.
 Legend:
 * :arrows_counterclockwise: Change
 * :sparkles:New feature
-* :part_alteration_mark: Refactor (turns out this sign is called "part alteration mark", so it fits.
+* :part_alternation_mark: Refactor (turns out this sign is called "part alternation mark" and not "weird 'M'", so it fits).
 * :put_litter_in_its_place: Deprecation
 * :arrow_up: Upgrade
 * :bug: Bug fix
