@@ -44,9 +44,12 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change Log for the BPjs Library.
 
-##@ 2020-09-22
+### 2020-09-22
 * :arrow_up: Added a b-thread name for the self-blocking warning [#103](https://github.com/bThink-BGU/BPjs/issues/103).
 * :arrow_up: Logging supports compound objects [#102](https://github.com/bThink-BGU/BPjs/issues/102).
+* :sparkles: B-thread name is available to JavaScript code.
+* :bug: All JS code is evaluated as ES6 (formerly, evaluations where optimized ES1.8).
+* :bug: Improved self-blocking warning logic.
 
 ### 2020-08-10
 * :put_litter_in_its_place: Unification of some simple event sets, e.g. `[es1]` is identical to `es1`, `[]` to `bp.none`, etc.
@@ -74,7 +77,7 @@ a link to this page somewhere in the documentation/system about section.
 
 Legend:
 * :arrows_counterclockwise: Change
-* :sparkles:New feature
+* :sparkles: New feature
 * :part_alternation_mark: Refactor (turns out this sign is called "part alternation mark" and not "weird 'M'", so it fits).
 * :put_litter_in_its_place: Deprecation
 * :arrow_up: Upgrade

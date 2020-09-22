@@ -9,6 +9,7 @@ import java.util.concurrent.Callable;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
 import il.ac.bgu.cs.bp.bpjs.model.ForkStatement;
+import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
@@ -97,10 +98,17 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
         
         if ( capturedStatement instanceof SyncStatement ) {
             final SyncStatement syncStatement = (SyncStatement) cbs.getApplicationState();
-            boolean hasCollision = syncStatement.getRequest().stream().allMatch(syncStatement.getBlock()::contains);
-            if ( hasCollision ) {
-                System.err.println("Warning: B-thread '"+bss.getName()+"' is blocking an event it is also requesting, this may lead to a deadlock.");
+            
+            // warn on self-blocking
+            boolean hasRequest = ! syncStatement.getRequest().isEmpty();
+            boolean hasBlock   = (syncStatement.getBlock() != EventSets.none );
+            if ( hasRequest && hasBlock ) {
+                boolean hasCollision = syncStatement.getRequest().stream().allMatch(syncStatement.getBlock()::contains);
+                if ( hasCollision ) {
+                    System.err.println("Warning: B-thread '"+bss.getName()+"' is blocking an event it is also requesting, this may lead to a deadlock.");
+                }
             }
+            
             return bss.copyWith(cbs.getContinuation(), syncStatement);
             
         } else if ( capturedStatement instanceof ForkStatement ) {
