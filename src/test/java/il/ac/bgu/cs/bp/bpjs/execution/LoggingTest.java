@@ -23,15 +23,16 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution;
 
-import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BpLog;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 /**
@@ -41,12 +42,12 @@ import org.junit.Test;
 public class LoggingTest {
     
     @Test
-    public void testLogLevels() throws InterruptedException, UnsupportedEncodingException {
+    public void testLogLevels() throws InterruptedException, UnsupportedEncodingException, IOException {
         PrintStream originalOut = System.out;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (PrintStream myOut = new PrintStream(baos)) {
             System.setOut(myOut);
-            new BProgramRunner( new ResourceBProgram("loggingTest.js")).run();
+            new BProgramRunner( new ResourceBProgram("logging/simple.js")).run();
             myOut.flush();
         }
         String result = baos.toString(StandardCharsets.UTF_8.name());
@@ -56,10 +57,11 @@ public class LoggingTest {
         System.out.println(result);
         
         org.junit.Assert.assertEquals(6l, (long)result.split("\n").length);
+        baos.close();
     }
     
     @Test
-    public void testExternalSetLogLevel() throws UnsupportedEncodingException {
+    public void testExternalSetLogLevel() throws UnsupportedEncodingException, IOException {
         PrintStream originalOut = System.out;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (PrintStream myOut = new PrintStream(baos)) {
@@ -75,7 +77,7 @@ public class LoggingTest {
             new BProgramRunner(bprog).run();
             myOut.flush();
         }
-        String result1 = baos.toString(StandardCharsets.UTF_8.name());
+        String result1 = baos.toString(StandardCharsets.UTF_8);
         org.junit.Assert.assertEquals(3l, (long)result1.split("\n").length);
         
         baos = new ByteArrayOutputStream();
@@ -92,7 +94,7 @@ public class LoggingTest {
             new BProgramRunner(bprog).run();
             myOut.flush();
         }
-        String result2 = baos.toString(StandardCharsets.UTF_8.name());
+        String result2 = baos.toString(StandardCharsets.UTF_8);
         org.junit.Assert.assertEquals(1l, (long)result2.split("\n").length);
         
         System.setOut(originalOut);
@@ -101,5 +103,38 @@ public class LoggingTest {
         System.out.println();
         System.out.println("Result 2:");
         System.out.println(result2);
+        baos.close();
     }
+    
+    @Test
+    public void testCompoundObjectLogging() throws IOException {
+        PrintStream originalOut = System.out;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        
+       
+        try (PrintStream myOut = new PrintStream(baos)) {
+            System.setOut(myOut);
+        
+            new BProgramRunner(new ResourceBProgram("logging/compound.js")).run();
+            myOut.flush();
+            
+        } finally {
+            System.setOut(originalOut);    
+        }
+        String result = baos.toString(StandardCharsets.UTF_8);
+        baos.close();
+        
+        System.out.println(result);
+        
+        assertTrue(result.contains("Set"));
+        assertTrue(result.contains("JS_Array"));
+        assertTrue(result.contains("JS_Obj"));
+        assertTrue(result.contains("List"));
+        assertTrue(result.contains("Map"));
+        assertTrue(result.contains("->"));
+        assertTrue(result.contains("|"));
+        assertTrue(result.contains("{"));
+        assertTrue(result.contains("}"));
+    }
+    
 }

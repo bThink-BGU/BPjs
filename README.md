@@ -46,6 +46,7 @@ a link to this page somewhere in the documentation/system about section.
 
 ##@ 2020-09-22
 * :arrow_up: Added a b-thread name for the self-blocking warning [#103](https://github.com/bThink-BGU/BPjs/issues/103).
+* :arrow_up: Logging supports compound objects [#102](https://github.com/bThink-BGU/BPjs/issues/102).
 
 ### 2020-08-10
 * :put_litter_in_its_place: Unification of some simple event sets, e.g. `[es1]` is identical to `es1`, `[]` to `bp.none`, etc.
