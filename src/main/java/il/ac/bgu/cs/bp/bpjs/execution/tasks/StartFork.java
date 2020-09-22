@@ -48,13 +48,12 @@ public class StartFork extends BPEngineTask {
     }
 
     @Override
-    BThreadSyncSnapshot callImpl(Context jsContext) {
+    void callImpl(Context jsContext) {
         NativeContinuation cont = (NativeContinuation) bss.getContinuation();
         Scriptable tls = ScriptableObject.getTopLevelScope(cont);
         BProgramJsProxy bprPxy = new BProgramJsProxy(bprog);
         ScriptableObject.defineProperty(tls, "bp", bprPxy, 0);
         jsContext.resumeContinuation(cont, tls, forkValue);
-        return null;
     }
 
     @Override

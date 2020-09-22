@@ -16,10 +16,9 @@ public class ResumeBThread extends BPEngineTask {
     }
 
     @Override
-    BThreadSyncSnapshot callImpl(Context jsContext) {        
+    void callImpl(Context jsContext) {        
         Object eventInJS = Context.javaToJS(event, bss.getScope());
         jsContext.resumeContinuation(bss.getContinuation(), bss.getScope(), eventInJS);
-        return null;
     }
 
     @Override

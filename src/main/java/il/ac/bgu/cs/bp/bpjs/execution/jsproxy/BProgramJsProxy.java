@@ -27,11 +27,11 @@ import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
 
 /**
- * An object representing the {@link BProgram} context for Javascript code.
- * Methods in this object allow Javascript code to register new BThreads, 
+ * An object representing the {@link BProgram} context for JavaScript code.
+ * Methods in this object allow JavaScript code to register new BThreads, 
  * create events,write messages to the log etc.
  * 
- * Methods in the class are available to Javascript code via the {@code bp}
+ * Methods in the class are available to JavaScript code via the {@code bp}
  * object, like so:
  * 
  * <pre><code>
@@ -67,7 +67,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
     public final EventSet none = EventSets.none;
     
     /**
-     * Facility for creating random numbers. BPjs code should not use Javascript's
+     * Facility for creating random numbers. BPjs code should not use JavaScript's
      * random facility, as it won't play well with model checking.
      */
     public RandomProxy random = new RandomProxy();
@@ -77,7 +77,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
     }
     
     /**
-     * Event constructor, called from Javascript, hence the funny
+     * Event constructor, called from JavaScript, hence the funny
      * capitalization.
      *
      * @param name name of the event
@@ -88,7 +88,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
     }
 
     /**
-     * Event constructor, called from Javascript, hence the funny
+     * Event constructor, called from JavaScript, hence the funny
      * capitalization.
      *
      * @param name name of the event
@@ -215,11 +215,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
                      .block( blockSet )
                  .interrupt( interruptSet )
                       .data( data );
-        boolean hasCollision = stmt.getRequest().stream().anyMatch(blockSet::contains);
-        if ( hasCollision ) {
-            System.err.println("Warning: B-thread is blocking an event it is also requesting, this may lead to a deadlock.");
-        }
-        
+       
         captureBThreadState(stmt);
     }
 

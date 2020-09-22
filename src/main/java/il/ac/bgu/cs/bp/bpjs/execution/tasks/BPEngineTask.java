@@ -45,7 +45,7 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
         bss = aBss;
     }
     
-    abstract BThreadSyncSnapshot callImpl(Context jsContext);
+    abstract void callImpl(Context jsContext);
     
     @Override
     public BThreadSyncSnapshot call() {
@@ -53,7 +53,8 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
         Context jsContext = Context.enter();
         try {            
             BProgramJsProxy.setCurrentBThread(bss);
-            return callImpl( jsContext );
+            callImpl( jsContext );
+            return null;
 
         } catch (ContinuationPending cbs) {
             return handleContinuationPending(cbs, jsContext);
@@ -63,8 +64,10 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
             
         } catch ( EcmaError jsError ) {
             throw new BPjsRuntimeException("JavaScript error: " + jsError.getMessage(), jsError);
+            
         } catch ( EvaluatorException eve ) {
             throw new BPjsRuntimeException("JavaScript evaluation failed: " + eve.getMessage(), eve);
+            
         } catch ( Throwable generalThrowable ) {
             System.err.println("BPjs Error: Unhandled exception in BPEngineTask.");
             System.err.println("            This is a bug in BPjs. Please report. Sorry.");
@@ -94,6 +97,10 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
         
         if ( capturedStatement instanceof SyncStatement ) {
             final SyncStatement syncStatement = (SyncStatement) cbs.getApplicationState();
+            boolean hasCollision = syncStatement.getRequest().stream().allMatch(syncStatement.getBlock()::contains);
+            if ( hasCollision ) {
+                System.err.println("Warning: B-thread '"+bss.getName()+"' is blocking an event it is also requesting, this may lead to a deadlock.");
+            }
             return bss.copyWith(cbs.getContinuation(), syncStatement);
             
         } else if ( capturedStatement instanceof ForkStatement ) {
