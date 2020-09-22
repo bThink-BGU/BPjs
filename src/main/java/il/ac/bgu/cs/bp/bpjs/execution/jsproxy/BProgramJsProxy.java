@@ -288,7 +288,12 @@ public class BProgramJsProxy extends SyncStatementBuilder
     public long getTime() {
         return System.currentTimeMillis();
     }
-
+    
+    
+    public BThreadDataProxy getThread(){
+        return new BThreadDataProxy(CURRENT_BTHREAD.get());
+    }
+    
     /**
      * Gets the name of the Java thread executing this b-thread at the moment. Useful for
      * debugging Java runtime issues.

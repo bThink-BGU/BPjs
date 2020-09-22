@@ -1,7 +1,7 @@
-/*
+/* 
  * The MIT License
  *
- * Copyright 2017 michael.
+ * Copyright 2020 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,27 +21,18 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.execution;
 
-import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
-import static org.junit.Assert.assertTrue;
-import org.junit.Test;
+/* global bp */
 
-/**
- *
- * @author michael
- */
-public class GetTimeTest {
- 
-    @Test
-    public void test() throws InterruptedException {
-        BProgram sut = new ResourceBProgram("getTimeTest.js");
-        long timePre = System.currentTimeMillis();
-        new BProgramRunner(sut).run();
-        long timePost = System.currentTimeMillis();
-        Long actual = sut.getFromGlobalScope("theTime", Long.class).get();
-        assertTrue( (actual>=timePre) && (actual<=timePost) );
-    }
+const nameArr = ["hello", "world", "b-thread","names"];
+
+function doTheSync() {
+    bp.sync({request:bp.Event(bp.thread.name)});
 }
+
+const bthreadFunction = function(){
+    bp.log.info("My name is " + bp.thread.name );
+    doTheSync();
+};
+
+nameArr.forEach( n => bp.registerBThread(n, bthreadFunction) );
