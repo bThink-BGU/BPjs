@@ -47,6 +47,7 @@ a link to this page somewhere in the documentation/system about section.
 ### 2020-09-23
 * :tada: B-Threads have a data object, available to b-thread code via `bp.thread.data`. This object can be set, updated, and 
     replaced during execution. It can also be pre-set on b-thread creation [#106](https://github.com/bThink-BGU/BPjs/issues/106).
+* :sparkles: DFS scan that uses forgetful state storage is not resilient to cyclic state graphs [#95](https://github.com/bThink-BGU/BPjs/issues/95).
 
 ### 2020-09-22
 * :arrow_up: Added a b-thread name for the self-blocking warning [#103](https://github.com/bThink-BGU/BPjs/issues/103).

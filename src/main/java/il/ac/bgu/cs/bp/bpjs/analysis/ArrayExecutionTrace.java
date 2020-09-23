@@ -27,8 +27,12 @@ import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.TreeMap;
 
 /**
  *
@@ -44,7 +48,13 @@ public class ArrayExecutionTrace implements ExecutionTrace {
     private int cycleToIndex = -1;
     
     private final BProgram bprogram;
-
+    
+    private static final int[] BLOOM_KEYS = new int[]{1,13,37};
+    /**
+     * Bloom filter for exiting BProgramSyncSnapshot. NOT ENTRIES, SNAPSHOTS!
+     */
+    private final int[] bloomFilter = new int[256];
+    
     public ArrayExecutionTrace( BProgram aBProgram ) {
         bprogram = aBProgram;
     }
@@ -95,11 +105,20 @@ public class ArrayExecutionTrace implements ExecutionTrace {
     
     public void push( BProgramSyncSnapshot aState ) {
         stack.add( new Entry(aState) );
+        int curHash = Objects.hashCode(aState);
+        for ( int i=0; i<BLOOM_KEYS.length; i++ ){
+            bloomFilter[ Math.abs(curHash*BLOOM_KEYS[i])%bloomFilter.length ]++;
+        }
     }
     
     public Entry pop() {
         cycleToIndex = -1;
-        return stack.remove(stack.size()-1);
+        Entry onWayOut = stack.remove(stack.size()-1);
+        int curHash = Objects.hashCode(onWayOut.getState());
+        for ( int i=0; i<BLOOM_KEYS.length; i++ ){
+            bloomFilter[ Math.abs(curHash*BLOOM_KEYS[i])%bloomFilter.length ]--;
+        } 
+        return onWayOut;
     }
     
     public void advance( BEvent anEvent, BProgramSyncSnapshot nextState ){
@@ -113,9 +132,28 @@ public class ArrayExecutionTrace implements ExecutionTrace {
         cycleToIndex = aCycleToIndex;
     }
     
+    public int indexOf( BProgramSyncSnapshot bpss ) {
+        // check bloom
+        int hash = Objects.hashCode(bpss);
+        for ( int i=0; i<BLOOM_KEYS.length; i++ ){
+            if ( bloomFilter[ Math.abs(hash*BLOOM_KEYS[i])%bloomFilter.length ] == 0 ) {
+                return -1;
+            }
+        }
+        
+        // if OK, check for real
+        for ( int i=0; i<stack.size(); i++ ) {
+            if ( stack.get(i).getState().equals(bpss) ) {
+                return i;
+            }
+        }
+        return -1;
+    }
+    
     public void clear() {
         stack.clear();
         cycleToIndex=-1;
+        Arrays.fill(bloomFilter, 0);
     }
     
 }

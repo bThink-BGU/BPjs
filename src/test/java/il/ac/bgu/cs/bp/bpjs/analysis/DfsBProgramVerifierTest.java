@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
+import il.ac.bgu.cs.bp.bpjs.TestUtils;
 import static il.ac.bgu.cs.bp.bpjs.TestUtils.eventNamesString;
 
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
@@ -49,6 +50,8 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import static java.util.stream.Collectors.joining;
 
 /**
@@ -501,5 +504,43 @@ public class DfsBProgramVerifierTest {
         
         assertTrue( errorCalled.get() );
         assertTrue( errorMadeSense.get() );
+    }
+    
+    /**
+     * Test that even with forgetful storage, a circular trace does not get 
+     * use to an infinite run.
+     * @throws java.lang.Exception
+     */
+    @Test//(timeout=6000)
+    public void testCircularTraceDetection_forgetfulStorage() throws Exception {
+        String bprog = "bp.registerBThread(function(){\n"
+            + "while (true) {\n"
+            + "  bp.sync({request:bp.Event(\"X\")});"
+            + "  bp.sync({request:bp.Event(\"Y\")});"
+            + "  bp.sync({request:bp.Event(\"Z\")});"
+            + "  bp.sync({request:bp.Event(\"W\")});"
+            + "  bp.sync({request:bp.Event(\"A\")});"
+            + "  bp.sync({request:bp.Event(\"B\")});"
+            + "}"
+            + "});";
+        
+        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        sut.setVisitedStateStore( new ForgetfulVisitedStateStore() );
+        final AtomicInteger cycleToIndex = new AtomicInteger(Integer.MAX_VALUE);
+        final AtomicReference<String> lastEventName = new AtomicReference<>();
+        sut.addInspection(ExecutionTraceInspection.named("Cycle", t->{
+            if ( t.isCyclic() ) {
+                cycleToIndex.set( t.getCycleToIndex() );
+                lastEventName.set( t.getLastEvent().getName() );
+                System.out.println(TestUtils.traceEventNamesString(t, ", "));
+            }
+            return Optional.empty();
+        }));
+        
+        VerificationResult res = sut.verify(new StringBProgram(bprog));
+        System.out.println("states: " + res.getScannedStatesCount());
+        assertEquals( 0, cycleToIndex.get() );
+        assertEquals( "B", lastEventName.get() );
+        
     }
 }

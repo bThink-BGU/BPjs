@@ -53,8 +53,11 @@ The analysis process involves a few classes of note. When writing new types of a
 ``Violation``
   When an ``ExecutionTraceInspection`` instance finds a trace that violates some requirement, it describes that discovery using an instance of this class.
 
-``VisitedNodeStore``
-  In order to detect cycles in a b-program's execution graph, the verifier needs to know whether a given state was already visited. This is done using an instance of this class. BPjs  ships with three implementations: One that looks at the entire state of the b-program, on that looks only at the hash code of that state, and one that assumes that all states are new. The latter consumes very little memory, but is only useful for analyzing programs whose state space is a tree.
+``VisitedStateStore``
+  In order to detect cycles in a b-program's execution graph, the verifier needs to know whether a given state was already visited. This is done using an instance of this class. BPjs ships with three implementations: One that looks at the entire state of the b-program, on that looks only at the hash code of that state, and one that assumes that all states are new.
+
+.. tip::
+  The forgetful visited state store (``ForgetfulVisitedStateStore``) is useful for traversing all graph's edges, since it does not stop a scan when it arrives at a node it already visited. The scan is still resilient to cycles - these are detected by looking at the DFS stack, not the visited state store.
 
 
 Verifying Safety Properties

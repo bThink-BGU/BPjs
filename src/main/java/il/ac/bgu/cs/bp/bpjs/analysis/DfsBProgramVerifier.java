@@ -235,43 +235,39 @@ public class DfsBProgramVerifier {
                 visitedEdgeCount++;
 
                 BProgramSyncSnapshot pns = possibleNextNode.getSystemState();
-                if (visited.isVisited(pns) ) {
-                    boolean cycleFound = false;
-                    for ( int idx=0; idx<currentPath.size() && !cycleFound; idx++) {
-                        // Was this a cycle?
-                        DfsTraversalNode nd = currentPath.get(idx);
-                        if ( pns.equals(nd.getSystemState()) ) {
-                            // found an actual cycle
-                            cycleFound = true;
-                            trace.cycleTo(nextEvent, idx);
-                            Set<Violation> res = inspections.stream().map(i->i.inspectTrace(trace))
-                                .filter(o->o.isPresent()).map(Optional::get).collect(toSet());
+                int stateIndexOnTrace = trace.indexOf(pns);
+                if ( stateIndexOnTrace > -1 ) {
+                    // cycle found
+                    trace.cycleTo(nextEvent, stateIndexOnTrace);
+                    Set<Violation> res = inspections.stream().map(i->i.inspectTrace(trace))
+                        .filter(o->o.isPresent()).map(Optional::get).collect(toSet());
 
-                            for ( Violation v : res ) {
-                                if ( ! listener.violationFound(v, this)) {
-                                    throw new ViolatingPathFoundException(v);
-                                }
+                    for ( Violation v : res ) {
+                        if ( ! listener.violationFound(v, this)) {
+                            throw new ViolatingPathFoundException(v);
+                        }
+                    }
+                    
+                } else if ( visited.isVisited(pns) ) {
+                    // non cyclic, revisiting a state from a different path.
+                    //     ... Quickly inspect the path and continue.
+                    trace.advance(nextEvent, pns);
+                    Set<Violation> res = inspections.stream().map(i->i.inspectTrace(trace))
+                            .filter(o->o.isPresent()).map(Optional::get).collect(toSet());
+                    if ( res.size() > 0  ) {
+                        for ( Violation v : res ) {
+                            if ( ! listener.violationFound(v, this) ) {
+                                throw new ViolatingPathFoundException(v);
                             }
                         }
                     }
-                    if ( ! cycleFound ) {
-                        // revisiting a state from a different path. Quickly inspect the path and continue.
-                        trace.advance(nextEvent, pns);
-                        Set<Violation> res = inspections.stream().map(i->i.inspectTrace(trace))
-                                .filter(o->o.isPresent()).map(Optional::get).collect(toSet());
-                        if ( res.size() > 0  ) {
-                            for ( Violation v : res ) {
-                                if ( ! listener.violationFound(v, this) ) {
-                                    throw new ViolatingPathFoundException(v);
-                                }
-                            }
-                        }
-                        trace.pop();
-                    }
+                    trace.pop();
+                    
                 } else {
                     // advance to this newly discovered node
                     return possibleNextNode;
                 }
+                
             } catch ( BPjsRuntimeException bprte ) {
                 trace.advance(nextEvent, null);
                 Violation jsev = new JsErrorViolation(trace, bprte);
