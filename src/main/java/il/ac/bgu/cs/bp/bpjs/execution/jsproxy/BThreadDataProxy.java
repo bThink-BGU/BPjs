@@ -42,4 +42,11 @@ public class BThreadDataProxy {
     
     public final String name;
     
+    public Object getData() {
+        return btData.getData();
+    }
+    
+    public void setData( Object someNewData ) {
+        btData.setData(someNewData);
+    }
 }

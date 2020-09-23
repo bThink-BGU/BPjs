@@ -182,7 +182,7 @@ public class BProgramSyncSnapshotIO {
             btos.writeObject(bss.getEntryPoint());
             btos.writeObject(bss.getInterrupt().orElse(null));
             btos.writeObject(bss.getSyncStatement());
-
+            btos.writeObject(bss.getData());
             btos.writeObject(bss.getContinuation());
             btos.flush();
         }
@@ -209,8 +209,9 @@ public class BProgramSyncSnapshotIO {
             Function entryPoint = (Function) bssis.readObject();
             Function interruptHandler = (Function) bssis.readObject();
             SyncStatement stmt = (SyncStatement) bssis.readObject();
+            Object data = bssis.readObject();
             Object cont = bssis.readObject();
-            final BThreadSyncSnapshot bThreadSyncSnapshot = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, cont, stmt);
+            final BThreadSyncSnapshot bThreadSyncSnapshot = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, cont, stmt, data);
 
             return bThreadSyncSnapshot;
         }

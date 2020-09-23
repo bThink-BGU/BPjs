@@ -80,7 +80,7 @@ public class BpLog implements java.io.Serializable {
         if ( o instanceof ConsString ) return "\"" + ((ConsString)o).toString() + "\"";
         if ( o instanceof NativeArray ) {
             NativeArray arr = (NativeArray) o;
-            return arr.getIndexIds().stream().map( id -> id + ": " + stringify(arr.get(id)) ).collect(joining("|", "[JS_Array ", "]"));
+            return arr.getIndexIds().stream().map( id -> id + ":" + stringify(arr.get(id)) ).collect(joining(" | ", "[JS_Array ", "]"));
         }
         if ( o instanceof ScriptableObject ) {
             ScriptableObject sob = (ScriptableObject) o;
@@ -88,7 +88,7 @@ public class BpLog implements java.io.Serializable {
         }
         if ( o instanceof Object[] ) {
             Object[] objArr = (Object[]) o;
-            return IntStream.range(0, objArr.length).mapToObj(idx -> stringify(objArr[idx])).collect(joining("|","[Array ", "]"));
+            return IntStream.range(0, objArr.length).mapToObj(idx -> stringify(objArr[idx])).collect(joining("|","[Java_Array ", "]"));
         }
         if ( o instanceof Map ) {
             Map<?,?> mp = (Map<?,?>) o;
@@ -96,11 +96,11 @@ public class BpLog implements java.io.Serializable {
         }
         if ( o instanceof List ) {
             List<?> ls = (List<?>) o;
-            return ls.stream().map(this::stringify).collect(joining(",","<List ", ">"));
+            return ls.stream().map(this::stringify).collect(joining(", ","<List ", ">"));
         }
         if ( o instanceof Set ) {
             Set<?> ls = (Set<?>) o;
-            return ls.stream().map(this::stringify).collect(joining(",","{Set ", "}"));
+            return ls.stream().map(this::stringify).collect(joining(", ","{Set ", "}"));
         }
         return o.toString();
         

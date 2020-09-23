@@ -44,6 +44,10 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change Log for the BPjs Library.
 
+### 2020-09-23
+* :tada: B-Threads have a data object, available to b-thread code via `bp.thread.data`. This object can be set, updated, and 
+    replaced during execution. It can also be pre-set on b-thread creation [#106](https://github.com/bThink-BGU/BPjs/issues/106).
+
 ### 2020-09-22
 * :arrow_up: Added a b-thread name for the self-blocking warning [#103](https://github.com/bThink-BGU/BPjs/issues/103).
 * :arrow_up: Logging supports compound objects [#102](https://github.com/bThink-BGU/BPjs/issues/102).
@@ -78,6 +82,7 @@ a link to this page somewhere in the documentation/system about section.
 Legend:
 * :arrows_counterclockwise: Change
 * :sparkles: New feature
+* :tada: New feature, but more exciting
 * :part_alternation_mark: Refactor (turns out this sign is called "part alternation mark" and not "weird 'M'", so it fits).
 * :put_litter_in_its_place: Deprecation
 * :arrow_up: Upgrade

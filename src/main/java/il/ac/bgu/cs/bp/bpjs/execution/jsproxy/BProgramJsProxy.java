@@ -11,7 +11,6 @@ import il.ac.bgu.cs.bp.bpjs.execution.tasks.FailedAssertionException;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.ForkStatement;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -112,7 +111,20 @@ public class BProgramJsProxy extends SyncStatementBuilder
     }
     
     /**
-     * Called from JS to add BThreads running func as their runnable code.
+     * Called from JS to add BThreads with data.
+     *
+     * @param name Name of the registered BThread (useful for debugging).
+     * @param data Data object for the b-thread.
+     * @param func Script entry point of the BThread.
+     *
+     * @see #registerBThread(org.mozilla.javascript.Function)
+     */
+    public void registerBThread(String name, Object data, Function func) {
+        program.registerBThread(new BThreadSyncSnapshot(name, func, null, null, null, data));
+    }
+    
+    /**
+     * Called from JS to add BThreads running function as their runnable code.
      *
      * @param name Name of the registered BThread (useful for debugging).
      * @param func Script entry point of the BThread.
