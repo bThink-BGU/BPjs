@@ -27,7 +27,7 @@ import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 
 /**
  * JS object that exposes the b-thread metadata to b-thread JS code.
- * Available to the b-thread code via {@code
+ * Available to the b-thread code via {@code bp.thread}.
  * 
  * @author michael
  */
