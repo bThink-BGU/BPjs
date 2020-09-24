@@ -11,7 +11,6 @@ import il.ac.bgu.cs.bp.bpjs.execution.tasks.FailedAssertionException;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.ForkStatement;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
-import java.util.Arrays;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -27,11 +26,11 @@ import org.mozilla.javascript.NativeArray;
 import org.mozilla.javascript.NativeObject;
 
 /**
- * An object representing the {@link BProgram} context for Javascript code.
- * Methods in this object allow Javascript code to register new BThreads, 
+ * An object representing the {@link BProgram} context for JavaScript code.
+ * Methods in this object allow JavaScript code to register new BThreads, 
  * create events,write messages to the log etc.
  * 
- * Methods in the class are available to Javascript code via the {@code bp}
+ * Methods in the class are available to JavaScript code via the {@code bp}
  * object, like so:
  * 
  * <pre><code>
@@ -67,7 +66,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
     public final EventSet none = EventSets.none;
     
     /**
-     * Facility for creating random numbers. BPjs code should not use Javascript's
+     * Facility for creating random numbers. BPjs code should not use JavaScript's
      * random facility, as it won't play well with model checking.
      */
     public RandomProxy random = new RandomProxy();
@@ -77,7 +76,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
     }
     
     /**
-     * Event constructor, called from Javascript, hence the funny
+     * Event constructor, called from JavaScript, hence the funny
      * capitalization.
      *
      * @param name name of the event
@@ -88,7 +87,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
     }
 
     /**
-     * Event constructor, called from Javascript, hence the funny
+     * Event constructor, called from JavaScript, hence the funny
      * capitalization.
      *
      * @param name name of the event
@@ -112,7 +111,20 @@ public class BProgramJsProxy extends SyncStatementBuilder
     }
     
     /**
-     * Called from JS to add BThreads running func as their runnable code.
+     * Called from JS to add BThreads with data.
+     *
+     * @param name Name of the registered BThread (useful for debugging).
+     * @param data Data object for the b-thread.
+     * @param func Script entry point of the BThread.
+     *
+     * @see #registerBThread(org.mozilla.javascript.Function)
+     */
+    public void registerBThread(String name, Object data, Function func) {
+        program.registerBThread(new BThreadSyncSnapshot(name, func, null, null, null, data));
+    }
+    
+    /**
+     * Called from JS to add BThreads running function as their runnable code.
      *
      * @param name Name of the registered BThread (useful for debugging).
      * @param func Script entry point of the BThread.
@@ -215,11 +227,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
                      .block( blockSet )
                  .interrupt( interruptSet )
                       .data( data );
-        boolean hasCollision = stmt.getRequest().stream().anyMatch(blockSet::contains);
-        if (hasCollision) {
-            System.err.println("Warning: B-thread is blocking an event it is also requesting, this may lead to a deadlock.");
-        }
-        
+       
         captureBThreadState(stmt);
     }
 
@@ -232,9 +240,14 @@ public class BProgramJsProxy extends SyncStatementBuilder
         
         } else if ( jsObject instanceof NativeArray ) {
             NativeArray arr = (NativeArray) jsObject;
+            if ( arr.isEmpty() ) return EventSets.none;
+            
             if ( Stream.of(arr.getIds()).anyMatch( id -> arr.get(id)==null) ) {
                 throw new RuntimeException("EventSet Array contains null sets.");
             }
+            
+            if ( arr.getLength() == 1 ) return (EventSet)arr.get(0);
+            
             return ComposableEventSet.anyOf(
                 arr.getIndexIds().stream()
                     .map( i ->(EventSet)arr.get(i) )
@@ -287,7 +300,12 @@ public class BProgramJsProxy extends SyncStatementBuilder
     public long getTime() {
         return System.currentTimeMillis();
     }
-
+    
+    
+    public BThreadDataProxy getThread(){
+        return new BThreadDataProxy(CURRENT_BTHREAD.get());
+    }
+    
     /**
      * Gets the name of the Java thread executing this b-thread at the moment. Useful for
      * debugging Java runtime issues.

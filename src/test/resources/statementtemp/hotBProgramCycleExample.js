@@ -47,13 +47,12 @@ var e = bp.Event("e");
 
 bp.registerBThread("main", function(){
     bp.sync({request:a});
-    var go = true;
-    while ( go ) {
+    while ( true ) {
         bp.hot(true).sync({request:b});
         bp.sync({request:c});
         var evt=bp.hot(true).sync({waitFor:[d,e]});
         if ( evt.name == "d" ) {
-            go=false;
+            return;
         }
     }
 });

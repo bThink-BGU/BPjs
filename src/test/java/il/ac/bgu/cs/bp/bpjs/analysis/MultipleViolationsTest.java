@@ -90,7 +90,7 @@ public class MultipleViolationsTest {
         AtomicBoolean maxLengthHit = new AtomicBoolean(false);
         
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-        vfr.addInspection( ExecutionTraceInspections.HOT_BTHREAD_CYCLES );
+        vfr.addInspection(ExecutionTraceInspections.HOT_BTHREADS );
         vfr.setMaxTraceLength(6);
         
         vfr.setProgressListener( new DfsBProgramVerifier.ProgressListener() {

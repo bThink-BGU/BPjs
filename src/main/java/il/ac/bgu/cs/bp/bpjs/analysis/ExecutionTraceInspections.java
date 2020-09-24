@@ -25,8 +25,9 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.DeadlockViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.FailedAssertionViolation;
-import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotBProgramCycleViolation;
-import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotBThreadCycleViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotSystemViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotBThreadViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotRunViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotTerminationViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
@@ -37,6 +38,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 
@@ -97,27 +99,50 @@ public class ExecutionTraceInspections {
     
     /**
      * Detects a case where a b-program can get into an infinite loop where, at 
-     * each sync point, at least one of the b-threads is in a hot sync. This does
+     * each sync point, at least one of the b-threads is hot. This does
      * not mean that individually b-threads are hot all along the loop.
      */
-    public static final ExecutionTraceInspection HOT_BPROGRAM_CYCLES = ExecutionTraceInspection.named(
-        "Hot B-Program Cycles",
+    public static final ExecutionTraceInspection HOT_SYSTEM = ExecutionTraceInspection.named("Hot System",
         trace -> {
             if ( trace.isCyclic() &&
                  trace.getFinalCycle().stream().allMatch(s -> s.getState().isHot()) ){
-                return Optional.of(new HotBProgramCycleViolation(trace));
+                return Optional.of(new HotSystemViolation(trace));
             } else return Optional.empty();
         }
     );
     
     /**
+     * Detects a case where a set of b-threads can get into an infinite loop where, at 
+     * each sync point, at least one of them is hot. This does
+     * not mean that individually b-threads are hot all along the loop.
+     * 
+     * @param bThreadNames the names of the inspected b-threads.
+     * @return An execution trace inspection for detecting a hot run of b-threads whose names were passed.
+     */
+    public static ExecutionTraceInspection hotRun( Set<String> bThreadNames){
+        return ExecutionTraceInspection.named("Hot Run of {" + bThreadNames.stream().sorted().collect(joining(", ")) + "}",
+        trace -> {
+            if ( trace.isCyclic() &&
+                 trace.getFinalCycle().stream().allMatch(s -> 
+                     s.getState().getBThreadSnapshots().stream()
+                         .filter( bt -> bThreadNames.contains(bt.getName()) )
+                         .anyMatch(bt -> bt.getSyncStatement().isHot() )
+                 )
+            ){
+                return Optional.of(new HotRunViolation(trace, bThreadNames));
+            } else return Optional.empty();
+        });
+    }
+    
+    
+    /**
      * Detects a case where a b-thread can get into an infinite loop where all
      * its sync points are hot.
      */    
-    public static final ExecutionTraceInspection HOT_BTHREAD_CYCLES = new ExecutionTraceInspection(){
+    public static final ExecutionTraceInspection HOT_BTHREADS = new ExecutionTraceInspection(){
         @Override
         public String title() {
-            return "Hot B-Program Cycles";
+            return "Hot B-Thread";
         }
 
         @Override
@@ -136,7 +161,7 @@ public class ExecutionTraceInspections {
                 });
                 
                 return alwaysHotOpt.filter( ahs -> ahs.size()>0 )
-                    .map( alwaysHots -> new HotBThreadCycleViolation(trace, alwaysHots) );
+                    .map(alwaysHots -> new HotBThreadViolation(trace, alwaysHots) );
                     
             } else return Optional.empty();
         }
@@ -149,10 +174,8 @@ public class ExecutionTraceInspections {
     };
                 
     
-    public static final Set<ExecutionTraceInspection> DEFAULT_SET = Collections.unmodifiableSet( 
-        new HashSet<ExecutionTraceInspection>(
-            Arrays.asList(
-                DEADLOCKS, FAILED_ASSERTIONS, HOT_TERMINATIONS, HOT_BTHREAD_CYCLES
+    public static final Set<ExecutionTraceInspection> DEFAULT_SET = Collections.unmodifiableSet(new HashSet<ExecutionTraceInspection>(
+            Arrays.asList(DEADLOCKS, FAILED_ASSERTIONS, HOT_TERMINATIONS, HOT_BTHREADS
     )));
     
     /////////////////////////

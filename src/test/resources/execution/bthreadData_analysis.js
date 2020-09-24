@@ -1,7 +1,7 @@
-/*
+/* 
  * The MIT License
  *
- * Copyright 2018 michael.
+ * Copyright 2020 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,35 +21,38 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis.violations;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
-import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import java.util.List;
+/* global bp */
 
-/**
- *
- * @author michael
- */
-public class HotBProgramCycleViolation extends Violation {
-    
-    public HotBProgramCycleViolation(ExecutionTrace trace) {
-        super(trace);
+const plans = [ ["a","b","c","d"],
+                ["1","2","3","4"] ];
+
+function runPlan() {
+    for ( let i in bp.thread.data ) {
+        bp.sync({request:bp.Event(bp.thread.data[i])});
     }
-
-    @Override
-    public String decsribe() {
-        return "Hot b-program cycle violation: returning to index " + getCycleToIndex() 
-                + " in the trace because of event " + getCycleToEvent();
-    }
-
-    public int getCycleToIndex() {
-        return getCounterExampleTrace().getCycleToIndex();
-    }
-
-    public BEvent getCycleToEvent() {
-        List<ExecutionTrace.Entry> nodes = getCounterExampleTrace().getNodes();
-        return nodes.get(nodes.size()-1).getEvent().get();
-    }
-    
 }
+
+function makeBT(plan) {
+    bp.registerBThread("bt"+plan[0], plan, runPlan );
+}
+
+plans.forEach( p => makeBT(p) );
+
+// For future reference: Below is the "pure"/"unrolled" version
+// of the above program. It has 25 states (5*5). The nicer above
+// program has about 182 states. Probably due to internal loop 
+// counters etc.
+// 
+//bp.registerBThread("ad", function(){
+//   bp.sync({request:bp.Event("a")}); 
+//   bp.sync({request:bp.Event("b")}); 
+//   bp.sync({request:bp.Event("c")}); 
+//   bp.sync({request:bp.Event("d")}); 
+//});
+//bp.registerBThread("03", function(){
+//   bp.sync({request:bp.Event("1")}); 
+//   bp.sync({request:bp.Event("2")}); 
+//   bp.sync({request:bp.Event("3")}); 
+//   bp.sync({request:bp.Event("4")}); 
+//});

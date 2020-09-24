@@ -24,8 +24,9 @@
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
 import il.ac.bgu.cs.bp.bpjs.TestUtils;
-import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotBThreadCycleViolation;
-import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotBProgramCycleViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotBThreadViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotRunViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotSystemViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotTerminationViolation;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
@@ -33,6 +34,7 @@ import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Set;
 import java.util.TreeSet;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -63,17 +65,17 @@ public class TemperatureVerificationsTest {
     
     
     @Test
-    public void testHotBProgramCycle_onHotBThreadCycle() throws Exception {
+    public void testHotSystem_onHotBThreadCycle() throws Exception {
         final ResourceBProgram bprog = new ResourceBProgram("statementtemp/hotBThreadCycleExample.js");
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         // Adding the inspector means it will be the only inspector run, as the default set will not be used.
-        vfr.addInspection(ExecutionTraceInspections.HOT_BPROGRAM_CYCLES);
+        vfr.addInspection(ExecutionTraceInspections.HOT_SYSTEM);
         final VerificationResult res = vfr.verify(bprog);
 
         assertTrue(res.isViolationFound());
-        assertTrue(res.getViolation().get() instanceof HotBProgramCycleViolation);
-        HotBProgramCycleViolation hcv = (HotBProgramCycleViolation) res.getViolation().get();
+        assertTrue(res.getViolation().get() instanceof HotSystemViolation);
+        HotSystemViolation hcv = (HotSystemViolation) res.getViolation().get();
         System.out.println(hcv.decsribe());
         System.out.println("Trace:");
         System.out.println(TestUtils.traceEventNamesString(hcv.getCounterExampleTrace(), "\n"));
@@ -88,16 +90,16 @@ public class TemperatureVerificationsTest {
     }
     
     @Test
-    public void testHotBProgramCycle_withJsEventSets() throws Exception {
+    public void testHotSystem_withJsEventSets() throws Exception {
         BProgram bprog = new ResourceBProgram("DFSVerifierTests/fruitRatio.js");
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         // Adding the inspector means it will be the only inspector run, as the default set will not be used.
-        vfr.addInspection(ExecutionTraceInspections.HOT_BPROGRAM_CYCLES);
+        vfr.addInspection(ExecutionTraceInspections.HOT_SYSTEM);
         vfr.setVisitedStateStore( new BThreadSnapshotVisitedStateStore() );
         final VerificationResult res = vfr.verify(bprog);
 
         assertTrue(res.isViolationFound());
-        assertTrue(res.getViolation().get() instanceof HotBProgramCycleViolation);
+        assertTrue(res.getViolation().get() instanceof HotSystemViolation);
         
     }
     
@@ -107,19 +109,19 @@ public class TemperatureVerificationsTest {
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         // Adding the inspector means it will be the only inspector run, as the default is to run them all.
-        vfr.addInspection(ExecutionTraceInspections.HOT_BTHREAD_CYCLES);
+        vfr.addInspection(ExecutionTraceInspections.HOT_BTHREADS);
         final VerificationResult res = vfr.verify(bprog);
 
         assertTrue(res.isViolationFound());
-        assertTrue(res.getViolation().get() instanceof HotBThreadCycleViolation);
-        HotBThreadCycleViolation htv = (HotBThreadCycleViolation) res.getViolation().get();
+        assertTrue(res.getViolation().get() instanceof HotBThreadViolation);
+        HotBThreadViolation htv = (HotBThreadViolation) res.getViolation().get();
         System.out.println(htv.decsribe());
         System.out.println("Trace:");
         System.out.println(TestUtils.traceEventNamesString(htv.getCounterExampleTrace(), "\n"));
         System.out.println("Cycle-to Index:" + htv.getCycleToIndex());
         System.out.println("Cycle-to Event:" + htv.getCycleToEvent());
         assertEquals( "e", htv.getCycleToEvent().getName() );
-        assertEquals( new TreeSet<>(Arrays.asList("cycled-thread")), htv.getBThreads() );
+        assertEquals( new TreeSet<>(Arrays.asList("cycled-thread")), htv.getBThreadNames() );
         
         // The expected index is the length of the path, minus the cycle length 
         // (which is 3 in our case) plus 1.
@@ -128,17 +130,17 @@ public class TemperatureVerificationsTest {
     }
     
     @Test
-    public void testHotBProgramCycle_onHotBProgramCycle() throws Exception {
+    public void testHotSystem_onHotBProgramCycle() throws Exception {
         final ResourceBProgram bprog = new ResourceBProgram("statementtemp/hotBProgramCycleExample.js");
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         // Adding the inspector means it will be the only inspector run, as the default is to run them all.
-        vfr.addInspection(ExecutionTraceInspections.HOT_BPROGRAM_CYCLES);
+        vfr.addInspection(ExecutionTraceInspections.HOT_SYSTEM);
         final VerificationResult res = vfr.verify(bprog);
 
         assertTrue(res.isViolationFound());
-        assertTrue(res.getViolation().get() instanceof HotBProgramCycleViolation);
-        HotBProgramCycleViolation hcv = (HotBProgramCycleViolation) res.getViolation().get();
+        assertTrue(res.getViolation().get() instanceof HotSystemViolation);
+        HotSystemViolation hcv = (HotSystemViolation) res.getViolation().get();
         assertEquals( "e", hcv.getCycleToEvent().getName() );
         int expectedCycleToIndex = hcv.getCounterExampleTrace().getStateCount()-3;
         assertEquals(expectedCycleToIndex, hcv.getCycleToIndex() );
@@ -150,10 +152,41 @@ public class TemperatureVerificationsTest {
 
         DfsBProgramVerifier vfr = new DfsBProgramVerifier();
         // Adding the inspector means it will be the only inspector run, as the default is to run them all.
-        vfr.addInspection(ExecutionTraceInspections.HOT_BTHREAD_CYCLES);
+        vfr.addInspection(ExecutionTraceInspections.HOT_BTHREADS);
         final VerificationResult res = vfr.verify(bprog);
 
         assertFalse(res.isViolationFound());
+    }
+    
+    @Test
+    public void testHotRun_inspectingColdCycle() throws Exception {
+        final ResourceBProgram bprog = new ResourceBProgram("statementtemp/hotRunExample.js");
+
+        DfsBProgramVerifier vfr = new DfsBProgramVerifier();
+        vfr.addInspection(ExecutionTraceInspections.hotRun(Set.of("A=>B", "B=>C")));
+        final VerificationResult res = vfr.verify(bprog);
+
+        assertFalse(res.isViolationFound());
+    }
+    
+    @Test
+    public void testHotRun_inspectingHotCycle() throws Exception {
+        final ResourceBProgram bprog = new ResourceBProgram("statementtemp/hotRunExample.js");
+
+        DfsBProgramVerifier vfr = new DfsBProgramVerifier();
+        vfr.addInspection(ExecutionTraceInspections.hotRun(Set.of("A=>B", "B=>C", "C=>A")));
+        final VerificationResult res = vfr.verify(bprog);
+        
+        HotRunViolation hrv = (HotRunViolation) res.getViolation().get();
+        assertEquals( "a", hrv.getCycleToEvent().getName() );
+        assertTrue( res.isViolationFound() );
+        assertTrue( res.getViolation().get() instanceof HotRunViolation );
+        
+        System.out.println(hrv.decsribe());
+        System.out.println("Trace:");
+        System.out.println(TestUtils.traceEventNamesString(hrv.getCounterExampleTrace(), "\n"));
+        System.out.println("Cycle-to Index:" + hrv.getCycleToIndex());
+        System.out.println("Cycle-to Event:" + hrv.getCycleToEvent());
     }
     
     public static void main(String[] args) {

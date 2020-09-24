@@ -1,7 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.exceptions;
 
 /**
- * An exception thrown when a code "makes no sense", e.g. when client code has
+ * An exception thrown when a code "makes no sense", e.g when client code
  * tries to make an invalid event set.
  * 
  * @author michael

@@ -1,0 +1,152 @@
+h1 {
+  text-shadow: 0 4px 6px rgba(0,0,0,.5);
+  font-weight: bold;
+}
+
+h2 {
+  text-shadow: 0 2px 4px rgba(0,0,0,.5);
+  font-weight: bold;
+}
+
+h3 {
+  text-shadow: 0 1px 2px rgba(0,0,0,.5);
+  font-weight: bold;
+}
+
+.sphinxsidebarwrapper ul li {
+  overflow-wrap: break-word;
+}
+
+.admonition {
+  box-shadow: 0 2px 2px rgba(255,255,255,.5) inset, 0 2px 4px rgba(0,0,0,.5);
+}
+
+.note {
+  background-color: #4ecb96;
+}
+
+.tip {
+  background-color: rgba(128,128,255,.4);
+}
+
+.caution {
+  background-color: rgba(255,128,128,.4);
+}
+
+.admonition-todo {
+  border: 1px solid black;
+  background-color: white;
+  position: relative;
+}
+
+.admonition-todo {
+  border: 1px solid black;
+  background-color: #FFA;
+  position: relative;
+  padding-left: 37px !important;
+}
+
+.admonition-todo::after {
+  content:"";
+  position: absolute;
+  display:block;
+  top:0;
+  right:0;
+  height:100%;
+  width:20px;
+  background: repeating-linear-gradient(
+    -45deg,
+    #FF0,
+    #FF0 7px,
+    #000 7px,
+    #000 14px
+  );
+}
+
+.admonition-todo::before {
+  content:"     ";
+  position: absolute;
+  display:block;
+  top:0;
+  left:0;
+  height:100%;
+  width:20px;
+  background: repeating-linear-gradient(
+    -45deg,
+    #FF0,
+    #FF0 7px,
+    #000 7px,
+    #000 14px
+  );
+}
+
+.linenodiv pre {
+  color: black;
+}
+
+.highlighttable tbody tr td.code {
+  width:100%
+}
+
+pre {
+  border: 1px solid white;
+}
+
+code.literal {
+  font-size: smaller;
+  font-family: Menlo, Monaco, "Courier New", monospace;
+  padding: inherit 4px;
+}
+
+.bash .highlight pre,
+.code.bash.literal-block {
+  background-color: #232;
+  color: #0B0;
+}
+
+.code.bash.literal-block span.ln {
+  color: #090;
+}
+
+footer {
+  padding: 1em 0.5em;
+  background-color: #5C5C5C;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.5) inset;
+  font-size: 9pt;
+}
+
+footer img {
+  vertical-align: middle;
+}
+
+footer a {
+  color: #DDD !important;
+  text-shadow: 0 0 4px black;
+  font-family: Monaco, Consolas, Courier, Monospace;
+  text-decoration: none;
+}
+
+footer a:hover {
+  text-shadow: 0 0 4px yellow;
+  text-decoration: none;
+}
+
+footer a:active {
+  text-decoration: none;
+  color: white;
+  text-shadow: 0 0 4px blue;
+}
+
+div.topic {
+  background-color: #e3fce1;
+  box-shadow: 0 2px 2px rgba(255,255,255,.5) inset, 0 2px 4px rgba(0,0,0,.5);
+}
+
+code.literal {
+  background-color: transparent;
+}
+
+p.caption {
+  font-style: italic;
+  color: #343;
+}

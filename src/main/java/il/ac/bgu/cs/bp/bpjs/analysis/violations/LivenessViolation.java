@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 michael.
+ * Copyright 2020 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,44 +26,30 @@ package il.ac.bgu.cs.bp.bpjs.analysis.violations;
 import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import java.util.List;
-import java.util.Set;
-import static java.util.stream.Collectors.joining;
 
 /**
- *
- * A violation where a set of one or more b-threads can be caught in an infinite
- * loop where all their sync points are hot.
+ * A violation that requires infinite time to manifest, such as a b-program
+ * getting into an infinite loop which prevents it from achieving a required 
+ * goal. These types of violations happen because of a "bad" cycle the the 
+ * violating b-program's state graph. The exact definition of "bad" varies,
+ * hence the "abstract base class with concrete sub-classes" design.
+ * 
  * 
  * @author michael
  */
-public class HotBThreadCycleViolation extends Violation {
+public abstract class LivenessViolation extends Violation {
     
-    private final Set<String> bthreads;
-    
-    public HotBThreadCycleViolation(ExecutionTrace trace, Set<String> bthreads) {
-        super(trace);
-        this.bthreads = bthreads;
+    public LivenessViolation(ExecutionTrace counterExampleTrace) {
+        super(counterExampleTrace);
     }
-    
-    @Override
-    public String decsribe() {
-        return "Hot b-thread cycle violation: b-threads "
-            + (bthreads.stream().collect(joining(" ,"))) 
-            + " can get to an infinite hot loop. Cycle returns to index " + getCounterExampleTrace().getCycleToIndex()
-                + " because of event " + getCycleToEvent(); 
+
+    public BEvent getCycleToEvent() {
+        List<ExecutionTrace.Entry> nodes = getCounterExampleTrace().getNodes();
+        return nodes.get(nodes.size() - 1).getEvent().get();
     }
 
     public int getCycleToIndex() {
         return getCounterExampleTrace().getCycleToIndex();
-    }
-
-    public BEvent getCycleToEvent() {
-        List<ExecutionTrace.Entry> nds = getCounterExampleTrace().getNodes();
-        return nds.get(nds.size()-1).getEvent().get();
-    }
-
-    public Set<String> getBThreads() {
-        return bthreads;
     }
     
 }

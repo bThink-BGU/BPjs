@@ -45,12 +45,13 @@ public class BThreadSyncSnapshot implements Serializable {
      */
     private SyncStatement syncStatement;
     
+    /**
+     * BThread-global data object. Can be anything. For verification, needs
+     * to be serializable, and with proper {@code equals} and {@code hashCode}.
+     */
+    private Object data;
+    
     private transient ContinuationProgramState programState;
-
-    public BThreadSyncSnapshot(String aName, Function anEntryPoint) {
-        name = aName;
-        entryPoint = anEntryPoint;
-    }
 
     /**
      * Fully detailed constructor. Mostly useful for getting objects out of
@@ -61,14 +62,30 @@ public class BThreadSyncSnapshot implements Serializable {
      * @param interruptHandler  function to handle interrupts (or {@code null}, mostly)
      * @param continuation      captured b-thread continuation
      * @param bSyncStatement    current statement of the b-thread
+     * @param someData          data for the b-thread (mqy be null).
      */
     public BThreadSyncSnapshot(String name, Function entryPoint, Function interruptHandler,
-            Object continuation, SyncStatement bSyncStatement) {
+            Object continuation, SyncStatement bSyncStatement, Object someData) {
         this.name = name;
         this.entryPoint = entryPoint;
         this.interruptHandler = interruptHandler;
         this.continuation = (NativeContinuation)continuation;
         this.syncStatement = bSyncStatement;
+        data = someData;
+    }
+
+    public BThreadSyncSnapshot(String name, Function entryPoint, Function interruptHandler,
+            Object continuation, SyncStatement bSyncStatement) {
+        this(name, entryPoint, interruptHandler, continuation, bSyncStatement, null);
+    }
+    
+    
+    public BThreadSyncSnapshot(String aName, Function anEntryPoint) {
+        this(aName, anEntryPoint, null, null, null, null );
+    }
+    
+    public BThreadSyncSnapshot(String aName, Object someData, Function anEntryPoint) {
+        this(aName, anEntryPoint, null, null, null, someData );
     }
 
     /**
@@ -79,10 +96,8 @@ public class BThreadSyncSnapshot implements Serializable {
      * @return a copy of {@code this} with updated continuation and statement.
      */
     public BThreadSyncSnapshot copyWith(Object aContinuation, SyncStatement aStatement) {
-        BThreadSyncSnapshot retVal = new BThreadSyncSnapshot(name, entryPoint);
-        retVal.continuation = (NativeContinuation)aContinuation;
-        retVal.setInterruptHandler(interruptHandler);
-        retVal.syncStatement = aStatement;
+        BThreadSyncSnapshot retVal = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, aContinuation, aStatement, data);
+        
         aStatement.setBthread(retVal);
 
         return retVal;
@@ -111,11 +126,6 @@ public class BThreadSyncSnapshot implements Serializable {
         this.name = name;
     }
 
-    @Override
-    public String toString() {
-        return "[BThreadSyncSnapshot: " + name + " @" + hashCode() + "]";
-    }
-
     public Optional<Function> getInterrupt() {
         return Optional.ofNullable(interruptHandler);
     }
@@ -130,6 +140,14 @@ public class BThreadSyncSnapshot implements Serializable {
 
     public Function getEntryPoint() {
         return entryPoint;
+    }
+
+    public Object getData() {
+        return data;
+    }
+
+    public void setData(Object data) {
+        this.data = data;
     }
     
     public ContinuationProgramState getContinuationProgramState() {
@@ -163,18 +181,28 @@ public class BThreadSyncSnapshot implements Serializable {
             return false;
         }
         BThreadSyncSnapshot other = (BThreadSyncSnapshot) obj;
+        
         if (!Objects.equals(getName(), other.getName())) {
             return false;
         }
         if ( ! Objects.equals(syncStatement,other.getSyncStatement()) ) {
             return false;
         }
+        
+        if ( ! Objects.equals(data,other.getData()) ) {
+            return false;
+        }
+        
         if (continuation == null) {
             return (other.continuation == null);
-
         } else {
             return getContinuationProgramState().equals(other.getContinuationProgramState());
         }
+    }
+
+    @Override
+    public String toString() {
+        return "[BThreadSyncSnapshot: " + name + " @" + hashCode() + "]";
     }
 
 }

@@ -1,4 +1,3 @@
-
 /* global bp */
 /*
  * Demonstrating the new bp.sync usage.

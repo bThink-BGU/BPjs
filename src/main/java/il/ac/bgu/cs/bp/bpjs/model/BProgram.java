@@ -208,7 +208,8 @@ public abstract class BProgram {
     protected Object evaluate(String script, String scriptName) {
         try {
             Context curCtx = Context.getCurrentContext();
-            curCtx.setLanguageVersion(Context.VERSION_1_8);
+            curCtx.setLanguageVersion(Context.VERSION_ES6);
+            curCtx.setOptimizationLevel(-1);
             return curCtx.evaluateString(programScope, script, scriptName, 1, null);
         } catch (EcmaError rerr) {
             throw new BPjsCodeEvaluationException(rerr);

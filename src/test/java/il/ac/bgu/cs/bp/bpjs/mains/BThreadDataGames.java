@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 michael.
+ * Copyright 2020 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,27 +21,29 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.execution;
+package il.ac.bgu.cs.bp.bpjs.mains;
 
-import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
-import static org.junit.Assert.assertTrue;
-import org.junit.Test;
 
 /**
  *
  * @author michael
  */
-public class GetTimeTest {
- 
-    @Test
-    public void test() throws InterruptedException {
-        BProgram sut = new ResourceBProgram("getTimeTest.js");
-        long timePre = System.currentTimeMillis();
-        new BProgramRunner(sut).run();
-        long timePost = System.currentTimeMillis();
-        Long actual = sut.getFromGlobalScope("theTime", Long.class).get();
-        assertTrue( (actual>=timePre) && (actual<=timePost) );
+public class BThreadDataGames {
+    public static void main(String[] args) {
+        BProgram sut = new ResourceBProgram("execution/bthreadData_dataObj.js");
+        BProgramRunner rnr = new BProgramRunner();
+        rnr.addListener(new PrintBProgramRunnerListener());
+        var evtListener = rnr.addListener(new InMemoryEventLoggingListener());
+        
+        rnr.setBProgram(sut);
+        rnr.run();
+        
+        System.out.println(evtListener.eventNames());
     }
+    
 }

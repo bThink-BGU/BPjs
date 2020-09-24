@@ -41,6 +41,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Just a static place for some repeated methods useful for testing.
@@ -93,5 +94,28 @@ public abstract class TestUtils {
         BProgram bprog = new StringBProgram("");
         Set<BThreadSyncSnapshot> bts = new HashSet<>(snapshots);
         return new MockBProgramSyncSnapshot(new BProgramSyncSnapshot(bprog, bts, Collections.emptyList(), null));
+    }
+    
+    /**
+     * Checks whether {@code sought} is equal to {@code list}, after the latter is
+     * filtered to contain only members of former.
+     * 
+     * e.g.:
+     * <code>
+     * 1,2,3,4 is embedded in a,1,d,2,g,r,cv,3,g,4
+     * a,b,x is not embedded in x,a,b
+     * a,b,x is not embedded in a,a,b,x
+     * </code>
+     * 
+     * @param <T>
+     * @param sought
+     * @param list
+     * @return 
+     */
+    public static <T> boolean isEmbeddedSublist( List<T> sought, List<T> list ) {
+        Set<T> filter = new HashSet<>(sought);
+        return list.stream()
+            .filter( filter::contains )
+            .collect( toList() ).equals(sought);
     }
 }

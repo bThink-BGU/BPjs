@@ -12,6 +12,7 @@ public class StringBProgram extends BProgram {
     private final String sourceCode;
 
     public StringBProgram(String sourceCode) {
+        super("StringBProgram");
         this.sourceCode = sourceCode;
     }
 
@@ -22,7 +23,7 @@ public class StringBProgram extends BProgram {
     
     @Override
     protected void setupProgramScope(Scriptable scope) {
-        evaluate(sourceCode, "StringBProgram");
+        evaluate(sourceCode, getName());
     }
     
 }
