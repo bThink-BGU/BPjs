@@ -129,7 +129,6 @@ public class BProgramRunner implements Runnable {
                             cur = cur.copyWith(updatedExternals);
                         }
 
-                        listeners.forEach(l->l.eventSelected(bprog, esr.getEvent())); 
                         cur = cur.triggerEvent(esr.getEvent(), execSvc, listeners);
                         if ( ! cur.isStateValid() ) {
                             failedAssertion = cur.getFailedAssertion();

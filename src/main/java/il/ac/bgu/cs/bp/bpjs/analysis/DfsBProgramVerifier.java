@@ -29,6 +29,7 @@ import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import java.util.ArrayList;
 import java.util.List;
 
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
@@ -144,6 +145,7 @@ public class DfsBProgramVerifier {
     private boolean debugMode = false;
     private final Set<ExecutionTraceInspection> inspections = new HashSet<>();
     private ArrayExecutionTrace trace;
+    protected List<BProgramRunnerListener> listeners = new ArrayList<>();
 
     public VerificationResult verify(BProgram aBp) throws Exception {
         if ( listener == null ) {
@@ -163,7 +165,7 @@ public class DfsBProgramVerifier {
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("DfsBProgramRunner-" + INSTANCE_COUNTER.incrementAndGet());
         long start = System.currentTimeMillis();
         listener.started(this);
-        Violation vio = dfsUsingStack(new DfsTraversalNode(currentBProgram, currentBProgram.setup().start(execSvc), null), execSvc);
+        Violation vio = dfsUsingStack(new DfsTraversalNode(currentBProgram, currentBProgram.setup().start(execSvc), listeners, null), execSvc);
         long end = System.currentTimeMillis();
         execSvc.shutdown();
         listener.done(this);
