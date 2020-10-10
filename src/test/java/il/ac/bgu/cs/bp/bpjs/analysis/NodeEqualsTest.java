@@ -10,6 +10,7 @@ import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import static java.util.Collections.emptyList;
 import java.util.concurrent.ExecutorService;
 import org.junit.After;
 import org.junit.Before;
@@ -35,10 +36,10 @@ public class NodeEqualsTest {
         BEvent eventX = new BEvent("X");
         // Discard initial node, as it has no event, and so can't
         // be used in the even/odd equalities later.
-        nodes[0] = DfsTraversalNode.getInitialNode(bprog, exSvc).getNextNode(eventX, exSvc);
+        nodes[0] = DfsTraversalNode.getInitialNode(bprog, exSvc).getNextNode(eventX, emptyList(), exSvc);
 
         for (int i = 1; i < 10; i++) {
-            nodes[i] = nodes[i - 1].getNextNode(eventX, exSvc);
+            nodes[i] = nodes[i - 1].getNextNode(eventX, emptyList(), exSvc);
         }
 
         for (int i = 1; i < 10; i += 2) {
@@ -63,7 +64,7 @@ public class NodeEqualsTest {
         nodes[0] = DfsTraversalNode.getInitialNode(bprog, exSvc);
 
         for (int i = 0; i < events.length; i++) {
-            nodes[i + 1] = nodes[i].getNextNode(new BEvent(events[i]), exSvc);
+            nodes[i + 1] = nodes[i].getNextNode(new BEvent(events[i]), emptyList(), exSvc);
         }
 
         for (int i = 0; i < nodes.length; i++) {
@@ -85,7 +86,7 @@ public class NodeEqualsTest {
         BEvent eventX = new BEvent("X");
         // Discard initial node, as it has no event, and so can't
         // be used in the even/odd equalities later.
-        nodes[0] = DfsTraversalNode.getInitialNode(bprog, exSvc).getNextNode(eventX, exSvc);
+        nodes[0] = DfsTraversalNode.getInitialNode(bprog, exSvc).getNextNode(eventX, emptyList(), exSvc);
 
         assertTrue(nodes[0].equals(nodes[0]));
         assertFalse(nodes[0].equals(null));

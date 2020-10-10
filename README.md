@@ -44,6 +44,10 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change Log for the BPjs Library.
 
+### 2020-10-10
+* :arrows_counterclockwise: Internal refactorings.
+
+
 ### 2020-09-23
 * :tada: B-Threads have a data object, available to b-thread code via `bp.thread.data`. This object can be set, updated, and 
     replaced during execution. It can also be pre-set on b-thread creation [#106](https://github.com/bThink-BGU/BPjs/issues/106).

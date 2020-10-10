@@ -34,6 +34,7 @@ import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
+import java.util.Collections;
 import java.util.HashSet;
 
 import java.util.Optional;
@@ -145,7 +146,7 @@ public class DfsBProgramVerifier {
     private boolean debugMode = false;
     private final Set<ExecutionTraceInspection> inspections = new HashSet<>();
     private ArrayExecutionTrace trace;
-    protected List<BProgramRunnerListener> listeners = new ArrayList<>();
+    protected List<BProgramRunnerListener> listeners = Collections.emptyList();
 
     public VerificationResult verify(BProgram aBp) throws Exception {
         if ( listener == null ) {
@@ -165,7 +166,7 @@ public class DfsBProgramVerifier {
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("DfsBProgramRunner-" + INSTANCE_COUNTER.incrementAndGet());
         long start = System.currentTimeMillis();
         listener.started(this);
-        Violation vio = dfsUsingStack(new DfsTraversalNode(currentBProgram, currentBProgram.setup().start(execSvc), listeners, null), execSvc);
+        Violation vio = dfsUsingStack(new DfsTraversalNode(currentBProgram, currentBProgram.setup().start(execSvc), null), execSvc);
         long end = System.currentTimeMillis();
         execSvc.shutdown();
         listener.done(this);
@@ -233,7 +234,7 @@ public class DfsBProgramVerifier {
         while (src.getEventIterator().hasNext()) {
             final BEvent nextEvent = src.getEventIterator().next();
             try {
-                DfsTraversalNode possibleNextNode = src.getNextNode(nextEvent, execSvc);
+                DfsTraversalNode possibleNextNode = src.getNextNode(nextEvent, listeners, execSvc);
                 visitedEdgeCount++;
 
                 BProgramSyncSnapshot pns = possibleNextNode.getSystemState();

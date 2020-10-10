@@ -31,23 +31,10 @@ public class DfsTraversalNode {
      * @throws Exception in case there's an error with the executed JavaScript code.
      * @deprecated Use the inside code, this whole class might be going away soon.
      */
-    public static DfsTraversalNode getInitialNode(BProgram bp, ExecutorService exSvc, List<BProgramRunnerListener> listeners) throws Exception {
+    public static DfsTraversalNode getInitialNode(BProgram bp, ExecutorService exSvc) throws Exception {
         BProgramSyncSnapshot seed = bp.setup().start(exSvc);
 
-        return new DfsTraversalNode(bp, seed, listeners, null);
-    }
-
-    /**
-     * Get the initial nod for a run of the passed {@code BPorgram}.
-     *
-     * @param bp The {@link BProgram} being verified.
-     * @param exSvc The executor service that will run the threads
-     * @return Initial node for the BProgram run
-     * @throws Exception in case there's an error with the executed JavaScript code.
-     * @deprecated Use the inside code, this whole class might be going away soon.
-     */
-    public static DfsTraversalNode getInitialNode(BProgram bp, ExecutorService exSvc) throws Exception {
-        return getInitialNode(bp, exSvc, Collections.emptyList());
+        return new DfsTraversalNode(bp, seed, null);
     }
 
     private final BProgramSyncSnapshot systemState;
@@ -55,12 +42,10 @@ public class DfsTraversalNode {
     private final Set<BEvent> selectableEvents;
     private final BEvent lastEvent;
     private final Iterator<BEvent> iterator;
-    private final List<BProgramRunnerListener> listeners;
 
-    protected DfsTraversalNode(BProgram bp, BProgramSyncSnapshot systemState, List<BProgramRunnerListener> listeners, BEvent e) {
+    protected DfsTraversalNode(BProgram bp, BProgramSyncSnapshot systemState, BEvent e) {
         this.bp = bp;
         this.systemState = systemState;
-        this.listeners = listeners;
         this.lastEvent = e;
 
         if (bp != null) {
@@ -94,14 +79,22 @@ public class DfsTraversalNode {
      * the given event.
      *
      * @param e the selected event
+     * @param listeners List of listeners for event selections
      * @param exSvc The executor service that will run the threads
      * @return State of the BProgram after event {@code e} was selected while
      * the program was at {@code this} node's state.
      * @throws BPjsRuntimeException  In case there's an error running the JavaScript code.
+     * 
+     * 
+     * Note about {@code listeners} - while type-wise these are RUNNER listeners, they won't get
+     * the start/stop etc. events, only the event-selected events.
+     * 
+     * TODO: Make the above note obsolete via refactor of BPjs or the BP paradigm (e.g. using STM)
+     * 
      */
-    public DfsTraversalNode getNextNode(BEvent e, ExecutorService exSvc) throws BPjsRuntimeException {
+    public DfsTraversalNode getNextNode(BEvent e, List<BProgramRunnerListener> listeners, ExecutorService exSvc) throws BPjsRuntimeException {
         try {
-            return new DfsTraversalNode(bp, BProgramSyncSnapshotCloner.clone(systemState).triggerEvent(e, exSvc, listeners), listeners, e);
+            return new DfsTraversalNode(bp, BProgramSyncSnapshotCloner.clone(systemState).triggerEvent(e, exSvc, listeners), e);
         } catch ( InterruptedException ie ) {
             throw new BPjsRuntimeException("Thread interrupted during event invocaiton", ie);
         }
