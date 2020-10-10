@@ -126,7 +126,8 @@ public class BProgramSyncSnapshot {
             throw new IllegalStateException("A BProgramSyncSnapshot is not allowed to be triggered twice.");
     	}
     	triggered = true;
-        
+        listeners.forEach(l->l.eventSelected(bprog, anEvent));
+
         Set<BThreadSyncSnapshot> resumingThisRound = new HashSet<>(threadSnapshots.size());
         Set<BThreadSyncSnapshot> sleepingThisRound = new HashSet<>(threadSnapshots.size());
         List<BEvent> nextExternalEvents = new ArrayList<>(getExternalEvents());

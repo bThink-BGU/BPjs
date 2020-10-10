@@ -2,15 +2,14 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
 
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotCloner;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Objects;
 
+import java.util.*;
+
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import java.util.Set;
+
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -32,10 +31,23 @@ public class DfsTraversalNode {
      * @throws Exception in case there's an error with the executed JavaScript code.
      * @deprecated Use the inside code, this whole class might be going away soon.
      */
-    public static DfsTraversalNode getInitialNode(BProgram bp, ExecutorService exSvc) throws Exception {
+    public static DfsTraversalNode getInitialNode(BProgram bp, ExecutorService exSvc, List<BProgramRunnerListener> listeners) throws Exception {
         BProgramSyncSnapshot seed = bp.setup().start(exSvc);
 
-        return new DfsTraversalNode(bp, seed, null);
+        return new DfsTraversalNode(bp, seed, listeners, null);
+    }
+
+    /**
+     * Get the initial nod for a run of the passed {@code BPorgram}.
+     *
+     * @param bp The {@link BProgram} being verified.
+     * @param exSvc The executor service that will run the threads
+     * @return Initial node for the BProgram run
+     * @throws Exception in case there's an error with the executed JavaScript code.
+     * @deprecated Use the inside code, this whole class might be going away soon.
+     */
+    public static DfsTraversalNode getInitialNode(BProgram bp, ExecutorService exSvc) throws Exception {
+        return getInitialNode(bp, exSvc, Collections.emptyList());
     }
 
     private final BProgramSyncSnapshot systemState;
@@ -43,10 +55,12 @@ public class DfsTraversalNode {
     private final Set<BEvent> selectableEvents;
     private final BEvent lastEvent;
     private final Iterator<BEvent> iterator;
+    private final List<BProgramRunnerListener> listeners;
 
-    protected DfsTraversalNode(BProgram bp, BProgramSyncSnapshot systemState, BEvent e) {
+    protected DfsTraversalNode(BProgram bp, BProgramSyncSnapshot systemState, List<BProgramRunnerListener> listeners, BEvent e) {
         this.bp = bp;
         this.systemState = systemState;
+        this.listeners = listeners;
         this.lastEvent = e;
 
         if (bp != null) {
@@ -87,7 +101,7 @@ public class DfsTraversalNode {
      */
     public DfsTraversalNode getNextNode(BEvent e, ExecutorService exSvc) throws BPjsRuntimeException {
         try {
-            return new DfsTraversalNode(bp, BProgramSyncSnapshotCloner.clone(systemState).triggerEvent(e, exSvc, Collections.emptySet()), e);
+            return new DfsTraversalNode(bp, BProgramSyncSnapshotCloner.clone(systemState).triggerEvent(e, exSvc, listeners), listeners, e);
         } catch ( InterruptedException ie ) {
             throw new BPjsRuntimeException("Thread interrupted during event invocaiton", ie);
         }
