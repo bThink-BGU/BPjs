@@ -23,12 +23,20 @@
  */
 package il.ac.bgu.cs.bp.bpjs;
 
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
+import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
+import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTraceInspection;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
@@ -39,6 +47,7 @@ import static java.util.stream.Collectors.toSet;
 import java.util.stream.IntStream;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 /**
  * Home for tests which examine BPjs as a whole.
@@ -120,4 +129,48 @@ public class GeneralTest {
         
     }
     
+    @Test
+    public void testScopesDuringRun() throws Exception {
+        ResourceBProgram bprog = new ResourceBProgram("scoping.js");
+        BProgramRunner sut = new BProgramRunner(bprog);
+        
+        sut.addListener( new PrintBProgramRunnerListener() );
+        InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
+        
+        sut.run();
+        
+        eventLogger.getEvents().forEach(e->System.out.println(e) );
+        assertEquals( 
+            Arrays.asList("global","undefined", "internalScope1", "b-thread", "internalScope2", "internalScope3"),
+            eventLogger.eventNames()
+        );
+    }
+    
+    @Test
+    public void testScopesDuringVerification() throws Exception {
+        ResourceBProgram bprog = new ResourceBProgram("scoping.js");
+        DfsBProgramVerifier vfr = new DfsBProgramVerifier();
+        final AtomicReference<List<String>> result = new AtomicReference<>();
+        vfr.addInspection(new ExecutionTraceInspection() {
+            @Override
+            public String title() {
+                return "trace test";
+            }
+
+            @Override
+            public Optional<Violation> inspectTrace(ExecutionTrace aTrace) {
+                if ( aTrace.getLastState().noBThreadsLeft() ) {
+                    result.set(TestUtils.traceEventNames(aTrace));
+                }
+                return Optional.empty();
+            }
+        });
+        
+        vfr.verify(bprog);
+        
+        assertEquals( 
+            Arrays.asList("global","undefined", "internalScope1", "b-thread", "internalScope2", "internalScope3"),
+            result.get()
+        );
+    }
 }

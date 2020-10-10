@@ -69,6 +69,15 @@ public abstract class TestUtils {
                     .collect(joining(delimiter));
     }
     
+    public static List<String> traceEventNames( ExecutionTrace trace ) {
+        return trace.getNodes().stream()
+                    .map(ExecutionTrace.Entry::getEvent)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .map(BEvent::getName)
+                    .collect(toList());
+    }
+    
     public static String eventNamesString( List<BEvent> trace, String delimiter ) {
         return trace.stream()
                     .map(BEvent::getName)
