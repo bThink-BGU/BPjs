@@ -46,6 +46,7 @@ a link to this page somewhere in the documentation/system about section.
 
 ### 2020-10-10
 * :arrows_counterclockwise: Internal refactorings.
+* :bug: JavaScript errors (regarding syntax and references) are reported, and halt both execution and analysis [#94](https://github.com/bThink-BGU/BPjs/issues/94).
 
 
 ### 2020-09-23

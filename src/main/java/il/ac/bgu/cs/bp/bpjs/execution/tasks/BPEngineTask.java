@@ -1,6 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BThreadSyncSnapshotOutputStream;
+import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsCodeEvaluationException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
@@ -18,6 +19,7 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.EvaluatorException;
+import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
@@ -63,11 +65,18 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
         } catch ( WrappedException wfae ) {
             return handleWrappedException(wfae);
             
-        } catch ( EcmaError jsError ) {
-            throw new BPjsRuntimeException("JavaScript error: " + jsError.getMessage(), jsError);
-            
         } catch ( EvaluatorException eve ) {
-            throw new BPjsRuntimeException("JavaScript evaluation failed: " + eve.getMessage(), eve);
+            throw new BPjsCodeEvaluationException(eve);
+            
+        } catch ( JavaScriptException eve ) {
+            throw new BPjsCodeEvaluationException(eve);
+            
+        } catch ( EcmaError jsError ) {
+            if ( jsError.getMessage().startsWith("ReferenceError") ) {
+                throw new BPjsCodeEvaluationException(jsError);
+            } else {
+                throw new BPjsRuntimeException("JavaScript error: " + jsError.getMessage(), jsError);            
+            }
             
         } catch ( Throwable generalThrowable ) {
             System.err.println("BPjs Error: Unhandled exception in BPEngineTask.");

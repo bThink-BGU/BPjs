@@ -50,7 +50,6 @@ import static java.util.stream.Collectors.toList;
  */
 public abstract class TestUtils {
     
-    
     /**
      * Preventing the instantiation of subclasses.
      */

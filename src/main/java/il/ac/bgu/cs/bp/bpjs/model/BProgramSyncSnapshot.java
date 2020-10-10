@@ -4,6 +4,7 @@ import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotIO;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BThreadSyncSnapshotInputStream;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.StreamObjectStub;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.StubProvider;
+import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.ResumeBThread;
@@ -163,18 +164,31 @@ public class BProgramSyncSnapshot {
                     .forEach(t->listeners.forEach(l->l.bthreadDone(bprog, t)));
 
             executeAllAddedBThreads(nextRound, exSvc, halter);
-        
-        } catch ( RuntimeException re ) {
+            
+        } catch ( BPjsException re ) { 
+            throw re;
+            
+        } catch ( RuntimeException re ) { 
+            // try to peel the exception layers to get to the meaningful exception.
             Throwable cause = re;
-            while ( cause.getCause() != null ) {
+            while ( cause instanceof RuntimeException  ) {
+                if ( cause.getCause() != null ) {
+                    cause = cause.getCause();
+                } else {
+                    throw (RuntimeException)cause;
+                }
+            }
+            if ( cause instanceof ExecutionException ) {
                 cause = cause.getCause();
             }
-            if ( cause instanceof BPjsRuntimeException ) {
-                throw (BPjsRuntimeException)cause;
+            
+            if ( cause instanceof BPjsException ) {
+                throw (BPjsException)cause;
             } else if ( cause instanceof EcmaError ) {
                 throw new BPjsRuntimeException("JavaScript Error: " + cause.getMessage(), cause );
             } else throw re;
         }
+        
         nextExternalEvents.addAll( bprog.drainEnqueuedExternalEvents() );
 
         // carry over BThreads that did not advance this round to next round.
@@ -184,7 +198,7 @@ public class BProgramSyncSnapshot {
         return new BProgramSyncSnapshot(bprog, nextRound, nextExternalEvents, violationRecord.get());
         
     }
-
+    
     private void handleInterrupts(BEvent anEvent, Iterable<BProgramRunnerListener> listeners, BProgram bprog, Context ctxt) {
         Set<BThreadSyncSnapshot> interrupted = threadSnapshots.stream()
                 .filter(bt -> bt.getSyncStatement().getInterrupt().contains(anEvent))
@@ -270,7 +284,11 @@ public class BProgramSyncSnapshot {
             return fbss.get();
         } catch (InterruptedException | ExecutionException ex) {
             Logger.getLogger(BProgramSyncSnapshot.class.getName()).log(Level.SEVERE, null, ex);
-            throw new RuntimeException("Error running a bthread: " + ex.getMessage(), ex);
+            if ( ex.getCause() instanceof BPjsException ) {
+                throw (BPjsException)ex.getCause();
+            } else {
+                throw new RuntimeException("Error running a b-thread: " + ex.getMessage(), ex);
+            }
         }
     }
     
