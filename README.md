@@ -44,6 +44,12 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change Log for the BPjs Library.
 
+### 2020-11-09
+* Trace's `getLastEvent` now return an `Optional<Event>` rather than an `Event`. This is because some traces may not have a last event (part of the fix to [#122](https://github.com/bThink-BGU/BPjs/issues/122)). 
+
+### 2020-10-20
+* :arrows_counterclockwise: `BEvent::toString` is more JS-like.
+
 ### 2020-10-10
 * :arrows_counterclockwise: Internal refactorings.
 * :bug: JavaScript errors (regarding syntax and references) are reported, and halt both execution and analysis [#94](https://github.com/bThink-BGU/BPjs/issues/94).

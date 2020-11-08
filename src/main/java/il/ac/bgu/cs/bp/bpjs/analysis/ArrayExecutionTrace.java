@@ -30,9 +30,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.TreeMap;
+import java.util.Optional;
 
 /**
  *
@@ -75,8 +74,12 @@ public class ArrayExecutionTrace implements ExecutionTrace {
     }
     
     @Override
-    public BEvent getLastEvent() {
-        return stack.get(stack.size()-(isCyclic()?1:2)).getEvent().get();
+    public Optional<BEvent> getLastEvent() {
+        if ( stack.size() < 2 ) {
+            return Optional.empty();
+        } else {
+            return stack.get(stack.size()-(isCyclic()?1:2)).getEvent();         
+        }
     }
     
     @Override

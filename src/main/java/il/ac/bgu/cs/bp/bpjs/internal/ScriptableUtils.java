@@ -53,7 +53,7 @@ public class ScriptableUtils {
         if ( aScope instanceof ScriptableObject ) {
             ScriptableObject sob = (ScriptableObject) aScope;
             return Stream.of(sob.getIds())
-                         .map( k -> k.toString() + "=>" + Objects.toString(sob.get(k)) )
+                         .map( k -> k.toString() + ":" + Objects.toString(sob.get(k)) )
                          .collect( joining(",", "{", "}") );
         } else return aScope.toString();
     }

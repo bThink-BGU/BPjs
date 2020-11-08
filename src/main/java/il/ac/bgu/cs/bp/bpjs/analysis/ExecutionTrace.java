@@ -129,9 +129,12 @@ public interface ExecutionTrace {
      * this would be the event that causes the b-program to get back to a state
      * already in the trace, thereby closing the cycle.
      * 
-     * @return the last event to happen in the node list.
+     * For traces that are empty, or have a single entry (and thus only last
+     * state but no last event), this method returns an empty optional.
+     * 
+     * @return the last event to happen in the node list, if any.
      */
-    BEvent getLastEvent();
+    Optional<BEvent> getLastEvent();
     
     /**
      * Ordered list of all nodes in the state. In case of cycles, the last node

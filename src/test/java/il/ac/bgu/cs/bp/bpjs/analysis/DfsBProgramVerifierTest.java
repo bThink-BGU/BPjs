@@ -531,7 +531,7 @@ public class DfsBProgramVerifierTest {
         sut.addInspection(ExecutionTraceInspection.named("Cycle", t->{
             if ( t.isCyclic() ) {
                 cycleToIndex.set( t.getCycleToIndex() );
-                lastEventName.set( t.getLastEvent().getName() );
+                lastEventName.set( t.getLastEvent().get().getName() );
                 System.out.println(TestUtils.traceEventNamesString(t, ", "));
             }
             return Optional.empty();
