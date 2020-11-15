@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Analysis and Verification &#8212; BPjs 0.10.5 documentation</title>
+    <title>Analysis and Verification &#8212; BPjs 0.10.6 documentation</title>
     <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
@@ -94,9 +94,13 @@ BPjs ships with multiple such inspections, as static fields in the <code class="
 </dd>
 <dt><code class="docutils literal notranslate"><span class="pre">Violation</span></code></dt><dd><p>When an <code class="docutils literal notranslate"><span class="pre">ExecutionTraceInspection</span></code> instance finds a trace that violates some requirement, it describes that discovery using an instance of this class.</p>
 </dd>
-<dt><code class="docutils literal notranslate"><span class="pre">VisitedNodeStore</span></code></dt><dd><p>In order to detect cycles in a b-program’s execution graph, the verifier needs to know whether a given state was already visited. This is done using an instance of this class. BPjs  ships with three implementations: One that looks at the entire state of the b-program, on that looks only at the hash code of that state, and one that assumes that all states are new. The latter consumes very little memory, but is only useful for analyzing programs whose state space is a tree.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">VisitedStateStore</span></code></dt><dd><p>In order to detect cycles in a b-program’s execution graph, the verifier needs to know whether a given state was already visited. This is done using an instance of this class. BPjs ships with three implementations: One that looks at the entire state of the b-program, on that looks only at the hash code of that state, and one that assumes that all states are new.</p>
 </dd>
 </dl>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>The forgetful visited state store (<code class="docutils literal notranslate"><span class="pre">ForgetfulVisitedStateStore</span></code>) is useful for traversing all graph’s edges, since it does not stop a scan when it arrives at a node it already visited. The scan is still resilient to cycles - these are detected by looking at the DFS stack, not the visited state store.</p>
+</div>
 </div>
 </div>
 <div class="section" id="verifying-safety-properties">
@@ -133,20 +137,22 @@ BPjs ships with multiple such inspections, as static fields in the <code class="
 <div class="section" id="types-of-liveness-violations">
 <h3>Types of Liveness Violations<a class="headerlink" href="#types-of-liveness-violations" title="Permalink to this headline">¶</a></h3>
 <p>A liveness violation occurs when some set of b-thread remains hot forever. This can happen on two cases: a) there’s cycle in the b-program’s state space, where at least a single b-thread is hot at each point; or b) the program can terminate while at least one of its b-threads is hot. These violation types are described in more detail below, and in the accompanying figure.</p>
-<blockquote>
-<div><dl class="simple">
-<dt>Hot Run (of a group of b-threads)</dt><dd><p>There exists a group of b-threads that can get into an infinite loop where at least one of its member b-threads is hot at each synchronization point. This means, semantically, that these b-threads are never “satisfied” and must always advance. In the below diagram, b-threads 1, 2, and 3 form a group which has a hot run (states A-&gt;B-&gt;C-&gt;A…). If we only consider b-threads 1 and 2, on the other hand, there is no hot run, since none of them is hot at state C.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Not all hot cycles are bugs! Some systems must be able to advance infinitely. One example would be a traffic light controller, which must be able to infinitely cycle between its lights.</p>
+</div>
+<dl class="simple">
+<dt>Hot Run (of a group of b-threads)</dt><dd><p>There exists a group of b-threads that can get into an infinite loop where at least one of its member b-threads is hot at each synchronization point. This means, semantically, that these b-threads are never “satisfied” and must always advance. In the below diagram, b-threads 1, 2, and 3 form a group which has a hot run (states A→B→C→A…). If we only consider b-threads 1 and 2, on the other hand, there is no hot run, since none of them is hot at state C.</p>
 </dd>
-<dt>Hot System Violation</dt><dd><p>A case where the b-program, as a whole, might find itself in a cycle whose synchronization points are all hot. This is a private case of a hot run, where the considered group contains all the b-program’s b-threads. In the below diagram, the described system has a hot system violation, because of the cycle A-&gt;B-&gt;C-&gt;A.</p>
+<dt>Hot System Violation</dt><dd><p>A case where the b-program, as a whole, might find itself in a cycle whose synchronization points are all hot. This is a private case of a hot run, where the considered group contains all the b-program’s b-threads. In the below diagram, the described system has a hot system violation, because of the cycle A→B→C→A.</p>
 </dd>
-<dt>Hot B-Thread Violation</dt><dd><p>A case where a single b-thread can get into a cycle were it is always hot. This is a private case of Hot Run, where the group that has the hot run contains a single thread. Normally, this situation indicate that some business requirement was violated, or that there might have been a programming error. In the below diagram, b-thread 5 has a hot b-thread violation, because of the cycle A-&gt;B-&gt;C-&gt;A.</p>
+<dt>Hot B-Thread Violation</dt><dd><p>A case where a single b-thread can get into a cycle were it is always hot. This is a private case of Hot Run, where the group that has the hot run contains a single thread. Normally, this situation indicates that some business requirement was violated, or that there might have been a programming error. In the below diagram, b-thread 5 has a hot b-thread violation, because of the cycle A→B→C→A.</p>
 </dd>
-<dt>Hot Termination</dt><dd><p>A case where a b-program terminates when one or more of its b-threads is hot. This is technically a safety violation, since the run is finite. However, these cases can be augmented to a Hot B-Thread violation, by adding a trivial self transition, from the terminal state to itself. In the below diagram, a run that ends at state X would be hot termination violation. The dotted transition to and from state X is the augmentation to a hot b-thread violation.</p>
+<dt>Hot Termination</dt><dd><p>A case where a b-program terminates when one or more of its b-threads is hot. This is technically a safety violation, since the run is finite. However, these cases can be augmented to a Hot B-Thread violation, by adding a trivial self transition, from the terminal state to itself. In the below diagram, a run that ends at state X would be a hot termination violation. The dotted transition to and from state X is the augmentation to a hot b-thread violation.</p>
 </dd>
 </dl>
-</div></blockquote>
 <div class="figure align-center" id="id2">
-<img alt="verification/images/liveness" src="verification/images/liveness" />
+<img alt="../_images/liveness.png" src="../_images/liveness.png" />
 <p class="caption"><span class="caption-text">A sample state graph of a b-program. This graph contains 5 states (A, B, C, X, Z). In each, there are five b-threads (1-5). At each state, hot b-threads are marked with a red background. This state graph contains various liveness violations, as described above.</span><a class="headerlink" href="#id2" title="Permalink to this image">¶</a></p>
 </div>
 <div class="admonition note">

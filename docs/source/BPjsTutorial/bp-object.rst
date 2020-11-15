@@ -49,6 +49,9 @@ Registers a new b-thread into the running b-program. The caller may specify a na
 * ``bthreadFunction``: A no-parameter function that is the body of the b-thread.
 
 
+.. tip::
+    Two (or more) b-threads can have the same name. A unique, meaningful name for each b-thread makes debugging/analysis easier, but it does not effect b-program's semantics. (Having said that, a b-program of 219 b-threads all named "my b-thread" might not be, um, ideal).
+
 ``bp.fork()``
 ~~~~~~~~~~~~~
 

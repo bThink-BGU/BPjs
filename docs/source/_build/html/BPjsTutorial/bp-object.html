@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>The bp Object &#8212; BPjs 0.10.5 documentation</title>
+    <title>The bp Object &#8212; BPjs 0.10.6 documentation</title>
     <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="../_static/css/custom.css" />
@@ -81,6 +81,10 @@
 <li><p><code class="docutils literal notranslate"><span class="pre">name</span></code>: Optional. Name of the b-thread. String.</p></li>
 <li><p><code class="docutils literal notranslate"><span class="pre">bthreadFunction</span></code>: A no-parameter function that is the body of the b-thread.</p></li>
 </ul>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<p>Two (or more) b-threads can have the same name. A unique, meaningful name for each b-thread makes debugging/analysis easier, but it does not effect b-program’s semantics. (Having said that, a b-program of 219 b-threads all named “my b-thread” might not be, um, ideal).</p>
+</div>
 </div>
 <div class="section" id="bp-fork">
 <h3><code class="docutils literal notranslate"><span class="pre">bp.fork()</span></code><a class="headerlink" href="#bp-fork" title="Permalink to this headline">¶</a></h3>
