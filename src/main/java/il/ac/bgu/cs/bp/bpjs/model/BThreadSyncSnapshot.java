@@ -194,8 +194,10 @@ public class BThreadSyncSnapshot implements Serializable {
         }
         
         if (continuation == null) {
-            return (other.continuation == null);
+            // This b-thread hasn't run yet. Check eqality on its source.
+            return (other.continuation == null) && entryPoint.equals(other.entryPoint);
         } else {
+            // Check equality on the PC+stack+heap
             return getContinuationProgramState().equals(other.getContinuationProgramState());
         }
     }

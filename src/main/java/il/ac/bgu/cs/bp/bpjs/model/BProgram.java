@@ -452,7 +452,7 @@ public abstract class BProgram {
     }
     
     Set<BThreadSyncSnapshot> drainRecentlyRegisteredBthreads() {
-        Set<BThreadSyncSnapshot> out = new HashSet<>();
+        Set<BThreadSyncSnapshot> out = new HashSet<>(recentlyRegisteredBthreads.size());
         recentlyRegisteredBthreads.drainTo(out);
         return out;
     }
