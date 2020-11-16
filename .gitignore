@@ -5,3 +5,4 @@
 settings.xml
 tst/results/*
 .vsCode
+/docs/build/*
