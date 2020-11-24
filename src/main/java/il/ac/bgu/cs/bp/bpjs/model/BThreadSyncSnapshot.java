@@ -1,7 +1,9 @@
 package il.ac.bgu.cs.bp.bpjs.model;
 
+import il.ac.bgu.cs.bp.bpjs.internal.MapProxy;
 import il.ac.bgu.cs.bp.bpjs.model.internal.ContinuationProgramState;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Optional;
 
 import org.mozilla.javascript.Function;
@@ -51,6 +53,8 @@ public class BThreadSyncSnapshot implements Serializable {
      */
     private Object data;
     
+    protected MapProxy<String, Object> bprogramStoreModifications;
+    
     private transient ContinuationProgramState programState;
 
     /**
@@ -63,29 +67,31 @@ public class BThreadSyncSnapshot implements Serializable {
      * @param continuation      captured b-thread continuation
      * @param bSyncStatement    current statement of the b-thread
      * @param someData          data for the b-thread (mqy be null).
+     * @param modifications     modifications to the b-program store
      */
     public BThreadSyncSnapshot(String name, Function entryPoint, Function interruptHandler,
-            Object continuation, SyncStatement bSyncStatement, Object someData) {
+            Object continuation, SyncStatement bSyncStatement, Object someData, MapProxy<String,Object> modifications) {
         this.name = name;
         this.entryPoint = entryPoint;
         this.interruptHandler = interruptHandler;
         this.continuation = (NativeContinuation)continuation;
         this.syncStatement = bSyncStatement;
         data = someData;
+        bprogramStoreModifications = modifications;
     }
 
     public BThreadSyncSnapshot(String name, Function entryPoint, Function interruptHandler,
             Object continuation, SyncStatement bSyncStatement) {
-        this(name, entryPoint, interruptHandler, continuation, bSyncStatement, null);
+        this(name, entryPoint, interruptHandler, continuation, bSyncStatement, null, null);
     }
     
     
     public BThreadSyncSnapshot(String aName, Function anEntryPoint) {
-        this(aName, anEntryPoint, null, null, null, null );
+        this(aName, anEntryPoint, null, null, null, null, null );
     }
     
     public BThreadSyncSnapshot(String aName, Object someData, Function anEntryPoint) {
-        this(aName, anEntryPoint, null, null, null, someData );
+        this(aName, anEntryPoint, null, null, null, someData, null );
     }
 
     /**
@@ -96,7 +102,7 @@ public class BThreadSyncSnapshot implements Serializable {
      * @return a copy of {@code this} with updated continuation and statement.
      */
     public BThreadSyncSnapshot copyWith(Object aContinuation, SyncStatement aStatement) {
-        BThreadSyncSnapshot retVal = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, aContinuation, aStatement, data);
+        BThreadSyncSnapshot retVal = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, aContinuation, aStatement, data, null);
         
         aStatement.setBthread(retVal);
 
@@ -149,6 +155,10 @@ public class BThreadSyncSnapshot implements Serializable {
     public void setData(Object data) {
         this.data = data;
     }
+
+    public Map<String, MapProxy.Modification<Object>> getBprogramStoreModifications() {
+        return bprogramStoreModifications.getModifications();
+    }
     
     public ContinuationProgramState getContinuationProgramState() {
         if ( programState == null ) {
@@ -189,7 +199,8 @@ public class BThreadSyncSnapshot implements Serializable {
             return false;
         }
         
-        if ( ! Objects.equals(data,other.getData()) ) {
+        if ( (!Objects.equals(data,other.getData())) ||
+              (!Objects.equals(bprogramStoreModifications,other.bprogramStoreModifications)) ) {
             return false;
         }
         

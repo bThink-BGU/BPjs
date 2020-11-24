@@ -120,7 +120,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
      * @see #registerBThread(org.mozilla.javascript.Function)
      */
     public void registerBThread(String name, Object data, Function func) {
-        program.registerBThread(new BThreadSyncSnapshot(name, func, null, null, null, data));
+        program.registerBThread(new BThreadSyncSnapshot(name, func, null, null, null, data, null));
     }
     
     /**

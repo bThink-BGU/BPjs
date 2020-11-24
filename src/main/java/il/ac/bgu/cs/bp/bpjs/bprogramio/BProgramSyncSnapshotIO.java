@@ -183,6 +183,7 @@ public class BProgramSyncSnapshotIO {
             btos.writeObject(bss.getInterrupt().orElse(null));
             btos.writeObject(bss.getSyncStatement());
             btos.writeObject(bss.getData());
+            btos.writeObject(bss.getBprogramStoreModifications());
             btos.writeObject(bss.getContinuation());
             btos.flush();
         }
@@ -210,8 +211,10 @@ public class BProgramSyncSnapshotIO {
             Function interruptHandler = (Function) bssis.readObject();
             SyncStatement stmt = (SyncStatement) bssis.readObject();
             Object data = bssis.readObject();
+            Object modifications = bssis.readObject();
             Object cont = bssis.readObject();
-            final BThreadSyncSnapshot bThreadSyncSnapshot = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, cont, stmt, data);
+//            FIXME use `modifications` rather than `null`. Need to decide exactly which map is the truth map.
+            final BThreadSyncSnapshot bThreadSyncSnapshot = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, cont, stmt, data, null);
 
             return bThreadSyncSnapshot;
         }
