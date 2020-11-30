@@ -24,35 +24,35 @@
 package il.ac.bgu.cs.bp.bpjs.analysis.violations;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
-import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
+import il.ac.bgu.cs.bp.bpjs.model.SafetyViolation;
 
 /**
- *
+ * A violation of a safety property, detected during b-program analysis.
+ * 
  * @author michael
  */
-public class FailedAssertionViolation extends Violation {
+public class DetectedSafetyViolation extends Violation {
     
-    private final FailedAssertion assertion;
+    private final SafetyViolation assertion;
 
-    public FailedAssertionViolation(FailedAssertion assertion, ExecutionTrace counterExampleTrace) {
+    public DetectedSafetyViolation(SafetyViolation assertion, ExecutionTrace counterExampleTrace) {
         super(counterExampleTrace);
         this.assertion = assertion;
     }
 
     @Override
     public String decsribe() {
-        return "Failed assertion on b-thread " +
-                assertion.getBThreadName() + ": " +
+        return "Safety Violation: " +
                 assertion.getMessage();
     }
 
-    public FailedAssertion getFailedAssertion() {
+    public SafetyViolation getFailedAssertion() {
         return assertion;
     }
 
     @Override
     public String toString() {
-        return "[FailedAssertionViolation assertion:" + assertion + ']';
+        return "[DetectedSafetyViolation assertion:" + assertion + ']';
     }
     
 }

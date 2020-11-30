@@ -81,7 +81,7 @@ public class MapProxyConsolidator {
     public class Conflict extends Result {
         
         // key -> Map(b-t, modification)
-        final Map<String, Map<BThreadSyncSnapshot, MapProxy.Modification<Object>>> conflicts;
+        public final Map<String, Map<BThreadSyncSnapshot, MapProxy.Modification<Object>>> conflicts;
 
         Conflict(Map<String, Map<BThreadSyncSnapshot, MapProxy.Modification<Object>>> conflicts) {
             this.conflicts = conflicts;

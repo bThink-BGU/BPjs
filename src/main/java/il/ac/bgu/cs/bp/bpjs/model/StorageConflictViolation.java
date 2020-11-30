@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 michael.
+ * Copyright 2020 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,35 +23,32 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model;
 
+import il.ac.bgu.cs.bp.bpjs.internal.MapProxyConsolidator;
 import java.util.Objects;
 
 /**
- * Captures a failed assertion done by a b-thread. This is normally used to capture
- * cases where some specification was violated.
+ * A safety violation which is the result of a storage modification conflict.
  * 
+ * @see MapProxyConsolidator
  * @author michael
  */
-public class FailedAssertion implements java.io.Serializable {
-    private final String message;
-    private final String bThreadName;
+public class StorageConflictViolation extends SafetyViolation implements java.io.Serializable {
+    
+    private final MapProxyConsolidator.Conflict conflict;
 
-    public FailedAssertion(String message, String bThreadName) {
-        this.message = message;
-        this.bThreadName = bThreadName;
+    public StorageConflictViolation(MapProxyConsolidator.Conflict conflict, String message) {
+        super(message);
+        this.conflict = conflict;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public String getBThreadName() {
-        return bThreadName;
+    public MapProxyConsolidator.Conflict getConflict() {
+        return conflict;
     }
 
     @Override
     public int hashCode() {
-        int hash = 5;
-        hash = 29 * hash + Objects.hashCode(this.bThreadName);
+        int hash = 3;
+        hash = 73 * hash + Objects.hashCode(this.conflict);
         return hash;
     }
 
@@ -63,20 +60,11 @@ public class FailedAssertion implements java.io.Serializable {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof FailedAssertion)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-        final FailedAssertion other = (FailedAssertion) obj;
-        if (!Objects.equals(this.message, other.message)) {
-            return false;
-        }
-        return Objects.equals(this.bThreadName, other.bThreadName);
+        final StorageConflictViolation other = (StorageConflictViolation) obj;
+        return Objects.equals(this.conflict, other.conflict) && super.equals(obj);
     }
-
-    @Override
-    public String toString() {
-        return "[FailedAssertion message:" + message + ", b-thread:" + bThreadName + ']';
-    }
-    
     
 }

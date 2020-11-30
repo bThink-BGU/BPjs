@@ -36,7 +36,8 @@ import java.util.Optional;
 import java.util.Set;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
-import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
+import il.ac.bgu.cs.bp.bpjs.model.FailedAssertionViolation;
+import il.ac.bgu.cs.bp.bpjs.model.SafetyViolation;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -54,7 +55,7 @@ public class BProgramRunner implements Runnable {
     private ExecutorService execSvc = null;
     private BProgram bprog = null;
     private final List<BProgramRunnerListener> listeners = new ArrayList<>();
-    private FailedAssertion failedAssertion;
+    private SafetyViolation failedAssertion;
     private final AtomicBoolean go = new AtomicBoolean(true);
     private volatile boolean halted;
     
@@ -86,7 +87,7 @@ public class BProgramRunner implements Runnable {
             cur = cur.start(execSvc);
 
             if ( ! cur.isStateValid() ) {
-                failedAssertion = cur.getFailedAssertion();
+                failedAssertion = cur.getViolation();
                 listeners.forEach( l->l.assertionFailed(bprog, failedAssertion));
                 go.set(false);
             }
@@ -131,7 +132,7 @@ public class BProgramRunner implements Runnable {
 
                         cur = cur.triggerEvent(esr.getEvent(), execSvc, listeners);
                         if ( ! cur.isStateValid() ) {
-                            failedAssertion = cur.getFailedAssertion();
+                            failedAssertion = cur.getViolation();
                             listeners.forEach( l->l.assertionFailed(bprog, failedAssertion));
                             go.set(false);
                         }
@@ -174,7 +175,7 @@ public class BProgramRunner implements Runnable {
         return failedAssertion!=null;
     }
 
-    public FailedAssertion getFailedAssertion() {
+    public SafetyViolation getFailedAssertion() {
         return failedAssertion;
     }
     

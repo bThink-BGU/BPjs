@@ -27,7 +27,7 @@ import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
+import il.ac.bgu.cs.bp.bpjs.model.FailedAssertionViolation;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
@@ -71,7 +71,7 @@ public class BProgramRunnerTest {
         
         runner.run();
         
-        FailedAssertion expected = new FailedAssertion("failRightAWay!", "forward");
+        FailedAssertionViolation expected = new FailedAssertionViolation("failRightAWay!", "forward");
         assertEquals(expected, runner.getFailedAssertion());
         assertEquals(0, listener.getEvents().size());
     }

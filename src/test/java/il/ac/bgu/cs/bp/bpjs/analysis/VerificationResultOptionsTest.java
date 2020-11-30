@@ -85,7 +85,7 @@ public class VerificationResultOptionsTest {
         assertTrue(res.isViolationFound());
         assertTrue(res.getViolation().get() instanceof FailedAssertionViolation);
         
-        FailedAssertion expectedAssert = new FailedAssertion("B happened", "assertor");
+        FailedAssertionViolation expectedAssert = new FailedAssertionViolation("B happened", "assertor");
         assertEquals(expectedAssert, ((FailedAssertionViolation)res.getViolation().get()).getFailedAssertion());
         
         Violation violation = res.getViolation().get();
@@ -116,7 +116,7 @@ public class VerificationResultOptionsTest {
 
         assertTrue(res.isViolationFound());
         assertTrue(res.getViolation().get() instanceof FailedAssertionViolation);
-        FailedAssertion expected = new FailedAssertion("failRightAWay!", "forward");
+        FailedAssertionViolation expected = new FailedAssertionViolation("failRightAWay!", "forward");
         assertEquals(expected, ((FailedAssertionViolation)res.getViolation().get()).getFailedAssertion());
         assertEquals(1, res.getScannedStatesCount());
     }

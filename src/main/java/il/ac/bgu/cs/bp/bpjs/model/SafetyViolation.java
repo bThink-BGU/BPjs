@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2019 michael.
+ * Copyright 2020 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,19 +21,47 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.mocks;
+package il.ac.bgu.cs.bp.bpjs.model;
 
-import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
-import java.util.ArrayList;
+import java.util.Objects;
 
 /**
- *
+ * A violation of a "bad" b-program state. For example, a failed assertion.
+ * 
  * @author michael
  */
-public class MockBProgramSyncSnapshot extends BProgramSyncSnapshot {
+public abstract class SafetyViolation implements java.io.Serializable {
     
-    public MockBProgramSyncSnapshot(BProgramSyncSnapshot bpss) {
-        super(bpss.getBProgram(), bpss.getBThreadSnapshots(), new ArrayList<>(bpss.getExternalEvents()), bpss.getViolation());
+    protected final String message;
+
+    public SafetyViolation(String message) {
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 23 * hash + Objects.hashCode(this.message);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final SafetyViolation other = (SafetyViolation) obj;
+        return Objects.equals(this.message, other.message);
     }
     
 }

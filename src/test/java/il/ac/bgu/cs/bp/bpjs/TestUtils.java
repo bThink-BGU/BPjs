@@ -38,6 +38,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import static java.util.Collections.emptySet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -46,7 +47,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
-import static org.apache.commons.io.FileUtils.waitFor;
 
 /**
  * Just a static place for some repeated methods useful for testing.
@@ -106,7 +106,7 @@ public abstract class TestUtils {
     public static BProgramSyncSnapshot makeBPSS( Collection<BThreadSyncSnapshot> snapshots ) {
         BProgram bprog = new StringBProgram("");
         Set<BThreadSyncSnapshot> bts = new HashSet<>(snapshots);
-        return new MockBProgramSyncSnapshot(new BProgramSyncSnapshot(bprog, bts, Collections.emptyList(), null));
+        return new MockBProgramSyncSnapshot(new BProgramSyncSnapshot(bprog, bts, new HashMap<>(), Collections.emptyList(), null));
     }
     
     public static MockBThreadSyncSnapshot makeMockBtss() {

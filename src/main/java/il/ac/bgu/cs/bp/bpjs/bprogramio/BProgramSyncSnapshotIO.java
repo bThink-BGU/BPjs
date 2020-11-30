@@ -29,7 +29,7 @@ import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
+import il.ac.bgu.cs.bp.bpjs.model.FailedAssertionViolation;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -53,7 +53,7 @@ public class BProgramSyncSnapshotIO {
 
     private static class Header implements java.io.Serializable {
 
-        public Header(int bthreadCount, int externalEventCount, FailedAssertion fa) {
+        public Header(int bthreadCount, int externalEventCount, FailedAssertionViolation fa) {
             this.bthreadCount = bthreadCount;
             this.externalEventCount = externalEventCount;
             this.fa = fa;
@@ -61,7 +61,7 @@ public class BProgramSyncSnapshotIO {
 
         final int bthreadCount;
         final int externalEventCount;
-        final FailedAssertion fa;
+        final FailedAssertionViolation fa;
     }
 
     private final BProgram bprogram;
@@ -81,7 +81,7 @@ public class BProgramSyncSnapshotIO {
             try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
                 ObjectOutputStream outs = new ObjectOutputStream(bytes)) {
 
-                outs.writeObject(new Header(bpss.getBThreadSnapshots().size(), bpss.getExternalEvents().size(), bpss.getFailedAssertion()));
+                outs.writeObject(new Header(bpss.getBThreadSnapshots().size(), bpss.getExternalEvents().size(), bpss.getViolation()));
 
                 for (BThreadSyncSnapshot bss : bpss.getBThreadSnapshots()) {
                     writeBThreadSnapshot(bss, outs, globalScope);

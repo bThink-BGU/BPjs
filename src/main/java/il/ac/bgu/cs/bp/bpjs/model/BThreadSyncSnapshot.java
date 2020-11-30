@@ -53,7 +53,14 @@ public class BThreadSyncSnapshot implements Serializable {
      */
     private Object data;
     
-    protected MapProxy<String, Object> bprogramStoreModifications;
+    /** 
+     * The changes to the b-program data this b-thread wants to make.
+     * These changes are not part of the sync snapshot serialized form, since at
+     * the serialization (i.e. after entering a sync point) all changes have been 
+     * applied to the program state, or we would have not been able to get into 
+     * the sync point due to conflict.
+     */
+    protected transient MapProxy<String, Object> bprogramStoreModifications;
     
     private transient ContinuationProgramState programState;
 

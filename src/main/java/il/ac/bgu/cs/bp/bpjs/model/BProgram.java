@@ -98,6 +98,9 @@ public abstract class BProgram {
      * initialized are collected here.
      */
     protected Map<String, Object> initialScopeValues = new HashMap<>();
+    
+    
+    protected Map<String, Object> initialStore = new HashMap<>();
 
     private Optional<BProgramCallback> addBThreadCallback = Optional.empty();
 
@@ -284,7 +287,7 @@ public abstract class BProgram {
         if (eventSelectionStrategy == null) {
             eventSelectionStrategy = new SimpleEventSelectionStrategy();
         }
-        FailedAssertion failedAssertion = null;
+        FailedAssertionViolation failedAssertion = null;
         try {
             Context cx = ContextFactory.getGlobal().enterContext();
             cx.setOptimizationLevel(-1); // must use interpreter mode
@@ -303,14 +306,14 @@ public abstract class BProgram {
             }
 
         } catch (FailedAssertionException fae) {
-            failedAssertion = new FailedAssertion(fae.getMessage(), "---init_code");
+            failedAssertion = new FailedAssertionViolation(fae.getMessage(), "---init_code");
 
         } finally {
             Context.exit();
         }
 
         started = true;
-        return new BProgramSyncSnapshot(this, bthreads, Collections.emptyList(), failedAssertion);
+        return new BProgramSyncSnapshot(this, bthreads, getStore(), Collections.emptyList(), failedAssertion);
     }
 
     private void initProgramScope(Context cx) {
@@ -449,6 +452,10 @@ public abstract class BProgram {
      */
     public String getName() {
         return name;
+    }
+    
+    public Map<String,Object> getStore() {
+        return initialStore;
     }
     
     Set<BThreadSyncSnapshot> drainRecentlyRegisteredBthreads() {

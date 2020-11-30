@@ -26,7 +26,7 @@ package il.ac.bgu.cs.bp.bpjs.execution;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
-import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
+import il.ac.bgu.cs.bp.bpjs.model.FailedAssertionViolation;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import java.util.Arrays;
 import static org.junit.Assert.assertEquals;
@@ -54,7 +54,7 @@ public class FailedAssertionTest {
         
         assertEquals( Arrays.asList("piff", "puff", "poof!"), eventLogger.eventNames() );
         assertTrue( sut.hasFailedAssertion() );
-        FailedAssertion fa = sut.getFailedAssertion();
+        FailedAssertionViolation fa = sut.getFailedAssertion();
         assertEquals("assertor", fa.getBThreadName());
         assertEquals("Poof has happened.", fa.getMessage());
         

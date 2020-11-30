@@ -8,7 +8,7 @@ import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import java.util.concurrent.Callable;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
-import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
+import il.ac.bgu.cs.bp.bpjs.model.FailedAssertionViolation;
 import il.ac.bgu.cs.bp.bpjs.model.ForkStatement;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
 import java.io.ByteArrayOutputStream;
@@ -36,7 +36,7 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
      * Callback interface for when assertions fail.
      */
     public static interface Listener {
-        public void assertionFailed( FailedAssertion fa );
+        public void assertionFailed( FailedAssertionViolation fa );
         public void addFork( ForkStatement stmt );
     }
     
@@ -162,7 +162,7 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
     private BThreadSyncSnapshot handleWrappedException(WrappedException wfae) throws WrappedException {
         if ( wfae.getCause() instanceof FailedAssertionException ) {
             FailedAssertionException fae = (FailedAssertionException) wfae.getCause();
-            FailedAssertion fa = new FailedAssertion( fae.getMessage(), bss.getName() );
+            FailedAssertionViolation fa = new FailedAssertionViolation( fae.getMessage(), bss.getName() );
             listener.assertionFailed( fa );
             return null;
         } else {
