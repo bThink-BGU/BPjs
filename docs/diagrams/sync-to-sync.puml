@@ -1,0 +1,60 @@
+This is a class diagram of the snapshots and proxies during a sync-to-sync
+hop.
+
+@startuml
+
+title Sync-to-Sync Classes
+header 
+BPjs 0.10.8
+endheader
+
+package java {
+    package util {
+        class Map {}
+    }
+    package lang {
+        class Object {}
+    }
+}
+
+package BPjs {
+    class BProgramSyncSnapshot {
+        - store:Map<String, Object>
+        - bthreads
+    }
+
+    class BThreadSyncSnapshot {
+
+    }
+
+    class BProgramJsProxy {
+
+    }
+
+    class BThreadDataProxy {
+
+    }
+
+    class MapProxy {
+        seed
+    }
+}
+
+package MozillaRhino <<node>> #DDDDDD {
+    annotation RunningBThread #FFFF00
+}
+
+
+BThreadSyncSnapshot "1..0" *--> Object: data
+MapProxy "1..*" o--> "1" Map: seed
+BProgramSyncSnapshot "1" *--> Map: store
+BProgramSyncSnapshot "1" *-> "*" BThreadSyncSnapshot : bthreads
+BProgramJsProxy *--> BThreadDataProxy : data
+BProgramJsProxy *--> MapProxy : store
+BThreadSyncSnapshot "1" *--> RunningBThread: continuation
+
+BProgramSyncSnapshot -[hidden]-> BProgramJsProxy
+
+RunningBThread -[dashed]-> BProgramJsProxy : bp
+
+@enduml
