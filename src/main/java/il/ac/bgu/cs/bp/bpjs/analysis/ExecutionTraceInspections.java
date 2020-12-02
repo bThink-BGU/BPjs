@@ -75,7 +75,7 @@ public class ExecutionTraceInspections {
             if ( trace.isCyclic() ) return Optional.empty(); 
             BProgramSyncSnapshot curState = trace.getLastState();
             if (!trace.getLastState().isStateValid()) {
-                return Optional.of(new DetectedSafetyViolation(trace.getLastState().getViolation(), trace));
+                return Optional.of(new DetectedSafetyViolation(trace.getLastState().getViolationTag(), trace));
             } else return Optional.empty();
     });
     

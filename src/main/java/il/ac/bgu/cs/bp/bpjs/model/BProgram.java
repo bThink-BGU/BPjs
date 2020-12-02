@@ -88,6 +88,8 @@ public abstract class BProgram {
     protected Scriptable programScope;
 
     private EventSelectionStrategy eventSelectionStrategy;
+    
+    private StorageModificationStrategy storageModificationStrategy = StorageModificationStrategy.PASSTHROUGH;
 
     private BProgramJsProxy jsProxy;
     
@@ -512,6 +514,14 @@ public abstract class BProgram {
     
     public BpLog.LogLevel getLogLevel() {
         return (jsProxy != null ) ? BpLog.LogLevel.valueOf(jsProxy.log.getLevel()) : null;
+    }
+
+    public StorageModificationStrategy getStorageModificationStrategy() {
+        return storageModificationStrategy;
+    }
+
+    public void setStorageModificationStrategy(StorageModificationStrategy storageModificationStrategy) {
+        this.storageModificationStrategy = storageModificationStrategy;
     }
     
     @Override

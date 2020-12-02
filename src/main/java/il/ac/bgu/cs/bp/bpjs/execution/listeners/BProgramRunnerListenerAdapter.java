@@ -49,7 +49,7 @@ public abstract class BProgramRunnerListenerAdapter implements BProgramRunnerLis
     public void ended(BProgram bp) {}
 
     @Override
-    public void assertionFailed(BProgram bp, il.ac.bgu.cs.bp.bpjs.model.SafetyViolation theFailedAssertion) {}
+    public void assertionFailed(BProgram bp, il.ac.bgu.cs.bp.bpjs.model.SafetyViolationTag theFailedAssertion) {}
 
     @Override
     public void bthreadAdded(BProgram bp, BThreadSyncSnapshot theBThread) {}

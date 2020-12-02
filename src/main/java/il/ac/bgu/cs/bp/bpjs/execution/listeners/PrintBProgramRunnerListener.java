@@ -44,7 +44,7 @@ public class PrintBProgramRunnerListener implements BProgramRunnerListener {
     }
 
     @Override
-    public void assertionFailed(BProgram bp, il.ac.bgu.cs.bp.bpjs.model.SafetyViolation theFailedAssertion) {
+    public void assertionFailed(BProgram bp, il.ac.bgu.cs.bp.bpjs.model.SafetyViolationTag theFailedAssertion) {
         out.println("---:" + bp.getName() + " " + theFailedAssertion.getMessage());
     }
 

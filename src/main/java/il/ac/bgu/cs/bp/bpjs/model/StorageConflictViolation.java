@@ -24,6 +24,7 @@
 package il.ac.bgu.cs.bp.bpjs.model;
 
 import il.ac.bgu.cs.bp.bpjs.internal.MapProxyConsolidator;
+import il.ac.bgu.cs.bp.bpjs.model.StorageConsolidationResult.Conflict;
 import java.util.Objects;
 
 /**
@@ -32,16 +33,16 @@ import java.util.Objects;
  * @see MapProxyConsolidator
  * @author michael
  */
-public class StorageConflictViolation extends SafetyViolation implements java.io.Serializable {
+public class StorageConflictViolation extends SafetyViolationTag implements java.io.Serializable {
     
-    private final MapProxyConsolidator.Conflict conflict;
+    private final Conflict conflict;
 
-    public StorageConflictViolation(MapProxyConsolidator.Conflict conflict, String message) {
+    public StorageConflictViolation(Conflict conflict, String message) {
         super(message);
         this.conflict = conflict;
     }
 
-    public MapProxyConsolidator.Conflict getConflict() {
+    public Conflict getConflict() {
         return conflict;
     }
 

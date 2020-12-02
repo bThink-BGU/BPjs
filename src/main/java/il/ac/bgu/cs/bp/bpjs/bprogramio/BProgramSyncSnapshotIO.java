@@ -28,8 +28,10 @@ import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.FailedAssertionViolation;
+import il.ac.bgu.cs.bp.bpjs.model.SafetyViolationTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -37,6 +39,7 @@ import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
@@ -53,7 +56,7 @@ public class BProgramSyncSnapshotIO {
 
     private static class Header implements java.io.Serializable {
 
-        public Header(int bthreadCount, int externalEventCount, FailedAssertionViolation fa) {
+        public Header(int bthreadCount, int externalEventCount, SafetyViolationTag fa) {
             this.bthreadCount = bthreadCount;
             this.externalEventCount = externalEventCount;
             this.fa = fa;
@@ -61,7 +64,7 @@ public class BProgramSyncSnapshotIO {
 
         final int bthreadCount;
         final int externalEventCount;
-        final FailedAssertionViolation fa;
+        final SafetyViolationTag fa;
     }
 
     private final BProgram bprogram;
@@ -81,8 +84,10 @@ public class BProgramSyncSnapshotIO {
             try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
                 ObjectOutputStream outs = new ObjectOutputStream(bytes)) {
 
-                outs.writeObject(new Header(bpss.getBThreadSnapshots().size(), bpss.getExternalEvents().size(), bpss.getViolation()));
-
+                outs.writeObject(new Header(bpss.getBThreadSnapshots().size(), bpss.getExternalEvents().size(), bpss.getViolationTag()));
+                
+                outs.writeObject( bpss.getDataStore() );
+                
                 for (BThreadSyncSnapshot bss : bpss.getBThreadSnapshots()) {
                     writeBThreadSnapshot(bss, outs, globalScope);
                 }
@@ -111,20 +116,23 @@ public class BProgramSyncSnapshotIO {
             try (ScriptableInputStream sis
                 = new ScriptableInputStream(new ByteArrayInputStream(bytes), globalScope)) {
                 Header header = (Header) sis.readObject();
-
+                
+                Map<String, Object> dataStore = (Map<String, Object>) sis.readObject();
+                
                 Set<BThreadSyncSnapshot> bthreads = new HashSet<>(header.bthreadCount);
 
                 for (int i = 0; i < header.bthreadCount; i++) {
-                    bthreads.add(readBThreadSnapshot(sis, globalScope));
+                    bthreads.add(readBThreadSnapshot(sis, globalScope, dataStore));
                 }
 
-                List<BEvent> events = new ArrayList<>(header.externalEventCount);
+                List<BEvent> externalEvents = new ArrayList<>(header.externalEventCount);
                 for (int i = 0; i < header.externalEventCount; i++) {
-                    events.add((BEvent) sis.readObject());
+                    externalEvents.add((BEvent) sis.readObject());
                 }
 
-                return new BProgramSyncSnapshot(bprogram, bthreads, events, header.fa);
+                return new BProgramSyncSnapshot(bprogram, bthreads, dataStore, externalEvents, header.fa);
             }
+            
         } finally {
             Context.exit();
         }
@@ -154,7 +162,7 @@ public class BProgramSyncSnapshotIO {
         }   
     }
     
-    public BThreadSyncSnapshot deserializeBThread( byte[] serializedBT ) {
+    public BThreadSyncSnapshot deserializeBThread( byte[] serializedBT,  Map<String,Object> bprogramDataStore  ) {
         try {
             Context ctxt = ContextFactory.getGlobal().enterContext();
 
@@ -164,7 +172,7 @@ public class BProgramSyncSnapshotIO {
 
             try (ScriptableInputStream sis
                 = new ScriptableInputStream(new ByteArrayInputStream(serializedBT), globalScope)) {
-                return readBThreadSnapshot(sis, globalScope);
+                return readBThreadSnapshot(sis, globalScope, bprogramDataStore);
             } catch (ClassNotFoundException|IOException ex) {
                 // reading from memory here.
                 throw new RuntimeException("Error reading a serialized b-thread: " + ex.getMessage(), ex );
@@ -192,7 +200,7 @@ public class BProgramSyncSnapshotIO {
         outs.writeObject(bthreadBytes.toByteArray());
     }
 
-    private BThreadSyncSnapshot readBThreadSnapshot(ScriptableInputStream sis, ScriptableObject scope) throws IOException, ClassNotFoundException {
+    private BThreadSyncSnapshot readBThreadSnapshot(ScriptableInputStream sis, ScriptableObject scope, Map<String,Object> bprogramDataStore) throws IOException, ClassNotFoundException {
         String name = (String) sis.readObject();
         byte[] contBytes = (byte[]) sis.readObject();
 
@@ -213,8 +221,9 @@ public class BProgramSyncSnapshotIO {
             Object data = bssis.readObject();
             Object modifications = bssis.readObject();
             Object cont = bssis.readObject();
-//            FIXME use `modifications` rather than `null`. Need to decide exactly which map is the truth map.
-            final BThreadSyncSnapshot bThreadSyncSnapshot = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, cont, stmt, data, null);
+            
+            MapProxy proxy = new MapProxy(bprogramDataStore, (Map<String, MapProxy.Modification<Object>>) modifications);
+            final BThreadSyncSnapshot bThreadSyncSnapshot = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, cont, stmt, data, proxy);
 
             return bThreadSyncSnapshot;
         }

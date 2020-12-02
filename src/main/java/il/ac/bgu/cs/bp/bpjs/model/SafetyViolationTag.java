@@ -26,15 +26,19 @@ package il.ac.bgu.cs.bp.bpjs.model;
 import java.util.Objects;
 
 /**
- * A violation of a "bad" b-program state. For example, a failed assertion.
+ * A tag for a b-program sync point, stating that said point violates a
+ * safety property of the b-program.
+ * 
+ * For example, a sync point with a failed assertion, should be tagged by one
+ * of this class' subclasses.
  * 
  * @author michael
  */
-public abstract class SafetyViolation implements java.io.Serializable {
+public abstract class SafetyViolationTag implements java.io.Serializable {
     
     protected final String message;
 
-    public SafetyViolation(String message) {
+    public SafetyViolationTag(String message) {
         this.message = message;
     }
 
@@ -60,7 +64,7 @@ public abstract class SafetyViolation implements java.io.Serializable {
         if (getClass() != obj.getClass()) {
             return false;
         }
-        final SafetyViolation other = (SafetyViolation) obj;
+        final SafetyViolationTag other = (SafetyViolationTag) obj;
         return Objects.equals(this.message, other.message);
     }
     

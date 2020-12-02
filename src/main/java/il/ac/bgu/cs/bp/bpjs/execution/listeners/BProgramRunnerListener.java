@@ -48,7 +48,7 @@ public interface BProgramRunnerListener {
      * @param bp The program where the failed assertion happened.
      * @param theFailedAssertion Details about the assertion that failed.
      */
-    void assertionFailed( BProgram bp, il.ac.bgu.cs.bp.bpjs.model.SafetyViolation theFailedAssertion);
+    void assertionFailed( BProgram bp, il.ac.bgu.cs.bp.bpjs.model.SafetyViolationTag theFailedAssertion);
     
     /**
      * Called when a BThread is added to a b-program.

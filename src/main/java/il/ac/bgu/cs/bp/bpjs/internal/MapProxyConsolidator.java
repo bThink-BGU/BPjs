@@ -23,13 +23,15 @@
  */
 package il.ac.bgu.cs.bp.bpjs.internal;
 
+import il.ac.bgu.cs.bp.bpjs.model.StorageConsolidationResult;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy;
+import il.ac.bgu.cs.bp.bpjs.model.StorageConsolidationResult.Conflict;
+import il.ac.bgu.cs.bp.bpjs.model.StorageConsolidationResult.Success;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 /**
@@ -39,62 +41,8 @@ import static java.util.stream.Collectors.toList;
  * @author michael
  */
 public class MapProxyConsolidator {
-   
-    public abstract class Result{};
-    
-    public class Success extends Result {
-        
-        final Map<String,MapProxy.Modification<Object>> updates;
-
-        public Success(Map<String, MapProxy.Modification<Object>> someUpdates) {
-            updates = someUpdates;
-        }
-        
-
-        /**
-         * Take the passed map, and create a new map that's based on it, but with
-         * the modifications applied.
-         * 
-         * @param in The map we want to modify
-         * @return a new map, same as the passed map, but with modifications.
-         */
-        public Map<String,Object> apply( Map<String, Object> in ) { 
-            final Map<String, Object> newMap = new HashMap<>();
-            // add new/updated values
-            updates.entrySet().stream()
-                .filter(  e -> e.getValue() instanceof MapProxy.PutValue)
-                .forEach( e -> newMap.put(e.getKey(), ((MapProxy.PutValue<Object>)e.getValue()).getValue()) );
-            
-            // add non-modified values
-            in.entrySet().stream()
-                .filter( e -> !updates.keySet().contains(e.getKey()) )
-                .forEach( e -> newMap.put(e.getKey(), e.getValue()) );
-            
-            return newMap;
-        }
-        
-        public Map<String, MapProxy.Modification<Object>> getUpdates() {
-            return updates;
-        }
-
-    }
-    
-    public class Conflict extends Result {
-        
-        // key -> Map(b-t, modification)
-        public final Map<String, Map<BThreadSyncSnapshot, MapProxy.Modification<Object>>> conflicts;
-
-        Conflict(Map<String, Map<BThreadSyncSnapshot, MapProxy.Modification<Object>>> conflicts) {
-            this.conflicts = conflicts;
-        }
-        
-        @Override
-        public String toString() {
-            return "[Conflict " + conflicts.keySet().stream().collect( joining(", ", "{","}")) + "]";
-        }
-    };
-    
-    public Result consolidate( Collection<BThreadSyncSnapshot> bts ) {
+      
+    public StorageConsolidationResult consolidate( Collection<BThreadSyncSnapshot> bts ) {
         
         Map<String, Map<BThreadSyncSnapshot, MapProxy.Modification<Object>>> consolidatedView = new HashMap<>();
         

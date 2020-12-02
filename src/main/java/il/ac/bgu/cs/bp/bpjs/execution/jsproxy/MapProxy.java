@@ -76,10 +76,16 @@ public class MapProxy<K,V> {
      */
     private final Map<K,V> seed;
 
-    private final Map<K,Modification<V>> modifications = new HashMap<>();
+    private final Map<K,Modification<V>> modifications;
     
-    public MapProxy(Map<K, V> seed) {
-        this.seed = seed;
+    public MapProxy(Map<K, V> aSeed) {
+        seed = aSeed;
+        modifications = new HashMap<>();
+    }
+
+    public MapProxy(Map<K, V> aSeed, Map<K, Modification<V>> someModifications) {
+        seed = aSeed;
+        modifications = someModifications;
     }
 
     public void put(K key, V value ) {

@@ -24,7 +24,7 @@
 package il.ac.bgu.cs.bp.bpjs.analysis.violations;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
-import il.ac.bgu.cs.bp.bpjs.model.SafetyViolation;
+import il.ac.bgu.cs.bp.bpjs.model.SafetyViolationTag;
 
 /**
  * A violation of a safety property, detected during b-program analysis.
@@ -33,9 +33,9 @@ import il.ac.bgu.cs.bp.bpjs.model.SafetyViolation;
  */
 public class DetectedSafetyViolation extends Violation {
     
-    private final SafetyViolation detected;
+    private final SafetyViolationTag detected;
 
-    public DetectedSafetyViolation(SafetyViolation aSafetyViolation, ExecutionTrace counterExampleTrace) {
+    public DetectedSafetyViolation(SafetyViolationTag aSafetyViolation, ExecutionTrace counterExampleTrace) {
         super(counterExampleTrace);
         this.detected = aSafetyViolation;
     }
@@ -46,7 +46,7 @@ public class DetectedSafetyViolation extends Violation {
                 detected.getMessage();
     }
 
-    public SafetyViolation getDetectedViolation() {
+    public SafetyViolationTag getDetectedViolation() {
         return detected;
     }
 

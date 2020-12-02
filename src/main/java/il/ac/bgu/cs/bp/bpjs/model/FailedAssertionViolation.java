@@ -31,7 +31,7 @@ import java.util.Objects;
  * 
  * @author michael
  */
-public class FailedAssertionViolation extends SafetyViolation implements java.io.Serializable {
+public class FailedAssertionViolation extends SafetyViolationTag implements java.io.Serializable {
     private final String bThreadName;
 
     public FailedAssertionViolation(String message, String bThreadName) {
