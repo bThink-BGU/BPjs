@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.internal;
+package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,6 +48,10 @@ public class MapProxy<K,V> {
             value = aValue;
         }
 
+        public VV getValue() {
+            return value;
+        }
+        
         @Override
         public int hashCode() {
             int hash = 5;

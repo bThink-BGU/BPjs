@@ -40,7 +40,7 @@ import static org.junit.Assert.*;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.PrintDfsVerifierListener;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.DeadlockViolation;
-import il.ac.bgu.cs.bp.bpjs.analysis.violations.FailedAssertionViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.DetectedSafetyViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.JsErrorViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
@@ -310,7 +310,7 @@ public class DfsBProgramVerifierTest {
         VerificationResult res = sut.verify(bprog);
 
         assertTrue(res.isViolationFound());
-        assertTrue(res.getViolation().get() instanceof FailedAssertionViolation);
+        assertTrue(res.getViolation().get() instanceof DetectedSafetyViolation);
         assertEquals(2, res.getScannedStatesCount());
         assertEquals(1, res.getScannedEdgesCount());
     }

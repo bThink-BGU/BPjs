@@ -8,6 +8,7 @@ import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.JsEventSet;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.FailedAssertionException;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.ForkStatement;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
@@ -44,11 +45,20 @@ import org.mozilla.javascript.NativeObject;
 public class BProgramJsProxy extends SyncStatementBuilder
                              implements java.io.Serializable {
     
-    private static final ThreadLocal<BThreadSyncSnapshot> CURRENT_BTHREAD = new ThreadLocal<>();
+    private static class BThreadData {
+        final BThreadSyncSnapshot snapshot;
+        final MapProxy storeModifications;
+
+        public BThreadData(BThreadSyncSnapshot snapshot, MapProxy storeModifications) {
+            this.snapshot = snapshot;
+            this.storeModifications = storeModifications;
+        }        
+    }
+    private static final ThreadLocal<BThreadData> CURRENT_BTHREAD = new ThreadLocal<>();
     
     
-    public static void setCurrentBThread( BThreadSyncSnapshot bss ) {
-        CURRENT_BTHREAD.set(bss);
+    public static void setCurrentBThread( BProgramSyncSnapshot bpss, BThreadSyncSnapshot btss ) {
+        CURRENT_BTHREAD.set(new BThreadData( btss, new MapProxy(bpss.getDataStore())));
     }
     
     public static void clearCurrentBThread(){
@@ -173,7 +183,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
     
     
     public void setInterruptHandler( Object aPossibleHandler ) {
-        CURRENT_BTHREAD.get().setInterruptHandler(
+        CURRENT_BTHREAD.get().snapshot.setInterruptHandler(
                 (aPossibleHandler instanceof Function) ? (Function) aPossibleHandler: null );
     }
     
@@ -303,7 +313,11 @@ public class BProgramJsProxy extends SyncStatementBuilder
     
     
     public BThreadDataProxy getThread(){
-        return new BThreadDataProxy(CURRENT_BTHREAD.get());
+        return new BThreadDataProxy(CURRENT_BTHREAD.get().snapshot);
+    }
+    
+    public MapProxy getStore() {
+        return CURRENT_BTHREAD.get().storeModifications;
     }
     
     /**

@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.internal;
 
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy;
 import il.ac.bgu.cs.bp.bpjs.TestUtils;
 import il.ac.bgu.cs.bp.bpjs.internal.MapProxyConsolidator.Conflict;
 import il.ac.bgu.cs.bp.bpjs.internal.MapProxyConsolidator.Success;

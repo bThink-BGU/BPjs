@@ -17,7 +17,7 @@ package java {
     }
 }
 
-package BPjs {
+package BPjs.* {
     class BProgramSyncSnapshot {
         - store:Map<String, Object>
         - bthreads
@@ -45,16 +45,22 @@ package MozillaRhino <<node>> #DDDDDD {
 }
 
 
-BThreadSyncSnapshot "1..0" *--> Object: data
-MapProxy "1..*" o--> "1" Map: seed
-BProgramSyncSnapshot "1" *--> Map: store
-BProgramSyncSnapshot "1" *-> "*" BThreadSyncSnapshot : bthreads
-BProgramJsProxy *--> BThreadDataProxy : data
-BProgramJsProxy *--> MapProxy : store
-BThreadSyncSnapshot "1" *--> RunningBThread: continuation
-
-BProgramSyncSnapshot -[hidden]-> BProgramJsProxy
-
+BProgramSyncSnapshot "1" *-left-> Map: store
+BProgramSyncSnapshot ..> BProgramSyncSnapshot: generates
+BProgramSyncSnapshot "1" *--> "*" BThreadSyncSnapshot : bthreads
+BThreadSyncSnapshot "1..0" *-> Object: data
+BThreadSyncSnapshot "1" *-> "1" MapProxy: storeModifications
+RunningBThread <-[dashed]-> BThreadSyncSnapshot: captured in > \n < continuation
+MapProxy "1..*" o-> "1" Map: seed
+BProgramJsProxy *--> BThreadDataProxy : 'bp.thread.data'
+BProgramJsProxy *--> MapProxy : 'bp.store'
 RunningBThread -[dashed]-> BProgramJsProxy : bp
+BThreadDataProxy -[dashed]-> Object : manage
+
+BThreadSyncSnapshot -[hidden]-> BProgramJsProxy
+BThreadSyncSnapshot -[hidden]- RunningBThread
+' MapProxy -[hidden]- Map
+' MapProxy -[hidden]- Object
+
 
 @enduml

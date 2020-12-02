@@ -1,5 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
+import static il.ac.bgu.cs.bp.bpjs.TestUtils.*;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import static org.junit.Assert.assertTrue;
@@ -17,7 +18,8 @@ public class ResumeBThreadTest {
     @Test
     public void testToString() {
         BEvent evt = new BEvent("evtName");
-        ResumeBThread sut = new ResumeBThread(new BThreadSyncSnapshot("snap-name", null), evt, null);
+        BThreadSyncSnapshot bt = new BThreadSyncSnapshot("snap-name", null);
+        ResumeBThread sut = new ResumeBThread(makeBPSS(bt), bt, evt, null);
         
         String toString = sut.toString();
         

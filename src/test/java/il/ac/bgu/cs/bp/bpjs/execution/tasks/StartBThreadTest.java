@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
+import static il.ac.bgu.cs.bp.bpjs.TestUtils.makeBPSS;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -38,7 +39,8 @@ public class StartBThreadTest {
      */
     @Test
     public void testToString() {
-        StartBThread sut = new StartBThread(new BThreadSyncSnapshot("foo", null), null);
+        BThreadSyncSnapshot bt = new BThreadSyncSnapshot("foo", null);
+        StartBThread sut = new StartBThread(makeBPSS(bt), bt, null);
         String toString = sut.toString();
         
         assertTrue( toString.startsWith("[StartBThread ") );

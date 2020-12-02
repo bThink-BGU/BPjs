@@ -21,7 +21,7 @@ import org.mozilla.javascript.Context;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.BPEngineTask;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.StartFork;
-import il.ac.bgu.cs.bp.bpjs.internal.MapProxy;
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy;
 import il.ac.bgu.cs.bp.bpjs.internal.MapProxyConsolidator;
 import il.ac.bgu.cs.bp.bpjs.internal.MapProxyConsolidator.*;
 import java.io.ByteArrayInputStream;
@@ -113,7 +113,7 @@ public class BProgramSyncSnapshot {
         Set<BThreadSyncSnapshot> nextRound = new HashSet<>(threadSnapshots.size());
         BPEngineTask.Listener halter = new ViolationRecorder(bprog, violationRecord);
         nextRound.addAll(exSvc.invokeAll(threadSnapshots.stream()
-                                .map(bt -> new StartBThread(bt, halter))
+                                .map(bt -> new StartBThread(this, bt, halter))
                                 .collect(toList())
                 ).stream().map(f -> safeGet(f) ).collect(toList())
         );
@@ -164,7 +164,7 @@ public class BProgramSyncSnapshot {
         try {
             nextRound.addAll(exSvc.invokeAll(
                                 resumingThisRound.stream()
-                                                 .map(bt -> new ResumeBThread(bt, anEvent, halter))
+                                                 .map(bt -> new ResumeBThread(this, bt, anEvent, halter))
                                                  .collect(toList())
                     ).stream().map(f -> safeGet(f)).filter(Objects::nonNull).collect(toList())
             );
@@ -298,6 +298,10 @@ public class BProgramSyncSnapshot {
     public SafetyViolation getViolation() {
         return violationRecord.get();
     }
+
+    public Map<String, Object> getDataStore() {
+        return dataStore;
+    }
     
     /**
      * Returns {@code true} if any of the b-threads at this point is at a "hot"
@@ -339,7 +343,7 @@ public class BProgramSyncSnapshot {
         while ( ((!addedBThreads.isEmpty()) || (!addedForks.isEmpty())) 
                 && !exSvc.isShutdown() ) {
             Stream<BPEngineTask> threadStream = addedBThreads.stream()
-                .map(bt -> new StartBThread(bt, listener));
+                .map(bt -> new StartBThread(this, bt, listener));
             Stream<BPEngineTask> forkStream = addedForks.stream().flatMap( f -> convertToTasks(f, listener) );
             
             nextRound.addAll(exSvc.invokeAll(Stream.concat(forkStream, threadStream).collect(toList())).stream()
@@ -385,7 +389,7 @@ public class BProgramSyncSnapshot {
             BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(bprog);
             BThreadSyncSnapshot forkedBT = io.deserializeBThread(io.serializeBThread(btss));
             bprog.registerForkedChild(btss);
-            return Stream.of(new StartFork(fkStmt, forkedBT, listener, bprog));
+            return Stream.of(new StartFork(fkStmt, this, forkedBT, listener, bprog));
         } finally {
             Context.exit();
         }
@@ -416,9 +420,10 @@ public class BProgramSyncSnapshot {
                 return false;
             }
         }
-        if ( ! getExternalEvents().equals(other.getExternalEvents()) ) {
-            return false;
-        }
+        
+        if ( ! getDataStore().equals(other.getDataStore()) ) return false;
+        if ( ! getExternalEvents().equals(other.getExternalEvents()) ) return false;
+        
         // optimization: non-equality by hash code - if we have one.
         if ( hashCodeCache != Integer.MIN_VALUE && other.hashCodeCache != Integer.MIN_VALUE ) {
             if ( hashCodeCache != other.hashCodeCache ) return false;

@@ -5,6 +5,7 @@ import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsCodeEvaluationException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import java.util.concurrent.Callable;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
@@ -40,12 +41,14 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
         public void addFork( ForkStatement stmt );
     }
     
-    protected final BThreadSyncSnapshot bss;
+    protected final BThreadSyncSnapshot btss;
+    protected final BProgramSyncSnapshot bpss;
     protected final Listener listener;
 
-    BPEngineTask(BThreadSyncSnapshot aBss, Listener aListener) {
+    BPEngineTask(BProgramSyncSnapshot aBpss, BThreadSyncSnapshot aBtss, Listener aListener) {
+        bpss = aBpss;
+        btss = aBtss;
         listener = aListener;
-        bss = aBss;
     }
     
     abstract void callImpl(Context jsContext);
@@ -55,7 +58,7 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
 
         Context jsContext = Context.enter();
         try {            
-            BProgramJsProxy.setCurrentBThread(bss);
+            BProgramJsProxy.setCurrentBThread(bpss, btss);
             callImpl( jsContext );
             return null;
 
@@ -114,15 +117,15 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
             if ( hasRequest && hasBlock ) {
                 boolean hasCollision = syncStatement.getRequest().stream().allMatch(syncStatement.getBlock()::contains);
                 if ( hasCollision ) {
-                    System.err.println("Warning: B-thread '"+bss.getName()+"' is blocking an event it is also requesting, this may lead to a deadlock.");
+                    System.err.println("Warning: B-thread '"+btss.getName()+"' is blocking an event it is also requesting, this may lead to a deadlock.");
                 }
             }
             
-            return bss.copyWith(cbs.getContinuation(), syncStatement);
+            return btss.copyWith(cbs.getContinuation(), syncStatement);
             
         } else if ( capturedStatement instanceof ForkStatement ) {
             ForkStatement forkStmt = (ForkStatement) capturedStatement;
-            forkStmt.setForkingBThread(bss);
+            forkStmt.setForkingBThread(btss);
             
             final ScriptableObject globalScope = jsContext.initStandardObjects();
             try ( ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -162,7 +165,7 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
     private BThreadSyncSnapshot handleWrappedException(WrappedException wfae) throws WrappedException {
         if ( wfae.getCause() instanceof FailedAssertionException ) {
             FailedAssertionException fae = (FailedAssertionException) wfae.getCause();
-            FailedAssertionViolation fa = new FailedAssertionViolation( fae.getMessage(), bss.getName() );
+            FailedAssertionViolation fa = new FailedAssertionViolation( fae.getMessage(), btss.getName() );
             listener.assertionFailed( fa );
             return null;
         } else {

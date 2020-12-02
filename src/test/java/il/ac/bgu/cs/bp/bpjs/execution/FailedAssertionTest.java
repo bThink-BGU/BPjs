@@ -23,7 +23,6 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution;
 
-import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.FailedAssertionViolation;
@@ -54,7 +53,7 @@ public class FailedAssertionTest {
         
         assertEquals( Arrays.asList("piff", "puff", "poof!"), eventLogger.eventNames() );
         assertTrue( sut.hasFailedAssertion() );
-        FailedAssertionViolation fa = sut.getFailedAssertion();
+        FailedAssertionViolation fa = (FailedAssertionViolation) sut.getFailedAssertion();
         assertEquals("assertor", fa.getBThreadName());
         assertEquals("Poof has happened.", fa.getMessage());
         

@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.internal;
 
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import java.util.Collection;
 import java.util.HashMap;
@@ -62,7 +63,7 @@ public class MapProxyConsolidator {
             // add new/updated values
             updates.entrySet().stream()
                 .filter(  e -> e.getValue() instanceof MapProxy.PutValue)
-                .forEach( e -> newMap.put(e.getKey(), ((MapProxy.PutValue<Object>)e.getValue()).value) );
+                .forEach( e -> newMap.put(e.getKey(), ((MapProxy.PutValue<Object>)e.getValue()).getValue()) );
             
             // add non-modified values
             in.entrySet().stream()

@@ -40,6 +40,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 
 import java.util.Collections;
+import static java.util.Collections.emptyMap;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
@@ -59,7 +60,7 @@ public class BProgramSyncSnapshotTest {
     @Test
     public void testEqualsSanity() {
         BProgram bp = new StringBProgram("");
-        BProgramSyncSnapshot bss = new BProgramSyncSnapshot(bp, emptySet(), emptyList(), null);
+        BProgramSyncSnapshot bss = new BProgramSyncSnapshot(bp, emptySet(), emptyMap(), emptyList(), null);
         assertEquals(bss, bss);
         Assert.assertNotEquals(bss, null);
         Assert.assertNotEquals(bss, "I'm not even the same class");

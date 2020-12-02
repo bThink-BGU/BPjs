@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.internal;
 
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;

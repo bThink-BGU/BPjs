@@ -33,26 +33,26 @@ import il.ac.bgu.cs.bp.bpjs.model.SafetyViolation;
  */
 public class DetectedSafetyViolation extends Violation {
     
-    private final SafetyViolation assertion;
+    private final SafetyViolation detected;
 
-    public DetectedSafetyViolation(SafetyViolation assertion, ExecutionTrace counterExampleTrace) {
+    public DetectedSafetyViolation(SafetyViolation aSafetyViolation, ExecutionTrace counterExampleTrace) {
         super(counterExampleTrace);
-        this.assertion = assertion;
+        this.detected = aSafetyViolation;
     }
 
     @Override
     public String decsribe() {
         return "Safety Violation: " +
-                assertion.getMessage();
+                detected.getMessage();
     }
 
-    public SafetyViolation getFailedAssertion() {
-        return assertion;
+    public SafetyViolation getDetectedViolation() {
+        return detected;
     }
 
     @Override
     public String toString() {
-        return "[DetectedSafetyViolation assertion:" + assertion + ']';
+        return "[DetectedSafetyViolation detected:" + detected + ']';
     }
     
 }
