@@ -33,7 +33,7 @@ import java.util.ArrayList;
 public class MockBProgramSyncSnapshot extends BProgramSyncSnapshot {
     
     public MockBProgramSyncSnapshot(BProgramSyncSnapshot bpss) {
-        super(bpss.getBProgram(), bpss.getBThreadSnapshots(), bpss.getDataStore(), new ArrayList<>(bpss.getExternalEvents()), bpss.getViolation());
+        super(bpss.getBProgram(), bpss.getBThreadSnapshots(), bpss.getDataStore(), new ArrayList<>(bpss.getExternalEvents()), bpss.getViolationTag());
     }
     
 }

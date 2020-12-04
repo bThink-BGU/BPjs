@@ -3,6 +3,7 @@ package il.ac.bgu.cs.bp.bpjs.mocks;
 
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
+import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.internal.ContinuationProgramState;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -55,7 +56,7 @@ public class MockBThreadSyncSnapshot extends BThreadSyncSnapshot {
     }
 
     public MockBThreadSyncSnapshot(String aName, SyncStatement stmt ) {
-        super(aName, null);
+        super(aName, null, new StringBProgram(""));
         setSyncStatement(stmt);
         stmt.setBthread(this);
     }

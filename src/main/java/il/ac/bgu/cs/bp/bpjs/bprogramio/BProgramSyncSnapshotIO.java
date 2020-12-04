@@ -191,7 +191,7 @@ public class BProgramSyncSnapshotIO {
             btos.writeObject(bss.getInterrupt().orElse(null));
             btos.writeObject(bss.getSyncStatement());
             btos.writeObject(bss.getData());
-            btos.writeObject(bss.getBprogramStoreModifications());
+            btos.writeObject(bss.getStorageModifications());
             btos.writeObject(bss.getContinuation());
             btos.flush();
         }

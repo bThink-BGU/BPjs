@@ -48,7 +48,7 @@ public class MapProxyConsolidator {
         
         // Consolidate the view
         bts.forEach( bt -> {
-            bt.getBprogramStoreModifications().forEach((key,mod)->{
+            bt.getStorageModifications().forEach((key,mod)->{
                 Map<BThreadSyncSnapshot, MapProxy.Modification<Object>> mods = consolidatedView.get(key);
                 if ( mods == null ) {
                     mods = new HashMap<>();

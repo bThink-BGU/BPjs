@@ -35,13 +35,13 @@ import java.util.Set;
  * @param <K> Type of the keys in the map.
  * @param <V> Type of values in the map.
  */
-public class MapProxy<K,V> {
+public class MapProxy<K,V> implements java.io.Serializable {
     
-    public static abstract class Modification<VV> {
+    public static abstract class Modification<VV> implements java.io.Serializable {
         public static final Modification DELETE = new Modification(){};
     }
     
-    public static class PutValue<VV> extends Modification<VV> {
+    public static class PutValue<VV> extends Modification<VV> implements java.io.Serializable {
         final VV value;
 
         public PutValue(VV aValue) {
@@ -144,5 +144,27 @@ public class MapProxy<K,V> {
     public void reset() {
         modifications.clear();
     }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 23 * hash + Objects.hashCode(this.modifications);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (getClass() != obj.getClass()) return false;
+        
+        final MapProxy<?, ?> other = (MapProxy<?, ?>) obj;
+        if (!Objects.equals(this.seed, other.seed)) {
+            return false;
+        }
+        return Objects.equals(this.modifications, other.modifications);
+    }
+    
+    
     
 }

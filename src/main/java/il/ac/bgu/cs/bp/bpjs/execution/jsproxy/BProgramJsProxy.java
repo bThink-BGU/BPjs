@@ -45,6 +45,9 @@ import org.mozilla.javascript.NativeObject;
 public class BProgramJsProxy extends SyncStatementBuilder
                              implements java.io.Serializable {
     
+    ///////////////////////////////
+    // A (Java) thread-local mechanism to allow the Java code calling the BP 
+    // code to communicate with the Java code called from the BP code.
     private static class BThreadData {
         final BThreadSyncSnapshot snapshot;
         final MapProxy storeModifications;
@@ -54,6 +57,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
             this.storeModifications = storeModifications;
         }        
     }
+    
     private static final ThreadLocal<BThreadData> CURRENT_BTHREAD = new ThreadLocal<>();
     
     
@@ -65,7 +69,24 @@ public class BProgramJsProxy extends SyncStatementBuilder
         CURRENT_BTHREAD.remove();
     }
     
-    private final BProgram program;
+    // /thread-local
+    ///////////////////////////////
+    
+    /**
+     * State of a b-thread, captures during a bp.sync.
+     */
+    public static class CapturedBThreadState {
+        public final SyncStatement syncStmt;
+        public final MapProxy modifications;
+
+        public CapturedBThreadState(SyncStatement syncStmt, MapProxy modifications) {
+            this.syncStmt = syncStmt;
+            this.modifications = modifications;
+        }
+    }
+    
+    
+    private final BProgram bProg;
     
     private final AtomicInteger autoAddCounter = new AtomicInteger(0);
     
@@ -81,8 +102,8 @@ public class BProgramJsProxy extends SyncStatementBuilder
      */
     public RandomProxy random = new RandomProxy();
     
-    public BProgramJsProxy(BProgram program) {
-        this.program = program;
+    public BProgramJsProxy(BProgram aBProgram) {
+        bProg = aBProgram;
     }
     
     /**
@@ -130,7 +151,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
      * @see #registerBThread(org.mozilla.javascript.Function)
      */
     public void registerBThread(String name, Object data, Function func) {
-        program.registerBThread(new BThreadSyncSnapshot(name, func, null, null, null, data, null));
+        bProg.registerBThread(new BThreadSyncSnapshot(name, func, null, null, null, data, null));
     }
     
     /**
@@ -142,7 +163,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
      * @see #registerBThread(org.mozilla.javascript.Function)
      */
     public void registerBThread(String name, Function func) {
-        program.registerBThread(new BThreadSyncSnapshot(name, func));
+        bProg.registerBThread(new BThreadSyncSnapshot(name, func, bProg));
     }
 
     /**
@@ -173,7 +194,6 @@ public class BProgramJsProxy extends SyncStatementBuilder
             throw new FailedAssertionException( message );
         }
     }
-    
     
     public void fork() throws ContinuationPending {
         ContinuationPending capturedContinuation = Context.getCurrentContext().captureContinuation();
@@ -265,13 +285,15 @@ public class BProgramJsProxy extends SyncStatementBuilder
         } else {
             final String errorMessage = "Cannot convert " + jsObject + " of class " + jsObject.getClass() + " to an event set";
             Logger.getLogger(BThreadSyncSnapshot.class.getName()).log(Level.SEVERE, errorMessage);
-            throw new IllegalArgumentException( errorMessage);
+            throw new IllegalArgumentException(errorMessage);
         }
     }
     
     private void captureBThreadState(SyncStatement stmt) throws ContinuationPending {
         ContinuationPending capturedContinuation = Context.getCurrentContext().captureContinuation();
-        capturedContinuation.setApplicationState(stmt);
+        BThreadData curBThreadData = CURRENT_BTHREAD.get();
+        capturedContinuation.setApplicationState(new CapturedBThreadState(stmt, 
+            curBThreadData!=null ? curBThreadData.storeModifications : null));
         throw capturedContinuation;
     }
     
@@ -285,7 +307,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
      * @return the event being pushed.
      */
     public BEvent enqueueExternalEvent( BEvent evt )  {
-        program.enqueueExternalEvent(evt);
+        bProg.enqueueExternalEvent(evt);
         return evt;
     }
     
@@ -297,11 +319,11 @@ public class BProgramJsProxy extends SyncStatementBuilder
      *                      {@code false} otherwise.
      */
     public void setWaitForExternalEvents( boolean newDaemonMode ) {
-        program.setWaitForExternalEvents( newDaemonMode );
+        bProg.setWaitForExternalEvents( newDaemonMode );
     }
     
     public boolean isWaitForExternalEvents() {
-        return program.isWaitForExternalEvents();
+        return bProg.isWaitForExternalEvents();
     }
     
     /**
@@ -333,7 +355,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 59 * hash + Objects.hashCode(this.program);
+        hash = 59 * hash + Objects.hashCode(this.bProg);
         return hash;
     }
 
@@ -349,7 +371,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
             return false;
         }
         final BProgramJsProxy other = (BProgramJsProxy) obj;
-        return Objects.equals(this.program, other.program);
+        return Objects.equals(this.bProg, other.bProg);
     }
 
 }

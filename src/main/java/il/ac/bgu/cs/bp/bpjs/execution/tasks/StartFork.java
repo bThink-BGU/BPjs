@@ -42,10 +42,10 @@ public class StartFork extends BPEngineTask {
     private final Object forkValue;
     private final BProgram bprog;
 
-    public StartFork(Object aForkValue, BProgramSyncSnapshot aBpss, BThreadSyncSnapshot aBtss, Listener aListener, BProgram aBprog) {
+    public StartFork(Object aForkValue, BProgramSyncSnapshot aBpss, BThreadSyncSnapshot aBtss, Listener aListener) {
         super(aBpss, aBtss, aListener);
         forkValue = aForkValue;
-        bprog = aBprog;
+        bprog =aBpss.getBProgram();
     }
 
     @Override

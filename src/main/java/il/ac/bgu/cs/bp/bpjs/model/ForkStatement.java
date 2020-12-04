@@ -23,6 +23,22 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model;
 
+import il.ac.bgu.cs.bp.bpjs.bprogramio.BThreadSyncSnapshotInputStream;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.BThreadSyncSnapshotOutputStream;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.StreamObjectStub;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.StubProvider;
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy;
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy.Modification;
+import il.ac.bgu.cs.bp.bpjs.execution.tasks.BPEngineTask;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.NotSerializableException;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Data required for performing {@code bp.fork}.
  * 
@@ -32,12 +48,70 @@ package il.ac.bgu.cs.bp.bpjs.model;
  */
 public class ForkStatement {
     
-    private final Object continuation;
-    private byte[] serializedContinuation;
+    private Object bthreadData;
+    private Map<String, Modification<Object>> storageModifications;
+    private Object continuation;
+    
     private BThreadSyncSnapshot forkingBThread;
 
     public ForkStatement(Object aContinuation) {
         continuation = aContinuation;        
+    }
+    
+    /**
+     * Clones the data of the forked b-thread, so that the original thread can 
+     * continue without changing the fork's data.
+     * @param syncOrigin The b-program sync snapshot out of which the forking b-thread started
+     */
+    public void cloneBThreadData(BProgramSyncSnapshot syncOrigin){
+        byte[] serializedForm;
+        
+        try ( ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            BThreadSyncSnapshotOutputStream btos = new BThreadSyncSnapshotOutputStream(baos, syncOrigin.getBProgram().getGlobalScope()) ) {
+            btos.writeObject(bthreadData);
+            btos.writeObject(storageModifications);
+            btos.writeObject(continuation);
+            btos.flush();
+            baos.flush();
+            serializedForm = baos.toByteArray();
+        } catch (IOException ex) {
+            Logger.getLogger(BPEngineTask.class.getName()).log(Level.SEVERE, "Error while serializing continuation during fork:" + ex.getMessage(), ex);
+            throw new RuntimeException("Error while serializing continuation during fork:" + ex.getMessage(), ex);
+        }
+        
+        final BProgramJsProxy bpProxy = new BProgramJsProxy(syncOrigin.getBProgram());
+
+        StubProvider stubPrv = (StreamObjectStub stub) -> {
+            if (stub == StreamObjectStub.BP_PROXY) {
+                return bpProxy;
+            }
+            throw new IllegalArgumentException("Unknown stub " + stub);
+        };
+        
+        try ( ByteArrayInputStream bais = new ByteArrayInputStream(serializedForm);
+              BThreadSyncSnapshotInputStream btis = new BThreadSyncSnapshotInputStream(bais, syncOrigin.getBProgram().getGlobalScope(), stubPrv)
+            ) {
+            
+            bthreadData = btis.readObject();
+            storageModifications = (Map<String, Modification<Object>>) btis.readObject();
+            continuation = btis.readObject();
+            
+        } catch (IOException | ClassNotFoundException ex) {
+            Logger.getLogger(BPEngineTask.class.getName()).log(Level.SEVERE, "Error while serializing continuation during fork:" + ex.getMessage(), ex);
+            throw new RuntimeException("Error while serializing continuation during fork:" + ex.getMessage(), ex);
+        }
+    }
+    
+    public BThreadSyncSnapshot makeSnapshot(String aName, BProgramSyncSnapshot syncOrigin) {
+        return new BThreadSyncSnapshot(
+            aName,
+            forkingBThread.getEntryPoint(),
+            forkingBThread.getInterrupt().orElse(null),
+            continuation,
+            null,
+            bthreadData,
+            new MapProxy(syncOrigin.getDataStore(), storageModifications)
+        );
     }
     
     public Object getContinuation() {
@@ -46,18 +120,20 @@ public class ForkStatement {
 
     public void setForkingBThread(BThreadSyncSnapshot forkingBThread) {
         this.forkingBThread = forkingBThread;
+        setBthreadData(forkingBThread.getData());
+        storageModifications = forkingBThread.getStorageModifications();
     }
 
     public BThreadSyncSnapshot getForkingBThread() {
         return forkingBThread;
     }
 
-    public byte[] getSerializedContinuation() {
-        return serializedContinuation;
+    public Object getBthreadData() {
+        return bthreadData;
     }
 
-    public void setSerializedContinuation(byte[] serializedContinuation) {
-        this.serializedContinuation = serializedContinuation;
+    public void setBthreadData(Object bthreadData) {
+        this.bthreadData = bthreadData;
     }
     
 }

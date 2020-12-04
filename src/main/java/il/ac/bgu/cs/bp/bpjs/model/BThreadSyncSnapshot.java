@@ -87,29 +87,22 @@ public class BThreadSyncSnapshot implements Serializable {
         bprogramStoreModifications = modifications;
     }
 
-    public BThreadSyncSnapshot(String name, Function entryPoint, Function interruptHandler,
-            Object continuation, SyncStatement bSyncStatement) {
-        this(name, entryPoint, interruptHandler, continuation, bSyncStatement, null, null);
+    public BThreadSyncSnapshot(String aName, Function anEntryPoint, BProgram bprog) {
+        this(aName, anEntryPoint, null, null, null, null, new MapProxy(bprog.getStore()) );
     }
     
-    
-    public BThreadSyncSnapshot(String aName, Function anEntryPoint) {
-        this(aName, anEntryPoint, null, null, null, null, null );
-    }
-    
-    public BThreadSyncSnapshot(String aName, Object someData, Function anEntryPoint) {
-        this(aName, anEntryPoint, null, null, null, someData, null );
-    }
-
     /**
-     * Creates the next snapshot of the BThread in a given run.
+     * Creates the next snapshot of the BThread, after {@code this} snapshot
+     * ran.
      *
-     * @param aContinuation The BThread's continuation for the next sync.
+     * @param aContinuation The BThread's continuation at the next sync.
      * @param aStatement The BThread's statement for the next sync.
+     * @param storageModifications storage modifications created during the run.
      * @return a copy of {@code this} with updated continuation and statement.
      */
-    public BThreadSyncSnapshot copyWith(Object aContinuation, SyncStatement aStatement) {
-        BThreadSyncSnapshot retVal = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, aContinuation, aStatement, data, null);
+    public BThreadSyncSnapshot copyWith(Object aContinuation, SyncStatement aStatement, MapProxy<String, Object> storageModifications) {
+        BThreadSyncSnapshot retVal = new BThreadSyncSnapshot(name, entryPoint, interruptHandler,
+            aContinuation, aStatement, data, storageModifications);
         
         aStatement.setBthread(retVal);
 
@@ -163,7 +156,7 @@ public class BThreadSyncSnapshot implements Serializable {
         this.data = data;
     }
 
-    public Map<String, MapProxy.Modification<Object>> getBprogramStoreModifications() {
+    public Map<String, MapProxy.Modification<Object>> getStorageModifications() {
         return bprogramStoreModifications.getModifications();
     }
     

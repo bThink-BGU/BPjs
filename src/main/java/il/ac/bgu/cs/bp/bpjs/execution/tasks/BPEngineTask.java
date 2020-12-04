@@ -1,9 +1,9 @@
 package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
-import il.ac.bgu.cs.bp.bpjs.bprogramio.BThreadSyncSnapshotOutputStream;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsCodeEvaluationException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy.CapturedBThreadState;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
@@ -12,17 +12,12 @@ import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.FailedAssertionViolation;
 import il.ac.bgu.cs.bp.bpjs.model.ForkStatement;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 import org.mozilla.javascript.WrappedException;
 
@@ -108,9 +103,10 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
     private BThreadSyncSnapshot handleContinuationPending(ContinuationPending cbs, Context jsContext) throws IllegalStateException {
         final Object capturedStatement = cbs.getApplicationState();
         
-        if ( capturedStatement instanceof SyncStatement ) {
-            final SyncStatement syncStatement = (SyncStatement) cbs.getApplicationState();
+        if ( capturedStatement instanceof CapturedBThreadState ) {
+            final CapturedBThreadState capturedState = (CapturedBThreadState) cbs.getApplicationState();
             
+            SyncStatement syncStatement = capturedState.syncStmt;
             // warn on self-blocking
             boolean hasRequest = ! syncStatement.getRequest().isEmpty();
             boolean hasBlock   = (syncStatement.getBlock() != EventSets.none );
@@ -121,28 +117,16 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
                 }
             }
             
-            return btss.copyWith(cbs.getContinuation(), syncStatement);
+            return btss.copyWith(cbs.getContinuation(), syncStatement, capturedState.modifications);
             
         } else if ( capturedStatement instanceof ForkStatement ) {
             ForkStatement forkStmt = (ForkStatement) capturedStatement;
             forkStmt.setForkingBThread(btss);
-            
-            final ScriptableObject globalScope = jsContext.initStandardObjects();
-            try ( ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                BThreadSyncSnapshotOutputStream btos = new BThreadSyncSnapshotOutputStream(baos, globalScope) ) {
-                btos.writeObject(cbs.getContinuation());
-                btos.flush();
-                baos.flush();
-                forkStmt.setSerializedContinuation(baos.toByteArray());
-                
-            } catch (IOException ex) {
-                Logger.getLogger(BPEngineTask.class.getName()).log(Level.SEVERE, "Error while serializing continuation during fork:" + ex.getMessage(), ex);
-                throw new RuntimeException("Error while serializing continuation during fork:" + ex.getMessage(), ex);
-            }
-            
+            forkStmt.cloneBThreadData(bpss); // and then there were two
             listener.addFork(forkStmt);
-            return continueParentOfFork(cbs, jsContext);
             
+            return continueParentOfFork(cbs, jsContext);
+                        
         } else {
             throw new IllegalStateException("Captured a statement of an unknown type: " + capturedStatement);
         }

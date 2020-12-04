@@ -25,6 +25,7 @@ package il.ac.bgu.cs.bp.bpjs.model;
 
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
+import static il.ac.bgu.cs.bp.bpjs.model.StorageModificationStrategy.PASSTHROUGH;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.EventSelectionResult;
 import org.junit.Rule;
 import org.junit.Test;
@@ -41,7 +42,7 @@ import static org.junit.Assert.*;
  * @author michael
  */
 public class BThreadSyncSnapshotTest {
-
+    
     @Rule
     public final ExpectedException exception = ExpectedException.none();
     private final List<BProgramRunnerListener> listeners = new ArrayList<>();
@@ -53,19 +54,19 @@ public class BThreadSyncSnapshotTest {
 
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("BProgramSnapshotEqualityTest");
         List<BProgramSyncSnapshot> snapshots = new ArrayList<>();
-        BProgramSyncSnapshot step = setup.start(execSvc);
+        BProgramSyncSnapshot step = setup.start(execSvc, PASSTHROUGH);
         snapshots.add(step);
         //Iteration 1, starts already at request state A
         for (int i = 0; i < 4; i++) {
             Set<BEvent> possibleEvents_a = bprog.getEventSelectionStrategy().selectableEvents(step);
             EventSelectionResult event_a = bprog.getEventSelectionStrategy().select(step, possibleEvents_a).get();
-            step = step.triggerEvent(event_a.getEvent(), execSvc, listeners);
+            step = step.triggerEvent(event_a.getEvent(), execSvc, listeners, PASSTHROUGH);
         }
         snapshots.add(step);
         for (int i = 0; i < 4; i++) {
             Set<BEvent> possibleEvents_a = bprog.getEventSelectionStrategy().selectableEvents(step);
             EventSelectionResult event_a = bprog.getEventSelectionStrategy().select(step, possibleEvents_a).get();
-            step = step.triggerEvent(event_a.getEvent(), execSvc, listeners);
+            step = step.triggerEvent(event_a.getEvent(), execSvc, listeners, PASSTHROUGH);
         }
         snapshots.add(step);
         // snapshots[1] is after the first loop iteration, snapshots[2] is after the second loop iteration.
@@ -86,14 +87,13 @@ public class BThreadSyncSnapshotTest {
                 "});");
         BProgramSyncSnapshot postSetup = bprog.setup();
         ExecutorService execSvcA = ExecutorServiceMaker.makeWithName("BProgramSnapshotTriggerTest");
-        BProgramSyncSnapshot postSync1 = postSetup.start(execSvcA);
+        BProgramSyncSnapshot postSync1 = postSetup.start(execSvcA, PASSTHROUGH);
         Set<BEvent> possibleEvents = bprog.getEventSelectionStrategy().selectableEvents(postSync1);
         EventSelectionResult esr = bprog.getEventSelectionStrategy().select(postSync1, possibleEvents).get();
-        BProgramSyncSnapshot postSync2 = postSync1.triggerEvent(esr.getEvent(), execSvcA, listeners);
+        BProgramSyncSnapshot postSync2 = postSync1.triggerEvent(esr.getEvent(), execSvcA, listeners, PASSTHROUGH);
         assertNotEquals(postSync1.getBThreadSnapshots(), postSync2.getBThreadSnapshots());
         execSvcA.shutdown();
     }
-
 
 }
 

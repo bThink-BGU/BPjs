@@ -44,11 +44,14 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change Log for the BPjs Library.
 
+### 2020-12-04
+* :bug: Forking now handles b-thread data properly.
+
 ### 2020-11-15
-* A B-Program can have multiple b-threads with the same name (closes[#112](https://github.com/bThink-BGU/BPjs/issues/112)).
+* :sparkles: A B-Program can have multiple b-threads with the same name (closes[#112](https://github.com/bThink-BGU/BPjs/issues/112)).
 
 ### 2020-11-09
-* Trace's `getLastEvent` now return an `Optional<Event>` rather than an `Event`. This is because some traces may not have a last event (part of the fix to [#122](https://github.com/bThink-BGU/BPjs/issues/122)). 
+* :arrow_up: Trace's `getLastEvent` now return an `Optional<Event>` rather than an `Event`. This is because some traces may not have a last event (part of the fix to [#122](https://github.com/bThink-BGU/BPjs/issues/122)). 
 
 ### 2020-10-20
 * :arrows_counterclockwise: `BEvent::toString` is more JS-like.

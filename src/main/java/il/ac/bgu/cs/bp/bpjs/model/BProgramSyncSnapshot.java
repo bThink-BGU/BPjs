@@ -1,12 +1,8 @@
 package il.ac.bgu.cs.bp.bpjs.model;
 
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotIO;
-import il.ac.bgu.cs.bp.bpjs.bprogramio.BThreadSyncSnapshotInputStream;
-import il.ac.bgu.cs.bp.bpjs.bprogramio.StreamObjectStub;
-import il.ac.bgu.cs.bp.bpjs.bprogramio.StubProvider;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
-import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.ResumeBThread;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.StartBThread;
 
@@ -21,13 +17,9 @@ import org.mozilla.javascript.Context;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.BPEngineTask;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.StartFork;
-import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy;
 import il.ac.bgu.cs.bp.bpjs.internal.MapProxyConsolidator;
-import il.ac.bgu.cs.bp.bpjs.internal.MapProxyConsolidator.*;
 import il.ac.bgu.cs.bp.bpjs.model.StorageConsolidationResult.Conflict;
 import il.ac.bgu.cs.bp.bpjs.model.StorageConsolidationResult.Success;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -40,7 +32,6 @@ import java.util.stream.Stream;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
 
 /**
  * The state of a {@link BProgram} when all its BThreads are at {@code bsync}.
@@ -106,6 +97,7 @@ public class BProgramSyncSnapshot {
      * {@code bp.sync}. 
      * 
      * @param exSvc the executor service that will advance the threads.
+     * @param sms The strategy to use when consolidating storage changes.
      * @return A snapshot of the program at the first {@code bp.sync}.
      * @throws java.lang.InterruptedException (since it's a blocking call)
      */
@@ -357,32 +349,10 @@ public class BProgramSyncSnapshot {
     
     Stream<StartFork> convertToTasks(ForkStatement fkStmt, BPEngineTask.Listener listener) {
         
-        // read continuation
-        Object cont=null;
-        final BProgramJsProxy bpProxy = new BProgramJsProxy(bprog);
-
-        StubProvider stubPrv = (StreamObjectStub stub) -> {
-            if (stub == StreamObjectStub.BP_PROXY) {
-                return bpProxy;
-            }
-            throw new IllegalArgumentException("Unknown stub " + stub);
-        };
-
-        try ( ByteArrayInputStream bais = new ByteArrayInputStream(fkStmt.getSerializedContinuation());
-            BThreadSyncSnapshotInputStream bssis = new BThreadSyncSnapshotInputStream(bais,
-                                                                ScriptableObject.getTopLevelScope(bprog.getGlobalScope()), stubPrv) ) {
-            cont = bssis.readObject();
-        } catch (ClassNotFoundException|IOException ex) {
-            throw new RuntimeException("Error while deserializing fork continuation: " + ex.getMessage(), ex);
-        }
-        
         // construct a BThreadSyncSnapshot
-        BThreadSyncSnapshot btss = new BThreadSyncSnapshot(
+        BThreadSyncSnapshot btss = fkStmt.makeSnapshot(
             "f" + FORK_NEXT_ID.incrementAndGet() + "$" + fkStmt.getForkingBThread().getName(),
-            fkStmt.getForkingBThread().getEntryPoint(), 
-            fkStmt.getForkingBThread().getInterrupt().orElse(null),
-            cont,
-            null
+            this
         );
         
         // duplicate snapshot and register the copy with the b-program
@@ -391,7 +361,9 @@ public class BProgramSyncSnapshot {
             BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(bprog);
             BThreadSyncSnapshot forkedBT = io.deserializeBThread(io.serializeBThread(btss), dataStore);
             bprog.registerForkedChild(btss);
-            return Stream.of(new StartFork(fkStmt, this, forkedBT, listener, bprog));
+            
+            // on child forks, the fork() statement returns 1.
+            return Stream.of(new StartFork(1, this, forkedBT, listener));
         } finally {
             Context.exit();
         }

@@ -29,28 +29,30 @@ var EVT_C = bp.Event("childPrint");
 var EVT_P = bp.Event("parentPrint");
 
 bp.registerBThread("source", function(){
-    var myInt = 0;
-    var myString = "base";
-    var myObj = {
+    let myInt = 0;
+    let myString = "base";
+    const myObj = {
         forkReturn: 0
     };
     
-    if ( bp.fork() ) {
+    let forkReturn = bp.fork();
+    if ( forkReturn ) {
         myInt=myInt+2;
         myString = myString+"/child/";
-        myObj.forkReturn=1;
+        myObj.forkReturn=true;
         myObj.childMessage="Child b-t";
-        bp.log.info("XX IN Child");
+        bp.log.info(bp.thread.name + "IN Child");
+        
     } else {
-        bp.log.info("XX IN Parent");
-        myObj.forkReturn=2;
+        bp.log.info(bp.thread.name +" IN Parent");
+        myObj.forkReturn=false;
         myInt=myInt+1;
         myString=myString+"/parent/";
         myObj.parentMessage="Parent b-t";
     }
     
     bp.sync({
-        request: myObj.forkReturn===1? EVT_C : EVT_P
+        request: myObj.forkReturn ? EVT_C : EVT_P
     });
     
     bp.log.info("myInt: " + myInt);

@@ -25,8 +25,8 @@ package il.ac.bgu.cs.bp.bpjs.internal;
 
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy;
 import il.ac.bgu.cs.bp.bpjs.TestUtils;
-import il.ac.bgu.cs.bp.bpjs.internal.MapProxyConsolidator.Conflict;
-import il.ac.bgu.cs.bp.bpjs.internal.MapProxyConsolidator.Success;
+import il.ac.bgu.cs.bp.bpjs.model.StorageConsolidationResult.Conflict;
+import il.ac.bgu.cs.bp.bpjs.model.StorageConsolidationResult.Success;
 import il.ac.bgu.cs.bp.bpjs.mocks.MockBThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import java.util.Map;
@@ -72,7 +72,7 @@ public class MapProxyConsolidatorTest {
         
         var sut = new MapProxyConsolidator();
         Set<BThreadSyncSnapshot> snaps = Set.<BThreadSyncSnapshot>of(mbt1, mbt2, mbt3);
-        var actual = sut.consolidate( snaps);
+        il.ac.bgu.cs.bp.bpjs.model.StorageConsolidationResult actual = sut.consolidate( snaps);
         
         assertTrue( actual instanceof Success );
         assertEquals(
