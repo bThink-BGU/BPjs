@@ -12,7 +12,9 @@ import org.junit.Test;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
+import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import static il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet.anyOf;
 import org.junit.Before;
 
@@ -136,7 +138,7 @@ public class PrioritizedBThreadsEventSelectionStrategyTest {
     }
     
     private BThreadSyncSnapshot bt( String name ) {
-        return new BThreadSyncSnapshot("bt"+name, null);
+        return new BThreadSyncSnapshot("bt"+name, null, new StringBProgram(""));
     }
 
 }

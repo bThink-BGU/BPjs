@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 michael.
+ * Copyright 2020 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -26,32 +26,30 @@ package il.ac.bgu.cs.bp.bpjs.model;
 import java.util.Objects;
 
 /**
- * Captures a failed assertion done by a b-thread. This is normally used to capture
- * cases where some specification was violated.
+ * A tag for a b-program sync point, stating that said point violates a
+ * safety property of the b-program.
+ * 
+ * For example, a sync point with a failed assertion, should be tagged by one
+ * of this class' subclasses.
  * 
  * @author michael
  */
-public class FailedAssertion implements java.io.Serializable {
-    private final String message;
-    private final String bThreadName;
+public abstract class SafetyViolationTag implements java.io.Serializable {
+    
+    protected final String message;
 
-    public FailedAssertion(String message, String bThreadName) {
+    public SafetyViolationTag(String message) {
         this.message = message;
-        this.bThreadName = bThreadName;
     }
 
     public String getMessage() {
         return message;
     }
 
-    public String getBThreadName() {
-        return bThreadName;
-    }
-
     @Override
     public int hashCode() {
         int hash = 5;
-        hash = 29 * hash + Objects.hashCode(this.bThreadName);
+        hash = 23 * hash + Objects.hashCode(this.message);
         return hash;
     }
 
@@ -63,20 +61,11 @@ public class FailedAssertion implements java.io.Serializable {
         if (obj == null) {
             return false;
         }
-        if (!(obj instanceof FailedAssertion)) {
+        if (getClass() != obj.getClass()) {
             return false;
         }
-        final FailedAssertion other = (FailedAssertion) obj;
-        if (!Objects.equals(this.message, other.message)) {
-            return false;
-        }
-        return Objects.equals(this.bThreadName, other.bThreadName);
+        final SafetyViolationTag other = (SafetyViolationTag) obj;
+        return Objects.equals(this.message, other.message);
     }
-
-    @Override
-    public String toString() {
-        return "[FailedAssertion message:" + message + ", b-thread:" + bThreadName + ']';
-    }
-    
     
 }

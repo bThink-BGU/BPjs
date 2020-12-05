@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BPjs tips &#8212; BPjs 0.10.5 documentation</title>
+    <title>BPjs tips &#8212; BPjs 0.10.6 documentation</title>
     <link rel="stylesheet" href="_static/classic.css" type="text/css" />
     <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="stylesheet" type="text/css" href="_static/css/custom.css" />
@@ -83,7 +83,7 @@ verification.</p>
 <div class="section" id="implementing-custom-events-and-using-custom-objects-as-event-data">
 <h2>Implementing Custom Events and Using Custom Objects as Event Data<a class="headerlink" href="#implementing-custom-events-and-using-custom-objects-as-event-data" title="Permalink to this headline">¶</a></h2>
 <p>ALWAYS make sure that you have state-based, meaningful <code class="docutils literal notranslate"><span class="pre">equals()</span></code> and
-<code class="docutils literal notranslate"><span class="pre">hashCode()</span></code>. Or verification fails.</p>
+<code class="docutils literal notranslate"><span class="pre">hashCode()</span></code>, and that serialization and de-serialization works. Or verification fails.</p>
 </div>
 <div class="section" id="state-minimization">
 <h2>State minimization<a class="headerlink" href="#state-minimization" title="Permalink to this headline">¶</a></h2>
@@ -126,6 +126,26 @@ fruitRatio.js file, this version of the b-threads yields three states:</p>
 <p>That’s because the former does not store the event from the previous
 iteration.</p>
 </div>
+<div class="section" id="variables-defined-in-loops">
+<h2>Variables Defined in Loops<a class="headerlink" href="#variables-defined-in-loops" title="Permalink to this headline">¶</a></h2>
+<p>When defining variables in loops, prefer <code class="docutils literal notranslate"><span class="pre">let</span></code> to <code class="docutils literal notranslate"><span class="pre">const</span></code>. This is because <code class="docutils literal notranslate"><span class="pre">const</span></code> won’t
+change after the first iteration, and the assignment attempt will fail silently.</p>
+<p>E.g. :</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="p">(</span> <span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="mi">10</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">evtName</span> <span class="o">=</span> <span class="nx">bp</span><span class="p">.</span><span class="nx">thread</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">eventPrefix</span> <span class="o">+</span> <span class="nb">String</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
+    <span class="nx">req</span><span class="p">(</span><span class="nx">evtName</span><span class="p">);</span> <span class="c1">// convenience function for bp.sync({request... (non-standard)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Will yield a series of events <code class="docutils literal notranslate"><span class="pre">event-0</span></code> to <code class="docutils literal notranslate"><span class="pre">event-9</span></code>, whereas:</p>
+<div class="highlight-javascript notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="p">(</span> <span class="kd">let</span> <span class="nx">i</span><span class="o">=</span><span class="mi">0</span><span class="p">;</span> <span class="nx">i</span><span class="o">&lt;</span><span class="mi">10</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span> <span class="p">)</span> <span class="p">{</span>
+    <span class="kr">const</span> <span class="nx">evtName</span> <span class="o">=</span> <span class="nx">bp</span><span class="p">.</span><span class="nx">thread</span><span class="p">.</span><span class="nx">data</span><span class="p">.</span><span class="nx">eventPrefix</span> <span class="o">+</span> <span class="nb">String</span><span class="p">(</span><span class="nx">i</span><span class="p">);</span>
+    <span class="nx">req</span><span class="p">(</span><span class="nx">evtName</span><span class="p">);</span> <span class="c1">// convenience function for bp.sync({request... (non-standard)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+<p>Will yield a series of 10 events named <code class="docutils literal notranslate"><span class="pre">event-0</span></code>.</p>
+</div>
 </div>
 
 
@@ -143,6 +163,7 @@ iteration.</p>
 <li><a class="reference internal" href="#event-comparison">Event comparison</a></li>
 <li><a class="reference internal" href="#implementing-custom-events-and-using-custom-objects-as-event-data">Implementing Custom Events and Using Custom Objects as Event Data</a></li>
 <li><a class="reference internal" href="#state-minimization">State minimization</a></li>
+<li><a class="reference internal" href="#variables-defined-in-loops">Variables Defined in Loops</a></li>
 </ul>
 </li>
 </ul>

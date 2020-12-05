@@ -24,7 +24,7 @@
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.DeadlockViolation;
-import il.ac.bgu.cs.bp.bpjs.analysis.violations.FailedAssertionViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.DetectedSafetyViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import il.ac.bgu.cs.bp.bpjs.model.*;
 
@@ -83,10 +83,10 @@ public class VerificationResultOptionsTest {
         final VerificationResult res = vfr.verify(bprog);
 
         assertTrue(res.isViolationFound());
-        assertTrue(res.getViolation().get() instanceof FailedAssertionViolation);
+        assertTrue(res.getViolation().get() instanceof DetectedSafetyViolation);
         
-        FailedAssertion expectedAssert = new FailedAssertion("B happened", "assertor");
-        assertEquals(expectedAssert, ((FailedAssertionViolation)res.getViolation().get()).getFailedAssertion());
+        FailedAssertionViolation expectedAssert = new FailedAssertionViolation("B happened", "assertor");
+        assertEquals(expectedAssert, ((DetectedSafetyViolation)res.getViolation().get()).getDetectedViolation());
         
         Violation violation = res.getViolation().get();
         assertTrue(violation.decsribe().contains("B happened"));
@@ -115,9 +115,9 @@ public class VerificationResultOptionsTest {
         final VerificationResult res = vfr.verify(bprog);
 
         assertTrue(res.isViolationFound());
-        assertTrue(res.getViolation().get() instanceof FailedAssertionViolation);
-        FailedAssertion expected = new FailedAssertion("failRightAWay!", "forward");
-        assertEquals(expected, ((FailedAssertionViolation)res.getViolation().get()).getFailedAssertion());
+        assertTrue(res.getViolation().get() instanceof DetectedSafetyViolation);
+        FailedAssertionViolation expected = new FailedAssertionViolation("failRightAWay!", "forward");
+        assertEquals(expected, ((DetectedSafetyViolation)res.getViolation().get()).getDetectedViolation());
         assertEquals(1, res.getScannedStatesCount());
     }
 

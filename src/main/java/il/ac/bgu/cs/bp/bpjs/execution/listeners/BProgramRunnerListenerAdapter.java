@@ -26,7 +26,7 @@ package il.ac.bgu.cs.bp.bpjs.execution.listeners;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
+import il.ac.bgu.cs.bp.bpjs.model.FailedAssertionViolation;
 
 /**
  * A {@link BProgramRunnerListener} with all methods defaultly implemented. Use when
@@ -49,7 +49,7 @@ public abstract class BProgramRunnerListenerAdapter implements BProgramRunnerLis
     public void ended(BProgram bp) {}
 
     @Override
-    public void assertionFailed(BProgram bp, FailedAssertion theFailedAssertion) {}
+    public void assertionFailed(BProgram bp, il.ac.bgu.cs.bp.bpjs.model.SafetyViolationTag theFailedAssertion) {}
 
     @Override
     public void bthreadAdded(BProgram bp, BThreadSyncSnapshot theBThread) {}

@@ -1,5 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import org.mozilla.javascript.Context;
 
@@ -8,17 +9,17 @@ import org.mozilla.javascript.Context;
  */
 public class StartBThread extends BPEngineTask {
 
-    public StartBThread(BThreadSyncSnapshot aBThread, BPEngineTask.Listener l) {
-        super(aBThread, l);
+    public StartBThread(BProgramSyncSnapshot aBpss, BThreadSyncSnapshot aBThread, BPEngineTask.Listener l) {
+        super(aBpss, aBThread, l);
     }
 
     @Override
     void callImpl( Context jsContext ) {
-        jsContext.callFunctionWithContinuations(bss.getEntryPoint(), bss.getEntryPoint(), new Object[0]);
+        jsContext.callFunctionWithContinuations(btss.getEntryPoint(), btss.getEntryPoint(), new Object[0]);
     }
    
     @Override
     public String toString() {
-        return "[StartBThread " + bss.getName() + "]";
+        return "[StartBThread " + btss.getName() + "]";
     }
 }

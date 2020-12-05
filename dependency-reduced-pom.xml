@@ -4,7 +4,7 @@
   <groupId>com.github.bthink-bgu</groupId>
   <artifactId>BPjs</artifactId>
   <name>BPjs</name>
-  <version>0.10.6</version>
+  <version>0.10.7</version>
   <description>Provides runtime and analysis for behavioral programs written in 
         JavaScript. It can run stand-alone (from the commmandline) or be 
         embedded in larger JVM-based systems.</description>
@@ -65,6 +65,21 @@
               <mainClass>il.ac.bgu.cs.bp.bpjs.mains.BPJsCliRunner</mainClass>
             </manifest>
           </archive>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <version>2.10.4</version>
+        <executions>
+          <execution>
+            <id>attach-javadocs</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <source>8</source>
         </configuration>
       </plugin>
     </plugins>

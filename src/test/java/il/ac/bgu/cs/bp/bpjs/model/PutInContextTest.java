@@ -35,7 +35,7 @@ import org.junit.Test;
 public class PutInContextTest {
     
     @Test
-    public void testPutInContext_global() throws InterruptedException {
+    public void testPutInContext_preRun() throws InterruptedException {
         BProgram sut = new StringBProgram("bp.log.info(obj);var len=obj.length;");
         String outsideObject = "I'm an outside object";
         sut.putInGlobalScope("obj", outsideObject);

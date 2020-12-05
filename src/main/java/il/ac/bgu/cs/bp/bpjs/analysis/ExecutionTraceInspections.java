@@ -24,7 +24,7 @@
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.DeadlockViolation;
-import il.ac.bgu.cs.bp.bpjs.analysis.violations.FailedAssertionViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.DetectedSafetyViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotSystemViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotBThreadViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.HotRunViolation;
@@ -75,7 +75,7 @@ public class ExecutionTraceInspections {
             if ( trace.isCyclic() ) return Optional.empty(); 
             BProgramSyncSnapshot curState = trace.getLastState();
             if (!trace.getLastState().isStateValid()) {
-                return Optional.of(new FailedAssertionViolation(trace.getLastState().getFailedAssertion(), trace));
+                return Optional.of(new DetectedSafetyViolation(trace.getLastState().getViolationTag(), trace));
             } else return Optional.empty();
     });
     

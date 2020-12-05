@@ -31,8 +31,9 @@ public class DfsTraversalNode {
      * @throws Exception in case there's an error with the executed JavaScript code.
      * @deprecated Use the inside code, this whole class might be going away soon.
      */
+    @Deprecated
     public static DfsTraversalNode getInitialNode(BProgram bp, ExecutorService exSvc) throws Exception {
-        BProgramSyncSnapshot seed = bp.setup().start(exSvc);
+        BProgramSyncSnapshot seed = bp.setup().start(exSvc, bp.getStorageModificationStrategy());
 
         return new DfsTraversalNode(bp, seed, null);
     }
@@ -79,7 +80,6 @@ public class DfsTraversalNode {
      * the given event.
      *
      * @param e the selected event
-     * @param listeners List of listeners for event selections
      * @param exSvc The executor service that will run the threads
      * @return State of the BProgram after event {@code e} was selected while
      * the program was at {@code this} node's state.
@@ -92,9 +92,9 @@ public class DfsTraversalNode {
      * TODO: Make the above note obsolete via refactor of BPjs or the BP paradigm (e.g. using STM)
      * 
      */
-    public DfsTraversalNode getNextNode(BEvent e, List<BProgramRunnerListener> listeners, ExecutorService exSvc) throws BPjsRuntimeException {
+    public DfsTraversalNode getNextNode(BEvent e, ExecutorService exSvc) throws BPjsRuntimeException {
         try {
-            return new DfsTraversalNode(bp, BProgramSyncSnapshotCloner.clone(systemState).triggerEvent(e, exSvc, listeners), e);
+            return new DfsTraversalNode(bp, BProgramSyncSnapshotCloner.clone(systemState).triggerEvent(e, exSvc, Collections.emptyList(), bp.getStorageModificationStrategy()), e);
         } catch ( InterruptedException ie ) {
             throw new BPjsRuntimeException("Thread interrupted during event invocaiton", ie);
         }

@@ -25,6 +25,7 @@ package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.NativeContinuation;
@@ -41,15 +42,15 @@ public class StartFork extends BPEngineTask {
     private final Object forkValue;
     private final BProgram bprog;
 
-    public StartFork(Object aForkValue, BThreadSyncSnapshot aBss, Listener aListener, BProgram aBprog) {
-        super(aBss, aListener);
+    public StartFork(Object aForkValue, BProgramSyncSnapshot aBpss, BThreadSyncSnapshot aBtss, Listener aListener) {
+        super(aBpss, aBtss, aListener);
         forkValue = aForkValue;
-        bprog = aBprog;
+        bprog =aBpss.getBProgram();
     }
 
     @Override
     void callImpl(Context jsContext) {
-        NativeContinuation cont = (NativeContinuation) bss.getContinuation();
+        NativeContinuation cont = (NativeContinuation) btss.getContinuation();
         Scriptable tls = ScriptableObject.getTopLevelScope(cont);
         BProgramJsProxy bprPxy = new BProgramJsProxy(bprog);
         ScriptableObject.defineProperty(tls, "bp", bprPxy, 0);
@@ -58,7 +59,7 @@ public class StartFork extends BPEngineTask {
 
     @Override
     public String toString() {
-        return "[StartFork bthread:" + bss.getName() + " value:" + forkValue + "]";
+        return "[StartFork bthread:" + btss.getName() + " value:" + forkValue + "]";
     }
     
     

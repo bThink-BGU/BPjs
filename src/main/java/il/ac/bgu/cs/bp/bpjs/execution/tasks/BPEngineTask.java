@@ -1,27 +1,23 @@
 package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
-import il.ac.bgu.cs.bp.bpjs.bprogramio.BThreadSyncSnapshotOutputStream;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsCodeEvaluationException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy.CapturedBThreadState;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import java.util.concurrent.Callable;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
-import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
+import il.ac.bgu.cs.bp.bpjs.model.FailedAssertionViolation;
 import il.ac.bgu.cs.bp.bpjs.model.ForkStatement;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
 import org.mozilla.javascript.Undefined;
 import org.mozilla.javascript.WrappedException;
 
@@ -36,16 +32,18 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
      * Callback interface for when assertions fail.
      */
     public static interface Listener {
-        public void assertionFailed( FailedAssertion fa );
+        public void assertionFailed( FailedAssertionViolation fa );
         public void addFork( ForkStatement stmt );
     }
     
-    protected final BThreadSyncSnapshot bss;
+    protected final BThreadSyncSnapshot btss;
+    protected final BProgramSyncSnapshot bpss;
     protected final Listener listener;
 
-    BPEngineTask(BThreadSyncSnapshot aBss, Listener aListener) {
+    BPEngineTask(BProgramSyncSnapshot aBpss, BThreadSyncSnapshot aBtss, Listener aListener) {
+        bpss = aBpss;
+        btss = aBtss;
         listener = aListener;
-        bss = aBss;
     }
     
     abstract void callImpl(Context jsContext);
@@ -55,7 +53,7 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
 
         Context jsContext = Context.enter();
         try {            
-            BProgramJsProxy.setCurrentBThread(bss);
+            BProgramJsProxy.setCurrentBThread(bpss, btss);
             callImpl( jsContext );
             return null;
 
@@ -105,41 +103,30 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
     private BThreadSyncSnapshot handleContinuationPending(ContinuationPending cbs, Context jsContext) throws IllegalStateException {
         final Object capturedStatement = cbs.getApplicationState();
         
-        if ( capturedStatement instanceof SyncStatement ) {
-            final SyncStatement syncStatement = (SyncStatement) cbs.getApplicationState();
+        if ( capturedStatement instanceof CapturedBThreadState ) {
+            final CapturedBThreadState capturedState = (CapturedBThreadState) cbs.getApplicationState();
             
+            SyncStatement syncStatement = capturedState.syncStmt;
             // warn on self-blocking
             boolean hasRequest = ! syncStatement.getRequest().isEmpty();
             boolean hasBlock   = (syncStatement.getBlock() != EventSets.none );
             if ( hasRequest && hasBlock ) {
                 boolean hasCollision = syncStatement.getRequest().stream().allMatch(syncStatement.getBlock()::contains);
                 if ( hasCollision ) {
-                    System.err.println("Warning: B-thread '"+bss.getName()+"' is blocking an event it is also requesting, this may lead to a deadlock.");
+                    System.err.println("Warning: B-thread '"+btss.getName()+"' is blocking an event it is also requesting, this may lead to a deadlock.");
                 }
             }
             
-            return bss.copyWith(cbs.getContinuation(), syncStatement);
+            return btss.copyWith(cbs.getContinuation(), syncStatement, capturedState.modifications);
             
         } else if ( capturedStatement instanceof ForkStatement ) {
             ForkStatement forkStmt = (ForkStatement) capturedStatement;
-            forkStmt.setForkingBThread(bss);
-            
-            final ScriptableObject globalScope = jsContext.initStandardObjects();
-            try ( ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                BThreadSyncSnapshotOutputStream btos = new BThreadSyncSnapshotOutputStream(baos, globalScope) ) {
-                btos.writeObject(cbs.getContinuation());
-                btos.flush();
-                baos.flush();
-                forkStmt.setSerializedContinuation(baos.toByteArray());
-                
-            } catch (IOException ex) {
-                Logger.getLogger(BPEngineTask.class.getName()).log(Level.SEVERE, "Error while serializing continuation during fork:" + ex.getMessage(), ex);
-                throw new RuntimeException("Error while serializing continuation during fork:" + ex.getMessage(), ex);
-            }
-            
+            forkStmt.setForkingBThread(btss);
+            forkStmt.cloneBThreadData(bpss); // and then there were two
             listener.addFork(forkStmt);
-            return continueParentOfFork(cbs, jsContext);
             
+            return continueParentOfFork(cbs, jsContext);
+                        
         } else {
             throw new IllegalStateException("Captured a statement of an unknown type: " + capturedStatement);
         }
@@ -162,7 +149,7 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
     private BThreadSyncSnapshot handleWrappedException(WrappedException wfae) throws WrappedException {
         if ( wfae.getCause() instanceof FailedAssertionException ) {
             FailedAssertionException fae = (FailedAssertionException) wfae.getCause();
-            FailedAssertion fa = new FailedAssertion( fae.getMessage(), bss.getName() );
+            FailedAssertionViolation fa = new FailedAssertionViolation( fae.getMessage(), btss.getName() );
             listener.assertionFailed( fa );
             return null;
         } else {

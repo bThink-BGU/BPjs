@@ -13,6 +13,10 @@ h3 {
   font-weight: bold;
 }
 
+th {
+  background-color: #cfcfcf;
+}
+
 .sphinxsidebarwrapper ul li {
   overflow-wrap: break-word;
 }
@@ -31,6 +35,11 @@ h3 {
 
 .caution {
   background-color: rgba(255,128,128,.4);
+}
+
+.danger {
+  background-color: rgba(255,100,100,.8);
+  color: rgb(146, 146, 0);
 }
 
 .admonition-todo {

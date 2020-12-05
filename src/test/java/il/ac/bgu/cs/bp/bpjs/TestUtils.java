@@ -27,13 +27,18 @@ import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.mocks.MockBProgramSyncSnapshot;
+import il.ac.bgu.cs.bp.bpjs.mocks.MockBThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
+import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
+import static java.util.Collections.emptySet;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -101,7 +106,14 @@ public abstract class TestUtils {
     public static BProgramSyncSnapshot makeBPSS( Collection<BThreadSyncSnapshot> snapshots ) {
         BProgram bprog = new StringBProgram("");
         Set<BThreadSyncSnapshot> bts = new HashSet<>(snapshots);
-        return new MockBProgramSyncSnapshot(new BProgramSyncSnapshot(bprog, bts, Collections.emptyList(), null));
+        return new MockBProgramSyncSnapshot(new BProgramSyncSnapshot(bprog, bts, new HashMap<>(), Collections.emptyList(), null));
+    }
+    
+    public static MockBThreadSyncSnapshot makeMockBtss() {
+        return new MockBThreadSyncSnapshot(
+                    new SyncStatement(null, emptySet(), EventSets.none, 
+                                      EventSets.none, EventSets.none, false, null)
+        );
     }
     
     /**

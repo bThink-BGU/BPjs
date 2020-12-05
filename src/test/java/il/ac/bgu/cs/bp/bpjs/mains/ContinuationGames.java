@@ -39,6 +39,7 @@ import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.StorageModificationStrategy;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
@@ -74,7 +75,7 @@ public class ContinuationGames {
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("TEST");
         
         // Run to first bp.sync
-        cur = cur.start(execSvc);
+        cur = cur.start(execSvc, StorageModificationStrategy.PASSTHROUGH);
         
         // Get a snapshot
         final BThreadSyncSnapshot snapshot = cur.getBThreadSnapshots().iterator().next();

@@ -1,7 +1,9 @@
 package il.ac.bgu.cs.bp.bpjs.model;
 
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy;
 import il.ac.bgu.cs.bp.bpjs.model.internal.ContinuationProgramState;
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Optional;
 
 import org.mozilla.javascript.Function;
@@ -51,6 +53,15 @@ public class BThreadSyncSnapshot implements Serializable {
      */
     private Object data;
     
+    /** 
+     * The changes to the b-program data this b-thread wants to make.
+     * These changes are not part of the sync snapshot serialized form, since at
+     * the serialization (i.e. after entering a sync point) all changes have been 
+     * applied to the program state, or we would have not been able to get into 
+     * the sync point due to conflict.
+     */
+    protected transient MapProxy<String, Object> bprogramStoreModifications;
+    
     private transient ContinuationProgramState programState;
 
     /**
@@ -63,40 +74,35 @@ public class BThreadSyncSnapshot implements Serializable {
      * @param continuation      captured b-thread continuation
      * @param bSyncStatement    current statement of the b-thread
      * @param someData          data for the b-thread (mqy be null).
+     * @param modifications     modifications to the b-program store
      */
     public BThreadSyncSnapshot(String name, Function entryPoint, Function interruptHandler,
-            Object continuation, SyncStatement bSyncStatement, Object someData) {
+            Object continuation, SyncStatement bSyncStatement, Object someData, MapProxy<String,Object> modifications) {
         this.name = name;
         this.entryPoint = entryPoint;
         this.interruptHandler = interruptHandler;
         this.continuation = (NativeContinuation)continuation;
         this.syncStatement = bSyncStatement;
         data = someData;
+        bprogramStoreModifications = modifications;
     }
 
-    public BThreadSyncSnapshot(String name, Function entryPoint, Function interruptHandler,
-            Object continuation, SyncStatement bSyncStatement) {
-        this(name, entryPoint, interruptHandler, continuation, bSyncStatement, null);
+    public BThreadSyncSnapshot(String aName, Function anEntryPoint, BProgram bprog) {
+        this(aName, anEntryPoint, null, null, null, null, new MapProxy(bprog.getStore()) );
     }
     
-    
-    public BThreadSyncSnapshot(String aName, Function anEntryPoint) {
-        this(aName, anEntryPoint, null, null, null, null );
-    }
-    
-    public BThreadSyncSnapshot(String aName, Object someData, Function anEntryPoint) {
-        this(aName, anEntryPoint, null, null, null, someData );
-    }
-
     /**
-     * Creates the next snapshot of the BThread in a given run.
+     * Creates the next snapshot of the BThread, after {@code this} snapshot
+     * ran.
      *
-     * @param aContinuation The BThread's continuation for the next sync.
+     * @param aContinuation The BThread's continuation at the next sync.
      * @param aStatement The BThread's statement for the next sync.
+     * @param storageModifications storage modifications created during the run.
      * @return a copy of {@code this} with updated continuation and statement.
      */
-    public BThreadSyncSnapshot copyWith(Object aContinuation, SyncStatement aStatement) {
-        BThreadSyncSnapshot retVal = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, aContinuation, aStatement, data);
+    public BThreadSyncSnapshot copyWith(Object aContinuation, SyncStatement aStatement, MapProxy<String, Object> storageModifications) {
+        BThreadSyncSnapshot retVal = new BThreadSyncSnapshot(name, entryPoint, interruptHandler,
+            aContinuation, aStatement, data, storageModifications);
         
         aStatement.setBthread(retVal);
 
@@ -150,6 +156,18 @@ public class BThreadSyncSnapshot implements Serializable {
         this.data = data;
     }
     
+    public void setBaseStore( Map<String,Object> aBaseStore ) {
+        bprogramStoreModifications.setSeed(aBaseStore);
+    }
+    
+    public Map<String, MapProxy.Modification<Object>> getStorageModifications() {
+        return bprogramStoreModifications.getModifications();
+    }
+
+    public void clearStorageModifications() {
+        bprogramStoreModifications.reset();
+    }
+    
     public ContinuationProgramState getContinuationProgramState() {
         if ( programState == null ) {
             programState = new ContinuationProgramState(continuation);
@@ -189,13 +207,16 @@ public class BThreadSyncSnapshot implements Serializable {
             return false;
         }
         
-        if ( ! Objects.equals(data,other.getData()) ) {
+        if ( (!Objects.equals(data,other.getData())) ||
+              (!Objects.equals(bprogramStoreModifications,other.bprogramStoreModifications)) ) {
             return false;
         }
         
         if (continuation == null) {
-            return (other.continuation == null);
+            // This b-thread hasn't run yet. Check eqality on its source.
+            return (other.continuation == null) && entryPoint.equals(other.entryPoint);
         } else {
+            // Check equality on the PC+stack+heap
             return getContinuationProgramState().equals(other.getContinuationProgramState());
         }
     }

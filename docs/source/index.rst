@@ -41,10 +41,11 @@ Topics:
    install-bpjs
    BPjsTutorial/index
    b-program-lifecycle
-   BPjs-class-structure
+   data-in-bpjs
    execute-bpjs
-   embed-bpjs
    verification/index
+   embed-bpjs
+   BPjs-class-structure
    extendBPjs/index
    glossary
    examples

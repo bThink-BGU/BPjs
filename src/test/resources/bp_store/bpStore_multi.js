@@ -1,7 +1,7 @@
-/*
+/* 
  * The MIT License
  *
- * Copyright 2018 michael.
+ * Copyright 2020 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,38 +21,37 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.analysis.violations;
+/* global bp */
 
-import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
-import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
+const START = bp.Event("START");
+const DONE  = bp.Event("Done");
 
-/**
- *
- * @author michael
- */
-public class FailedAssertionViolation extends Violation {
-    
-    private final FailedAssertion assertion;
+bp.registerBThread("starter", function(){
+    bp.store.put("v", {x:0, y:0});
+    bp.sync({request:START});
+    bp.sync({request:DONE});
+    const v = bp.store.get("v");
+    bp.sync({request: bp.Event("(" + v.x + "," + v.y + ")")});
+});
 
-    public FailedAssertionViolation(FailedAssertion assertion, ExecutionTrace counterExampleTrace) {
-        super(counterExampleTrace);
-        this.assertion = assertion;
-    }
+bp.registerBThread("advanceX", function(){
+   bp.sync({waitFor:START});
+   for ( let i=0; i<5; i++ ) {
+       bp.sync({request:bp.Event("advanceX"), block:DONE});
+       const v = bp.store.get("v");
+       v.x = v.x+1;
+       bp.store.put("v", v);
+       bp.log.info( v.x + "," + v.y );
+   } 
+});
 
-    @Override
-    public String decsribe() {
-        return "Failed assertion on b-thread " +
-                assertion.getBThreadName() + ": " +
-                assertion.getMessage();
-    }
-
-    public FailedAssertion getFailedAssertion() {
-        return assertion;
-    }
-
-    @Override
-    public String toString() {
-        return "[FailedAssertionViolation assertion:" + assertion + ']';
-    }
-    
-}
+bp.registerBThread("advanceY", function(){
+   bp.sync({waitFor:START});
+   for ( let i=0; i<5; i++ ) {
+       bp.sync({request:bp.Event("advanceY"), block:DONE});
+       const v = bp.store.get("v");
+       v.y = v.y+1;
+       bp.store.put("v", v);
+       bp.log.info( v.x + "," + v.y );
+   } 
+});

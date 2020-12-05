@@ -56,10 +56,10 @@ public class ArrayExecutionTraceTest {
         sut.advance(EVT_3, makeBPSS(new MockBThreadSyncSnapshot(SyncStatement.make())));
         sut.advance(EVT_4, makeBPSS(new MockBThreadSyncSnapshot(SyncStatement.make())));
         
-        assertEquals(EVT_4, sut.getLastEvent() );
+        assertEquals(EVT_4, sut.getLastEvent().get() );
         
         sut.cycleTo(EVT_3, 2);
-        assertEquals(EVT_3, sut.getLastEvent() );
+        assertEquals(EVT_3, sut.getLastEvent().get() );
     }
 
     
@@ -72,6 +72,7 @@ public class ArrayExecutionTraceTest {
         ArrayExecutionTrace sut = new ArrayExecutionTrace(new StringBProgram(""));
         
         sut.push(makeBPSS(new MockBThreadSyncSnapshot(SyncStatement.make())));
+        assertTrue( sut.getLastEvent().isEmpty() );
         sut.advance(EVT_1, makeBPSS(new MockBThreadSyncSnapshot(SyncStatement.make())));
         sut.advance(EVT_2, makeBPSS(new MockBThreadSyncSnapshot(SyncStatement.make())));
         sut.advance(EVT_3, makeBPSS(new MockBThreadSyncSnapshot(SyncStatement.make())));
@@ -103,6 +104,7 @@ public class ArrayExecutionTraceTest {
         sut.clear();
         
         assertEquals( 0, sut.getStateCount() );
+        assertTrue( sut.getLastEvent().isEmpty() );
         
     }
     

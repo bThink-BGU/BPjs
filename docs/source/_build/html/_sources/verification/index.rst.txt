@@ -53,8 +53,11 @@ The analysis process involves a few classes of note. When writing new types of a
 ``Violation``
   When an ``ExecutionTraceInspection`` instance finds a trace that violates some requirement, it describes that discovery using an instance of this class.
 
-``VisitedNodeStore``
-  In order to detect cycles in a b-program's execution graph, the verifier needs to know whether a given state was already visited. This is done using an instance of this class. BPjs  ships with three implementations: One that looks at the entire state of the b-program, on that looks only at the hash code of that state, and one that assumes that all states are new. The latter consumes very little memory, but is only useful for analyzing programs whose state space is a tree.
+``VisitedStateStore``
+  In order to detect cycles in a b-program's execution graph, the verifier needs to know whether a given state was already visited. This is done using an instance of this class. BPjs ships with three implementations: One that looks at the entire state of the b-program, on that looks only at the hash code of that state, and one that assumes that all states are new.
+
+.. tip::
+  The forgetful visited state store (``ForgetfulVisitedStateStore``) is useful for traversing all graph's edges, since it does not stop a scan when it arrives at a node it already visited. The scan is still resilient to cycles - these are detected by looking at the DFS stack, not the visited state store.
 
 
 Verifying Safety Properties
@@ -97,20 +100,24 @@ Types of Liveness Violations
 
 A liveness violation occurs when some set of b-thread remains hot forever. This can happen on two cases: a) there's cycle in the b-program's state space, where at least a single b-thread is hot at each point; or b) the program can terminate while at least one of its b-threads is hot. These violation types are described in more detail below, and in the accompanying figure.
 
-  Hot Run (of a group of b-threads)
-    There exists a group of b-threads that can get into an infinite loop where at least one of its member b-threads is hot at each synchronization point. This means, semantically, that these b-threads are never "satisfied" and must always advance. In the below diagram, b-threads 1, 2, and 3 form a group which has a hot run (states A->B->C->A...). If we only consider b-threads 1 and 2, on the other hand, there is no hot run, since none of them is hot at state C.
-
-  Hot System Violation
-    A case where the b-program, as a whole, might find itself in a cycle whose synchronization points are all hot. This is a private case of a hot run, where the considered group contains all the b-program's b-threads. In the below diagram, the described system has a hot system violation, because of the cycle A->B->C->A.
-
-  Hot B-Thread Violation
-    A case where a single b-thread can get into a cycle were it is always hot. This is a private case of Hot Run, where the group that has the hot run contains a single thread. Normally, this situation indicate that some business requirement was violated, or that there might have been a programming error. In the below diagram, b-thread 5 has a hot b-thread violation, because of the cycle A->B->C->A.
-
-  Hot Termination
-    A case where a b-program terminates when one or more of its b-threads is hot. This is technically a safety violation, since the run is finite. However, these cases can be augmented to a Hot B-Thread violation, by adding a trivial self transition, from the terminal state to itself. In the below diagram, a run that ends at state X would be hot termination violation. The dotted transition to and from state X is the augmentation to a hot b-thread violation.
+.. note::
+  Not all hot cycles are bugs! Some systems must be able to advance infinitely. One example would be a traffic light controller, which must be able to infinitely cycle between its lights.
 
 
-.. figure:: images/liveness
+Hot Run (of a group of b-threads)
+  There exists a group of b-threads that can get into an infinite loop where at least one of its member b-threads is hot at each synchronization point. This means, semantically, that these b-threads are never "satisfied" and must always advance. In the below diagram, b-threads 1, 2, and 3 form a group which has a hot run (states A→B→C→A...). If we only consider b-threads 1 and 2, on the other hand, there is no hot run, since none of them is hot at state C.
+
+Hot System Violation
+  A case where the b-program, as a whole, might find itself in a cycle whose synchronization points are all hot. This is a private case of a hot run, where the considered group contains all the b-program's b-threads. In the below diagram, the described system has a hot system violation, because of the cycle A→B→C→A.
+
+Hot B-Thread Violation
+  A case where a single b-thread can get into a cycle were it is always hot. This is a private case of Hot Run, where the group that has the hot run contains a single thread. Normally, this situation indicates that some business requirement was violated, or that there might have been a programming error. In the below diagram, b-thread 5 has a hot b-thread violation, because of the cycle A→B→C→A.
+
+Hot Termination
+  A case where a b-program terminates when one or more of its b-threads is hot. This is technically a safety violation, since the run is finite. However, these cases can be augmented to a Hot B-Thread violation, by adding a trivial self transition, from the terminal state to itself. In the below diagram, a run that ends at state X would be a hot termination violation. The dotted transition to and from state X is the augmentation to a hot b-thread violation.
+
+
+.. figure:: /images/liveness.png
     :align: center
 
     A sample state graph of a b-program. This graph contains 5 states (A, B, C, X, Z). In each, there are five b-threads (1-5). At each state, hot b-threads are marked with a red background. This state graph contains various liveness violations, as described above.

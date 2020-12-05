@@ -36,7 +36,7 @@ import java.util.Optional;
 import java.util.Set;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
-import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
+import il.ac.bgu.cs.bp.bpjs.model.SafetyViolationTag;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -54,7 +54,7 @@ public class BProgramRunner implements Runnable {
     private ExecutorService execSvc = null;
     private BProgram bprog = null;
     private final List<BProgramRunnerListener> listeners = new ArrayList<>();
-    private FailedAssertion failedAssertion;
+    private SafetyViolationTag failedAssertion;
     private final AtomicBoolean go = new AtomicBoolean(true);
     private volatile boolean halted;
     
@@ -83,10 +83,10 @@ public class BProgramRunner implements Runnable {
             go.set(true);
             halted = false;
             listeners.forEach(l -> l.started(bprog));
-            cur = cur.start(execSvc);
+            cur = cur.start(execSvc, bprog.getStorageModificationStrategy());
 
             if ( ! cur.isStateValid() ) {
-                failedAssertion = cur.getFailedAssertion();
+                failedAssertion = cur.getViolationTag();
                 listeners.forEach( l->l.assertionFailed(bprog, failedAssertion));
                 go.set(false);
             }
@@ -129,9 +129,9 @@ public class BProgramRunner implements Runnable {
                             cur = cur.copyWith(updatedExternals);
                         }
 
-                        cur = cur.triggerEvent(esr.getEvent(), execSvc, listeners);
+                        cur = cur.triggerEvent(esr.getEvent(), execSvc, listeners, bprog.getStorageModificationStrategy());
                         if ( ! cur.isStateValid() ) {
-                            failedAssertion = cur.getFailedAssertion();
+                            failedAssertion = cur.getViolationTag();
                             listeners.forEach( l->l.assertionFailed(bprog, failedAssertion));
                             go.set(false);
                         }
@@ -174,7 +174,7 @@ public class BProgramRunner implements Runnable {
         return failedAssertion!=null;
     }
 
-    public FailedAssertion getFailedAssertion() {
+    public SafetyViolationTag getFailedAssertion() {
         return failedAssertion;
     }
     

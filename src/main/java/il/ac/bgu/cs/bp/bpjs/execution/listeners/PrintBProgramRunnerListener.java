@@ -3,7 +3,7 @@ package il.ac.bgu.cs.bp.bpjs.execution.listeners;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.model.FailedAssertion;
+import il.ac.bgu.cs.bp.bpjs.model.FailedAssertionViolation;
 import java.io.PrintStream;
 
 /**
@@ -44,9 +44,8 @@ public class PrintBProgramRunnerListener implements BProgramRunnerListener {
     }
 
     @Override
-    public void assertionFailed(BProgram bp, FailedAssertion theFailedAssertion) {
-        out.println("---:" + bp.getName() + " B-thread " + theFailedAssertion.getBThreadName()
-                           + " is in invalid state: " + theFailedAssertion.getMessage());
+    public void assertionFailed(BProgram bp, il.ac.bgu.cs.bp.bpjs.model.SafetyViolationTag theFailedAssertion) {
+        out.println("---:" + bp.getName() + " " + theFailedAssertion.getMessage());
     }
 
     @Override

@@ -11,6 +11,7 @@ import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import static il.ac.bgu.cs.bp.bpjs.model.StorageModificationStrategy.PASSTHROUGH;
 import java.util.Arrays;
 import static java.util.Collections.emptySet;
 import java.util.concurrent.ExecutorService;
@@ -47,7 +48,6 @@ import org.junit.Test;
  */
 public class BProgramSyncSnapshotClonerTest {
     
-    
     @Test
     public void testProgramIsOk() throws InterruptedException {
         BProgramRunner bpr = new BProgramRunner(new ResourceBProgram("SnapshotTests/BProgramSyncSnapshotClonerTest.js"));
@@ -65,11 +65,11 @@ public class BProgramSyncSnapshotClonerTest {
         BProgram bprog = new ResourceBProgram("SnapshotTests/BProgramSyncSnapshotClonerTest.js");
         BProgramSyncSnapshot cur = bprog.setup();
         ExecutorService exSvc = ExecutorServiceMaker.makeWithName("test");
-        cur = cur.start(exSvc);
+        cur = cur.start(exSvc, PASSTHROUGH);
         cur.triggerEvent( 
                 cur.getStatements().stream().flatMap(s->s.getRequest().stream()).findFirst().get(),
                 exSvc,
-                emptySet());
+                emptySet(), PASSTHROUGH);
         BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(bprog);
         byte[] out = io.serialize(cur);
         io.deserialize(out);
@@ -83,11 +83,11 @@ public class BProgramSyncSnapshotClonerTest {
         ExecutorService exSvc = ExecutorServiceMaker.makeWithName("test");
         bprog.enqueueExternalEvent(new BEvent("External1"));
         bprog.enqueueExternalEvent(new BEvent("External2"));
-        cur = cur.start(exSvc);
+        cur = cur.start(exSvc, PASSTHROUGH);
         cur.triggerEvent( 
                 cur.getStatements().stream().flatMap(s->s.getRequest().stream()).findFirst().get(),
                 exSvc,
-                emptySet());
+                emptySet(), PASSTHROUGH);
         BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(bprog);
         byte[] out = io.serialize(cur);
         BProgramSyncSnapshot deserialized = io.deserialize(out);

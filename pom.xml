@@ -5,7 +5,7 @@
 
     <groupId>com.github.bthink-bgu</groupId>
     <artifactId>BPjs</artifactId>
-    <version>0.10.7</version>
+    <version>0.11.0</version>
     <packaging>jar</packaging>
 
     <name>BPjs</name>
@@ -42,6 +42,8 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <java.version>11</java.version>
         <exec.mainClass>il.ac.bgu.cs.bp.bpjs.mains.BPJsCliRunner</exec.mainClass>
+        <javax.activation.version>1.2.0</javax.activation.version>
+        <jaxb.api.version>2.3.0</jaxb.api.version>
     </properties>
 
     <distributionManagement>
@@ -64,7 +66,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13</version>
+            <version>4.13.1</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -78,6 +80,24 @@
             <artifactId>commons-csv</artifactId>
             <version>1.8</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.seleniumhq.selenium</groupId>
+            <artifactId>selenium-java</artifactId>
+            <scope>test</scope>
+            <version>2.44.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.opera</groupId>
+            <artifactId>operadriver</artifactId>
+            <scope>test</scope>
+            <version>1.5</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>org.seleniumhq.selenium</groupId>
+                    <artifactId>selenium-remote-driver</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
     </dependencies>
 
@@ -98,11 +118,18 @@
                 <groupId>org.eluder.coveralls</groupId>
                 <artifactId>coveralls-maven-plugin</artifactId>
                 <version>4.3.0</version>
+                <dependencies>
+                    <dependency>
+                        <groupId>javax.xml.bind</groupId>
+                        <artifactId>jaxb-api</artifactId>
+                        <version>2.2.3</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
-                <version>0.8.5</version>
+                <version>0.8.6</version>
                 <executions>
                     <execution>
                         <id>prepare-agent</id>
@@ -132,6 +159,7 @@
                 <configuration>
                     <source>8</source>
                 </configuration>
+<<<<<<< HEAD
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -140,6 +168,8 @@
                         </goals>
                     </execution>
                 </executions>
+=======
+>>>>>>> develop
             </plugin>
         </plugins>        
     </build>

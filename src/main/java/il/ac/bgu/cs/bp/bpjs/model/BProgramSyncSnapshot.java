@@ -1,12 +1,8 @@
 package il.ac.bgu.cs.bp.bpjs.model;
 
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotIO;
-import il.ac.bgu.cs.bp.bpjs.bprogramio.BThreadSyncSnapshotInputStream;
-import il.ac.bgu.cs.bp.bpjs.bprogramio.StreamObjectStub;
-import il.ac.bgu.cs.bp.bpjs.bprogramio.StubProvider;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
-import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.ResumeBThread;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.StartBThread;
 
@@ -21,8 +17,10 @@ import org.mozilla.javascript.Context;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.BPEngineTask;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.StartFork;
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
+import il.ac.bgu.cs.bp.bpjs.internal.MapProxyConsolidator;
+import il.ac.bgu.cs.bp.bpjs.model.StorageConsolidationResult.Conflict;
+import il.ac.bgu.cs.bp.bpjs.model.StorageConsolidationResult.Success;
+import java.util.Map;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
@@ -34,7 +32,6 @@ import java.util.stream.Stream;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
 
 /**
  * The state of a {@link BProgram} when all its BThreads are at {@code bsync}.
@@ -47,29 +44,30 @@ public class BProgramSyncSnapshot {
     
     private static final AtomicInteger FORK_NEXT_ID = new AtomicInteger(0);
     
-    private final Set<BThreadSyncSnapshot> threadSnapshots;
-    private final List<BEvent> externalEvents;
     private final BProgram bprog;
-    private final AtomicReference<FailedAssertion> violationRecord = new AtomicReference<>();
+    private final Set<BThreadSyncSnapshot> threadSnapshots;
+    private final Map<String, Object> dataStore;
+    private final List<BEvent> externalEvents;
+    private final AtomicReference<SafetyViolationTag> violationTag = new AtomicReference<>();
     private int hashCodeCache = Integer.MIN_VALUE;
     
     /** A flag to ensure the snapshot is only triggered once. */
     private boolean triggered=false;
     
     /**
-     * A listener that populates the {@link #violationRecord} field.
+     * A listener that populates the {@link #violationTag} field.
      */
     private static class ViolationRecorder implements BPEngineTask.Listener {
         private final BProgram bprogram;
-        private final AtomicReference<FailedAssertion> vioRec;
+        private final AtomicReference<SafetyViolationTag> vioRec;
 
-        public ViolationRecorder(BProgram bprogram, AtomicReference<FailedAssertion> aViolationRecord) {
+        public ViolationRecorder(BProgram bprogram, AtomicReference<SafetyViolationTag> aViolationRecord) {
             this.bprogram = bprogram;
             vioRec = aViolationRecord;
         }
         
         @Override
-        public void assertionFailed(FailedAssertion fa) {
+        public void assertionFailed(FailedAssertionViolation fa) {
             vioRec.compareAndSet(null, fa);
         }
 
@@ -80,15 +78,20 @@ public class BProgramSyncSnapshot {
     }
     
     public BProgramSyncSnapshot(BProgram aBProgram, Set<BThreadSyncSnapshot> someThreadSnapshots,
-                                List<BEvent> someExternalEvents, FailedAssertion aViolationRecord ) {
+                                 Map<String, Object> aDataStore,
+                                List<BEvent> someExternalEvents, SafetyViolationTag aViolationRecord ) {
         threadSnapshots = someThreadSnapshots;
+        dataStore = aDataStore;
         externalEvents = someExternalEvents;
         bprog = aBProgram;
-        violationRecord.set(aViolationRecord);
+        violationTag.set(aViolationRecord);
+        
+        threadSnapshots.forEach( ts -> ts.setBaseStore(dataStore) );
     }
     
     public BProgramSyncSnapshot copyWith( List<BEvent> updatedExternalEvents ) {
-        return new BProgramSyncSnapshot(bprog, threadSnapshots, updatedExternalEvents, violationRecord.get());
+        return new BProgramSyncSnapshot(bprog, threadSnapshots, dataStore,
+                                    updatedExternalEvents, violationTag.get());
     }
 
     /**
@@ -96,32 +99,38 @@ public class BProgramSyncSnapshot {
      * {@code bp.sync}. 
      * 
      * @param exSvc the executor service that will advance the threads.
+     * @param sms The strategy to use when consolidating storage changes.
      * @return A snapshot of the program at the first {@code bp.sync}.
      * @throws java.lang.InterruptedException (since it's a blocking call)
      */
-    public BProgramSyncSnapshot start( ExecutorService exSvc ) throws InterruptedException {
+    public BProgramSyncSnapshot start( ExecutorService exSvc, StorageModificationStrategy sms ) throws InterruptedException {
+        
+        // execute b-threads
         Set<BThreadSyncSnapshot> nextRound = new HashSet<>(threadSnapshots.size());
-        BPEngineTask.Listener halter = new ViolationRecorder(bprog, violationRecord);
+        BPEngineTask.Listener halter = new ViolationRecorder(bprog, violationTag);
         nextRound.addAll(exSvc.invokeAll(threadSnapshots.stream()
-                                .map(bt -> new StartBThread(bt, halter))
+                                .map(bt -> new StartBThread(this, bt, halter))
                                 .collect(toList())
                 ).stream().map(f -> safeGet(f) ).collect(toList())
         );
         executeAllAddedBThreads(nextRound, exSvc, halter);
+        
         List<BEvent> nextExternalEvents = new ArrayList<>(getExternalEvents());
         nextExternalEvents.addAll( bprog.drainEnqueuedExternalEvents() );
-        return new BProgramSyncSnapshot(bprog, nextRound, nextExternalEvents, violationRecord.get());
+                
+        return createNextSnapshot(nextRound, nextExternalEvents, sms);
     }
 
     /**
      * Runs the program from the snapshot, triggering the passed event.
-     * @param exSvc the executor service that will advance the threads.
-     * @param anEvent the event selected.
-     * @param listeners will be informed in case of b-thread interrupts
+     * @param exSvc     The executor service that will advance the threads.
+     * @param anEvent   The event selected.
+     * @param listeners Will be informed in case of b-thread interrupts.
+     * @param sms       A strategy for handling storage modifications.
      * @return A set of b-thread snapshots that should participate in the next cycle.
      * @throws InterruptedException (since it's a blocking call)
      */
-    public BProgramSyncSnapshot triggerEvent(BEvent anEvent, ExecutorService exSvc, Iterable<BProgramRunnerListener> listeners) throws InterruptedException, BPjsRuntimeException {
+    public BProgramSyncSnapshot triggerEvent(BEvent anEvent, ExecutorService exSvc, Iterable<BProgramRunnerListener> listeners, StorageModificationStrategy sms) throws InterruptedException, BPjsRuntimeException {
         if (anEvent == null) throw new IllegalArgumentException("Cannot trigger a null event.");
         if ( triggered ) {
             throw new IllegalStateException("A BProgramSyncSnapshot is not allowed to be triggered twice.");
@@ -145,14 +154,14 @@ public class BProgramSyncSnapshot {
             Context.exit();
         }
         
-        BPEngineTask.Listener halter = new ViolationRecorder(bprog, violationRecord);
+        BPEngineTask.Listener halter = new ViolationRecorder(bprog, violationTag);
 
         // add the run results of all those who advance this stage
         Set<BThreadSyncSnapshot> nextRound = new HashSet<>(threadSnapshots.size());
         try {
             nextRound.addAll(exSvc.invokeAll(
                                 resumingThisRound.stream()
-                                                 .map(bt -> new ResumeBThread(bt, anEvent, halter))
+                                                 .map(bt -> new ResumeBThread(this, bt, anEvent, halter))
                                                  .collect(toList())
                     ).stream().map(f -> safeGet(f)).filter(Objects::nonNull).collect(toList())
             );
@@ -194,9 +203,29 @@ public class BProgramSyncSnapshot {
         // carry over BThreads that did not advance this round to next round.
         nextRound.addAll(sleepingThisRound);
 
-
-        return new BProgramSyncSnapshot(bprog, nextRound, nextExternalEvents, violationRecord.get());
+        return createNextSnapshot(nextRound, nextExternalEvents, sms);
+    }
+    
+    private BProgramSyncSnapshot createNextSnapshot(Set<BThreadSyncSnapshot> nextRound, List<BEvent> nextExternalEvents, StorageModificationStrategy sms) {
+        // consolidate changes
+        MapProxyConsolidator mpc = new MapProxyConsolidator();
+        StorageConsolidationResult mpcRes = mpc.consolidate(nextRound);
         
+        if ( mpcRes instanceof Conflict ) {
+            mpcRes = sms.resolve((Conflict) mpcRes, this, nextRound);
+        }
+        
+        if ( mpcRes instanceof Success ) {
+            Success success = (Success)mpcRes;
+            success = sms.incomingModifications(success, this, nextRound);
+            Map<String, Object> updatedStore = success.apply(dataStore);
+            nextRound.forEach( ts -> ts.clearStorageModifications() ); // changes were applied, so can be reset.
+            return new BProgramSyncSnapshot(bprog, nextRound, updatedStore, nextExternalEvents, violationTag.get());
+            
+        } else {
+            Conflict conflict = (Conflict) mpcRes;
+            return new BProgramSyncSnapshot(bprog, nextRound, dataStore, nextExternalEvents, new StorageConflictViolation(conflict, "Storage conflict: " + conflict.toString()));
+        }
     }
     
     private void handleInterrupts(BEvent anEvent, Iterable<BProgramRunnerListener> listeners, BProgram bprog, Context ctxt) {
@@ -257,14 +286,18 @@ public class BProgramSyncSnapshot {
      * a b-thread makes an failed assertion.
      * 
      * @return {@code true} iff the program is in valid state.
-     * @see #getFailedAssertion() 
+     * @see #getViolationTag() 
      */
     public boolean isStateValid() {
-        return violationRecord.get() == null;
+        return violationTag.get() == null;
     }
     
-    public FailedAssertion getFailedAssertion() {
-        return violationRecord.get();
+    public SafetyViolationTag getViolationTag() {
+        return violationTag.get();
+    }
+
+    public Map<String, Object> getDataStore() {
+        return dataStore;
     }
     
     /**
@@ -307,7 +340,7 @@ public class BProgramSyncSnapshot {
         while ( ((!addedBThreads.isEmpty()) || (!addedForks.isEmpty())) 
                 && !exSvc.isShutdown() ) {
             Stream<BPEngineTask> threadStream = addedBThreads.stream()
-                .map(bt -> new StartBThread(bt, listener));
+                .map(bt -> new StartBThread(this, bt, listener));
             Stream<BPEngineTask> forkStream = addedForks.stream().flatMap( f -> convertToTasks(f, listener) );
             
             nextRound.addAll(exSvc.invokeAll(Stream.concat(forkStream, threadStream).collect(toList())).stream()
@@ -319,41 +352,21 @@ public class BProgramSyncSnapshot {
     
     Stream<StartFork> convertToTasks(ForkStatement fkStmt, BPEngineTask.Listener listener) {
         
-        // read continuation
-        Object cont=null;
-        final BProgramJsProxy bpProxy = new BProgramJsProxy(bprog);
-
-        StubProvider stubPrv = (StreamObjectStub stub) -> {
-            if (stub == StreamObjectStub.BP_PROXY) {
-                return bpProxy;
-            }
-            throw new IllegalArgumentException("Unknown stub " + stub);
-        };
-
-        try ( ByteArrayInputStream bais = new ByteArrayInputStream(fkStmt.getSerializedContinuation());
-            BThreadSyncSnapshotInputStream bssis = new BThreadSyncSnapshotInputStream(bais,
-                                                                ScriptableObject.getTopLevelScope(bprog.getGlobalScope()), stubPrv) ) {
-            cont = bssis.readObject();
-        } catch (ClassNotFoundException|IOException ex) {
-            throw new RuntimeException("Error while deserializing fork continuation: " + ex.getMessage(), ex);
-        }
-        
         // construct a BThreadSyncSnapshot
-        BThreadSyncSnapshot btss = new BThreadSyncSnapshot(
+        BThreadSyncSnapshot btss = fkStmt.makeSnapshot(
             "f" + FORK_NEXT_ID.incrementAndGet() + "$" + fkStmt.getForkingBThread().getName(),
-            fkStmt.getForkingBThread().getEntryPoint(), 
-            fkStmt.getForkingBThread().getInterrupt().orElse(null),
-            cont,
-            null
+            this
         );
         
         // duplicate snapshot and register the copy with the b-program
         try {
             Context.enter();
             BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(bprog);
-            BThreadSyncSnapshot forkedBT = io.deserializeBThread(io.serializeBThread(btss));
+            BThreadSyncSnapshot forkedBT = io.deserializeBThread(io.serializeBThread(btss), dataStore);
             bprog.registerForkedChild(btss);
-            return Stream.of(new StartFork(fkStmt, forkedBT, listener, bprog));
+            
+            // on child forks, the fork() statement returns 1.
+            return Stream.of(new StartFork(1, this, forkedBT, listener));
         } finally {
             Context.exit();
         }
@@ -380,13 +393,14 @@ public class BProgramSyncSnapshot {
             return false;
         }
         if (!isStateValid()) {
-            if (!getFailedAssertion().equals(other.getFailedAssertion()) ) {
+            if (!getViolationTag().equals(other.getViolationTag()) ) {
                 return false;
             }
         }
-        if ( ! getExternalEvents().equals(other.getExternalEvents()) ) {
-            return false;
-        }
+        
+        if ( ! getDataStore().equals(other.getDataStore()) ) return false;
+        if ( ! getExternalEvents().equals(other.getExternalEvents()) ) return false;
+        
         // optimization: non-equality by hash code - if we have one.
         if ( hashCodeCache != Integer.MIN_VALUE && other.hashCodeCache != Integer.MIN_VALUE ) {
             if ( hashCodeCache != other.hashCodeCache ) return false;

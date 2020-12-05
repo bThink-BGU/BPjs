@@ -52,7 +52,9 @@ public class BThreadSyncSnapshotOutputStream extends ScriptableOutputStream {
         if ( obj instanceof BProgramJsProxy ) {
             stubs.add(StreamObjectStub.BP_PROXY);
             return StreamObjectStub.BP_PROXY;
-            
+        } else if ( ! (obj instanceof java.io.Serializable) ) {
+            System.err.println("Attempt to write a non-serializable object " + obj.toString());
+            return "NOT SERIALIZABLE: " + obj.toString();
         } else {
             return obj;
         }

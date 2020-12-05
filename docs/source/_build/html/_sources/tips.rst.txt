@@ -57,7 +57,7 @@ Implementing Custom Events and Using Custom Objects as Event Data
 -----------------------------------------------------------------
 
 ALWAYS make sure that you have state-based, meaningful ``equals()`` and
-``hashCode()``. Or verification fails.
+``hashCode()``, and that serialization and de-serialization works. Or verification fails.
 
 State minimization
 ------------------
@@ -104,3 +104,29 @@ Where this version yields 4 (note different location of ``var evt``) :
 
 That’s because the former does not store the event from the previous
 iteration.
+
+Variables Defined in Loops
+--------------------------
+
+When defining variables in loops, prefer ``let`` to ``const``. This is because ``const`` won't
+change after the first iteration, and the assignment attempt will fail silently.
+
+E.g. :
+
+.. code:: javascript
+    
+    for ( let i=0; i<10; i++ ) {
+        let evtName = bp.thread.data.eventPrefix + String(i);
+        req(evtName); // convenience function for bp.sync({request... (non-standard)
+    }
+
+Will yield a series of events ``event-0`` to ``event-9``, whereas:
+
+.. code:: javascript
+    
+    for ( let i=0; i<10; i++ ) {
+        const evtName = bp.thread.data.eventPrefix + String(i);
+        req(evtName); // convenience function for bp.sync({request... (non-standard)
+    }
+
+Will yield a series of 10 events named ``event-0``.
