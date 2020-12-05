@@ -39,7 +39,7 @@ th {
 
 .danger {
   background-color: rgba(255,100,100,.8);
-  color: yellow;
+  color: rgb(146, 146, 0);
 }
 
 .admonition-todo {
