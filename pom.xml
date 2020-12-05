@@ -159,7 +159,6 @@
                 <configuration>
                     <source>8</source>
                 </configuration>
-<<<<<<< HEAD
                 <executions>
                     <execution>
                         <id>attach-javadocs</id>
@@ -168,8 +167,6 @@
                         </goals>
                     </execution>
                 </executions>
-=======
->>>>>>> develop
             </plugin>
         </plugins>        
     </build>
