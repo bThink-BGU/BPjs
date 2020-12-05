@@ -44,6 +44,9 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change Log for the BPjs Library.
 
+### 2020-12-06
+* :sparkles: BProgram data storage ready (closes[#123](https://github.com/bThink-BGU/BPjs/issues/123)).
+
 ### 2020-12-04
 * :bug: Forking now handles b-thread data properly.
 
