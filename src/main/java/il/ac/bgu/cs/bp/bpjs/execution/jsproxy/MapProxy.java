@@ -74,7 +74,7 @@ public class MapProxy<K,V> implements java.io.Serializable {
     /**
      * The map we are proxying.
      */
-    private final Map<K,V> seed;
+    private Map<K,V> seed;
 
     private final Map<K,Modification<V>> modifications;
     
@@ -87,7 +87,7 @@ public class MapProxy<K,V> implements java.io.Serializable {
         seed = aSeed;
         modifications = someModifications;
     }
-
+    
     public void put(K key, V value ) {
         modifications.put(key, new PutValue<>(value));
     }
@@ -139,7 +139,11 @@ public class MapProxy<K,V> implements java.io.Serializable {
     public Map<K, Modification<V>> getModifications() {
         return modifications;
     }
-     
+    
+    public void setSeed( Map<K, V> aNewSeed ) {
+        seed = aNewSeed;
+    }
+    
     // clear modifications?
     public void reset() {
         modifications.clear();

@@ -85,6 +85,8 @@ public class BProgramSyncSnapshot {
         externalEvents = someExternalEvents;
         bprog = aBProgram;
         violationTag.set(aViolationRecord);
+        
+        threadSnapshots.forEach( ts -> ts.setBaseStore(dataStore) );
     }
     
     public BProgramSyncSnapshot copyWith( List<BEvent> updatedExternalEvents ) {
@@ -216,8 +218,9 @@ public class BProgramSyncSnapshot {
         if ( mpcRes instanceof Success ) {
             Success success = (Success)mpcRes;
             success = sms.incomingModifications(success, this, nextRound);
-            
-            return new BProgramSyncSnapshot(bprog, nextRound, success.apply(dataStore), nextExternalEvents, violationTag.get());
+            Map<String, Object> updatedStore = success.apply(dataStore);
+            nextRound.forEach( ts -> ts.clearStorageModifications() ); // changes were applied, so can be reset.
+            return new BProgramSyncSnapshot(bprog, nextRound, updatedStore, nextExternalEvents, violationTag.get());
             
         } else {
             Conflict conflict = (Conflict) mpcRes;

@@ -155,9 +155,17 @@ public class BThreadSyncSnapshot implements Serializable {
     public void setData(Object data) {
         this.data = data;
     }
-
+    
+    public void setBaseStore( Map<String,Object> aBaseStore ) {
+        bprogramStoreModifications.setSeed(aBaseStore);
+    }
+    
     public Map<String, MapProxy.Modification<Object>> getStorageModifications() {
         return bprogramStoreModifications.getModifications();
+    }
+
+    public void clearStorageModifications() {
+        bprogramStoreModifications.reset();
     }
     
     public ContinuationProgramState getContinuationProgramState() {
