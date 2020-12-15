@@ -23,11 +23,10 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A Proxy to a map.Stores changes to the proxied map, but does not change it.
@@ -95,7 +94,18 @@ public class MapProxy<K,V> implements java.io.Serializable {
     public void remove(K key) {
         modifications.put(key, Modification.DELETE);
     }
-    
+
+    public List<V> filter(Function<V, Boolean> func) {
+        return Stream.concat(
+            modifications.values().stream()
+                .filter(m -> m != Modification.DELETE && func.apply(((PutValue<V>) m).value))
+                .map(m -> ((PutValue<V>) m).value),
+            seed.entrySet().stream()
+                .filter(entry -> !modifications.containsKey(entry.getKey()) && func.apply(entry.getValue()))
+                .map(Map.Entry::getValue)
+        ).collect(Collectors.toList());
+    }
+
     public V get( K key ) {
         if ( modifications.containsKey(key) ) {
             Modification<V> m = modifications.get(key);
