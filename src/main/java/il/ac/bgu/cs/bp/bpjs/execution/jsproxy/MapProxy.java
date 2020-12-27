@@ -27,6 +27,7 @@ import il.ac.bgu.cs.bp.bpjs.internal.Pair;
 
 import java.util.*;
 import java.util.function.BiFunction;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -97,15 +98,14 @@ public class MapProxy<K,V> implements java.io.Serializable {
         modifications.put(key, Modification.DELETE);
     }
 
-    public List<Pair<K, V>> filter(BiFunction<K, V, Boolean> func) {
-        return Stream.concat(
-            modifications.entrySet().stream()
-                .filter(entry -> entry.getValue() != Modification.DELETE && func.apply(entry.getKey(), ((PutValue<V>) entry.getValue()).value))
-                .map(entry -> new Pair<>(entry.getKey(), ((PutValue<V>) entry.getValue()).value)),
-            seed.entrySet().stream()
-                .filter(entry -> !modifications.containsKey(entry.getKey()) && func.apply(entry.getKey(), entry.getValue()))
-                .map(entry -> new Pair<>(entry.getKey(), entry.getValue()))
-        ).collect(Collectors.toList());
+    public Map<K, V> filter(BiFunction<K, V, Boolean> func) {
+        Map<K, V> result = modifications.entrySet().stream()
+            .filter(entry -> entry.getValue() != Modification.DELETE && func.apply(entry.getKey(), ((PutValue<V>) entry.getValue()).value))
+            .collect(Collectors.toMap(Map.Entry::getKey, value -> ((PutValue<V>) value).value));
+        result.putAll(seed.entrySet().stream()
+            .filter(entry -> !modifications.containsKey(entry.getKey()) && func.apply(entry.getKey(), entry.getValue()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+        return result;
     }
 
     public V get( K key ) {
