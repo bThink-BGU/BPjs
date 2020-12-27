@@ -101,7 +101,7 @@ public class MapProxy<K,V> implements java.io.Serializable {
     public Map<K, V> filter(BiFunction<K, V, Boolean> func) {
         Map<K, V> result = modifications.entrySet().stream()
             .filter(entry -> entry.getValue() != Modification.DELETE && func.apply(entry.getKey(), ((PutValue<V>) entry.getValue()).value))
-            .collect(Collectors.toMap(Map.Entry::getKey, value -> ((PutValue<V>) value).value));
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> ((PutValue<V>) entry.getValue()).value));
         result.putAll(seed.entrySet().stream()
             .filter(entry -> !modifications.containsKey(entry.getKey()) && func.apply(entry.getKey(), entry.getValue()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
