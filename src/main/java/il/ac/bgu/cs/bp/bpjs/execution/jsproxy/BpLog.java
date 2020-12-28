@@ -75,6 +75,4 @@ public class BpLog implements java.io.Serializable {
         return level.name();
     }
     
-
-    
 }

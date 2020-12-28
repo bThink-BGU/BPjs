@@ -4,7 +4,7 @@
   <groupId>com.github.bthink-bgu</groupId>
   <artifactId>BPjs</artifactId>
   <name>BPjs</name>
-  <version>0.10.7</version>
+  <version>0.11.0-SNAPSHOT</version>
   <description>Provides runtime and analysis for behavioral programs written in 
         JavaScript. It can run stand-alone (from the commmandline) or be 
         embedded in larger JVM-based systems.</description>
@@ -42,11 +42,18 @@
         <groupId>org.eluder.coveralls</groupId>
         <artifactId>coveralls-maven-plugin</artifactId>
         <version>4.3.0</version>
+        <dependencies>
+          <dependency>
+            <groupId>javax.xml.bind</groupId>
+            <artifactId>jaxb-api</artifactId>
+            <version>2.2.3</version>
+          </dependency>
+        </dependencies>
       </plugin>
       <plugin>
         <groupId>org.jacoco</groupId>
         <artifactId>jacoco-maven-plugin</artifactId>
-        <version>0.8.5</version>
+        <version>0.8.6</version>
         <executions>
           <execution>
             <id>prepare-agent</id>
@@ -70,14 +77,6 @@
       <plugin>
         <artifactId>maven-javadoc-plugin</artifactId>
         <version>2.10.4</version>
-        <executions>
-          <execution>
-            <id>attach-javadocs</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
         <configuration>
           <source>8</source>
         </configuration>
@@ -179,7 +178,7 @@
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.13</version>
+      <version>4.13.1</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -194,6 +193,78 @@
       <version>1.8</version>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <version>2.44.0</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>selenium-chrome-driver</artifactId>
+          <groupId>org.seleniumhq.selenium</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>selenium-htmlunit-driver</artifactId>
+          <groupId>org.seleniumhq.selenium</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>selenium-firefox-driver</artifactId>
+          <groupId>org.seleniumhq.selenium</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>selenium-ie-driver</artifactId>
+          <groupId>org.seleniumhq.selenium</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>selenium-safari-driver</artifactId>
+          <groupId>org.seleniumhq.selenium</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>selenium-support</artifactId>
+          <groupId>org.seleniumhq.selenium</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>webbit</artifactId>
+          <groupId>org.webbitserver</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.opera</groupId>
+      <artifactId>operadriver</artifactId>
+      <version>1.5</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>selenium-remote-driver</artifactId>
+          <groupId>org.seleniumhq.selenium</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>operalaunchers</artifactId>
+          <groupId>com.opera</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>protobuf-java</artifactId>
+          <groupId>com.google.protobuf</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>guava</artifactId>
+          <groupId>com.google.guava</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>commons-jxpath</artifactId>
+          <groupId>commons-jxpath</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>commons-exec</artifactId>
+          <groupId>org.apache.commons</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>ini4j</artifactId>
+          <groupId>org.ini4j</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
   <distributionManagement>
     <repository>
@@ -206,9 +277,11 @@
     </snapshotRepository>
   </distributionManagement>
   <properties>
+    <javax.activation.version>1.2.0</javax.activation.version>
     <exec.mainClass>il.ac.bgu.cs.bp.bpjs.mains.BPJsCliRunner</exec.mainClass>
     <java.version>11</java.version>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <jaxb.api.version>2.3.0</jaxb.api.version>
   </properties>
 </project>
 
