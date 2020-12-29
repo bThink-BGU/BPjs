@@ -25,15 +25,9 @@ package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 
 import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+
+import java.text.MessageFormat;
 import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import static java.util.stream.Collectors.joining;
-import java.util.stream.IntStream;
-import org.mozilla.javascript.ConsString;
-import org.mozilla.javascript.NativeArray;
-import org.mozilla.javascript.ScriptableObject;
 
 /**
  * Simple logging mechanism for {@link BProgram}s.
@@ -47,21 +41,23 @@ public class BpLog implements java.io.Serializable {
     }
     LogLevel level = LogLevel.Info;
 
-    public void warn(Object msg) {
-        log(LogLevel.Warn, msg);
+    public void warn(Object msg, Object ...args) {
+        log(LogLevel.Warn, msg, args);
     }
 
-    public void info(Object msg) {
-        log(LogLevel.Info, msg);
+    public void info(Object msg, Object ...args) {
+        log(LogLevel.Info, msg, args);
     }
 
-    public void fine(Object msg) {
-        log(LogLevel.Fine, msg);
+    public void fine(Object msg, Object ...args) {
+        log(LogLevel.Fine, msg, args);
     }
 
-    public void log(LogLevel lvl, Object msg) {
+    public void log(LogLevel lvl, Object msg, Object... args) {
         if (level.compareTo(lvl) >= 0) {
-            System.out.println("[BP][" + lvl.name() + "] " + ScriptableUtils.stringify(msg));
+            System.out.println("[BP][" + lvl.name() + "] " +
+                args == null || args.length == 0 ? ScriptableUtils.stringify(msg) :
+                MessageFormat.format(ScriptableUtils.stringify(msg), Arrays.stream(args).map(ScriptableUtils::stringify).toArray()));
         }
     }
 
