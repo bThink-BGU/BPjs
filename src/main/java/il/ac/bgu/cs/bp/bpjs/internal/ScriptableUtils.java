@@ -102,7 +102,7 @@ public class ScriptableUtils {
         }
         if ( o instanceof ScriptableObject ) {
             ScriptableObject sob = (ScriptableObject) o;
-            return Arrays.stream(sob.getIds()).map( id -> id + ": " + stringify(sob.get(id)) ).collect( joining("\n", "{JS_Obj ", "}"));
+            return Arrays.stream(sob.getIds()).map( id -> id + ": " + stringify(sob.get(id)) ).collect( joining(", Cha", "{JS_Obj ", "}"));
         }
         if ( o instanceof Object[] ) {
             Object[] objArr = (Object[]) o;
