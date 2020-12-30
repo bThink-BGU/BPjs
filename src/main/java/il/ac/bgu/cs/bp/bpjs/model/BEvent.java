@@ -88,9 +88,7 @@ public class BEvent implements Comparable<BEvent>, EventSet, java.io.Serializabl
      * @return String representation of {@code data}.
      */
     private String dataToString( Object data ) {
-        if ( data == null ) return "<null>";
-        return ( data instanceof Scriptable ) ? ScriptableUtils.toString((Scriptable) data)
-                                              : Objects.toString(data);
+        return ScriptableUtils.stringify(data);
     }
     
     @Override

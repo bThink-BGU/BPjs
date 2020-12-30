@@ -23,15 +23,13 @@
  */
 package il.ac.bgu.cs.bp.bpjs.internal;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
+
 import static java.util.stream.Collectors.joining;
-import java.util.stream.Stream;
-import org.mozilla.javascript.ConsString;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
+
+import java.util.stream.IntStream;
+
+import org.mozilla.javascript.*;
 
 /**
  * Some methods to make working with {@link Scriptable} easier.
@@ -49,13 +47,7 @@ public class ScriptableUtils {
     }
     
     public static String toString( Scriptable aScope ) {
-        if ( aScope == null ) return "<null>";
-        if ( aScope instanceof ScriptableObject ) {
-            ScriptableObject sob = (ScriptableObject) aScope;
-            return Stream.of(sob.getIds())
-                         .map( k -> k.toString() + ":" + Objects.toString(sob.get(k)) )
-                         .collect( joining(",", "{", "}") );
-        } else return aScope.toString();
+        return stringify(aScope);
     }
     
     /**
@@ -98,6 +90,38 @@ public class ScriptableUtils {
         
         return o1Ids.equals(o2Ids) &&
                 o1Ids.stream().allMatch(id -> jsEquals(o1.get(id), o2.get(id)));
+    }
+
+    public static String stringify( Object o ) {
+        if ( o == null ) return "<null>";
+        if ( o instanceof String ) return "\""+o + "\"";
+        if ( o instanceof ConsString ) return "\"" + ((ConsString)o).toString() + "\"";
+        if ( o instanceof NativeArray) {
+            NativeArray arr = (NativeArray) o;
+            return arr.getIndexIds().stream().map( id -> id + ":" + stringify(arr.get(id)) ).collect(joining(" | ", "[JS_Array ", "]"));
+        }
+        if ( o instanceof ScriptableObject ) {
+            ScriptableObject sob = (ScriptableObject) o;
+            return Arrays.stream(sob.getIds()).map( id -> id + ": " + stringify(sob.get(id)) ).collect( joining(", Cha", "{JS_Obj ", "}"));
+        }
+        if ( o instanceof Object[] ) {
+            Object[] objArr = (Object[]) o;
+            return IntStream.range(0, objArr.length).mapToObj(idx -> stringify(objArr[idx])).collect(joining("|","[Java_Array ", "]"));
+        }
+        if ( o instanceof Map) {
+            Map<?,?> mp = (Map<?,?>) o;
+            return mp.entrySet().stream().map( e -> e.getKey()+"->" + stringify(e.getValue())).collect(joining(",","{Map ", "}"));
+        }
+        if ( o instanceof List ) {
+            List<?> ls = (List<?>) o;
+            return ls.stream().map(ScriptableUtils::stringify).collect(joining(", ","<List ", ">"));
+        }
+        if ( o instanceof Set ) {
+            Set<?> ls = (Set<?>) o;
+            return ls.stream().map(ScriptableUtils::stringify).collect(joining(", ","{Set ", "}"));
+        }
+        return o.toString();
+
     }
     
     /**

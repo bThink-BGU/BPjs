@@ -23,11 +23,13 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import il.ac.bgu.cs.bp.bpjs.internal.Pair;
+
+import java.util.*;
+import java.util.function.BiFunction;
+import java.util.function.Function;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * A Proxy to a map.Stores changes to the proxied map, but does not change it.
@@ -36,7 +38,7 @@ import java.util.Set;
  * @param <V> Type of values in the map.
  */
 public class MapProxy<K,V> implements java.io.Serializable {
-    
+
     public static abstract class Modification<VV> implements java.io.Serializable {
         public static final Modification DELETE = new Modification(){};
     }
@@ -95,7 +97,17 @@ public class MapProxy<K,V> implements java.io.Serializable {
     public void remove(K key) {
         modifications.put(key, Modification.DELETE);
     }
-    
+
+    public Map<K, V> filter(BiFunction<K, V, Boolean> func) {
+        Map<K, V> result = modifications.entrySet().stream()
+            .filter(entry -> entry.getValue() != Modification.DELETE && func.apply(entry.getKey(), ((PutValue<V>) entry.getValue()).value))
+            .collect(Collectors.toMap(Map.Entry::getKey, entry -> ((PutValue<V>) entry.getValue()).value));
+        result.putAll(seed.entrySet().stream()
+            .filter(entry -> !modifications.containsKey(entry.getKey()) && func.apply(entry.getKey(), entry.getValue()))
+            .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue)));
+        return result;
+    }
+
     public V get( K key ) {
         if ( modifications.containsKey(key) ) {
             Modification<V> m = modifications.get(key);
