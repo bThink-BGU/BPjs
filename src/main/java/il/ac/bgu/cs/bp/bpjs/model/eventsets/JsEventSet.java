@@ -40,13 +40,13 @@ public class JsEventSet implements EventSet, java.io.Serializable {
 
             Boolean res = (Boolean) Context.jsToJava(result, Boolean.class);
             if (res == null) {
-                throw new RuntimeException("JS Predicate returned null, not a boolean value. " + predicate.toString());
+                throw new RuntimeException("EventSet " + name + ": JS Predicate returned null, not a boolean value. " + predicate.toString());
             }
             return res;
         } catch (EvaluatorException ee) {
-            throw new BPjsRuntimeException("JS Predicate did not return a boolean value.", ee);
+            throw new BPjsRuntimeException("EventSet " + name + ": JS Predicate did not return a boolean value.", ee);
         } catch (EcmaError ee) {
-            throw new BPjsRuntimeException("Error evaluating JS Predicate:" + ee.getMessage(), ee);
+            throw new BPjsRuntimeException("Error evaluating JS Predicate " + name + ": " + ee.getMessage(), ee);
         }
     }
 
