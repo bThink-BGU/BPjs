@@ -24,7 +24,7 @@ a link to this page somewhere in the documentation/system about section.
     <dependency>
         <groupId>com.github.bthink-bgu</groupId>
         <artifactId>BPjs</artifactId>
-        <version>0.10.5</version>
+        <version>0.11.1</version>
     </dependency>
     ...
 </dependencies>
@@ -51,6 +51,7 @@ a link to this page somewhere in the documentation/system about section.
 * :arrow_up: Improved logging consistency ([#132](https://github.com/bThink-BGU/BPjs/issues/132)).
 * :bug: Fixed the note color issue in the documentation ([#137](https://github.com/bThink-BGU/BPjs/issues/137)).
 * :arrow_up: Error messages when passing non-events to a synchronization statement are more informative (([#131](https://github.com/bThink-BGU/BPjs/issues/131)).
+* :bug_up: Removed extraneous dependencies from `pom.xml` (([#133](https://github.com/bThink-BGU/BPjs/issues/133)).
 
 
 [Earlier Changes](changelog-2020.md)
