@@ -53,6 +53,7 @@ a link to this page somewhere in the documentation/system about section.
 * :arrow_up: Error messages when passing non-events to a synchronization statement are more informative (([#131](https://github.com/bThink-BGU/BPjs/issues/131)).
 * :arrow_up: Error messages when JS event sets do not return a `Boolean` are more informative (([#138](https://github.com/bThink-BGU/BPjs/issues/138)).
 * :bug_up: Removed extraneous dependencies from `pom.xml` (([#133](https://github.com/bThink-BGU/BPjs/issues/133)).
+* :arrow_up: BThread data documentation updated (([#134](https://github.com/bThink-BGU/BPjs/issues/134)).
 
 
 [Earlier Changes](changelog-2020.md)

@@ -20,6 +20,19 @@ Then, we can use our own synchronization function that also reads from the b-thr
 
 .. danger:: For verification to work, the data object stored in the b-thread has to implement state-based ``hashCode`` and ``equals``.
 
+B-threads can be started with a pre-defined data object. This is done by passing that object to ``bp.registerBThread``, as shown in the below code:
+
+.. literalinclude:: BPjsTutorial/code/start-with-data.js
+  :linenos:
+  :language: javascript
+
+Which prints out the below::
+
+    ---:BPjs Started
+    [BP][Info] BT data: {JS_Obj some:"Data", num:17.0}
+    --:BPjs Event [BEvent name:Data]
+    -:BPjs Done BTwDT
+    ---:BPjs Ended
 
 B-Program Data Store
 --------------------
