@@ -56,8 +56,8 @@ public class BpLog implements java.io.Serializable {
     public void log(LogLevel lvl, Object msg, Object... args) {
         if (level.compareTo(lvl) >= 0) {
             System.out.println("[BP][" + lvl.name() + "] " +
-                args == null || args.length == 0 ? ScriptableUtils.stringify(msg) :
-                MessageFormat.format(ScriptableUtils.stringify(msg), Arrays.stream(args).map(ScriptableUtils::stringify).toArray()));
+                (args.length == 0 ? ScriptableUtils.stringify(msg) :
+                MessageFormat.format(ScriptableUtils.stringify(msg), Arrays.stream(args).map(ScriptableUtils::stringify).toArray())));
         }
     }
 
