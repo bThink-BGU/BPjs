@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.WrappedException;
 
 /**
  * The state of a {@link BProgram} when all its BThreads are at {@code bsync}.
@@ -190,6 +191,9 @@ public class BProgramSyncSnapshot {
             if ( cause instanceof ExecutionException ) {
                 cause = cause.getCause();
             }
+            if ( cause instanceof WrappedException ) {
+                cause = cause.getCause();
+            }
             
             if ( cause instanceof BPjsException ) {
                 throw (BPjsException)cause;
@@ -315,8 +319,7 @@ public class BProgramSyncSnapshot {
     private BThreadSyncSnapshot safeGet(Future<BThreadSyncSnapshot> fbss) {
         try {
             return fbss.get();
-        } catch (InterruptedException | ExecutionException ex) {
-            Logger.getLogger(BProgramSyncSnapshot.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (InterruptedException | ExecutionException | WrappedException ex) {
             if ( ex.getCause() instanceof BPjsException ) {
                 throw (BPjsException)ex.getCause();
             } else {

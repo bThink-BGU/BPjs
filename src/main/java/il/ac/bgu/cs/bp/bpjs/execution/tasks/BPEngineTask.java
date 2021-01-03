@@ -1,6 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsCodeEvaluationException;
+import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy.CapturedBThreadState;
@@ -152,6 +153,8 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
             FailedAssertionViolation fa = new FailedAssertionViolation( fae.getMessage(), btss.getName() );
             listener.assertionFailed( fa );
             return null;
+        } else if (wfae.getCause() instanceof BPjsException) {
+            throw (BPjsException)wfae.getCause();
         } else {
             throw wfae;
         }

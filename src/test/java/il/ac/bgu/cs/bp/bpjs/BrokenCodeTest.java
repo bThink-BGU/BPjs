@@ -26,8 +26,11 @@ package il.ac.bgu.cs.bp.bpjs;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsCodeEvaluationException;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
+import java.util.concurrent.atomic.AtomicBoolean;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 /**
@@ -83,5 +86,47 @@ public class BrokenCodeTest {
         vfr.verify(bp);
     }
     
+    @Test()
+    public void requestNonEvent() throws Exception {
+        testRuntimeError(1, "NON_EVENT");
+    }
     
+    @Test()
+    public void requestNonEventInArray() throws Exception {
+        testRuntimeError(2, "NON_EVENT");
+    }
+    
+    @Test()
+    public void waitedForNonEvent() throws Exception {
+        testRuntimeError(3, "NON_EVENT_or_SET");
+    }
+    
+    @Test()
+    public void blockedForNonEvent() throws Exception {
+        testRuntimeError(4, "NON_EVENT_or_SET");
+    }
+    
+    @Test()
+    public void interruptingForNonEvent() throws Exception {
+        testRuntimeError(5, "NON_EVENT_or_SET");
+    }
+    
+    
+    public void testRuntimeError(int swValue, String expectedInReport) throws Exception {
+        BProgram bp = new ResourceBProgram("broken/requestNonEvents.js");
+        BProgramRunner rnr = new BProgramRunner();
+        rnr.setBProgram(bp);
+        final AtomicBoolean exceptionReported = new AtomicBoolean();
+        rnr.addListener(new BProgramRunnerListenerAdapter() {
+            @Override
+            public void error(BProgram bp, Exception ex) {
+                assertTrue("Message expected to contain '" + expectedInReport + "'",ex.getMessage().contains(expectedInReport));
+                exceptionReported.set(true);
+            }
+        });
+        bp.putInGlobalScope("sw", swValue);
+        rnr.run();
+        
+        assertTrue(exceptionReported.get());
+    }
 }

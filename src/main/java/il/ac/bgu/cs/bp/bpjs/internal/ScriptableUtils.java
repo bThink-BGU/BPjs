@@ -71,7 +71,7 @@ public class ScriptableUtils {
             return jsScriptableObjectEqual((ScriptableObject) o1, (ScriptableObject) o2);
         }
 
-        // Concatenated strings in Rhino have a different type. We need to manually
+        // Concatenated strings in Rhino are not java.lang.Strings. We need to manually
         // resolve to String semantics, which is what the following lines do.
         if (o1 instanceof ConsString) {
             o1 = o1.toString();
@@ -91,36 +91,45 @@ public class ScriptableUtils {
         return o1Ids.equals(o2Ids) &&
                 o1Ids.stream().allMatch(id -> jsEquals(o1.get(id), o2.get(id)));
     }
-
+    
     public static String stringify( Object o ) {
+        return stringify(o, false);
+    }
+    
+    public static String stringify( Object o, boolean quoteStrings) {
         if ( o == null ) return "<null>";
-        if ( o instanceof String ) return "\""+o + "\"";
-        if ( o instanceof ConsString ) return "\"" + ((ConsString)o).toString() + "\"";
+        if ( o instanceof String ) return quoteStrings ? "\""+o + "\"" : (String)o;
+        if ( o instanceof ConsString ) return quoteStrings ? "\"" + ((ConsString)o).toString() + "\"" : ((ConsString)o).toString();
         if ( o instanceof NativeArray) {
             NativeArray arr = (NativeArray) o;
-            return arr.getIndexIds().stream().map( id -> id + ":" + stringify(arr.get(id)) ).collect(joining(" | ", "[JS_Array ", "]"));
+            return arr.getIndexIds().stream().map( id -> id + ":" + stringify(arr.get(id), true) ).collect(joining(" | ", "[JS_Array ", "]"));
+        }
+        if ( o instanceof NativeSet ) {
+            NativeSet ns = (NativeSet) o;
+            return "{JS_Set " + toString(ns) + "}";
         }
         if ( o instanceof ScriptableObject ) {
             ScriptableObject sob = (ScriptableObject) o;
-            return Arrays.stream(sob.getIds()).map( id -> id + ": " + stringify(sob.get(id)) ).collect( joining(", Cha", "{JS_Obj ", "}"));
+            return Arrays.stream(sob.getIds()).map( id -> id + ":" + stringify(sob.get(id), true) ).collect( joining(", ", "{JS_Obj ", "}"));
         }
         if ( o instanceof Object[] ) {
             Object[] objArr = (Object[]) o;
-            return IntStream.range(0, objArr.length).mapToObj(idx -> stringify(objArr[idx])).collect(joining("|","[Java_Array ", "]"));
+            return IntStream.range(0, objArr.length).mapToObj(idx -> stringify(objArr[idx], true)).collect(joining(" | ","[J_Array ", "]"));
         }
         if ( o instanceof Map) {
             Map<?,?> mp = (Map<?,?>) o;
-            return mp.entrySet().stream().map( e -> e.getKey()+"->" + stringify(e.getValue())).collect(joining(",","{Map ", "}"));
+            return mp.entrySet().stream().map( e -> e.getKey()+"->" + stringify(e.getValue(), true)).collect(joining(",","{J_Map ", "}"));
         }
         if ( o instanceof List ) {
             List<?> ls = (List<?>) o;
-            return ls.stream().map(ScriptableUtils::stringify).collect(joining(", ","<List ", ">"));
+            return ls.stream().map( e->stringify(e,true) ).collect(joining(", ","<J_List ", ">"));
         }
         if ( o instanceof Set ) {
             Set<?> ls = (Set<?>) o;
-            return ls.stream().map(ScriptableUtils::stringify).collect(joining(", ","{Set ", "}"));
+            return ls.stream().map( e->stringify(e,true) ).collect(joining(", ","{J_Set ", "}"));
         }
         return o.toString();
+        
 
     }
     
@@ -155,5 +164,34 @@ public class ScriptableUtils {
             .forEach( h -> acc[0]^=h );
         
         return acc[0];
+    }
+    
+    /**
+     * A problematic-yet-working way of getting a meanningful toString 
+     * on a NativeSet.
+     * @param ns
+     * @return a textual description of {@code ns}.
+     */
+    private static String toString(NativeSet ns) {
+        
+        String code = "const arr=[]; ns.forEach(e=>arr.push(e)); arr";
+        
+         try {
+            Context curCtx = Context.enter();
+            curCtx.setLanguageVersion(Context.VERSION_ES6);
+            ImporterTopLevel importer = new ImporterTopLevel(curCtx);
+            Scriptable tlScope = curCtx.initStandardObjects(importer);
+            tlScope.put("ns", tlScope, ns);
+            Object resultObj = curCtx.evaluateString(
+                tlScope, code, 
+                "", 1, null);
+            
+            NativeArray arr = (NativeArray) resultObj;
+            return arr.getIndexIds().stream().map( id -> stringify(arr.get(id), true) ).collect(joining(", "));
+            
+        } finally {
+            Context.exit();
+        }
+        
     }
 }

@@ -2,11 +2,9 @@ package il.ac.bgu.cs.bp.bpjs.model;
 
 import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.mozilla.javascript.Scriptable;
 
 /**
  * A base class for events. Each event has a name and optional data, which is a
@@ -23,13 +21,13 @@ public class BEvent implements Comparable<BEvent>, EventSet, java.io.Serializabl
     private static final ConcurrentHashMap<String,AtomicInteger> NAME_INDICES =new ConcurrentHashMap<>();
 
     /**
-     * Name of the event. Public access, so that the Javascript code feels
+     * Name of the event. Public access, so that the JavaScript code feels
      * natural.
      */
     public final String name;
 
     /**
-     * Extra data for the event. Public access, so that the Javascript code
+     * Extra data for the event. Public access, so that the JavaScript code
      * feels natural.
      */
     public final Object maybeData;
@@ -72,8 +70,9 @@ public class BEvent implements Comparable<BEvent>, EventSet, java.io.Serializabl
     }
     
     /**
-     * A JavaScript accessor for the event's data. If you are using this method 
-     * from Java code, you may want to consider using {@link #getDataField()}.
+     * A JavaScript accessor for the event's data, which may be @{code null}. 
+     * If you are using this method from Java code, you may want to consider 
+     * using {@link #getDataField()}, for a more Java-friendly API.
      * 
      * @return the event's data, or {@code null}.
      * @see #getDataField() 

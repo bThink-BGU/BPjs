@@ -61,6 +61,36 @@ public class LoggingTest {
     }
     
     @Test
+    public void testFormatting() throws InterruptedException, UnsupportedEncodingException, IOException {
+        PrintStream originalOut = System.out;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try (PrintStream myOut = new PrintStream(baos)) {
+            System.setOut(myOut);
+            new BProgramRunner( new StringBProgram(
+                "bp.log.info(\"{0}\",1000);\n" +
+                "bp.log.info(\"{0}\",{a:1,b:2, c:\"banana\", arr:[1,2,3]});\n" +
+                "bp.log.info(\"0\");\n" +
+                "bp.log.info(null);\n" +
+                "")).run();
+            myOut.flush();
+        }
+        String result = baos.toString(StandardCharsets.UTF_8.name());
+        System.setOut(originalOut);
+        baos.close();
+        
+        System.out.println("result:");
+        System.out.println(result);
+        
+        String[] lines = result.split("\n");
+        assertTrue(lines[0].contains("1,000") );
+        assertTrue(lines[1].contains("a:1") );
+        assertTrue(lines[1].contains("b:2") );
+        assertTrue(lines[2].contains("0") );
+        assertTrue(lines[3].contains("null") );
+    }
+    
+    
+    @Test
     public void testExternalSetLogLevel() throws UnsupportedEncodingException, IOException {
         PrintStream originalOut = System.out;
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -109,20 +139,20 @@ public class LoggingTest {
     @Test
     public void testCompoundObjectLogging() throws IOException {
         PrintStream originalOut = System.out;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        String result;
         
-       
-        try (PrintStream myOut = new PrintStream(baos)) {
-            System.setOut(myOut);
-        
-            new BProgramRunner(new ResourceBProgram("logging/compound.js")).run();
-            myOut.flush();
-            
-        } finally {
-            System.setOut(originalOut);    
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            try (PrintStream myOut = new PrintStream(baos)) {
+                System.setOut(myOut);
+                
+                new BProgramRunner(new ResourceBProgram("logging/compound.js")).run();
+                myOut.flush();
+                
+            } finally {
+                System.setOut(originalOut);
+            }
+            result = baos.toString(StandardCharsets.UTF_8);    
         }
-        String result = baos.toString(StandardCharsets.UTF_8);
-        baos.close();
         
         System.out.println(result);
         

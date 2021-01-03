@@ -58,7 +58,7 @@ import org.mozilla.javascript.Scriptable;
  *
  * @author michael
  */
-public class BPJsCliRunner {
+public class BPjsCliRunner {
 
     public static void main(String[] args) throws Exception {
         if (args.length == 0) {
@@ -90,7 +90,7 @@ public class BPJsCliRunner {
                                 logScriptExceptionAndQuit(ee, arg);
                             } catch (IOException ex) {
                                 println("Exception while processing " + arg + ": " + ex.getMessage());
-                                Logger.getLogger(BPJsCliRunner.class.getName()).log(Level.SEVERE, null, ex);
+                                Logger.getLogger(BPjsCliRunner.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
                     }

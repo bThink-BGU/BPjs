@@ -1,4 +1,4 @@
-bp.log.info("registering bthreads - start");
+bp.log.info("registering b-threads - start");
 var LOG_LEVELS = ["Fine", "Info", "Warn", "Off"];
 
 bp.registerBThread( "event generator", function(){
@@ -19,4 +19,4 @@ bp.registerBThread( "event logging", function() {
   }
 })
 
-bp.log.info("registering bthreads - done");
+bp.log.info("registering b-threads - done");

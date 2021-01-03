@@ -12,13 +12,13 @@ As our programs become more complex, some logging/``printf`` capabilities are ne
 
 The "event generator" creates four events, one for each logging level. The "event logging" b-thread waits for all events (note the use of ``bp.all``), sets the logger level (line 14), and attempts to log in all three log methods (lines 15-17). Here is the program output. Note that after event 3, where the level is set to ``"Off"``, no messages are emitted at all.
 
-.. code:: bash
+.. code:: 
 
   #  [READ] /.../logging.js
-  [JS][Info] registering bthreads - start
+  [JS][Info] registering b-threads - start
     -:BPjs Added event generator
     -:BPjs Added event logging
-  [JS][Info] registering bthreads - done
+  [JS][Info] registering b-threads - done
   #  [ OK ] logging.js
   ---:BPjs Started
    --:BPjs Event [BEvent name:event 0]
@@ -35,11 +35,26 @@ The "event generator" creates four events, one for each logging level. The "even
   ---:BPjs Ended
 
 
-
-
-
 .. caution :: Later versions might integrate BPjs with a full-blown logging system, such as `logback`_ or `log4j2`_. Programs relying on the exact logging format may need to change once the logging is updated. If you need to write a program that relies on accurate interpretation a b-program life cycle and selected events, consider implementing a `BProgramRunnerListener`_.
+
+Message Formatting
+------------------
+
+The BPjs logger formats messages using Java's `MessageFormat`_. Under the hood, JavaScript objects are printed using a special formatter, which gives more information that the default cryptic ``[object object]``. The code below contains some formatting examples:
+
+.. literalinclude:: code/logging-with-data.js
+  :linenos:
+  :language: javascript
+
+
+.. code:: 
+
+  [BP][Info] Here is field hello: World of object {JS_Obj hello:"World", idioms:[JS_Array 0:"request" | 1:"waitFor" | 2:"block"]}
+  [BP][Info] Here is are some stuff: {JS_Set "thing 1", "thing 2", "thing 42"}
+  [BP][Info] I have a 1,000,000 reasons to block this event.
+  [BP][Info] 3.142 3.14 3.1416
 
 .. _logback: https://logback.qos.ch
 .. _log4j2: http://logging.apache.org/log4j/2.x/index.html
 .. _BProgramRunnerListener: http://javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/execution/listeners/BProgramRunnerListener.html
+.. _MessageFormat: https://docs.oracle.com/javase/8/docs/api/java/text/MessageFormat.html

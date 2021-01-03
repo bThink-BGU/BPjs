@@ -8,6 +8,7 @@ import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.JsEventSet;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.FailedAssertionException;
+import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.ForkStatement;
@@ -240,18 +241,22 @@ public class BProgramJsProxy extends SyncStatementBuilder
         }
         Object req = jRWB.get("request");
         if ( req != null ) {
-            if ( req instanceof BEvent ) {
-                stmt = stmt.request((BEvent)req);
-            } else if ( req instanceof NativeArray ) {
-                NativeArray arr = (NativeArray) req;
-                stmt = stmt.request(arr.getIndexIds().stream()
-                                       .map( i -> (BEvent)arr.get(i) )
-                                       .collect( toList() ));
-            } 
+            try { 
+                if ( req instanceof NativeArray ) {
+                    NativeArray arr = (NativeArray) req;
+                    stmt = stmt.request(arr.getIndexIds().stream()
+                                           .map( i -> (BEvent)arr.get(i) )
+                                           .collect( toList() ));
+                } else {
+                    stmt = stmt.request((BEvent)req);
+                }
+            } catch (ClassCastException cce ) {
+                throw new BPjsRuntimeException("A non-event object requested in a sync statement. Offending object:'" + ScriptableUtils.stringify(req) + "'");
+            }
         }
 
-        EventSet waitForSet = convertToEventSet(jRWB.get("waitFor"));
-        EventSet blockSet = convertToEventSet(jRWB.get("block"));
+        EventSet waitForSet   = convertToEventSet(jRWB.get("waitFor"));
+        EventSet blockSet     = convertToEventSet(jRWB.get("block"));
         EventSet interruptSet = convertToEventSet(jRWB.get("interrupt"));
         stmt = stmt.waitFor( waitForSet )
                      .block( blockSet )
@@ -284,8 +289,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
                     .collect( toSet() ) );
         } else {
             final String errorMessage = "Cannot convert " + jsObject + " of class " + jsObject.getClass() + " to an event set";
-            Logger.getLogger(BThreadSyncSnapshot.class.getName()).log(Level.SEVERE, errorMessage);
-            throw new IllegalArgumentException(errorMessage);
+            throw new BPjsRuntimeException(errorMessage);
         }
     }
     

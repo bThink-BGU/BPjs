@@ -28,6 +28,7 @@ import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Set;
 
 /**
  * Simple logging mechanism for {@link BProgram}s.
@@ -53,11 +54,12 @@ public class BpLog implements java.io.Serializable {
         log(LogLevel.Fine, msg, args);
     }
 
-    public void log(LogLevel lvl, Object msg, Object... args) {
+    public void log(LogLevel lvl, Object msg, Object ...args) {
         if (level.compareTo(lvl) >= 0) {
             System.out.println("[BP][" + lvl.name() + "] " +
-                (args.length == 0 ? ScriptableUtils.stringify(msg) :
-                MessageFormat.format(ScriptableUtils.stringify(msg), Arrays.stream(args).map(ScriptableUtils::stringify).toArray())));
+                (((args==null)||(args.length > 0)) 
+                   ? MessageFormat.format( (msg!=null ? msg.toString():"<null>"), Arrays.stream(args).map(this::formatArg).toArray())
+                   : ScriptableUtils.stringify(msg)));
         }
     }
 
@@ -69,6 +71,14 @@ public class BpLog implements java.io.Serializable {
 
     public String getLevel() {
         return level.name();
+    }
+    
+    private static final Set<Class> PASS_THROUGH = Set.of(Integer.class, Long.class, Short.class, Double.class, Float.class);
+    
+    private Object formatArg(Object arg) {
+        if ( arg == null ) return arg;
+        if ( PASS_THROUGH.contains(arg.getClass()) ) return arg;
+        return ScriptableUtils.stringify(arg);
     }
     
 }

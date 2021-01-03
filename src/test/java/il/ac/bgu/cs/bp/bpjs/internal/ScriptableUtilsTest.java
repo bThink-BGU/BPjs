@@ -41,22 +41,48 @@ public class ScriptableUtilsTest {
      * Test of toString method, of class ScriptableUtils.
      */
     @Test
-    public void testToString() {
-        Context curCtx;
+    public void testToStringJSObject() {
+        Scriptable aScope = evaluateJS("var a={}; a");
+        String expResult = "{JS_Obj }";
+        String result = ScriptableUtils.toString(aScope);
+        assertEquals(expResult, result);
+        
+        aScope = evaluateJS("var a={x:\"hello\"}; a");
+        expResult = "{JS_Obj x:\"hello\"}";
+        result = ScriptableUtils.toString(aScope);
+        assertEquals(expResult, result);
+        
+        aScope = evaluateJS("var a={x:\"hello\", y:\"world\"}; a");
+        expResult = "{JS_Obj x:\"hello\", y:\"world\"}";
+        result = ScriptableUtils.toString(aScope);
+        assertEquals(expResult, result);
+    }
+    
+    @Test
+    public void testToStringJSSet() {
+        Scriptable aScope = evaluateJS("var a=new Set(); a.add(\"a\"); a.add(\"b\"); a");
+        
+        String result = ScriptableUtils.toString(aScope);
+        assertTrue(result.startsWith("{JS_Set"));
+        assertTrue(result.contains("\"a\""));
+        assertTrue(result.contains("\"b\""));
+        assertTrue(result.contains(", "));
+        
+    }
+    
+    
+    private Scriptable evaluateJS(String code) {
         try {
-            Context.enter();
-            curCtx = Context.getCurrentContext();
-            curCtx.setLanguageVersion(Context.VERSION_1_8);
+            Context curCtx = Context.enter();
+            curCtx.setLanguageVersion(Context.VERSION_ES6);
             ImporterTopLevel importer = new ImporterTopLevel(curCtx);
             Scriptable tlScope = curCtx.initStandardObjects(importer);
-            Object scopeObj = curCtx.evaluateString(
-                tlScope,
-                "var a={}; a", 
+            Object resultObj = curCtx.evaluateString(
+                tlScope, code, 
                 "", 1, null);
-            Scriptable aScope = (Scriptable)scopeObj;
-            String expResult = "{}";
-            String result = ScriptableUtils.toString(aScope);
-            assertEquals(expResult, result);
+            
+            return (Scriptable)resultObj;
+            
         } finally {
             Context.exit();
         }
