@@ -168,6 +168,17 @@ public class BThreadSyncSnapshot implements Serializable {
         bprogramStoreModifications.reset();
     }
     
+    /**
+     * When {@code true}, this b-thread can continue. In cases where the return
+     * value is {@code false}, this object holds data about the results of the 
+     * b-thread execution, e.g. storage modifications.
+     * 
+     * @return {@code true} iff this b-thread can run another round.
+     */
+    public boolean canContinue(){
+        return (getContinuation()!=null) || (getEntryPoint()!=null);
+    }
+    
     public ContinuationProgramState getContinuationProgramState() {
         if ( programState == null ) {
             programState = new ContinuationProgramState(continuation);

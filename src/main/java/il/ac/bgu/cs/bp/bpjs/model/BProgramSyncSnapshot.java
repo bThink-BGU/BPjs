@@ -217,6 +217,9 @@ public class BProgramSyncSnapshot {
             mpcRes = sms.resolve((Conflict) mpcRes, this, nextRound);
         }
         
+        // remove b-threads that are done, but but submitted some storage modifications.
+        nextRound = nextRound.stream().filter(BThreadSyncSnapshot::canContinue).collect(toSet());
+        
         if ( mpcRes instanceof Success ) {
             Success success = (Success)mpcRes;
             success = sms.incomingModifications(success, this, nextRound);

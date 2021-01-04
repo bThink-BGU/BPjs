@@ -2,6 +2,7 @@ package il.ac.bgu.cs.bp.bpjs.model;
 
 import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -127,7 +128,7 @@ public class BEvent implements Comparable<BEvent>, EventSet, java.io.Serializabl
 
     @Override
     public int hashCode() {
-        return 19*name.hashCode() ^ getDataField().map(ScriptableUtils::jsHash).orElse(0);
+        return 19*Objects.hashCode(name) ^ getDataField().map(ScriptableUtils::jsHash).orElse(0);
     }
 
     @Override

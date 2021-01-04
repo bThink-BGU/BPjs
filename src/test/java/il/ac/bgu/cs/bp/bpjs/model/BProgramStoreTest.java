@@ -186,4 +186,18 @@ public class BProgramStoreTest {
         assertEquals( List.of("Josh", "Agenta Falskog"), evtListener.eventNames() );
     }
     
+    @Test
+    public void lastLeg_run() {
+        BProgram sut = new ResourceBProgram("bp_store/bpStore_lastLegChanges.js");
+        BProgramRunner rnr = new BProgramRunner();
+        rnr.addListener(new PrintBProgramRunnerListener());
+        var evtListener = rnr.addListener(new InMemoryEventLoggingListener());
+        
+        rnr.setBProgram(sut);
+        rnr.run();
+        
+        assertEquals( List.of("A","B","C","D"), evtListener.eventNames() );
+    }
+    
+    
 }

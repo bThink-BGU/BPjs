@@ -5,6 +5,7 @@ import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy.CapturedBThreadState;
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
@@ -56,6 +57,13 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
         try {            
             BProgramJsProxy.setCurrentBThread(bpss, btss);
             callImpl( jsContext );
+            // capture proxy changes
+            MapProxy<String,Object> changes = BProgramJsProxy.getCurrentChanges();
+            if ( changes != null ) {
+                if ( ! changes.getModifications().isEmpty() ) {
+                    return new BThreadSyncSnapshot(btss.getName(), null, null, null, null, null, changes);
+                }
+            } 
             return null;
 
         } catch (ContinuationPending cbs) {

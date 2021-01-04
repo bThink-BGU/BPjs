@@ -68,6 +68,11 @@ public class BProgramJsProxy extends SyncStatementBuilder
         CURRENT_BTHREAD.remove();
     }
     
+    public static MapProxy getCurrentChanges() {
+        BThreadData bThreadData = CURRENT_BTHREAD.get();
+        return (bThreadData != null) ? bThreadData.storeModifications : null;
+    }
+    
     // /thread-local
     ///////////////////////////////
     
