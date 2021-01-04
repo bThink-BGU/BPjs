@@ -23,13 +23,10 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 
-import il.ac.bgu.cs.bp.bpjs.internal.Pair;
 
 import java.util.*;
 import java.util.function.BiFunction;
-import java.util.function.Function;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * A Proxy to a map.Stores changes to the proxied map, but does not change it.
@@ -76,7 +73,7 @@ public class MapProxy<K,V> implements java.io.Serializable {
     /**
      * The map we are proxying.
      */
-    private Map<K,V> seed;
+    Map<K,V> seed;
 
     private final Map<K,Modification<V>> modifications;
     

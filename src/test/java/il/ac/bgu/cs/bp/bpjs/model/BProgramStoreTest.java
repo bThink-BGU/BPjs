@@ -174,4 +174,16 @@ public class BProgramStoreTest {
         StorageConflictViolation scv = (StorageConflictViolation) dsv.getDetectedViolation();
         assertEquals( Set.of("c"), scv.getConflict().conflicts.keySet() );
     }
+    
+    @Test
+    public void preRunStorageTest() {
+        BProgram sut = new ResourceBProgram("bp_store/bpStore_pre_run.js");
+        BProgramRunner rnr = new BProgramRunner();
+        var evtListener = rnr.addListener(new InMemoryEventLoggingListener());
+                
+        rnr.setBProgram(sut);
+        rnr.run();
+        assertEquals( List.of("Josh", "Agenta Falskog"), evtListener.eventNames() );
+    }
+    
 }

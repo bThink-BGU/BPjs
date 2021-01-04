@@ -16,8 +16,6 @@ import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toSet;
 import java.util.stream.Stream;
@@ -343,7 +341,10 @@ public class BProgramJsProxy extends SyncStatementBuilder
     }
     
     public MapProxy getStore() {
-        return CURRENT_BTHREAD.get().storeModifications;
+        BThreadData bThreadExecutionContext = CURRENT_BTHREAD.get();
+        
+        return (bThreadExecutionContext!=null) ? bThreadExecutionContext.storeModifications
+            : new DirectMapProxy<>(bProg.getStore());
     }
     
     /**
