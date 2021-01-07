@@ -85,8 +85,8 @@ public class BProgramSyncSnapshotIO {
                 ObjectOutputStream outs = new ObjectOutputStream(bytes)) {
 
                 outs.writeObject(new Header(bpss.getBThreadSnapshots().size(), bpss.getExternalEvents().size(), bpss.getViolationTag()));
-                
-                outs.writeObject( bpss.getDataStore() );
+
+                writeStoreSnapshot(bpss.getDataStore(), outs, globalScope);
                 
                 for (BThreadSyncSnapshot bss : bpss.getBThreadSnapshots()) {
                     writeBThreadSnapshot(bss, outs, globalScope);
@@ -117,7 +117,7 @@ public class BProgramSyncSnapshotIO {
                 = new ScriptableInputStream(new ByteArrayInputStream(bytes), globalScope)) {
                 Header header = (Header) sis.readObject();
                 
-                Map<String, Object> dataStore = (Map<String, Object>) sis.readObject();
+                Map<String, Object> dataStore = readStoreSnapshot(sis, globalScope);
                 
                 Set<BThreadSyncSnapshot> bthreads = new HashSet<>(header.bthreadCount);
 
@@ -180,6 +180,37 @@ public class BProgramSyncSnapshotIO {
         } finally {
             Context.exit();
         }
+    }
+
+    private void writeStoreSnapshot(Map<String,Object> bprogramDataStore, ObjectOutputStream outs, ScriptableObject scope) throws IOException {
+        ByteArrayOutputStream storeBytes = new ByteArrayOutputStream();
+        try (BProgramSyncSnapshotOutputStream bpos = new BProgramSyncSnapshotOutputStream(storeBytes, scope)) {
+            bpos.writeObject(bprogramDataStore);
+            bpos.flush();
+        }
+        storeBytes.flush();
+        storeBytes.close();
+        outs.writeObject(storeBytes.toByteArray());
+    }
+
+    private Map<String,Object> readStoreSnapshot(ScriptableInputStream sis, ScriptableObject scope) throws IOException, ClassNotFoundException {
+
+        byte[] storeBytes = (byte[]) sis.readObject();
+
+        final BProgramJsProxy bpProxy = new BProgramJsProxy(bprogram);
+
+        StubProvider stubPrv = (StreamObjectStub stub) -> {
+            if (stub == StreamObjectStub.BP_PROXY) {
+                return bpProxy;
+            }
+            throw new IllegalArgumentException("Unknown stub " + stub);
+        };
+
+        try (ByteArrayInputStream inBytes = new ByteArrayInputStream(storeBytes);
+             BProgramSyncSnapshotInputStream bssis = new BProgramSyncSnapshotInputStream(inBytes, scope, stubPrv)) {
+            return (Map<String,Object>) bssis.readObject();
+        }
+
     }
 
     private void writeBThreadSnapshot(BThreadSyncSnapshot bss, ObjectOutputStream outs, ScriptableObject scope) throws IOException {
