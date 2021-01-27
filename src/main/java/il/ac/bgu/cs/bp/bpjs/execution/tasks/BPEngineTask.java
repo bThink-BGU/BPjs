@@ -126,7 +126,7 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
                 }
             }
             
-            return btss.copyWith(cbs.getContinuation(), syncStatement, capturedState.modifications);
+            return btss.makeNext(cbs.getContinuation(), syncStatement, capturedState.modifications);
             
         } else if ( capturedStatement instanceof ForkStatement ) {
             ForkStatement forkStmt = (ForkStatement) capturedStatement;
@@ -137,6 +137,7 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
             return continueParentOfFork(cbs, jsContext);
                         
         } else {
+            
             throw new IllegalStateException("Captured a statement of an unknown type: " + capturedStatement);
         }
     }

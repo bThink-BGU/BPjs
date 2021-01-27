@@ -58,6 +58,8 @@ a link to this page somewhere in the documentation/system about section.
 * :arrow_up: Changes made to the b-program store after the last sync of a b-thread are now applied (([#130](https://github.com/bThink-BGU/BPjs/issues/130)).
 * :bug: :tada: JS-semantics are applied for `equals` and `hashCode` for b-thread and b-program data (([#144](https://github.com/bThink-BGU/BPjs/issues/144)).
 * :arrow_up: More tests (logger, JSProxy, ScriptableUtils, OrderedSet).
+* :bug: Fixed the bench marker.
+* :sparkles: BThread snapshots do not retain their entry point function after their first sync point. This results in lower memory footprint, and a more efficient de/serialization. These result in improved analysis performance and efficiency.
 
 
 [Earlier Changes](changelog-2020.md)

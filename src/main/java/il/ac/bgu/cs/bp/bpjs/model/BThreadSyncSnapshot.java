@@ -102,8 +102,8 @@ public class BThreadSyncSnapshot implements Serializable {
      * @param storageModifications storage modifications created during the run.
      * @return a copy of {@code this} with updated continuation and statement.
      */
-    public BThreadSyncSnapshot copyWith(Object aContinuation, SyncStatement aStatement, MapProxy<String, Object> storageModifications) {
-        BThreadSyncSnapshot retVal = new BThreadSyncSnapshot(name, entryPoint, interruptHandler,
+    public BThreadSyncSnapshot makeNext(Object aContinuation, SyncStatement aStatement, MapProxy<String, Object> storageModifications) {
+        BThreadSyncSnapshot retVal = new BThreadSyncSnapshot(name, null, interruptHandler,
             aContinuation, aStatement, data, storageModifications);
         
         aStatement.setBthread(retVal);

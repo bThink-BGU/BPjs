@@ -1,9 +1,13 @@
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotIO;
-import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
+import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
+import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.StorageConsolidationResult;
+import il.ac.bgu.cs.bp.bpjs.model.StorageModificationStrategy;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.*;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVPrinter;
@@ -14,7 +18,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.IntStream;
@@ -29,12 +32,12 @@ public class SnapshotBenchmarks {
 
     private final static Logger LOGGER = Logger.getLogger(SnapshotBenchmarks.class.getName());
 
-    private static int ITERATIONS = 10;
+    private static final int ITERATIONS = 10;
 
     public static void main(String[] args) throws Exception {
         LOGGER.setLevel(Level.INFO);
         VariableSizedArraysBenchmark.benchmarkVariableSizedArrays();
-        EventSelectionBenchmark.benchmarkEventSelection();
+//        EventSelectionBenchmark.benchmarkEventSelection();
     }
 
     static abstract class Benchmark {
@@ -56,19 +59,34 @@ public class SnapshotBenchmarks {
 
         static int[] getStateSizes(BProgram program, int num_steps) throws Exception {
             LOGGER.info("Measuring state size");
-            ExecutorService execSvc = ExecutorServiceMaker.makeWithName("SnapshotStore");
-            DfsBProgramVerifier sut = new DfsBProgramVerifier();
-            BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(program);
-            ArrayList<Integer> snapshotSizes = new ArrayList<>();
+            final BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(program);
+            final ArrayList<Integer> snapshotSizes = new ArrayList<>();
+            final BProgramRunner rnr = new BProgramRunner( program );
+            
+            StorageModificationStrategy sms = new StorageModificationStrategy() {
+                int count = 0;
+                
+                @Override
+                public StorageConsolidationResult.Success incomingModifications(StorageConsolidationResult.Success modifications, BProgramSyncSnapshot bpss, Set<BThreadSyncSnapshot> nextRoundBThreads) {
+                    try {
+                        snapshotSizes.add(io.serialize(bpss).length);
+                    } catch (IOException ex) {
+                        Logger.getLogger(SnapshotBenchmarks.class.getName()).log(Level.SEVERE, null, ex);
+                    }
+                    count++;
+                    if (count == num_steps) rnr.halt();
+                    return modifications;
+                }
 
-            DfsTraversalNode next = DfsTraversalNode.getInitialNode(program, execSvc);
-
-            //Iteration 1,starts already at request state A
-            for (int i = 0; i < num_steps; i++) {
-                snapshotSizes.add(io.serialize(next.getSystemState()).length);
-                next = sut.getUnvisitedNextNode(next, execSvc);
-            }
-            execSvc.shutdown();
+                @Override
+                public StorageConsolidationResult resolve(StorageConsolidationResult.Conflict conflict, BProgramSyncSnapshot bpss, Set<BThreadSyncSnapshot> nextRoundBThreads) {
+                    return conflict;
+                }
+            };
+            
+            program.setStorageModificationStrategy(sms);
+            rnr.run();
+                
 
             return snapshotSizes.stream().mapToInt(i -> i).toArray();
         }
