@@ -23,35 +23,46 @@
  */
 package il.ac.bgu.cs.bp.bpjs.bprogramio;
 
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
+import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.serialize.ScriptableInputStream;
+import org.mozilla.javascript.serialize.ScriptableOutputStream;
 
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
- *
+ * Output stream for {@link BThreadSyncSnapshot} objects. Creates stubs for objects that can link back to the java
+ * context, such as the {@code XJsProxy} classes.
+ * 
  * @author michael
  */
-public class BProgramSyncSnapshotInputStream extends ScriptableInputStream {
+public class BPJSStubOutputStream extends ScriptableOutputStream {
 
-    private final StubProvider stubProvider;
+    private final List<StreamObjectStub> stubs = new ArrayList<>();
 
-    public BProgramSyncSnapshotInputStream(InputStream in, Scriptable scope, StubProvider aProvider) throws IOException {
-        super(in, scope);
-        stubProvider = aProvider;
+    @SuppressWarnings("OverridableMethodCallInConstructor")
+    public BPJSStubOutputStream(OutputStream out, Scriptable scope) throws IOException {
+        super(out, scope);
     }
 
     @Override
-    protected Object resolveObject(Object obj) throws IOException {
-        return ( obj instanceof StreamObjectStub )
-            ? stubProvider.get((StreamObjectStub) obj)
-            : obj;
+    protected Object replaceObject(Object obj) throws IOException {
+        if ( obj instanceof BProgramJsProxy ) {
+            stubs.add(StreamObjectStub.BP_PROXY);
+            return StreamObjectStub.BP_PROXY;
+        } else if ( ! (obj instanceof java.io.Serializable) ) {
+            System.err.println("Attempt to write a non-serializable object " + obj.toString());
+            return "NOT SERIALIZABLE: " + obj.toString();
+        } else {
+            return obj;
+        }
     }
 
-    @Override
-    protected Object readObjectOverride() throws IOException, ClassNotFoundException {
-        return super.readObjectOverride();
+    public List<StreamObjectStub> getStubs() {
+        return stubs;
     }
     
 }

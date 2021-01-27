@@ -32,11 +32,11 @@ import org.mozilla.javascript.serialize.ScriptableInputStream;
  *
  * @author michael
  */
-public class BThreadSyncSnapshotInputStream extends ScriptableInputStream {
-    
+public class BPJSStubInputStream extends ScriptableInputStream {
+
     private final StubProvider stubProvider;
-    
-    public BThreadSyncSnapshotInputStream(InputStream in, Scriptable scope, StubProvider aProvider) throws IOException {
+
+    public BPJSStubInputStream(InputStream in, Scriptable scope, StubProvider aProvider) throws IOException {
         super(in, scope);
         stubProvider = aProvider;
     }

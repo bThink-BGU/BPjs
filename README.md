@@ -60,6 +60,8 @@ a link to this page somewhere in the documentation/system about section.
 * :arrow_up: More tests (logger, JSProxy, ScriptableUtils, OrderedSet).
 * :bug: Fixed the bench marker.
 * :sparkles: BThread snapshots do not retain their entry point function after their first sync point. This results in lower memory footprint, and a more efficient de/serialization. These result in improved analysis performance and efficiency.
+* :sparkles: `BProgramSyncSnapshot`s are serialized using a single stream, and with the b-program's original scope as a top-level scope (([#126](https://github.com/bThink-BGU/BPjs/issues/126)).
+* :put_litter_in_its_place: Significant cleanup of the b-program io area. 
 
 
 [Earlier Changes](changelog-2020.md)

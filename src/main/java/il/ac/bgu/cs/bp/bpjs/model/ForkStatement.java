@@ -23,8 +23,8 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model;
 
-import il.ac.bgu.cs.bp.bpjs.bprogramio.BThreadSyncSnapshotInputStream;
-import il.ac.bgu.cs.bp.bpjs.bprogramio.BThreadSyncSnapshotOutputStream;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.BPJSStubInputStream;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.BPJSStubOutputStream;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.StreamObjectStub;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.StubProvider;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
@@ -34,7 +34,6 @@ import il.ac.bgu.cs.bp.bpjs.execution.tasks.BPEngineTask;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.NotSerializableException;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -67,7 +66,7 @@ public class ForkStatement {
         byte[] serializedForm;
         
         try ( ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            BThreadSyncSnapshotOutputStream btos = new BThreadSyncSnapshotOutputStream(baos, syncOrigin.getBProgram().getGlobalScope()) ) {
+            BPJSStubOutputStream btos = new BPJSStubOutputStream(baos, syncOrigin.getBProgram().getGlobalScope()) ) {
             btos.writeObject(bthreadData);
             btos.writeObject(storageModifications);
             btos.writeObject(continuation);
@@ -89,7 +88,7 @@ public class ForkStatement {
         };
         
         try ( ByteArrayInputStream bais = new ByteArrayInputStream(serializedForm);
-              BThreadSyncSnapshotInputStream btis = new BThreadSyncSnapshotInputStream(bais, syncOrigin.getBProgram().getGlobalScope(), stubPrv)
+              BPJSStubInputStream btis = new BPJSStubInputStream(bais, syncOrigin.getBProgram().getGlobalScope(), stubPrv)
             ) {
             
             bthreadData = btis.readObject();
