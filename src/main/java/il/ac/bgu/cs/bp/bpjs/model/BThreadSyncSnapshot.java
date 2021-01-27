@@ -203,15 +203,10 @@ public class BThreadSyncSnapshot implements Serializable {
     public boolean equals(Object obj) {
 
         // Quick circuit-breakers
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (!(obj instanceof BThreadSyncSnapshot)) {
-            return false;
-        }
+        if (this == obj) return true;
+        if (obj == null) return false;
+        if (!(obj instanceof BThreadSyncSnapshot)) return false;
+        
         BThreadSyncSnapshot other = (BThreadSyncSnapshot) obj;
         
         if (!Objects.equals(getName(), other.getName())) {

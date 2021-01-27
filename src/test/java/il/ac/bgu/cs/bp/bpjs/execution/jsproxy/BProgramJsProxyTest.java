@@ -33,6 +33,7 @@ import org.junit.Test;
 
 import static il.ac.bgu.cs.bp.bpjs.TestUtils.traceEventNamesString;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.DeadlockViolation;
+import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import java.util.HashMap;
 import java.util.Map;
 import static org.junit.Assert.assertEquals;
@@ -97,7 +98,7 @@ public class BProgramJsProxyTest {
     }
     
     @Test
-    public void DeadlockSameThread() throws Exception{
+    public void deadlockSameThread() throws Exception{
         BProgram bpr = new ResourceBProgram("bpsync-blockrequest.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setVisitedStateStore(new BThreadSnapshotVisitedStateStore());
@@ -111,5 +112,17 @@ public class BProgramJsProxyTest {
         assertTrue(res.isViolationFound());
         assertTrue(res.getViolation().get() instanceof DeadlockViolation);
         assertEquals("sampleEvent", traceEventNamesString(res.getViolation().get().getCounterExampleTrace(), ""));
+    }
+    
+    @Test
+    public void formattedLogFromGeneralScope() {
+        String src = "let s = new Set()\n" +
+                        "s.add('a')\n" +
+                        "bp.log.info(\"{0}\", s)";
+        BProgram bprog = new StringBProgram(src);
+        
+        BProgramRunner rnr = new BProgramRunner(bprog);
+        
+        rnr.run();
     }
 }

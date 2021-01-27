@@ -175,6 +175,7 @@ public class StateStoreTests {
     public void StateStoreHashTestIdenticalRuns() throws Exception {
         VisitedStateStore hashStore = new HashVisitedStateStore();
         testEqualRuns(hashStore);
+        assertTrue( hashStore.toString().contains( ":"+Long.toString(hashStore.getVisitedStateCount())) );
     }
     /*
         This test makes sure we compare nodes/states properly.
@@ -192,7 +193,6 @@ public class StateStoreTests {
         DfsTraversalNode initial2 = DfsTraversalNode.getInitialNode(bprog2, execSvc);
 
         assertEquals(initial1,initial2);
-
 
         DfsTraversalNode next1 = initial1;
         DfsTraversalNode next2 = initial2;

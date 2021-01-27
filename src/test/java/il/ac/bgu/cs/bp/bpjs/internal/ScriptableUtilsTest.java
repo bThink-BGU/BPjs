@@ -71,6 +71,20 @@ public class ScriptableUtilsTest {
         assertTrue(result.contains(", "));
         
     }
+   
+    @Test
+    public void testToStringJArray() {
+        Object arr = new Object[]{"a","b","c",5};
+        
+        String result = ScriptableUtils.stringify(arr);
+        assertTrue(result.startsWith("[J_Array"));
+        assertTrue(result.contains("\"a\""));
+        assertTrue(result.contains("\"b\""));
+        assertTrue(result.contains("\"c\""));
+        assertTrue(result.contains(" | "));
+        assertTrue(result.contains("5"));
+        
+    }
     
     @Test
     public void testJsEquals_primitives() {
@@ -152,13 +166,13 @@ public class ScriptableUtilsTest {
             "c",jsExp("[42, 'dark castle', 'kings quest']")
         );
         
-        assertTrue( ScriptableUtils.jsMapEquals(mpA, mpAb));
-        assertTrue( ScriptableUtils.jsMapEquals(mpA, mpA));
-        assertTrue( ScriptableUtils.jsMapEquals(null, null));
+        assertTrue( ScriptableUtils.jsEquals(mpA, mpAb));
+        assertTrue( ScriptableUtils.jsEquals(mpA, mpA));
+        assertTrue( ScriptableUtils.jsEquals(null, null));
         
-        assertFalse( ScriptableUtils.jsMapEquals(mpA, null));
-        assertFalse( ScriptableUtils.jsMapEquals(mpA, mpAdim));
-        assertFalse( ScriptableUtils.jsMapEquals(mpA, mpB));
+        assertFalse( ScriptableUtils.jsEquals(mpA, null));
+        assertFalse( ScriptableUtils.jsEquals(mpA, mpAdim));
+        assertFalse( ScriptableUtils.jsEquals(mpA, mpB));
     }
     
     @Test 
@@ -188,14 +202,14 @@ public class ScriptableUtilsTest {
             jsExp("[42, 'dark castle', 'kings quest']")
         );
         
-        assertTrue( ScriptableUtils.jsListEquals(mpA, mpAb));
-        assertTrue( ScriptableUtils.jsListEquals(mpA, mpA));
-        assertTrue( ScriptableUtils.jsListEquals(null, null));
+        assertTrue( ScriptableUtils.jsEquals(mpA, mpAb));
+        assertTrue( ScriptableUtils.jsEquals(mpA, mpA));
+        assertTrue( ScriptableUtils.jsEquals(null, null));
         
-        assertFalse( ScriptableUtils.jsListEquals(mpA, null));
-        assertFalse( ScriptableUtils.jsListEquals(mpA, mpAdim));
-        assertFalse( ScriptableUtils.jsListEquals(mpA, mpB));
-        assertFalse( ScriptableUtils.jsListEquals(mpA, mpC));
+        assertFalse( ScriptableUtils.jsEquals(mpA, null));
+        assertFalse( ScriptableUtils.jsEquals(mpA, mpAdim));
+        assertFalse( ScriptableUtils.jsEquals(mpA, mpB));
+        assertFalse( ScriptableUtils.jsEquals(mpA, mpC));
     }
     
     @Test 
@@ -244,6 +258,7 @@ public class ScriptableUtilsTest {
         assertEquals( "test-test".hashCode(), ScriptableUtils.jsHashCode(cStr1) );
         assertEquals( ScriptableUtils.jsHashCode(jsExp("\"hello\"")), ScriptableUtils.jsHashCode(jsExp("\"hello\"")) );
         assertEquals( ScriptableUtils.jsHashCode(jsExp("[1,2,3]")), ScriptableUtils.jsHashCode(jsExp("[1,2,3]")) );
+        assertEquals( ScriptableUtils.jsHashCode(jsExp("{a:1, b:2, c:[3,4,5]}")), ScriptableUtils.jsHashCode(jsExp("{a:1, b:2, c:[3,4,5]}")) );
     }
     
     @Test

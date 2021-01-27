@@ -25,6 +25,7 @@ package il.ac.bgu.cs.bp.bpjs.internal;
 
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.List;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -76,6 +77,8 @@ public class OrderedSetTest {
         sutA.add("X");
         assertNotEquals(sutA, sutB);
         assertNotEquals(sutB, sutA);
+        
+        assertNotEquals(sutB, "Just a String");
     }
     
     @Test
@@ -114,6 +117,33 @@ public class OrderedSetTest {
         assertEquals( OrderedSet.of("a","b","d"), sut );
         assertFalse( sut.remove("NOT_THERE") );
         assertEquals( OrderedSet.of("a","b","d"), sut );
+    }
+    
+    @Test
+    public void testAddAll() {
+        OrderedSet<String> sut = OrderedSet.of("a","b","c","d");
+        
+        assertTrue( sut.addAll(List.of("e","f","g")) );
+        assertFalse( sut.addAll(List.of("e","f","g")) );
+        assertEquals( OrderedSet.of("a","b","c","d","e","f","g"), sut );    
+    }
+    
+    @Test
+    public void testRemoveAll() {
+        OrderedSet<String> sut = OrderedSet.of("a","b","c","d","e","f","g");
+        
+        assertTrue( sut.removeAll(List.of("e","f","g")) );
+        assertFalse( sut.removeAll(List.of("e","f","g")) );
+        assertEquals( OrderedSet.of("a","b","c","d"), sut );    
+    }
+    
+    @Test
+    public void testRetainAll() {
+        OrderedSet<String> sut = OrderedSet.of("a","b","c","d","e","f","g");
+        
+        assertTrue( sut.retainAll(List.of("e","f","g")) );
+        assertFalse( sut.retainAll(List.of("e","f","g")) );
+        assertEquals( OrderedSet.of("e","f","g"), sut );    
     }
     
     @Test
