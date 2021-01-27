@@ -1,4 +1,4 @@
-package il.ac.bgu.cs.bp.bpjs.TicTacToe;
+package il.ac.bgu.cs.bp.bpjs.examples.analysis.TicTacToe;
 
 import il.ac.bgu.cs.bp.bpjs.analysis.BThreadSnapshotVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;

@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model;
 
+import static il.ac.bgu.cs.bp.bpjs.TestUtils.jsExp;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -85,6 +86,18 @@ public class BEventTest {
         assertEquals( bEvent2, bEvent3 );
         assertEquals( bEvent1, bEvent3 );
     }
+    
+    @Test
+    public void testWithObjects()  {
+        final BEvent bEvent1 = new BEvent("a", jsExp("{a:1, b:2, c:[3,3,3]}") );
+        final BEvent bEvent2 = new BEvent("a", jsExp("{a:1, b:2, c:[3,3,3]}") );
+        final BEvent bEvent3 = new BEvent("a", jsExp("{a:1, b:2, c:[22,700,'X']}"));
+        final BEvent bEvent2t = new BEvent("X", jsExp("{a:1, b:2, c:[3,3,3]}") );
+        assertEquals( bEvent1, bEvent2 );
+        assertNotEquals( bEvent2, bEvent3 );
+        assertNotEquals( bEvent2, bEvent2t );
+    }
+    
     
     @Test
     public void testCompare()  {

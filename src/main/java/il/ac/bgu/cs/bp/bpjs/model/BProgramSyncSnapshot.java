@@ -18,6 +18,7 @@ import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.BPEngineTask;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.StartFork;
 import il.ac.bgu.cs.bp.bpjs.internal.MapProxyConsolidator;
+import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
 import il.ac.bgu.cs.bp.bpjs.model.StorageConsolidationResult.Conflict;
 import il.ac.bgu.cs.bp.bpjs.model.StorageConsolidationResult.Success;
 import java.util.Map;
@@ -379,7 +380,9 @@ public class BProgramSyncSnapshot {
     @Override
     public int hashCode() {
         if ( hashCodeCache == Integer.MIN_VALUE  ) {
-            hashCodeCache = (threadSnapshots.hashCode()+1) * (externalEvents.hashCode()+1);
+            hashCodeCache = 37*(threadSnapshots.hashCode() + 
+                            externalEvents.hashCode() + 
+                            ScriptableUtils.jsHashCode(dataStore)+1);
         }
         return hashCodeCache;
     }
@@ -402,7 +405,7 @@ public class BProgramSyncSnapshot {
             }
         }
         
-        if ( ! getDataStore().equals(other.getDataStore()) ) return false;
+        if ( ! ScriptableUtils.jsMapEquals(getDataStore(), other.getDataStore()) ) return false;
         if ( ! getExternalEvents().equals(other.getExternalEvents()) ) return false;
         
         // optimization: non-equality by hash code - if we have one.

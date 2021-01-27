@@ -1,4 +1,4 @@
-package il.ac.bgu.cs.bp.bpjs.TicTacToe;
+package il.ac.bgu.cs.bp.bpjs.examples.analysis.TicTacToe;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;

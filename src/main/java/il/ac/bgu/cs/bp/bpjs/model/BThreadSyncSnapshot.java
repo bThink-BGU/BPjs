@@ -1,6 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.model;
 
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy;
+import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
 import il.ac.bgu.cs.bp.bpjs.model.internal.ContinuationProgramState;
 import java.io.Serializable;
 import java.util.Map;
@@ -11,6 +12,7 @@ import org.mozilla.javascript.NativeContinuation;
 import org.mozilla.javascript.Scriptable;
 
 import java.util.Objects;
+import org.mozilla.javascript.ScriptRuntime;
 
 /**
  * The state of a BThread at {@code bsync}.
@@ -193,6 +195,7 @@ public class BThreadSyncSnapshot implements Serializable {
         if (continuation != null) {
             result += getContinuationProgramState().hashCode(name);
         }
+        result += ScriptableUtils.jsHashCode(data);
         return result;
     }
 
@@ -218,7 +221,7 @@ public class BThreadSyncSnapshot implements Serializable {
             return false;
         }
         
-        if ( (!Objects.equals(data,other.getData())) ||
+        if ( (!ScriptableUtils.jsEquals(data,other.getData())) ||
               (!Objects.equals(bprogramStoreModifications,other.bprogramStoreModifications)) ) {
             return false;
         }

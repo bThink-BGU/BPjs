@@ -24,6 +24,7 @@
 package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 
 
+import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
@@ -54,7 +55,7 @@ public class MapProxy<K,V> implements java.io.Serializable {
         @Override
         public int hashCode() {
             int hash = 5;
-            hash = 23 * hash + Objects.hashCode(this.value);
+            hash = 23 * hash + ScriptableUtils.jsHashCode(this.value);
             return hash;
         }
 
@@ -65,7 +66,7 @@ public class MapProxy<K,V> implements java.io.Serializable {
             if (getClass() != obj.getClass()) return false;
             final PutValue other = (PutValue) obj;
             
-            return Objects.equals(this.value, other.value);
+            return ScriptableUtils.jsEquals(this.value, other.value);
         }        
     }
    
@@ -161,7 +162,7 @@ public class MapProxy<K,V> implements java.io.Serializable {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 23 * hash + Objects.hashCode(this.modifications);
+        hash = 23 * hash + ScriptableUtils.jsHashCode(this.modifications);
         return hash;
     }
 
@@ -175,7 +176,7 @@ public class MapProxy<K,V> implements java.io.Serializable {
         if (!Objects.equals(this.seed, other.seed)) {
             return false;
         }
-        return Objects.equals(this.modifications, other.modifications);
+        return ScriptableUtils.jsMapEquals(getModifications(), other.getModifications());
     }
     
     

@@ -1,4 +1,4 @@
-package il.ac.bgu.cs.bp.bpjs.TicTacToe.events;
+package il.ac.bgu.cs.bp.bpjs.examples.analysis.TicTacToe.events;
 
 /**
  * An event that is fired when player X makes a move.

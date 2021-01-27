@@ -543,4 +543,17 @@ public class DfsBProgramVerifierTest {
         assertEquals( "B", lastEventName.get() );
         
     }
+    
+    @Test
+    public void testThreadStorageEquality() throws Exception {
+        BProgram program = new ResourceBProgram("hotColdThreadMonitor.js");
+        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        sut.setProgressListener(new PrintDfsVerifierListener());
+        VisitedStateStore stateStore = new BThreadSnapshotVisitedStateStore();
+        sut.setVisitedStateStore(stateStore);
+        VerificationResult res = sut.verify(program);
+        
+        assertEquals( 9, res.getScannedStatesCount() );
+        assertEquals( 9, stateStore.getVisitedStateCount() );
+    }
 }

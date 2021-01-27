@@ -47,6 +47,9 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ImporterTopLevel;
+import org.mozilla.javascript.Scriptable;
 
 /**
  * Just a static place for some repeated methods useful for testing.
@@ -138,4 +141,42 @@ public abstract class TestUtils {
             .filter( filter::contains )
             .collect( toList() ).equals(sought);
     }
+    
+    
+    /**
+     * Convenience method for evaluating a JavaScript expression.
+     * Example:
+     * {@code res = jsExp("{a:1,b:2}"); } 
+     * @param jsExperssion
+     * @return The result of the passed JavaScript expression.
+     * @see #evaluateJS(java.lang.String) 
+     */
+    public static Object jsExp(String jsExperssion ){
+        return evaluateJS("var e=" + jsExperssion + "; e");
+    }
+    
+    /**
+     * Evaluate the passed JavaScript code, and return the result.
+     * Example:
+     * {@code res = evaluateJs("var a={a:1,b:2}; a"); } 
+     * @param jsCode
+     * @return The result of the passed code.
+     */
+    public static Object evaluateJS(String jsCode) {
+        try {
+            Context curCtx = Context.enter();
+            curCtx.setLanguageVersion(Context.VERSION_ES6);
+            ImporterTopLevel importer = new ImporterTopLevel(curCtx);
+            Scriptable tlScope = curCtx.initStandardObjects(importer);
+            Object resultObj = curCtx.evaluateString(
+                tlScope, jsCode, 
+                "", 1, null);
+            
+            return resultObj;
+            
+        } finally {
+            Context.exit();
+        }
+    }
+
 }

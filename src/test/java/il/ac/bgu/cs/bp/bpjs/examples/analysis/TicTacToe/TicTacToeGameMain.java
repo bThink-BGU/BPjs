@@ -1,4 +1,4 @@
-package il.ac.bgu.cs.bp.bpjs.TicTacToe;
+package il.ac.bgu.cs.bp.bpjs.examples.analysis.TicTacToe;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;

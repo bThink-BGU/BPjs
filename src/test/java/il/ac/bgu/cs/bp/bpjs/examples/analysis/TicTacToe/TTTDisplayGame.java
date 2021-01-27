@@ -1,4 +1,4 @@
-package il.ac.bgu.cs.bp.bpjs.TicTacToe;
+package il.ac.bgu.cs.bp.bpjs.examples.analysis.TicTacToe;
 
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
@@ -12,9 +12,9 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 
-import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.Click;
-import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.Move;
-import il.ac.bgu.cs.bp.bpjs.TicTacToe.events.StaticEvents;
+import il.ac.bgu.cs.bp.bpjs.examples.analysis.TicTacToe.events.Click;
+import il.ac.bgu.cs.bp.bpjs.examples.analysis.TicTacToe.events.Move;
+import il.ac.bgu.cs.bp.bpjs.examples.analysis.TicTacToe.events.StaticEvents;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;

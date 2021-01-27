@@ -24,6 +24,7 @@
 package il.ac.bgu.cs.bp.bpjs.internal;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.joining;
 
@@ -70,7 +71,15 @@ public class ScriptableUtils {
         if (o1 instanceof ScriptableObject && o2 instanceof ScriptableObject) {
             return jsScriptableObjectEqual((ScriptableObject) o1, (ScriptableObject) o2);
         }
-
+        
+        if ( o1 instanceof Map && o2 instanceof Map ) {
+            return jsMapEquals((Map)o1, (Map)o2);
+        }
+        
+        if ( o1 instanceof List && o2 instanceof List ) {
+            return jsListEquals((List)o1, (List)o2);
+        }
+        
         // Concatenated strings in Rhino are not java.lang.Strings. We need to manually
         // resolve to String semantics, which is what the following lines do.
         if (o1 instanceof ConsString) {
@@ -90,6 +99,53 @@ public class ScriptableUtils {
         
         return o1Ids.equals(o2Ids) &&
                 o1Ids.stream().allMatch(id -> jsEquals(o1.get(id), o2.get(id)));
+    }
+    
+    /**
+     * An equals method of two maps, that uses JS-equality rather than Java-equality.
+     * JS-equality only used for values, not for keys.
+     * 
+     * @param a
+     * @param b
+     * @return 
+     */
+    public static boolean jsMapEquals( Map<?,?> a, Map<?,?> b ) {
+        if ( a == b ) return true;
+        if ( a==null ^ b==null ) return false;
+        if ( a.size() != b.size() ) return false;
+        if ( ! a.keySet().equals(b.keySet()) ) return false;
+        
+        return a.keySet().stream().map( k -> jsEquals(a.get(k), b.get(k)) )
+            .filter( v -> !v )
+            .findAny()
+            .isEmpty();
+    }
+    
+    public static boolean jsListEquals( List<?> a, List<?> b ) {
+        if ( a == b ) return true;
+        if ( a==null ^ b==null ) return false;
+        if ( a.size() != b.size() ) return false;
+        
+        Iterator itA = a.iterator();
+        Iterator itB = b.iterator();
+        
+        while ( itA.hasNext() ) {
+            if ( ! jsEquals(itA.next(), itB.next()) ) return false;
+        }
+        
+        return true;
+    }
+    
+    public static boolean jsSetEquals( Set<?> a, Set<?> b ) {
+        if ( a == b ) return true;
+        if ( a==null ^ b==null ) return false;
+        if ( a.size() != b.size() ) return false;
+        
+        List<?> aAsArr = a.stream().collect( Collectors.toCollection(() -> new ArrayList<>(a.size())));
+        
+        return b.stream().map(bItm -> 
+            aAsArr.stream().filter( aItm -> jsEquals(aItm, bItm) ).findAny() // Maps items from b to whether they are js-present in a
+        ).noneMatch(found -> found.isEmpty() );
     }
     
     public static String stringify( Object o ) {
@@ -141,17 +197,17 @@ public class ScriptableUtils {
      * @param jsObj The JavaScript object to calculate the hash of.
      * @return {@code jsObj}'s hash code.
      */
-    public static int jsHash(Object jsObj) {
+    public static int jsHashCode(Object jsObj) {
         if (jsObj == null) {
             return 1;
         }
         
         // Concatenated strings in Rhino have a different type. We need to manually
         // resolve to String semantics, which is what the following lines do.
-        if (jsObj instanceof ConsString) {
-            return jsObj.toString().hashCode();
-        }
-
+        if (jsObj instanceof ConsString) return jsObj.toString().hashCode();
+        if ( jsObj instanceof Map ) return jsMapHashCode( (Map)jsObj );
+        if ( jsObj instanceof Collection ) return jsColHashCode( (Collection)jsObj );
+        
         return (jsObj instanceof ScriptableObject)
                 ? jsScriptableObjectHashCode((ScriptableObject) jsObj)
                 : jsObj.hashCode();
@@ -164,6 +220,20 @@ public class ScriptableUtils {
             .forEach( h -> acc[0]^=h );
         
         return acc[0];
+    }
+    
+    public static int jsMapHashCode( Map<?,?> aMap ) {
+        if ( aMap == null ) return 1;
+        
+        return jsColHashCode( aMap.values() );
+    }
+    
+    public static int jsColHashCode( Iterable<?> aSet ) {
+        if ( aSet == null ) return 1;
+        
+        final int h[] = {0};
+        aSet.iterator().forEachRemaining(i->h[0]+=jsHashCode(i) );
+        return h[0];    
     }
     
     /**

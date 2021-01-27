@@ -55,7 +55,8 @@ a link to this page somewhere in the documentation/system about section.
 * :bug_up: Removed extraneous dependencies from `pom.xml` (([#133](https://github.com/bThink-BGU/BPjs/issues/133)).
 * :arrow_up: BThread data documentation updated (([#134](https://github.com/bThink-BGU/BPjs/issues/134)).
 * :arrow_up: BProgram storage can be updated by the b-program before b-threads run (([#129](https://github.com/bThink-BGU/BPjs/issues/129)).
-* :arrow_up: Changes made to the b-program store after the last sync of a b-thread are now applied.  (([#130](https://github.com/bThink-BGU/BPjs/issues/130)).
+* :arrow_up: Changes made to the b-program store after the last sync of a b-thread are now applied (([#130](https://github.com/bThink-BGU/BPjs/issues/130)).
+* :bug: :tada: JS-semantics are applied for `equals` and `hashCode` for b-thread and b-program data (([#144](https://github.com/bThink-BGU/BPjs/issues/133)).
 
 
 [Earlier Changes](changelog-2020.md)

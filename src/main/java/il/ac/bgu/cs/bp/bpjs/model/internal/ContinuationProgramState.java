@@ -183,7 +183,7 @@ public class ContinuationProgramState {
         String prefix = btName+"!";
         return 37 * (programCounter + frameIndex +
 	                                variables.entrySet().stream()
-	                                           .map( es-> (prefix+es.getKey()).hashCode()*ScriptableUtils.jsHash(es.getValue()) )  
+	                                           .map( es-> (prefix+es.getKey()).hashCode()*ScriptableUtils.jsHashCode(es.getValue()) )  
 	                                           .collect( Collectors.reducing(1, (x,y)->x+y)));
     }
 

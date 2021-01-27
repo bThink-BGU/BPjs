@@ -104,31 +104,21 @@ public class BEvent implements Comparable<BEvent>, EventSet, java.io.Serializabl
             return false;
         }
         
-        if ( (maybeData!=null) ^ (other.getDataField().isPresent()) ) {
+        if ( maybeData == other.getData() ) return true; // same (possibly null) data on both.
+        if ( (maybeData==null) ^ (other.getDataField().isEmpty()) ) {
             // one has data, the other does not.
             return false;
         }
+        
+        // OK, delve into data semantics
+        Object theirData = other.getDataField().get();
+        return ScriptableUtils.jsEquals(maybeData, theirData);
 
-        if ( (maybeData!=null) ) { // and, by above test, other also has data
-            // OK, delve into Javascript semantics.
-            Object theirData = other.getDataField().get();
-            if (!(maybeData.getClass().isAssignableFrom(theirData.getClass())
-                    || theirData.getClass().isAssignableFrom(maybeData.getClass()))) {
-                return false; // not same type of data.
-            }
-
-            // Evaluate datas.
-            return ScriptableUtils.jsEquals(maybeData, theirData);
-
-        } else {
-            // whew - both don't have data
-            return true;
-        }
     }
 
     @Override
     public int hashCode() {
-        return 19*Objects.hashCode(name) ^ getDataField().map(ScriptableUtils::jsHash).orElse(0);
+        return 19*Objects.hashCode(name) ^ getDataField().map(ScriptableUtils::jsHashCode).orElse(0);
     }
 
     @Override
