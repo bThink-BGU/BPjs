@@ -80,6 +80,10 @@ public class ScriptableUtils {
             return jsListEquals((List)o1, (List)o2);
         }
         
+        if ( o1 instanceof Set && o2 instanceof Set ) {
+            return jsSetEquals((Set)o1, (Set)o2);
+        }
+        
         // Concatenated strings in Rhino are not java.lang.Strings. We need to manually
         // resolve to String semantics, which is what the following lines do.
         if (o1 instanceof ConsString) {

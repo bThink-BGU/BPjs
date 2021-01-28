@@ -239,14 +239,14 @@ public class ScriptableUtilsTest {
             jsExp("[42, 'dark castle', 'kings quest']")
         );
         
-        assertTrue( ScriptableUtils.jsSetEquals(mpA, mpAb));
-        assertTrue( ScriptableUtils.jsSetEquals(mpA, mpA));
-        assertTrue( ScriptableUtils.jsSetEquals(null, null));
+        assertTrue( ScriptableUtils.jsEquals(mpA, mpAb));
+        assertTrue( ScriptableUtils.jsEquals(mpA, mpA));
+        assertTrue( ScriptableUtils.jsEquals(null, null));
         
-        assertFalse( ScriptableUtils.jsSetEquals(mpA, null));
-        assertFalse( ScriptableUtils.jsSetEquals(mpA, mpAdim));
-        assertFalse( ScriptableUtils.jsSetEquals(mpA, mpB));
-        assertFalse( ScriptableUtils.jsSetEquals(mpA, mpC));
+        assertFalse( ScriptableUtils.jsEquals(mpA, null));
+        assertFalse( ScriptableUtils.jsEquals(mpA, mpAdim));
+        assertFalse( ScriptableUtils.jsEquals(mpA, mpB));
+        assertFalse( ScriptableUtils.jsEquals(mpA, mpC));
     }
     
 
