@@ -33,7 +33,7 @@ import java.util.stream.Stream;
  */
 public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSelectionStrategy {
 
-    public static final int DEFAULT_PRIORITY = -1;
+    public static final int DEFAULT_PRIORITY = 0;
     
     /** A mapping of b-thread names to their priorities. */
     final private Map<String, Integer> priorities = new HashMap<>();

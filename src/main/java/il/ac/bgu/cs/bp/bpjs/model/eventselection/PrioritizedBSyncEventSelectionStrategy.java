@@ -50,6 +50,8 @@ import org.mozilla.javascript.Context;
  */
 public class PrioritizedBSyncEventSelectionStrategy extends AbstractEventSelectionStrategy {
 
+    public static final int DEFAULT_PRIORITY = 0;
+
     public PrioritizedBSyncEventSelectionStrategy(long seed) {
         super(seed);
     }
@@ -94,7 +96,7 @@ public class PrioritizedBSyncEventSelectionStrategy extends AbstractEventSelecti
     
     private int getValue( SyncStatement stmt ) {
         return (stmt.hasData() && (stmt.getData() instanceof Number))? 
-                ((Number)stmt.getData()).intValue() : Integer.MIN_VALUE;
+                ((Number)stmt.getData()).intValue() : DEFAULT_PRIORITY;
     }
 
     
