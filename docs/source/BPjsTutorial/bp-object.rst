@@ -62,6 +62,23 @@ Splits the calling b-thread to two identical b-threads. On the "parent" b-thread
 
 Provides access to the logger. See :doc:`logging`.
 
+``bp.eventSets``
+~~~~~~~~~~~~~~~~
+
+Provides access to useful event sets methods and constant:
+
+* ``bp.eventSets.all``: All events (an event set that contains all events).
+* ``bp.eventSets.none``: An event set that does not contain any event.
+* ``bp.eventSets.anyOf(e1, e2, e3)``: An event set that contains ``e1``, ``e2``, and ``e3``. Similar to ``e1.or(e2).or(e3)``.
+* ``bp.eventSets.allOf(s1, s2, s3)``: An event set that is the conjunction of ``s1``, ``s2``, and ``s3`` (so, contains only events that are in ``s1`` and ``s2`` AND ``s3``). Similar to ``e1.and(e2).and(e3)``.
+* ``bp.eventSets.not(es42)``: An event set containing all events that are not in ``es42``.
+
+.. note::
+    Recall that events are event sets themselves (technically, an event is an event set that contains a single event - itself). So whenever a method expects an event _set_, you can pass a regular event to it.
+
+
+
+
 ``bp.random``
 ~~~~~~~~~~~~~
 
