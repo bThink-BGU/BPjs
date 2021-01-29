@@ -1,7 +1,8 @@
 package il.ac.bgu.cs.bp.bpjs.model.eventsets;
 
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-
+import static il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet.*;
+import java.util.Set;
 
 /**
  * A <em>mathematical</em> set of events - a predicate for testing whether an
@@ -21,5 +22,34 @@ public interface EventSet extends java.io.Serializable {
 	 * @return {@code true} if the object is a member of this set.
 	 */
 	boolean contains(BEvent event);
-
+    
+    
+    default EventSet and( final EventSet ifce ) {
+        if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
+		return new AllOf(Set.of(this, ifce));
+	}
+	
+	default EventSet or( final EventSet ifce ) {
+        if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
+		return new AnyOf(Set.of(this, ifce) );
+	}
+	
+	default EventSet xor( final EventSet ifce ) {
+        if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
+		return new Xor(this, ifce);
+	}
+	
+	default EventSet nor( final EventSet ifce ) {
+        if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
+		return new Not( or(ifce) );
+	}
+	
+	default EventSet nand( final EventSet ifce ) {
+        if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
+		return new Not( and(ifce) );
+	}
+    
+    default EventSet negate() {
+        return new Not(this);
+    }
 }

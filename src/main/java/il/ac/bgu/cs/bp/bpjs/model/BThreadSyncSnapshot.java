@@ -12,7 +12,6 @@ import org.mozilla.javascript.NativeContinuation;
 import org.mozilla.javascript.Scriptable;
 
 import java.util.Objects;
-import org.mozilla.javascript.ScriptRuntime;
 
 /**
  * The state of a BThread at {@code bsync}.
@@ -194,6 +193,7 @@ public class BThreadSyncSnapshot implements Serializable {
         int result = prime * Objects.hash(name, syncStatement);
         if (continuation != null) {
             result += getContinuationProgramState().hashCode(name);
+//            result += continuation.hashCode();
         }
         result += ScriptableUtils.jsHashCode(data);
         return result;
@@ -227,6 +227,7 @@ public class BThreadSyncSnapshot implements Serializable {
         } else {
             // Check equality on the PC+stack+heap
             return getContinuationProgramState().equals(other.getContinuationProgramState());
+//            return continuation.equals(other.getContinuation());
         }
     }
 

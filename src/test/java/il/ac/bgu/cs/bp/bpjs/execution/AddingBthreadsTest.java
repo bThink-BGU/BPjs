@@ -1,12 +1,12 @@
 package il.ac.bgu.cs.bp.bpjs.execution;
 
-import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.analysis.eventpattern.EventPattern;
+import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
 import org.junit.Test;
 import static org.junit.Assert.assertTrue;
 
@@ -29,7 +29,7 @@ public class AddingBthreadsTest {
         InMemoryEventLoggingListener eventLogger = sut.addListener( new InMemoryEventLoggingListener() );
         
         sut.run();
-        EventSet kiddies = il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet.anyOf(kidADone, kidBDone);
+        EventSet kiddies = EventSets.anyOf(kidADone, kidBDone);
         EventPattern expected = new EventPattern()
                 .append(kiddies)
                 .append(kiddies)

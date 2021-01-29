@@ -1,0 +1,78 @@
+
+Description="BPjs_Log"
+
+Categories = {"bpjs", "shell", "log"}
+
+Identifiers=[[ [a-zA-Z_]\w*(?!\w*\/) ]]
+
+Keywords={
+  { Id=1,
+    List={"Added", "Done", "Starting", "Started", "Ended"},
+  },
+  { Id=2,
+    List={"BEvent"},
+  }
+  -- { Id=3,
+  --   List={"ls", "cat", "tac", "rev", "cp", "mv", "rm", "rmdir", "chmod", "mkdir", "ls", "ll"},
+  -- },
+
+  -- fixes issue with expressions like ${SHELL="${CONFIG_SHELL-/bin/sh}"}
+  -- the [^\}]+ part fixes issue with "s#@PATH@#/opt/${pkgname}/bin/# ${pkgdir}/etc/profile.d/${pkgname}.sh"
+  -- { Id=4,
+  --   Regex=[[\$\{[^\}]+\$\{.+?\}.+?\}|\$\{.+?\}|\$\(.+?\) ]],
+  -- },
+  -- { Id=4,
+  --   Regex=[[ \$[\w\#]+ ]],
+  -- },
+  -- { Id=2,
+  --   Regex=[[ \-\-?[\w\-]+ ]],
+  -- },
+
+  --see OnStateChange
+  --{ Id=5,
+  --  Regex=[[ \*\[.*?\]\* ]],
+  --}
+}
+
+-- hereDoc opening delimiter, see OnStateChange to handle end of string
+-- Strings={
+--   Delimiter=[[<<[\-]?\s*["']?\s*[A-Za-z_]+["']?|"|`|']],
+-- }
+
+IgnoreCase=false
+
+Comments={
+  { Block=false,
+    Delimiter= { [[#]] },
+  },
+}
+
+-- Operators=[[\(|\)|\[|\]|\{|\}|\,|\;|\:|\&|<|>|\!|\=|\/|\*|\%|\+|\-|\|]]
+
+function OnStateChange(oldState, newState, token, kwClass)
+
+  if oldState==HL_STRING and token==hereDoc then
+    hereDoc = nil
+    return HL_STRING_END
+  end
+
+  if  (string.sub(token,1,1) =="$" )  and oldState==HL_STRING and newState==HL_KEYWORD then
+    return HL_INTERPOLATION
+  end
+
+  -- fix of code like case $1 in  *[\\\`\"\$]*)
+  if  kwClass==5 then
+    return HL_OPERATOR
+  end
+
+  if hereDoc~=nil then
+    return HL_STRING
+  end
+
+  --recognize hereDoc multine strings
+  if oldState==HL_STANDARD and newState==HL_STRING  then
+    hereDoc = string.match(token, "<<%-?%s*%'?([%-%a%d_]+)" )
+  end
+
+  return newState
+end

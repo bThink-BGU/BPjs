@@ -12,10 +12,9 @@ import org.junit.Test;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
-import static il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet.anyOf;
+import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
 import org.junit.Before;
 
 public class PrioritizedBThreadsEventSelectionStrategyTest {
@@ -101,7 +100,7 @@ public class PrioritizedBThreadsEventSelectionStrategyTest {
 		BProgramSyncSnapshot bpss = TestUtils.makeBPSS(
             new MockBThreadSyncSnapshot("bt1",  SyncStatement.make(bt("1")).request(Arrays.asList(EVT_1))),
             new MockBThreadSyncSnapshot("bt2",  SyncStatement.make(bt("2")).request(Arrays.asList(EVT_2))),
-            new MockBThreadSyncSnapshot("bt3",  SyncStatement.make(bt("3")).block(anyOf(EVT_1, EVT_2)))
+            new MockBThreadSyncSnapshot("bt3",  SyncStatement.make(bt("3")).block(EventSets.anyOf(EVT_1, EVT_2)))
         );
         
         bpss.getExternalEvents().add(EVT_X);
@@ -114,7 +113,7 @@ public class PrioritizedBThreadsEventSelectionStrategyTest {
 		BProgramSyncSnapshot bpss = TestUtils.makeBPSS(
             new MockBThreadSyncSnapshot("bt1",  SyncStatement.make(bt("1")).request(Arrays.asList(EVT_1))),
             new MockBThreadSyncSnapshot("bt2",  SyncStatement.make(bt("2")).request(Arrays.asList(EVT_2))),
-            new MockBThreadSyncSnapshot("bt3",  SyncStatement.make(bt("3")).block(anyOf(EVT_1)))
+            new MockBThreadSyncSnapshot("bt3",  SyncStatement.make(bt("3")).block(EVT_1))
         );
         
         bpss.getExternalEvents().add(EVT_X);

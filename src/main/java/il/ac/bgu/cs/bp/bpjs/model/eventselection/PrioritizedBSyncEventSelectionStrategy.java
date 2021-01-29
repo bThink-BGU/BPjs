@@ -26,7 +26,6 @@ package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
-import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
 import static java.util.Collections.emptySet;
@@ -63,7 +62,7 @@ public class PrioritizedBSyncEventSelectionStrategy extends AbstractEventSelecti
         Set<SyncStatement> statements = bpss.getStatements();
         List<BEvent> externalEvents = bpss.getExternalEvents();
         
-        EventSet blocked = ComposableEventSet.anyOf(statements.stream()
+        EventSet blocked = EventSets.anyOf(statements.stream()
                 .filter( stmt -> stmt!=null )
                 .map(SyncStatement::getBlock )
                 .filter( r -> r != EventSets.none )

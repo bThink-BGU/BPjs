@@ -30,8 +30,6 @@ import org.mozilla.javascript.serialize.ScriptableOutputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Output stream for {@link BThreadSyncSnapshot} objects. Creates stubs for objects that can link back to the java
@@ -41,8 +39,6 @@ import java.util.List;
  */
 public class BPJSStubOutputStream extends ScriptableOutputStream {
 
-    private final List<StreamObjectStub> stubs = new ArrayList<>();
-
     @SuppressWarnings("OverridableMethodCallInConstructor")
     public BPJSStubOutputStream(OutputStream out, Scriptable scope) throws IOException {
         super(out, scope);
@@ -50,19 +46,12 @@ public class BPJSStubOutputStream extends ScriptableOutputStream {
 
     @Override
     protected Object replaceObject(Object obj) throws IOException {
+        if ( obj == null ) return null;
         if ( obj instanceof BProgramJsProxy ) {
-            stubs.add(StreamObjectStub.BP_PROXY);
             return StreamObjectStub.BP_PROXY;
-        } else if ( ! (obj instanceof java.io.Serializable) ) {
-            System.err.println("Attempt to write a non-serializable object " + obj.toString());
-            return "NOT SERIALIZABLE: " + obj.toString();
         } else {
-            return obj;
+            return super.replaceObject(obj);
         }
-    }
-
-    public List<StreamObjectStub> getStubs() {
-        return stubs;
     }
     
 }

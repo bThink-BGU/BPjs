@@ -15,7 +15,6 @@ import org.mozilla.javascript.Context;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
-import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
 import java.util.Collection;
@@ -55,7 +54,7 @@ public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSele
             return externalEvents.isEmpty() ? emptySet() : singleton(externalEvents.get(0));
         }
         
-        final EventSet blocked = ComposableEventSet.anyOf(statements.stream()
+        final EventSet blocked = EventSets.anyOf(statements.stream()
                 .filter( stmt -> stmt!=null )
                 .map(SyncStatement::getBlock )
                 .filter( r -> r != EventSets.none )

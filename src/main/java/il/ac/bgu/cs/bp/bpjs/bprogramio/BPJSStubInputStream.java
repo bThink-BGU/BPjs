@@ -45,7 +45,7 @@ public class BPJSStubInputStream extends ScriptableInputStream {
     protected Object resolveObject(Object obj) throws IOException {
         return ( obj instanceof StreamObjectStub )
             ? stubProvider.get((StreamObjectStub) obj)
-            : obj;
+            : super.resolveObject(obj);
     }
 
     @Override

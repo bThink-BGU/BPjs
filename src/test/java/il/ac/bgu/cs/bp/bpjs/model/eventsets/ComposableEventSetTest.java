@@ -24,13 +24,9 @@
 package il.ac.bgu.cs.bp.bpjs.model.eventsets;
 
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import static il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet.*;
+import static il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets.*;
 import static java.util.Arrays.asList;
 import java.util.HashSet;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
 
@@ -39,26 +35,6 @@ import static org.junit.Assert.*;
  * @author michael
  */
 public class ComposableEventSetTest {
-    
-    public ComposableEventSetTest() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
-    }
-    
     
     static final BEvent E_A = new BEvent("A");
     static final BEvent E_B = new BEvent("B");
@@ -70,9 +46,9 @@ public class ComposableEventSetTest {
      */
     @Test
     public void testTheEventSet() {
-        EventSet sutA = theEventSet(E_A);
-        EventSet sutA1 = theEventSet(E_A);
-        EventSet sutB = theEventSet(E_B);
+        EventSet sutA = E_A;
+        EventSet sutA1 = E_A;
+        EventSet sutB = E_B;
         
         assertEquals( sutA, sutA );
         assertEquals( sutA, sutA1 );
@@ -90,7 +66,7 @@ public class ComposableEventSetTest {
      */
     @Test
     public void testNot() {
-        EventSet sut = not(theEventSet(E_A));
+        EventSet sut = not(E_A);
         assertFalse( sut.contains(E_A) );
         assertTrue( sut.contains(E_B) );
         assertEquals( sut, not(not(sut)) );
@@ -199,10 +175,10 @@ public class ComposableEventSetTest {
      */
     @Test
     public void testAnd() {
-        ComposableEventSet aOrB = anyOf( E_A, E_B );
-        ComposableEventSet bOrC = anyOf( E_B, E_C );
+        EventSet aOrB = anyOf( E_A, E_B );
+        EventSet bOrC = anyOf( E_B, E_C );
         
-        ComposableEventSet sut = aOrB.and(bOrC);
+        EventSet sut = aOrB.and(bOrC);
         
         assertTrue( sut.contains(E_B) );
         assertFalse( sut.contains(E_A) );
@@ -211,9 +187,9 @@ public class ComposableEventSetTest {
         assertEquals( aOrB.and(bOrC), bOrC.and(aOrB) );
         
         HashSet<EventSet> same = new HashSet<>();
-        same.add(theEventSet(E_A).and(E_B).and(E_C));
-        same.add(theEventSet(E_C).and(E_A).and(E_B));
-        same.add(theEventSet(E_C).and(E_A).and(E_B).and(E_A));
+        same.add(E_A.and(E_B).and(E_C));
+        same.add(E_C.and(E_A).and(E_B));
+        same.add(E_C.and(E_A).and(E_B).and(E_A));
         assertEquals( 1, same.size() );
         
         assertFalse( sut.equals(new Object()) );
@@ -224,8 +200,8 @@ public class ComposableEventSetTest {
      */
     @Test
     public void testOr() {
-        ComposableEventSet sutA = theEventSet(E_A).or(E_B);
-        ComposableEventSet sutB = theEventSet(E_B).or(E_A);
+        EventSet sutA = E_A.or(E_B);
+        EventSet sutB = E_B.or(E_A);
         
         assertEquals( sutA, sutB );
         assertEquals( sutA, sutB.or(E_A) );
@@ -236,8 +212,8 @@ public class ComposableEventSetTest {
      */
     @Test
     public void testXor() {
-        ComposableEventSet aOrB = anyOf( E_A, E_B );
-        ComposableEventSet bOrC = anyOf( E_B, E_C );
+        EventSet aOrB = anyOf( E_A, E_B );
+        EventSet bOrC = anyOf( E_B, E_C );
         EventSet sut = aOrB.xor(bOrC);
         
         assertTrue( sut.contains(E_A) );
@@ -264,8 +240,8 @@ public class ComposableEventSetTest {
      */
     @Test
     public void testNor() {
-        ComposableEventSet aOrB = anyOf( E_A, E_B );
-        ComposableEventSet bOrC = anyOf( E_B, E_C );
+        EventSet aOrB = anyOf( E_A, E_B );
+        EventSet bOrC = anyOf( E_B, E_C );
         EventSet sut = aOrB.nor(bOrC);
         
         assertFalse( sut.contains(E_A) );
@@ -275,8 +251,9 @@ public class ComposableEventSetTest {
         
         assertTrue( sut.toString().contains("not") );
         assertTrue( sut.toString().contains("any") );
-        assertTrue( sut.toString().contains(aOrB.toString()) );
-        assertTrue( sut.toString().contains(bOrC.toString()) );
+        assertTrue( sut.toString().contains(E_A.toString()) );
+        assertTrue( sut.toString().contains(E_B.toString()) );
+        assertTrue( sut.toString().contains(E_C.toString()) );
         
         assertFalse( sut.equals(new Object()) );
     }
@@ -286,8 +263,8 @@ public class ComposableEventSetTest {
      */
     @Test
     public void testNand() {
-        ComposableEventSet aOrB = anyOf( E_A, E_B );
-        ComposableEventSet bOrC = anyOf( E_B, E_C );
+        EventSet aOrB = anyOf( E_A, E_B );
+        EventSet bOrC = anyOf( E_B, E_C );
         EventSet sut = aOrB.nand(bOrC);
         
         assertTrue( sut.contains(E_A) );
@@ -302,9 +279,15 @@ public class ComposableEventSetTest {
     }
     
     @Test
+    public void testNegate() {
+        assertFalse( E_A.negate().contains(E_A) );
+        assertTrue( E_A.negate().negate().contains(E_A) );
+    }
+    
+    @Test
     public void testSemantics() {
-        EventSet sutA = theEventSet(E_A).or(E_B).and( theEventSet(E_B).or(E_C) );
-        EventSet sutB = theEventSet(E_C).or(E_B).and( theEventSet(E_B).or(E_A) );
+        EventSet sutA = E_A.or(E_B).and( E_B.or(E_C) );
+        EventSet sutB = E_C.or(E_B).and( E_B.or(E_A) );
         assertEquals( sutA, sutB );
         
         assertEquals( allOf(E_A, E_B, E_C, E_D), allOf(E_A, E_B).and(allOf(E_C, E_D)) );
@@ -313,9 +296,16 @@ public class ComposableEventSetTest {
         assertEquals( anyOf(E_A, E_B, E_C, E_D), anyOf(E_A, E_B).or(anyOf(E_C, E_D)) );
         assertEquals( anyOf(E_A, E_B, E_C, E_D), anyOf(E_A, E_B, E_B, E_B).or(anyOf(E_C, E_D)) );
         
-        assertTrue( theEventSet(E_A).xor(E_B).or(E_C).contains(E_A) );
-        assertTrue( theEventSet(E_A).xor(E_B).or(E_C).contains(E_B) );
-        assertTrue( theEventSet(E_A).xor(E_B).or(E_C).contains(E_C) );
+        assertEquals( E_A, E_A.negate().negate() );
+        
+        // not strictly necessary semantically, but efficient.
+        assertSame( E_A, E_A.negate().negate() );
+        assertSame( EventSets.all, EventSets.none.negate() ); 
+        assertSame( EventSets.none, EventSets.all.negate() ); 
+        
+        assertTrue( E_A.xor(E_B).or(E_C).contains(E_A) );
+        assertTrue( E_A.xor(E_B).or(E_C).contains(E_B) );
+        assertTrue( E_A.xor(E_B).or(E_C).contains(E_C) );
     }
     
 }

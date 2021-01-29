@@ -61,8 +61,10 @@ a link to this page somewhere in the documentation/system about section.
 * :bug: Fixed the bench marker.
 * :sparkles: BThread snapshots do not retain their entry point function after their first sync point. This results in lower memory footprint, and a more efficient de/serialization. These result in improved analysis performance and efficiency.
 * :sparkles: `BProgramSyncSnapshot`s are serialized using a single stream, and with the b-program's original scope as a top-level scope (([#126](https://github.com/bThink-BGU/BPjs/issues/126)).
-* :put_litter_in_its_place: Significant cleanup of the b-program io area. 
-
+* :put_litter_in_its_place: Significant cleanup of the b-program io area.
+* :sparkles: Event sets (and, by inheritance, events) are now composable. So you can write, e.g., `bp.Event("A").or(bp.Event("B")).negate()` to create an event set that contains all events except `A` and `B`.
+* :put_litter_in_its_place: Significant cleanup of the event set area. Some methods moved from `ComposableEventSet` to `EventSets`.
+* :sparkles: Another easy event set composition/creation added: `bp.eventSets` gives access to `EventSets`, with methods such as `bp.eventSets.anyOf(...)` and `bp.eventSets.not(...)`
 
 [Earlier Changes](changelog-2020.md)
 

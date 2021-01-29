@@ -23,7 +23,11 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model.eventsets;
 
+import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -31,6 +35,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.List;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -89,5 +94,20 @@ public class EventSetsTest {
         assertTrue( deSerialized.get(0) == original.get(0) );
         assertTrue( deSerialized.get(1) == original.get(1) );
         
+    }
+    
+    @Test
+    public void testJSComposition(){
+        BProgram bprog = new ResourceBProgram("jsEventSetComposition.js");
+        BProgramRunner rnr = new BProgramRunner(bprog);
+        InMemoryEventLoggingListener lgr = rnr.addListener( new InMemoryEventLoggingListener());
+        
+        rnr.run();
+        
+        assertEquals( 2, lgr.eventNames().stream().filter(n->n.equals("AC")).count() );
+        assertEquals( 2, lgr.eventNames().stream().filter(n->n.equals("BC")).count() );
+        assertEquals( 2, lgr.eventNames().stream().filter(n->n.equals("and-OK")).count() );
+        assertEquals( 2, lgr.eventNames().stream().filter(n->n.equals("allOf-OK")).count() );
+        assertEquals( 1, lgr.eventNames().stream().filter(n->n.equals("conv-OK")).count() );
     }
 }

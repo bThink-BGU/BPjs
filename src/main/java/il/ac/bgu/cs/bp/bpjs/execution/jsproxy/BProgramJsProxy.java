@@ -12,7 +12,6 @@ import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.ForkStatement;
-import il.ac.bgu.cs.bp.bpjs.model.eventsets.ComposableEventSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -96,9 +95,15 @@ public class BProgramJsProxy extends SyncStatementBuilder
     
     public final BpLog log = new BpLog();
     
+    /** Deprecated - use eventSets.all */
+    @Deprecated(forRemoval = true)
     public final EventSet all = EventSets.all;
     
+    /** Deprecated - use eventSets.none */
+    @Deprecated(forRemoval = true)
     public final EventSet none = EventSets.none;
+    
+    public final EventSetsJsProxy eventSets = new EventSetsJsProxy();
     
     /**
      * Facility for creating random numbers. BPjs code should not use JavaScript's
@@ -142,7 +147,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
     }
     
     public EventSet allExcept( EventSet es ) {
-        return ComposableEventSet.not(es);
+        return EventSets.not(es);
     }
     
     /**
@@ -286,7 +291,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
             
             if ( arr.getLength() == 1 ) return (EventSet)arr.get(0);
             
-            return ComposableEventSet.anyOf(
+            return EventSets.anyOf(
                 arr.getIndexIds().stream()
                     .map( i ->(EventSet)arr.get(i) )
                     .collect( toSet() ) );
