@@ -109,9 +109,9 @@ public class ScriptableUtils {
      * An equals method of two maps, that uses JS-equality rather than Java-equality.
      * JS-equality only used for values, not for keys.
      * 
-     * @param a
-     * @param b
-     * @return 
+     * @param a A map
+     * @param b Another map
+     * @return {@code true} iff maps are semantically equal.
      */
     public static boolean jsMapEquals( Map<?,?> a, Map<?,?> b ) {
         if ( a == b ) return true;
