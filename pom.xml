@@ -102,7 +102,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>${project.properties.exec.mainClass}</mainClass>
+                            <mainClass>il.ac.bgu.cs.bp.bpjs.mains.BPjsCliRunner</mainClass>
                             <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                         </manifest>
                     </archive>
@@ -172,7 +172,11 @@
                                 </goals>
                                 <configuration>
                                     <transformers>
-                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ComponentsXmlResourceTransformer"/>
+                                        <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                            <manifestEntries>
+                                                <Main-Class>il.ac.bgu.cs.bp.bpjs.mains.BPjsCliRunner</Main-Class>
+                                            </manifestEntries>
+                                        </transformer>
                                     </transformers>
                                 </configuration>
                             </execution>

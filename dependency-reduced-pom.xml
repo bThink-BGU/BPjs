@@ -4,7 +4,7 @@
   <groupId>com.github.bthink-bgu</groupId>
   <artifactId>BPjs</artifactId>
   <name>BPjs</name>
-  <version>0.11.1-SNAPSHOT</version>
+  <version>0.11.1</version>
   <description>Provides runtime and analysis for behavioral programs written in 
         JavaScript. It can run stand-alone (from the commmandline) or be 
         embedded in larger JVM-based systems.</description>
@@ -44,7 +44,7 @@
         <configuration>
           <archive>
             <manifest>
-              <mainClass>${project.properties.exec.mainClass}</mainClass>
+              <mainClass>il.ac.bgu.cs.bp.bpjs.mains.BPjsCliRunner</mainClass>
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
             </manifest>
           </archive>
@@ -109,7 +109,11 @@
                 </goals>
                 <configuration>
                   <transformers>
-                    <transformer />
+                    <transformer>
+                      <manifestEntries>
+                        <Main-Class>il.ac.bgu.cs.bp.bpjs.mains.BPjsCliRunner</Main-Class>
+                      </manifestEntries>
+                    </transformer>
                   </transformers>
                 </configuration>
               </execution>
