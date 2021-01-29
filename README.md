@@ -46,27 +46,27 @@ a link to this page somewhere in the documentation/system about section.
 
 ### 2021-01
 
+* :sparkles: `BProgramSyncSnapshot`s are serialized using a single stream, and with the b-program's original scope as a top-level scope (([#126](https://github.com/bThink-BGU/BPjs/issues/126)).
+* :sparkles: BThread snapshots do not retain their entry point function after their first sync point. This results in lower memory footprint, and a more efficient de/serialization. These result in improved analysis performance and efficiency.
+* :sparkles: Event sets (and, by inheritance, events) are now composable. So you can write, e.g., `bp.Event("A").or(bp.Event("B")).negate()` to create an event set that contains all events except `A` and `B`.
+* :sparkles: Another easy event set composition/creation added: `bp.eventSets` gives access to `EventSets`, with methods such as `bp.eventSets.anyOf(...)` and `bp.eventSets.not(...)`
 * :arrow_up: Logging now allows formatting, using Java's MessageFormat.
 * :arrow_up: Expressive `toString` on JavaScript sets ([#135](https://github.com/bThink-BGU/BPjs/issues/135)).
-* :arrow_up: Improved logging consistency ([#132](https://github.com/bThink-BGU/BPjs/issues/132)).
-* :bug: Fixed the note color issue in the documentation ([#137](https://github.com/bThink-BGU/BPjs/issues/137)).
 * :arrow_up: Error messages when passing non-events to a synchronization statement are more informative (([#131](https://github.com/bThink-BGU/BPjs/issues/131)).
+* :arrow_up: Improved logging consistency ([#132](https://github.com/bThink-BGU/BPjs/issues/132)).
 * :arrow_up: Error messages when JS event sets do not return a `Boolean` are more informative (([#138](https://github.com/bThink-BGU/BPjs/issues/138)).
-* :bug_up: Removed extraneous dependencies from `pom.xml` (([#133](https://github.com/bThink-BGU/BPjs/issues/133)).
 * :arrow_up: BThread data documentation updated (([#134](https://github.com/bThink-BGU/BPjs/issues/134)).
 * :arrow_up: BProgram storage can be updated by the b-program before b-threads run (([#129](https://github.com/bThink-BGU/BPjs/issues/129)).
 * :arrow_up: Changes made to the b-program store after the last sync of a b-thread are now applied (([#130](https://github.com/bThink-BGU/BPjs/issues/130)).
-* :bug: :tada: JS-semantics are applied for `equals` and `hashCode` for b-thread and b-program data (([#144](https://github.com/bThink-BGU/BPjs/issues/144)).
-* :bug: Fixed the bench marker.
-* :sparkles: BThread snapshots do not retain their entry point function after their first sync point. This results in lower memory footprint, and a more efficient de/serialization. These result in improved analysis performance and efficiency.
-* :sparkles: `BProgramSyncSnapshot`s are serialized using a single stream, and with the b-program's original scope as a top-level scope (([#126](https://github.com/bThink-BGU/BPjs/issues/126)).
-* :put_litter_in_its_place: Significant cleanup of the b-program io area.
-* :sparkles: Event sets (and, by inheritance, events) are now composable. So you can write, e.g., `bp.Event("A").or(bp.Event("B")).negate()` to create an event set that contains all events except `A` and `B`.
-* :put_litter_in_its_place: Significant cleanup of the event set area. Some methods moved from `ComposableEventSet` to `EventSets`.
-* :sparkles: Another easy event set composition/creation added: `bp.eventSets` gives access to `EventSets`, with methods such as `bp.eventSets.anyOf(...)` and `bp.eventSets.not(...)`
-* :put_litter_in_its_place: Some documentation updates and corrections.
-* :bug: Fixes a crash when a JS event set predicate returns `null` instead of a boolean.
 * :arrow_up: More tests (logger, JSProxy, ScriptableUtils, OrderedSet, JsEventSet, some event selection strategies).
+* :bug: :tada: JS-semantics are applied for `equals` and `hashCode` for b-thread and b-program data (([#144](https://github.com/bThink-BGU/BPjs/issues/144)).
+* :bug: Fixed the note color issue in the documentation ([#137](https://github.com/bThink-BGU/BPjs/issues/137)).
+* :bug: Fixed the bench marker.
+* :bug: Fixes a crash when a JS event set predicate returns `null` instead of a boolean.
+* :put_litter_in_its_place: Significant cleanup of the b-program io area.
+* :put_litter_in_its_place: Significant cleanup of the event set area. Some methods moved from `ComposableEventSet` to `EventSets`.
+* :put_litter_in_its_place: Some documentation updates and corrections.
+* :put_litter_in_its_place: Removed extraneous dependencies from `pom.xml` (([#133](https://github.com/bThink-BGU/BPjs/issues/133)).
 
 [Earlier Changes](changelog-2020.md)
 
