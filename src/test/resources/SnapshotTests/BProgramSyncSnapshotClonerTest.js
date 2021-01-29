@@ -41,5 +41,7 @@ bp.registerBThread("EventStore", function() {
 //});
 
 bp.registerBThread("requestor", function() {
+    const myBP = bp; // checking serialization to bpjs' proxy ref.
     bp.sync({request:bp.Event("e")});
+    bp.log.info("myProxy " + myBP);
 });

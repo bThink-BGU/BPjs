@@ -37,7 +37,7 @@ public class PrioritizedBSyncEventSelectionStrategyTest {
 
 	@Test
 	public void testSelectableEvents_withBlocking() {
-		PrioritizedBSyncEventSelectionStrategy sut = new PrioritizedBSyncEventSelectionStrategy();
+		PrioritizedBSyncEventSelectionStrategy sut = new PrioritizedBSyncEventSelectionStrategy(500);
 
 		BProgramSyncSnapshot bpss = TestUtils.makeBPSS(
             new MockBThreadSyncSnapshot(SyncStatement.make().request(Arrays.asList(EVT_4))),
@@ -60,6 +60,23 @@ public class PrioritizedBSyncEventSelectionStrategyTest {
         );
 
 		assertEquals(Collections.emptySet(), sut.selectableEvents(bpss));
+	}
+    
+    @Test
+	public void testSelectableEvents_allBlockedWithExtrnal() {
+		
+        BEvent external = new BEvent("External");
+        PrioritizedBSyncEventSelectionStrategy sut = new PrioritizedBSyncEventSelectionStrategy();
+           
+		BProgramSyncSnapshot bpss = TestUtils.makeBPSS(
+            new MockBThreadSyncSnapshot(SyncStatement.make().request(Arrays.asList(EVT_4)).block(EVT_1)),
+            new MockBThreadSyncSnapshot(SyncStatement.make().request(Arrays.asList(EVT_1)).data(5).block(EVT_2)),
+            new MockBThreadSyncSnapshot(SyncStatement.make().request(Arrays.asList(EVT_2)).data(1).block(EVT_3)),
+            new MockBThreadSyncSnapshot(SyncStatement.make().request(Arrays.asList(EVT_3)).data(10).block(EVT_4))
+        );
+        bpss.getExternalEvents().add(external);
+
+		assertEquals(Collections.singleton(external), sut.selectableEvents(bpss));
 	}
 
 }

@@ -23,11 +23,11 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution;
 
-import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+import il.ac.bgu.cs.bp.bpjs.model.eventselection.SimpleEventSelectionStrategy;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
@@ -46,7 +46,7 @@ public class DynamicBThreadAdditionTest {
     
     @Test
     public void testAddOnStart() throws InterruptedException {
-        ResourceBProgram bprog = new ResourceBProgram("dynamicBthreadAddition.js");
+        ResourceBProgram bprog = new ResourceBProgram("dynamicBthreadAddition.js", new SimpleEventSelectionStrategy());
         bprog.putInGlobalScope("ADD_ON_START", true);
         BProgramRunner sut = new BProgramRunner(bprog);
         sut.addListener(new PrintBProgramRunnerListener() );

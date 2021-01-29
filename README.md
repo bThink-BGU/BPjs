@@ -57,7 +57,6 @@ a link to this page somewhere in the documentation/system about section.
 * :arrow_up: BProgram storage can be updated by the b-program before b-threads run (([#129](https://github.com/bThink-BGU/BPjs/issues/129)).
 * :arrow_up: Changes made to the b-program store after the last sync of a b-thread are now applied (([#130](https://github.com/bThink-BGU/BPjs/issues/130)).
 * :bug: :tada: JS-semantics are applied for `equals` and `hashCode` for b-thread and b-program data (([#144](https://github.com/bThink-BGU/BPjs/issues/144)).
-* :arrow_up: More tests (logger, JSProxy, ScriptableUtils, OrderedSet).
 * :bug: Fixed the bench marker.
 * :sparkles: BThread snapshots do not retain their entry point function after their first sync point. This results in lower memory footprint, and a more efficient de/serialization. These result in improved analysis performance and efficiency.
 * :sparkles: `BProgramSyncSnapshot`s are serialized using a single stream, and with the b-program's original scope as a top-level scope (([#126](https://github.com/bThink-BGU/BPjs/issues/126)).
@@ -65,6 +64,9 @@ a link to this page somewhere in the documentation/system about section.
 * :sparkles: Event sets (and, by inheritance, events) are now composable. So you can write, e.g., `bp.Event("A").or(bp.Event("B")).negate()` to create an event set that contains all events except `A` and `B`.
 * :put_litter_in_its_place: Significant cleanup of the event set area. Some methods moved from `ComposableEventSet` to `EventSets`.
 * :sparkles: Another easy event set composition/creation added: `bp.eventSets` gives access to `EventSets`, with methods such as `bp.eventSets.anyOf(...)` and `bp.eventSets.not(...)`
+* :put_litter_in_its_place: Some documentation updates and corrections.
+* :bug: Fixes a crash when a JS event set predicate returns `null` instead of a boolean.
+* :arrow_up: More tests (logger, JSProxy, ScriptableUtils, OrderedSet, JsEventSet, some event selection strategies).
 
 [Earlier Changes](changelog-2020.md)
 

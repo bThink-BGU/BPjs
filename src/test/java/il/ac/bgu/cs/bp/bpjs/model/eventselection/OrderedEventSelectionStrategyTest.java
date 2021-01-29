@@ -28,9 +28,11 @@ import il.ac.bgu.cs.bp.bpjs.mocks.MockBThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
+import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
@@ -74,6 +76,39 @@ public class OrderedEventSelectionStrategyTest {
        );
        
        assertEquals( new HashSet<>(Arrays.asList(EVT_3, EVT_2)), sut.selectableEvents(bpss));
+    }
+    
+    @Test
+    public void testSelectableEvents_allBlocked() {
+        
+       OrderedEventSelectionStrategy sut = new OrderedEventSelectionStrategy();
+       
+       BProgramSyncSnapshot bpss = TestUtils.makeBPSS(
+            new MockBThreadSyncSnapshot(SyncStatement.make().request(List.of(EVT_1, EVT_2, EVT_3, EVT_4))),
+            new MockBThreadSyncSnapshot(SyncStatement.make().request(List.of(EVT_2, EVT_3, EVT_4))),
+            new MockBThreadSyncSnapshot(SyncStatement.make().block(EventSets.anyOf(EVT_1, EVT_2, EVT_3, EVT_4))),
+            new MockBThreadSyncSnapshot(SyncStatement.make().request(List.of(EVT_3, EVT_4)))
+       );
+        BEvent externalEvent = new BEvent("Exti");
+       
+       bpss.getExternalEvents().add(externalEvent);
+       
+       assertEquals( Set.of(externalEvent), sut.selectableEvents(bpss));
+    }
+    
+    @Test
+    public void testSelectableEvents_empties() {
+        
+       OrderedEventSelectionStrategy sut = new OrderedEventSelectionStrategy();
+       
+       BProgramSyncSnapshot bpss = TestUtils.makeBPSS();
+        BEvent externalEvent = new BEvent("Exti");
+       
+       assertEquals( Collections.emptySet(), sut.selectableEvents(bpss));
+       
+       bpss.getExternalEvents().add(externalEvent);
+       
+       assertEquals( Set.of(externalEvent), sut.selectableEvents(bpss));
     }
     
 }

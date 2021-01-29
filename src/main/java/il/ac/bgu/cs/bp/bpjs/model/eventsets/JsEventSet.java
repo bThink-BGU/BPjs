@@ -40,7 +40,7 @@ public class JsEventSet implements EventSet, java.io.Serializable {
 
             Boolean res = (Boolean) Context.jsToJava(result, Boolean.class);
             if (res == null) {
-                throw new RuntimeException("EventSet " + name + ": JS Predicate returned null, not a boolean value. " + predicate.toString());
+                throw new BPjsRuntimeException("EventSet " + name + ": JS Predicate returned null, not a boolean value. " + predicate.toString());
             }
             return res;
         } catch (EvaluatorException ee) {
