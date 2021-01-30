@@ -241,31 +241,30 @@ public class ScriptableUtils {
     }
     
     /**
-     * A problematic-yet-working way of getting a meanningful toString 
+     * A problematic-yet-working way of getting a meaningful toString
      * on a NativeSet.
      * @param ns
      * @return a textual description of {@code ns}.
      */
     private static String toString(NativeSet ns) {
-        
+
         String code = "const arr=[]; ns.forEach(e=>arr.push(e)); arr";
-        
+
          try {
             Context curCtx = Context.enter();
             curCtx.setLanguageVersion(Context.VERSION_ES6);
-            ImporterTopLevel importer = new ImporterTopLevel(curCtx);
-            Scriptable tlScope = curCtx.initStandardObjects(importer);
+            ImporterTopLevel tlScope = new ImporterTopLevel(curCtx);
             tlScope.put("ns", tlScope, ns);
             Object resultObj = curCtx.evaluateString(
-                tlScope, code, 
+                tlScope, code,
                 "", 1, null);
-            
+
             NativeArray arr = (NativeArray) resultObj;
             return arr.getIndexIds().stream().map( id -> stringify(arr.get(id), true) ).collect(joining(", "));
-            
+
         } finally {
             Context.exit();
         }
-        
+
     }
 }
