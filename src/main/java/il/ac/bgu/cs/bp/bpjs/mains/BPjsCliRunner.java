@@ -23,11 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.mains;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.BThreadSnapshotVisitedStateStore;
-import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
-import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTraceInspections;
-import il.ac.bgu.cs.bp.bpjs.analysis.HashVisitedStateStore;
-import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
+import il.ac.bgu.cs.bp.bpjs.analysis.*;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.PrintDfsVerifierListener;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
@@ -119,7 +115,7 @@ public class BPjsCliRunner {
                 println("Using full state storage");
                 vfr.setVisitedStateStore( new BThreadSnapshotVisitedStateStore() );
             } else {
-                vfr.setVisitedStateStore( new HashVisitedStateStore() );
+                vfr.setVisitedStateStore( new BProgramSnapshotVisitedStateStore() );
             }
             if ( switchPresent("--liveness", args) ) {
                 vfr.addInspection(ExecutionTraceInspections.HOT_SYSTEM);

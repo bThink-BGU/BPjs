@@ -36,7 +36,7 @@ public class StateStoreTests {
 
     @Test
     public void VisitedStateStoreHashBasic() throws Exception {
-        VisitedStateStore useHash = new HashVisitedStateStore();
+        VisitedStateStore useHash = new BProgramSnapshotVisitedStateStore();
         TestAAABTraceStore(useHash);
     }
 
@@ -67,7 +67,7 @@ public class StateStoreTests {
 
     @Test
     public void StateStoreHashTestDiffJSVar() throws Exception {
-        VisitedStateStore hashStore = new HashVisitedStateStore();
+        VisitedStateStore hashStore = new BProgramSnapshotVisitedStateStore();
         TestDiffJSVar(hashStore);
     }
 
@@ -117,7 +117,7 @@ public class StateStoreTests {
 
     @Test
     public void StateStoreHashTestEqualJSVar() throws Exception {
-        VisitedStateStore hashStore = new HashVisitedStateStore();
+        VisitedStateStore hashStore = new BProgramSnapshotVisitedStateStore();
         TestEqualJSVar(hashStore);
     }
 
@@ -173,7 +173,7 @@ public class StateStoreTests {
 
     @Test
     public void StateStoreHashTestIdenticalRuns() throws Exception {
-        VisitedStateStore hashStore = new HashVisitedStateStore();
+        VisitedStateStore hashStore = new BProgramSnapshotVisitedStateStore();
         testEqualRuns(hashStore);
         assertTrue( hashStore.toString().contains( ":"+Long.toString(hashStore.getVisitedStateCount())) );
     }
@@ -214,7 +214,7 @@ public class StateStoreTests {
 
     @Test
     public void testStateStoreJavaVarsHash() throws Exception {
-        VisitedStateStore hashStore = new HashVisitedStateStore();
+        VisitedStateStore hashStore = new BProgramSnapshotVisitedStateStore();
         testStateStoreJavaVars(hashStore);
     }
 

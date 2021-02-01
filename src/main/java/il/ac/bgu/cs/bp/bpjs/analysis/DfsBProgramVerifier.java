@@ -137,7 +137,7 @@ public class DfsBProgramVerifier {
         
     
     private long visitedEdgeCount;
-    private VisitedStateStore visited = new BThreadSnapshotVisitedStateStore();
+    private VisitedStateStore visited = new BProgramSnapshotVisitedStateStore();
     private long maxTraceLength = DEFAULT_MAX_TRACE;
     private final List<DfsTraversalNode> currentPath = new ArrayList<>();
     private ProgressListener listener;

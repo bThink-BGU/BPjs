@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 michael.
+ * Copyright 2017 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -24,24 +24,62 @@
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
+
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A {@link VisitedStateStore} that uses a hash function over the BProgram's states.
- * @author michael
+ *
+ * A {@link VisitedStateStore} that stores the state of the {@code BThread}s in the node.
+ * Ignores the last event that led to this node.
+ *
+ * @author achiya
  */
-public class HashVisitedStateStore implements VisitedStateStore {
-    private final Set<Integer> visited = new HashSet<>();
+public class BProgramSnapshotVisitedStateStore implements VisitedStateStore {
+    private final Set<Snapshot> visited = new HashSet<>();
+    
+    /**
+     * The item that's stored in {@link #visited}.
+     */
+    private static final class Snapshot {
+        final BProgramSyncSnapshot bpss;
+        private final int hashCode;
+    
+        Snapshot( BProgramSyncSnapshot bpss ){
+            this.bpss = bpss;
+            hashCode = bpss.hashCode();
+        }
 
+        @Override
+        public int hashCode() {
+            return hashCode;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null) return false;
+            if (getClass() != obj.getClass()) return false;
+            
+            final Snapshot other = (Snapshot) obj;
+            return (hashCode==other.hashCode)
+                    && bpss.equals(other.bpss);
+        }
+    }
+    
     @Override
     public void store(BProgramSyncSnapshot bss) {
-        visited.add( bss.hashCode() );
+        visited.add(new Snapshot(bss));
     }
 
     @Override
     public boolean isVisited(BProgramSyncSnapshot bss) {
-        return visited.contains( bss.hashCode() );
+        return visited.contains(new Snapshot(bss));
+    }   
+    
+    @Override
+    public void clear() {
+        visited.clear();
     }
 
     @Override
@@ -50,12 +88,7 @@ public class HashVisitedStateStore implements VisitedStateStore {
     }
     
     @Override
-    public void clear() {
-        visited.clear();
-    }
-
-    @Override
     public String toString() {
-        return "[HashVisitedStateStore stateCount:" + visited.size()+ ']';
+        return "[BProgramSnapshotVisitedStateStore visited:" + visited.size()+ ']';
     }
 }

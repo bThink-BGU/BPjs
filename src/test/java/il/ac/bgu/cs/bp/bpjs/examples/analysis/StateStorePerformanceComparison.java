@@ -63,7 +63,7 @@ public class StateStorePerformanceComparison {
         // test
         verifier.setVisitedStateStore(new BThreadSnapshotVisitedStateStore());
         runVerifier(verifier);
-        verifier.setVisitedStateStore(new HashVisitedStateStore());
+        verifier.setVisitedStateStore(new BProgramSnapshotVisitedStateStore());
         runVerifier(verifier);
         verifier.setVisitedStateStore(new ForgetfulVisitedStateStore());
         runVerifier(verifier);
