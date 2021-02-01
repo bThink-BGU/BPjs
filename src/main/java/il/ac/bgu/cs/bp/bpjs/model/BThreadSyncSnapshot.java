@@ -121,7 +121,7 @@ public class BThreadSyncSnapshot implements Serializable {
         }
     }
 
-    public Object getContinuation() {
+    public NativeContinuation getContinuation() {
         return continuation;
     }
 
@@ -193,7 +193,7 @@ public class BThreadSyncSnapshot implements Serializable {
         int result = prime * Objects.hash(name, syncStatement);
         if (continuation != null) {
 //            result += getContinuationProgramState().hashCode(name);
-            result += continuation.hashCode();
+            result += continuation.getImplementation().hashCode();
         }
         result += ScriptableUtils.jsHashCode(data);
         return result;
@@ -227,7 +227,7 @@ public class BThreadSyncSnapshot implements Serializable {
         } else {
             // Check equality on the PC+stack+heap
 //            return getContinuationProgramState().equals(other.getContinuationProgramState());
-            return continuation.equals(other.getContinuation());
+            return NativeContinuation.equalImplementations(continuation,other.getContinuation());
         }
     }
 
