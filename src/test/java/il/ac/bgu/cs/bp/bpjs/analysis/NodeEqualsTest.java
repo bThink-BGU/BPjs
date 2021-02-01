@@ -45,7 +45,7 @@ public class NodeEqualsTest {
             final BThreadSyncSnapshot sysState0 = nodes[0].getSystemState().getBThreadSnapshots().iterator().next();
             final BThreadSyncSnapshot sysStatei_1 = nodes[i - 1].getSystemState().getBThreadSnapshots().iterator().next();
 
-            assertTrue("Failed equality for i=" + i, sysState0.equals(sysStatei_1));
+            assertTrue("Failed equality for node num " + i, sysState0.equals(sysStatei_1));
 
             assertEquals(nodes[0], nodes[i - 1]);
             assertEquals(nodes[1], nodes[i]);
