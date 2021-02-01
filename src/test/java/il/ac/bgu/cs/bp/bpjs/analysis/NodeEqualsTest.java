@@ -47,8 +47,8 @@ public class NodeEqualsTest {
 
             assertTrue("Failed equality for node num " + i, sysState0.equals(sysStatei_1));
 
-            assertEquals(nodes[0], nodes[i - 1]);
-            assertEquals(nodes[1], nodes[i]);
+            assertEquals("Failed equality for node num " + (i-1), nodes[0], nodes[i - 1]);
+            assertEquals("Failed equality for node num " + i, nodes[1], nodes[i]);
         }
     }
 
