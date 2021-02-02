@@ -28,7 +28,7 @@
  */
 
 bp.registerBThread(function(){
-    for ( var i=0; i<10; i++ ) {
+    for ( let i=0; i<10; i++ ) {
         bp.sync({request:bp.Event("A")});
         bp.sync({request:bp.Event("B")});
         bp.sync({request:bp.Event("C")});

@@ -188,6 +188,7 @@ public class BProgramSyncSnapshotTest {
         ExecutorService execSvcB = ExecutorServiceMaker.makeWithName("BProgramSnapshotEqualityTest");
         BProgramSyncSnapshot postStart1 = setup1.start(execSvcA, PASSTHROUGH);
         BProgramSyncSnapshot postStart2 = setup2.start(execSvcB, PASSTHROUGH);
+        //@Achiya the new equals fails here because it compares source code and they are different.
         assertEquals(postStart1, postStart2);
         assertNotEquals(setup1, postStart1);
         assertNotEquals(setup2, postStart2);

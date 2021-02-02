@@ -71,7 +71,7 @@ public class BThreadSyncSnapshotTest {
         snapshots.add(step);
         // snapshots[1] is after the first loop iteration, snapshots[2] is after the second loop iteration.
         //  They should differ in loop index.
-        assertNotEquals(snapshots.get(1).getBThreadSnapshots(), snapshots.get(2).getBThreadSnapshots());
+        assertNotEquals(snapshots.get(1).getBThreadSnapshots(), snapshots.get(0).getBThreadSnapshots());
         
         execSvc.shutdown();
     }
