@@ -26,7 +26,7 @@ public class DfsTraversalNode {
      * Get the initial nod for a run of the passed {@code BPorgram}.
      *
      * @param bp The {@link BProgram} being verified.
-     * @param seed The {@link BProgramSyncSnapshot} received from the setup function of {@param bp}
+     * @param seed The {@link BProgramSyncSnapshot} received from the setup function of {@link BProgram}.
      * @return Initial node for the BProgram run
      * @throws Exception in case there's an error with the executed JavaScript code.
      */
