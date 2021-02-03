@@ -254,7 +254,7 @@ public class StateStoreTests {
         //now a should be 7 again
         //and now we should see the node
         next = sut.getUnvisitedNextNode(next, execSvc);
-        assertTrue(storeToUse.isVisited(next.getSystemState()));
+        assertTrue("Achiya: fails because a is 7 and not NativeJavaObject", storeToUse.isVisited(next.getSystemState()));
         execSvc.shutdown();
     }
 }
