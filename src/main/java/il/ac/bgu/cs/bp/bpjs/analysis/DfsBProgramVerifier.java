@@ -146,7 +146,14 @@ public class DfsBProgramVerifier {
     private boolean debugMode = false;
     private final Set<ExecutionTraceInspection> inspections = new HashSet<>();
     private ArrayExecutionTrace trace;
-    
+
+    public DfsBProgramVerifier(BProgram aBp) {
+        currentBProgram = aBp;
+        trace = new ArrayExecutionTrace(currentBProgram);
+    }
+
+    public DfsBProgramVerifier() { }
+
     public VerificationResult verify(BProgram aBp) throws Exception {
         if ( listener == null ) {
             listener = NULL_PROGRESS_LISTENER;

@@ -26,13 +26,11 @@ public class DfsTraversalNode {
      * Get the initial nod for a run of the passed {@code BPorgram}.
      *
      * @param bp The {@link BProgram} being verified.
-     * @param exSvc The executor service that will run the threads
+     * @param seed The {@link BProgramSyncSnapshot} received from the setup function of {@param bp}
      * @return Initial node for the BProgram run
      * @throws Exception in case there's an error with the executed JavaScript code.
      */
-    public static DfsTraversalNode getInitialNode(BProgram bp, ExecutorService exSvc) throws Exception {
-        BProgramSyncSnapshot seed = bp.setup().start(exSvc, bp.getStorageModificationStrategy());
-
+    public static DfsTraversalNode getInitialNode(BProgram bp, BProgramSyncSnapshot seed) throws Exception {
         return new DfsTraversalNode(bp, seed, null);
     }
 

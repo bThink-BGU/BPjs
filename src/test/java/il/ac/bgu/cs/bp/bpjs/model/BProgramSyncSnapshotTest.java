@@ -131,6 +131,7 @@ public class BProgramSyncSnapshotTest {
         ExecutorService execSvcB = ExecutorServiceMaker.makeWithName("BProgramSnapshotEqualityTest");
         BProgramSyncSnapshot stepa = setup.start(execSvcA, PASSTHROUGH);
         BProgramSyncSnapshot stepb = setup2.start(execSvcB, PASSTHROUGH);
+        fail("Achiya: fails because we cannot compare continuations from different BPrograms");
         assertEquals(stepa, stepb);
         assertNotEquals(setup, stepa);
         assertNotEquals(setup2, stepb);
@@ -188,8 +189,7 @@ public class BProgramSyncSnapshotTest {
         ExecutorService execSvcB = ExecutorServiceMaker.makeWithName("BProgramSnapshotEqualityTest");
         BProgramSyncSnapshot postStart1 = setup1.start(execSvcA, PASSTHROUGH);
         BProgramSyncSnapshot postStart2 = setup2.start(execSvcB, PASSTHROUGH);
-        //@Achiya the new equals fails here because it compares source code and they are different.
-        assertEquals(postStart1, postStart2);
+        assertEquals("Achiya: the test fails because the source code of the two bthreads is different.", postStart1, postStart2);
         assertNotEquals(setup1, postStart1);
         assertNotEquals(setup2, postStart2);
         
