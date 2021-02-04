@@ -26,7 +26,9 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -65,6 +67,10 @@ public class BProgramSnapshotVisitedStateStore implements VisitedStateStore {
             return (hashCode==other.hashCode)
                     && bpss.equals(other.bpss);
         }
+    }
+
+    public Set<BProgramSyncSnapshot> getStates() {
+        return visited.stream().map(s->s.bpss).collect(Collectors.toSet());
     }
     
     @Override

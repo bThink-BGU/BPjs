@@ -28,6 +28,7 @@ import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  *
@@ -66,6 +67,10 @@ public class BThreadSnapshotVisitedStateStore implements VisitedStateStore {
             return (hashCode==other.hashCode)
                     && bthreads.equals(other.bthreads);
         }
+    }
+
+    public Set<Set<BThreadSyncSnapshot>> getStates() {
+        return visited.stream().map(s->s.bthreads).collect(Collectors.toSet());
     }
     
     @Override
