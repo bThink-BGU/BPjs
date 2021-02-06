@@ -44,6 +44,9 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change Log for the BPjs Library.
 
+### 2021-02
+* :bug: Fixed an issue that caused `toString` for JavaScript objects to crash at certain cases ([#145](https://github.com/bThink-BGU/BPjs/issues/145)).
+
 ### 2021-01
 
 * :sparkles: `BProgramSyncSnapshot`s are serialized using a single stream, and with the b-program's original scope as a top-level scope (([#126](https://github.com/bThink-BGU/BPjs/issues/126)).
@@ -63,7 +66,7 @@ a link to this page somewhere in the documentation/system about section.
 * :bug: Fixed the note color issue in the documentation ([#137](https://github.com/bThink-BGU/BPjs/issues/137)).
 * :bug: Fixed the bench marker.
 * :bug: Fixes a crash when a JS event set predicate returns `null` instead of a boolean.
-* :put_litter_in_its_place: Significant cleanup of the b-program io area.
+* :put_litter_in_its_place: Significant cleanup of the b-program I/O area.
 * :put_litter_in_its_place: Significant cleanup of the event set area. Some methods moved from `ComposableEventSet` to `EventSets`.
 * :put_litter_in_its_place: Some documentation updates and corrections.
 * :put_litter_in_its_place: Removed extraneous dependencies from `pom.xml` (([#133](https://github.com/bThink-BGU/BPjs/issues/133)).
