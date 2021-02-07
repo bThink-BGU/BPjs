@@ -1,5 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.internal.Pair;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
@@ -67,7 +68,7 @@ public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSele
         
         // Let's see what internal events are requested and not blocked (if any).
         try {
-            Context.enter();
+            BPjs.enterRhinoContext();
             
             Set<Pair<BEvent,Integer>> requestedAndNotBlockedWithPriorities = requested.stream()
                     .filter( req -> !blocked.contains(req.getLeft()) )

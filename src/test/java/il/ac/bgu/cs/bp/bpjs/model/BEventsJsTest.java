@@ -72,7 +72,7 @@ public class BEventsJsTest {
                         + "events.put('m1i', bp.Event('metaE',{e:bp.Event('e'), v:'js-string'}));\n" 
                         + "events.put('m2i', bp.Event('metaE',{e:bp.Event('e'), v:'js-string'}));"
                         ,
-                        "inline script" );
+                        "inline script", Context.getCurrentContext() );
             }
         };
         new BProgramRunner(prog).run();

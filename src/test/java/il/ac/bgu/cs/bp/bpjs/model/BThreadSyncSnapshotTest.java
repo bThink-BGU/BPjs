@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model;
 
+import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotCloner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import static il.ac.bgu.cs.bp.bpjs.model.StorageModificationStrategy.PASSTHROUGH;
@@ -55,23 +56,23 @@ public class BThreadSyncSnapshotTest {
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("BProgramSnapshotEqualityTest");
         List<BProgramSyncSnapshot> snapshots = new ArrayList<>();
         BProgramSyncSnapshot step = setup.start(execSvc, PASSTHROUGH);
-        snapshots.add(step);
+        snapshots.add(BProgramSyncSnapshotCloner.clone(step));
         //Iteration 1, starts already at request state A
         for (int i = 0; i < 4; i++) {
             Set<BEvent> possibleEvents_a = bprog.getEventSelectionStrategy().selectableEvents(step);
             EventSelectionResult event_a = bprog.getEventSelectionStrategy().select(step, possibleEvents_a).get();
             step = step.triggerEvent(event_a.getEvent(), execSvc, listeners, PASSTHROUGH);
         }
-        snapshots.add(step);
+        snapshots.add(BProgramSyncSnapshotCloner.clone(step));
         for (int i = 0; i < 4; i++) {
             Set<BEvent> possibleEvents_a = bprog.getEventSelectionStrategy().selectableEvents(step);
             EventSelectionResult event_a = bprog.getEventSelectionStrategy().select(step, possibleEvents_a).get();
             step = step.triggerEvent(event_a.getEvent(), execSvc, listeners, PASSTHROUGH);
         }
-        snapshots.add(step);
+        snapshots.add(BProgramSyncSnapshotCloner.clone(step));
         // snapshots[1] is after the first loop iteration, snapshots[2] is after the second loop iteration.
         //  They should differ in loop index.
-        assertNotEquals(snapshots.get(1).getBThreadSnapshots(), snapshots.get(2).getBThreadSnapshots());
+        assertNotEquals(snapshots.get(1).getBThreadSnapshots(), snapshots.get(0).getBThreadSnapshots());
         
         execSvc.shutdown();
     }
@@ -79,7 +80,7 @@ public class BThreadSyncSnapshotTest {
     @Test
     public void testJavaVarState() throws InterruptedException {
         BProgram bprog = new StringBProgram("bp.registerBThread(function(){\n" +
-                "        var a = new java.lang.Integer(7);\n" +
+                "        let a = new java.lang.Integer(7);\n" +
                 "        while (true) {" +
                 "        bp.sync({request:bp.Event(\"A\")});\n" +
                 "        a = java.lang.Integer.reverse(a);\n" +
@@ -90,7 +91,7 @@ public class BThreadSyncSnapshotTest {
         BProgramSyncSnapshot postSync1 = postSetup.start(execSvcA, PASSTHROUGH);
         Set<BEvent> possibleEvents = bprog.getEventSelectionStrategy().selectableEvents(postSync1);
         EventSelectionResult esr = bprog.getEventSelectionStrategy().select(postSync1, possibleEvents).get();
-        BProgramSyncSnapshot postSync2 = postSync1.triggerEvent(esr.getEvent(), execSvcA, listeners, PASSTHROUGH);
+        BProgramSyncSnapshot postSync2 = BProgramSyncSnapshotCloner.clone(postSync1).triggerEvent(esr.getEvent(), execSvcA, listeners, PASSTHROUGH);
         assertNotEquals(postSync1.getBThreadSnapshots(), postSync2.getBThreadSnapshots());
         execSvcA.shutdown();
     }

@@ -103,7 +103,7 @@ public class DfsBProgramVerifierTest {
         sut.setDebugMode(true);
         sut.setProgressListener(new PrintDfsVerifierListener());
         program.appendSource(Requirements.eventNotSelected("B"));
-        VisitedStateStore stateStore = new HashVisitedStateStore();
+        VisitedStateStore stateStore = new BProgramSnapshotVisitedStateStore();
         sut.setVisitedStateStore(stateStore);
         VerificationResult res = sut.verify(program);
         assertTrue(res.isViolationFound());
@@ -419,7 +419,7 @@ public class DfsBProgramVerifierTest {
     public void testDoublePathWithVariablesDiscovery() throws Exception {
         BProgram bprog = new StringBProgram("doubleWithVar", //
                 "bp.registerBThread(\"round\", function(){\n" +
-                "    var le=null;\n" + 
+                "    var le=null;\n" +
                 "    while( true ) {\n" +
                 "        bp.sync({request:bp.Event(\"A\")});\n" +
                 "        le = bp.sync({waitFor:[bp.Event(\"B1\"), bp.Event(\"B2\")]});\n" +
@@ -454,7 +454,7 @@ public class DfsBProgramVerifierTest {
             foundTraces.add(eventTrace);
             return Optional.empty();
         }));
-        sut.setVisitedStateStore( new HashVisitedStateStore() );
+        sut.setVisitedStateStore( new BProgramSnapshotVisitedStateStore() );
         sut.setProgressListener(new PrintDfsVerifierListener());
         VerificationResult res = sut.verify(bprog);
 

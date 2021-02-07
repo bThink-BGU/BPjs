@@ -144,7 +144,7 @@ public class SnapshotBenchmarks {
 
         private static BenchmarkResult measureProgram(int object_type) throws Exception {
             VisitedStateStore store = new BThreadSnapshotVisitedStateStore();
-            VisitedStateStore storeHash = new HashVisitedStateStore();
+            VisitedStateStore storeHash = new BProgramSnapshotVisitedStateStore();
             DfsBProgramVerifier verifier = new DfsBProgramVerifier();
             String testName = TEST_NAME + ((object_type == 1) ? "object" : "integer");
             /*
@@ -214,7 +214,7 @@ public class SnapshotBenchmarks {
 
         private static BenchmarkResult measureProgram(EventSelectionStrategy strategy, int num_threads, boolean save_sync) throws Exception {
             VisitedStateStore store = new BThreadSnapshotVisitedStateStore();
-            VisitedStateStore storeHash = new HashVisitedStateStore();
+            VisitedStateStore storeHash = new BProgramSnapshotVisitedStateStore();
             DfsBProgramVerifier verifier = new DfsBProgramVerifier();
             /*
                 Test for variable num_steps

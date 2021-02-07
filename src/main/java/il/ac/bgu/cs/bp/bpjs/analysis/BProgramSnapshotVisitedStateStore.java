@@ -24,9 +24,9 @@
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
-import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
-import java.util.Collections;
+
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -35,21 +35,21 @@ import java.util.stream.Collectors;
  * A {@link VisitedStateStore} that stores the state of the {@code BThread}s in the node.
  * Ignores the last event that led to this node.
  *
- * @author michael
+ * @author achiya
  */
-public class BThreadSnapshotVisitedStateStore implements VisitedStateStore {
+public class BProgramSnapshotVisitedStateStore implements VisitedStateStore {
     private final Set<Snapshot> visited = new HashSet<>();
     
     /**
      * The item that's stored in {@link #visited}.
      */
     private static final class Snapshot {
-        final Set<BThreadSyncSnapshot> bthreads;
+        final BProgramSyncSnapshot bpss;
         private final int hashCode;
     
         Snapshot( BProgramSyncSnapshot bpss ){
-            bthreads = Collections.unmodifiableSet(bpss.getBThreadSnapshots());
-            hashCode = bthreads.hashCode();
+            this.bpss = bpss;
+            hashCode = bpss.hashCode();
         }
 
         @Override
@@ -65,12 +65,12 @@ public class BThreadSnapshotVisitedStateStore implements VisitedStateStore {
             
             final Snapshot other = (Snapshot) obj;
             return (hashCode==other.hashCode)
-                    && bthreads.equals(other.bthreads);
+                    && bpss.equals(other.bpss);
         }
     }
 
-    public Set<Set<BThreadSyncSnapshot>> getStates() {
-        return visited.stream().map(s->s.bthreads).collect(Collectors.toSet());
+    public Set<BProgramSyncSnapshot> getStates() {
+        return visited.stream().map(s->s.bpss).collect(Collectors.toSet());
     }
     
     @Override
@@ -95,6 +95,6 @@ public class BThreadSnapshotVisitedStateStore implements VisitedStateStore {
     
     @Override
     public String toString() {
-        return "[BThreadSnapshotVisitedStateStore visited:" + visited.size()+ ']';
+        return "[BProgramSnapshotVisitedStateStore visited:" + visited.size()+ ']';
     }
 }

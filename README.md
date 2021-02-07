@@ -45,7 +45,11 @@ a link to this page somewhere in the documentation/system about section.
 ## Change Log for the BPjs Library.
 
 ### 2021-02
+
+* :sparkles: :sparkles: :tada: :sparkles: :tada: :sparkles: :rainbow: :sparkles: :sparkles: :sparkles: BPjs now uses Rhino's native continuation equality and hash code ([#116](https://github.com/bThink-BGU/BPjs/issues/116). Also, :tada: :rainbow: :sparkles:.
+* :arrow_up: Scope and context creations across BPjs have been consolidated to utility methods in a new class called `BPjs`.
 * :bug: Fixed an issue that caused `toString` for JavaScript objects to crash at certain cases ([#145](https://github.com/bThink-BGU/BPjs/issues/145)).
+
 
 ### 2021-01
 

@@ -369,24 +369,26 @@ public class BProgramJsProxy extends SyncStatementBuilder
     
     @Override
     public int hashCode() {
-        int hash = 7;
-        hash = 59 * hash + Objects.hashCode(this.bProg);
-        return hash;
+        return 42;
     }
 
+    /**
+     * Proxies contain no state of their own, and provide a gateway to the Java
+     * environment the BProgram runs in. When comparing sync snapshots, we can 
+     * encounter JS proxies when traversing the JS heap and stack. To prevent leaking
+     * the equality evaluation outside of the JavaScript, we do not check the 
+     * equality of the {@link BProgram} {@code this} is a proxy of. Rather, we 
+     * just check that the other object is a proxy too.
+     * 
+     * @param obj
+     * @return {@code true} iff the other object is a {@code BProgramJsProxy}.
+     */
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
-            return true;
-        }
-        if (obj == null) {
-            return false;
-        }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        final BProgramJsProxy other = (BProgramJsProxy) obj;
-        return Objects.equals(this.bProg, other.bProg);
+        if (this == obj) return true;
+        if (obj == null) return false;
+        
+        return getClass() == obj.getClass();
     }
 
 }

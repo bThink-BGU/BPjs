@@ -1,5 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.model;
 
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
 /**
@@ -23,7 +24,7 @@ public class StringBProgram extends BProgram {
     
     @Override
     protected void setupProgramScope(Scriptable scope) {
-        evaluate(sourceCode, getName());
+        evaluate(sourceCode, getName(), Context.getCurrentContext());
     }
     
 }

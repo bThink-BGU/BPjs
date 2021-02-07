@@ -3,6 +3,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model.eventsets;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
@@ -51,7 +52,7 @@ public class BEventSetsJsTest {
                         "events.put( \"eVizObj\", bp.Event(\"aName\", {viz:\"viz\"}) );\n" +
                         "events.put( \"eViz\", bp.Event('aName', 'viz') );"
                         ,
-                        "inline script" );
+                        "inline script", Context.getCurrentContext() );
             }
         };
         new BProgramRunner(prog).run();
@@ -64,7 +65,7 @@ public class BEventSetsJsTest {
         BEvent eNotName = events.get("eNotName");
         EventSet esName = eventSets.get("esName");
         
-        Context.enter();
+        BPjs.enterRhinoContext();
         assertTrue( esName.contains(eName) );
         assertFalse( esName.contains(eNotName) );
         Context.exit();
@@ -77,7 +78,7 @@ public class BEventSetsJsTest {
         BEvent eName = events.get("eName");
         EventSet esDataVizIsViz = eventSets.get("esDataObjVizIsViz");
         EventSet esDataIsViz = eventSets.get("esDataIsViz");
-        Context.enter();
+        BPjs.enterRhinoContext();
         assertTrue( esDataVizIsViz.contains(eVizObj) );
         assertTrue( esDataIsViz.contains(eViz) );
         

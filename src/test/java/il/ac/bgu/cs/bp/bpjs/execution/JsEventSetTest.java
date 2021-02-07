@@ -3,6 +3,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
@@ -153,7 +154,7 @@ public class JsEventSetTest {
     @Test
     public void testJsSetData() throws InterruptedException, URISyntaxException {
         try {
-            Context.enter();
+            BPjs.enterRhinoContext();
             BProgram bpr = new StringBProgram( "Eventset",
                       "var es=bp.EventSet('a',function(e){return e.name=='a';});\n"
             );

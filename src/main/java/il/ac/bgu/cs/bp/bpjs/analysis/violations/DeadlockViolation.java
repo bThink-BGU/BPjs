@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.analysis.violations;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTrace;
 import il.ac.bgu.cs.bp.bpjs.internal.Pair;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
@@ -62,7 +63,7 @@ public class DeadlockViolation extends Violation {
             });
         });
         
-        Context.enter();
+        BPjs.enterRhinoContext();
         try {
             // collect who blocked what
             blockedBy = requestedBy.keySet().stream().map( evt -> Pair.of(

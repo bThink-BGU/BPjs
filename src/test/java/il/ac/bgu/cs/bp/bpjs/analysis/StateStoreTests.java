@@ -1,5 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
+import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotCloner;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import il.ac.bgu.cs.bp.bpjs.model.*;
 import org.junit.Test;
@@ -16,9 +17,10 @@ public class StateStoreTests {
     public void ForgetfulStore() throws Exception {
         BProgram program = new ResourceBProgram("SnapshotTests/ABCDTrace.js");
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvc");
-        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        BProgramSyncSnapshot bpss = program.setup().start(execSvc, program.getStorageModificationStrategy());
+        DfsBProgramVerifier sut = new DfsBProgramVerifier(program);
         VisitedStateStore forgetful = new ForgetfulVisitedStateStore();
-        DfsTraversalNode initial = DfsTraversalNode.getInitialNode(program, execSvc);
+        DfsTraversalNode initial = DfsTraversalNode.getInitialNode(program, bpss);
         forgetful.store(initial.getSystemState());
         assertFalse(forgetful.isVisited(initial.getSystemState()));
 
@@ -36,15 +38,16 @@ public class StateStoreTests {
 
     @Test
     public void VisitedStateStoreHashBasic() throws Exception {
-        VisitedStateStore useHash = new HashVisitedStateStore();
+        VisitedStateStore useHash = new BProgramSnapshotVisitedStateStore();
         TestAAABTraceStore(useHash);
     }
 
     private void TestAAABTraceStore(VisitedStateStore storeToUse) throws Exception {
         BProgram program = new ResourceBProgram("SnapshotTests/ABCDTrace.js");
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvc");
-        DfsBProgramVerifier sut = new DfsBProgramVerifier();
-        DfsTraversalNode initial = DfsTraversalNode.getInitialNode(program, execSvc);
+        BProgramSyncSnapshot bpss = program.setup().start(execSvc, program.getStorageModificationStrategy());
+        DfsBProgramVerifier sut = new DfsBProgramVerifier(program);
+        DfsTraversalNode initial = DfsTraversalNode.getInitialNode(program, bpss);
         storeToUse.store(initial.getSystemState());
         assertTrue(storeToUse.isVisited(initial.getSystemState()));
 
@@ -67,7 +70,7 @@ public class StateStoreTests {
 
     @Test
     public void StateStoreHashTestDiffJSVar() throws Exception {
-        VisitedStateStore hashStore = new HashVisitedStateStore();
+        VisitedStateStore hashStore = new BProgramSnapshotVisitedStateStore();
         TestDiffJSVar(hashStore);
     }
 
@@ -81,10 +84,12 @@ public class StateStoreTests {
                 "    }\n" +
                 "});");
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvcDiiffJSVar");
-        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        BProgramSyncSnapshot bpss = program.setup().start(execSvc, program.getStorageModificationStrategy());
+
+        DfsBProgramVerifier sut = new DfsBProgramVerifier(program);
         List<DfsTraversalNode> snapshots = new ArrayList<>();
 
-        DfsTraversalNode initial = DfsTraversalNode.getInitialNode(program, execSvc);
+        DfsTraversalNode initial = DfsTraversalNode.getInitialNode(program, bpss);
         storeToUse.store(initial.getSystemState());
         snapshots.add(initial);
         assertTrue(storeToUse.isVisited(initial.getSystemState()));
@@ -117,7 +122,7 @@ public class StateStoreTests {
 
     @Test
     public void StateStoreHashTestEqualJSVar() throws Exception {
-        VisitedStateStore hashStore = new HashVisitedStateStore();
+        VisitedStateStore hashStore = new BProgramSnapshotVisitedStateStore();
         TestEqualJSVar(hashStore);
     }
 
@@ -131,10 +136,11 @@ public class StateStoreTests {
                 "    }\n" +
                 "});");
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvcEqualJSVar");
-        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        BProgramSyncSnapshot bpss = program.setup().start(execSvc, program.getStorageModificationStrategy());
+        DfsBProgramVerifier sut = new DfsBProgramVerifier(program);
         List<DfsTraversalNode> snapshots = new ArrayList<>();
 
-        DfsTraversalNode initial = DfsTraversalNode.getInitialNode(program, execSvc);
+        DfsTraversalNode initial = DfsTraversalNode.getInitialNode(program, bpss);
         storeToUse.store(initial.getSystemState());
         snapshots.add(initial);
         assertTrue(storeToUse.isVisited(initial.getSystemState()));
@@ -173,7 +179,7 @@ public class StateStoreTests {
 
     @Test
     public void StateStoreHashTestIdenticalRuns() throws Exception {
-        VisitedStateStore hashStore = new HashVisitedStateStore();
+        VisitedStateStore hashStore = new BProgramSnapshotVisitedStateStore();
         testEqualRuns(hashStore);
         assertTrue( hashStore.toString().contains( ":"+Long.toString(hashStore.getVisitedStateCount())) );
     }
@@ -183,14 +189,14 @@ public class StateStoreTests {
      */
     private void testEqualRuns(VisitedStateStore storeToUse) throws Exception {
         BProgram bprog = new ResourceBProgram("SnapshotTests/ABCDTrace.js");
-        BProgram bprog2 = new ResourceBProgram("SnapshotTests/ABCDTrace.js");
-
-
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvcEqualJSVar");
-        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        BProgramSyncSnapshot bpss1 = bprog.setup().start(execSvc, bprog.getStorageModificationStrategy());
+        BProgramSyncSnapshot bpss2 = BProgramSyncSnapshotCloner.clone(bpss1);
 
-        DfsTraversalNode initial1 = DfsTraversalNode.getInitialNode(bprog, execSvc);
-        DfsTraversalNode initial2 = DfsTraversalNode.getInitialNode(bprog2, execSvc);
+        DfsBProgramVerifier sut = new DfsBProgramVerifier(bprog);
+
+        DfsTraversalNode initial1 = DfsTraversalNode.getInitialNode(bprog, bpss1);
+        DfsTraversalNode initial2 = DfsTraversalNode.getInitialNode(bprog, bpss2);
 
         assertEquals(initial1,initial2);
 
@@ -214,7 +220,7 @@ public class StateStoreTests {
 
     @Test
     public void testStateStoreJavaVarsHash() throws Exception {
-        VisitedStateStore hashStore = new HashVisitedStateStore();
+        VisitedStateStore hashStore = new BProgramSnapshotVisitedStateStore();
         testStateStoreJavaVars(hashStore);
     }
 
@@ -229,9 +235,10 @@ public class StateStoreTests {
                 "        }\n" +
                 "});");
         ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvcEqualJSVar");
-        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        BProgramSyncSnapshot bpss = bprog.setup().start(execSvc, bprog.getStorageModificationStrategy());
+        DfsBProgramVerifier sut = new DfsBProgramVerifier(bprog);
 
-        DfsTraversalNode next = DfsTraversalNode.getInitialNode(bprog, execSvc);
+        DfsTraversalNode next = DfsTraversalNode.getInitialNode(bprog, bpss);
         storeToUse.store(next.getSystemState());
         assertTrue(storeToUse.isVisited(next.getSystemState()));
         //now we enter the loop and generate initial node
@@ -247,7 +254,7 @@ public class StateStoreTests {
         //now a should be 7 again
         //and now we should see the node
         next = sut.getUnvisitedNextNode(next, execSvc);
-        assertTrue(storeToUse.isVisited(next.getSystemState()));
+        assertTrue("Achiya: fails because a is 7 and not NativeJavaObject", storeToUse.isVisited(next.getSystemState()));
         execSvc.shutdown();
     }
 }

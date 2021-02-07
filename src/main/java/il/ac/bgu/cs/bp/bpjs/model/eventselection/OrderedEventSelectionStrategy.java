@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
@@ -76,7 +77,7 @@ public class OrderedEventSelectionStrategy extends AbstractEventSelectionStrateg
         
         // Let's see what internal events are requested and not blocked (if any).
         try {
-            Context.enter();
+            BPjs.enterRhinoContext();
             Set<BEvent> requestedAndNotBlocked = requested.stream()
                     .filter( req -> !blocked.contains(req) )
                     .collect( toSet() );

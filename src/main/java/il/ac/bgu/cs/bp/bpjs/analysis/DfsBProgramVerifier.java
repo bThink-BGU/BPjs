@@ -137,7 +137,7 @@ public class DfsBProgramVerifier {
         
     
     private long visitedEdgeCount;
-    private VisitedStateStore visited = new BThreadSnapshotVisitedStateStore();
+    private VisitedStateStore visited = new BProgramSnapshotVisitedStateStore();
     private long maxTraceLength = DEFAULT_MAX_TRACE;
     private final List<DfsTraversalNode> currentPath = new ArrayList<>();
     private ProgressListener listener;
@@ -146,7 +146,14 @@ public class DfsBProgramVerifier {
     private boolean debugMode = false;
     private final Set<ExecutionTraceInspection> inspections = new HashSet<>();
     private ArrayExecutionTrace trace;
-    
+
+    public DfsBProgramVerifier(BProgram aBp) {
+        currentBProgram = aBp;
+        trace = new ArrayExecutionTrace(currentBProgram);
+    }
+
+    public DfsBProgramVerifier() { }
+
     public VerificationResult verify(BProgram aBp) throws Exception {
         if ( listener == null ) {
             listener = NULL_PROGRESS_LISTENER;

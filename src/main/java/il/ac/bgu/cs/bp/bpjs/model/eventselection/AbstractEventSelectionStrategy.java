@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
@@ -90,7 +91,7 @@ public abstract class AbstractEventSelectionStrategy implements EventSelectionSt
 
     protected Set<BEvent> getRequestedAndNotBlocked(SyncStatement stmt, EventSet blocked) {
         try {
-            Context.enter();
+            BPjs.enterRhinoContext();
             return stmt.getRequest().stream().filter((BEvent req) -> !blocked.contains(req)).collect(toSet());
         } finally {
             Context.exit();

@@ -112,53 +112,52 @@ public class BProgramSyncSnapshotTest {
      */
     @Test
     public void testEqualsSingleStep() throws InterruptedException {
-        BProgram bprog = new StringBProgram("bp.registerBThread(function(){\n" +
-                "        bp.sync({request:bp.Event(\"A\")});\n" +
-                "        bp.sync({request:bp.Event(\"B\")});\n" +
-                "        bp.ASSERT(false,\"Failed Assert\");\n" +
-                "});");
-        BProgram bprog2 = new StringBProgram("bp.registerBThread(function(){\n" +
-                "        bp.sync({request:bp.Event(\"A\")});\n" +
-                "        bp.sync({request:bp.Event(\"B\")});\n" +
-                "        bp.ASSERT(false,\"Failed Assert\");\n" +
-                "});");
+        final String sourceCode = "bp.registerBThread(function(){\n" +
+            "        bp.sync({request:bp.Event(\"A\")});\n" +
+            "        bp.sync({request:bp.Event(\"B\")});\n" +
+            "        bp.ASSERT(false,\"Failed Assert\");\n" +
+            "});";
+        BProgram bprog = new StringBProgram(sourceCode);
+        BProgram bprog2 = new StringBProgram(sourceCode);
 
-        BProgramSyncSnapshot setup = bprog.setup();
-        BProgramSyncSnapshot setup2 = bprog2.setup();
-
+        BProgramSyncSnapshot setupA = bprog.setup();
+        BProgramSyncSnapshot setupB = bprog2.setup();
+        assertEquals( setupA, setupB );
+        
+        
         // Run first step
         ExecutorService execSvcA = ExecutorServiceMaker.makeWithName("BProgramSnapshotEqualityTest");
         ExecutorService execSvcB = ExecutorServiceMaker.makeWithName("BProgramSnapshotEqualityTest");
-        BProgramSyncSnapshot stepa = setup.start(execSvcA, PASSTHROUGH);
-        BProgramSyncSnapshot stepb = setup2.start(execSvcB, PASSTHROUGH);
-        assertEquals(stepa, stepb);
-        assertNotEquals(setup, stepa);
-        assertNotEquals(setup2, stepb);
+        BProgramSyncSnapshot step1A = setupA.start(execSvcA, PASSTHROUGH);
+        BProgramSyncSnapshot step1B = setupB.start(execSvcB, PASSTHROUGH);
+        assertEquals(step1A, step1B);
+        assertNotEquals(setupA, step1A);
+        assertNotEquals(setupB, step1B);
 
         //run second step
-        Set<BEvent> possibleEvents_a = bprog.getEventSelectionStrategy().selectableEvents(stepa);
-        Set<BEvent> possibleEvents_b = bprog2.getEventSelectionStrategy().selectableEvents(stepb);
-        EventSelectionResult event_a = bprog.getEventSelectionStrategy().select(stepa, possibleEvents_a).get();
-        EventSelectionResult event_b = bprog2.getEventSelectionStrategy().select(stepa, possibleEvents_b).get();
-        BProgramSyncSnapshot step2a = stepa.triggerEvent(event_a.getEvent(), execSvcA, listeners, PASSTHROUGH);
-        BProgramSyncSnapshot step2b = stepb.triggerEvent(event_b.getEvent(), execSvcB, listeners, PASSTHROUGH);
-        assertEquals(step2a, step2b);
-        assertNotEquals(stepa, step2a);
-        assertNotEquals(stepb, step2b);
+        Set<BEvent> possibleEventsA = bprog.getEventSelectionStrategy().selectableEvents(step1A);
+        Set<BEvent> possibleEventsB = bprog2.getEventSelectionStrategy().selectableEvents(step1B);
+        EventSelectionResult eventA = bprog.getEventSelectionStrategy().select(step1A, possibleEventsA).get();
+        EventSelectionResult eventB = bprog2.getEventSelectionStrategy().select(step1A, possibleEventsB).get();
+        BProgramSyncSnapshot step2A = step1A.triggerEvent(eventA.getEvent(), execSvcA, listeners, PASSTHROUGH);
+        BProgramSyncSnapshot step2B = step1B.triggerEvent(eventB.getEvent(), execSvcB, listeners, PASSTHROUGH);
+        assertEquals(step2A, step2B);
+        assertNotEquals(step1A, step2A);
+        assertNotEquals(step1B, step2B);
 
-        possibleEvents_a = bprog.getEventSelectionStrategy().selectableEvents(step2a);
-        possibleEvents_b = bprog2.getEventSelectionStrategy().selectableEvents(step2b);
-        event_a = bprog.getEventSelectionStrategy().select(step2a, possibleEvents_a).get();
-        event_b = bprog2.getEventSelectionStrategy().select(step2b, possibleEvents_b).get();
-        BProgramSyncSnapshot step3a = step2a.triggerEvent(event_a.getEvent(), execSvcA, listeners, PASSTHROUGH);
-        BProgramSyncSnapshot step3b = step2b.triggerEvent(event_b.getEvent(), execSvcB, listeners, PASSTHROUGH);
-        assertEquals(step3a, step3b);
-        assertNotEquals(step3a, step2a);
-        assertNotEquals(step3b, step2a);
-        assertEquals(step3a, step3b);
-        assertNotEquals(step3a, step2a);
-        assertNotEquals(step3b, step2a);
-        assertTrue(step3a.noBThreadsLeft());
+        possibleEventsA = bprog.getEventSelectionStrategy().selectableEvents(step2A);
+        possibleEventsB = bprog2.getEventSelectionStrategy().selectableEvents(step2B);
+        eventA = bprog.getEventSelectionStrategy().select(step2A, possibleEventsA).get();
+        eventB = bprog2.getEventSelectionStrategy().select(step2B, possibleEventsB).get();
+        BProgramSyncSnapshot step3A = step2A.triggerEvent(eventA.getEvent(), execSvcA, listeners, PASSTHROUGH);
+        BProgramSyncSnapshot step3B = step2B.triggerEvent(eventB.getEvent(), execSvcB, listeners, PASSTHROUGH);
+        assertEquals(step3A, step3B);
+        assertNotEquals(step3A, step2A);
+        assertNotEquals(step3B, step2A);
+        assertEquals(step3A, step3B);
+        assertNotEquals(step3A, step2A);
+        assertNotEquals(step3B, step2A);
+        assertTrue(step3A.noBThreadsLeft());
         execSvcA.shutdown();
         execSvcB.shutdown();
     }
@@ -188,7 +187,7 @@ public class BProgramSyncSnapshotTest {
         ExecutorService execSvcB = ExecutorServiceMaker.makeWithName("BProgramSnapshotEqualityTest");
         BProgramSyncSnapshot postStart1 = setup1.start(execSvcA, PASSTHROUGH);
         BProgramSyncSnapshot postStart2 = setup2.start(execSvcB, PASSTHROUGH);
-        assertEquals(postStart1, postStart2);
+        assertNotEquals("The source code of the two bthreads is different, thus they should not eb equal.", postStart1, postStart2);
         assertNotEquals(setup1, postStart1);
         assertNotEquals(setup2, postStart2);
         
@@ -196,29 +195,9 @@ public class BProgramSyncSnapshotTest {
         Set<BEvent> possibleEvents1 = bprog1.getEventSelectionStrategy().selectableEvents(postStart1);
         Set<BEvent> possibleEvents2 = bprog2.getEventSelectionStrategy().selectableEvents(postStart2);
         EventSelectionResult event1_1 = bprog1.getEventSelectionStrategy().select(postStart1, possibleEvents1).get();
-        EventSelectionResult event1_2 = bprog2.getEventSelectionStrategy().select(postStart1, possibleEvents2).get();
-        BProgramSyncSnapshot postSync1_1 = postStart1.triggerEvent(event1_1.getEvent(), execSvcA, listeners, PASSTHROUGH);
-        BProgramSyncSnapshot postSync1_2 = postStart2.triggerEvent(event1_2.getEvent(), execSvcB, listeners, PASSTHROUGH);
-        assertTrue(postSync1_1.isStateValid());
-        assertEquals(postSync1_1, postSync1_2);
-        assertNotEquals(postStart1, postSync1_1);
-        assertNotEquals(postStart2, postSync1_2);
+        EventSelectionResult event1_2 = bprog2.getEventSelectionStrategy().select(postStart2, possibleEvents2).get();
+        assertEquals( event1_1, event1_2 );
 
-        possibleEvents1 = bprog1.getEventSelectionStrategy().selectableEvents(postSync1_1);
-        possibleEvents2 = bprog2.getEventSelectionStrategy().selectableEvents(postSync1_2);
-        EventSelectionResult event2_1 = bprog1.getEventSelectionStrategy().select(postSync1_1, possibleEvents1).get();
-        EventSelectionResult event2_2 = bprog2.getEventSelectionStrategy().select(postSync1_2, possibleEvents2).get();
-        assertEquals("B", event2_1.getEvent().name);
-        
-        BProgramSyncSnapshot postSync2_1 = postSync1_1.triggerEvent(event2_1.getEvent(), execSvcA, listeners, PASSTHROUGH);
-        assertFalse(postSync2_1.isStateValid());
-        assertNotEquals(postSync2_1, postSync1_1);
-        
-        BProgramSyncSnapshot postSync2_2 = postSync1_2.triggerEvent(event2_2.getEvent(), execSvcB, listeners, PASSTHROUGH);
-        assertNotEquals(postSync1_2, postSync2_2);
-        assertNotEquals(postSync1_2, postSync1_1);
-        assertNotEquals(postSync2_2, postSync1_1);
-        assertNotEquals(postSync2_2, postSync2_1);
 
         execSvcA.shutdown();
         execSvcB.shutdown();

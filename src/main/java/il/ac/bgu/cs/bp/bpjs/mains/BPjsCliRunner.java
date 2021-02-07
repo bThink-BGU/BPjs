@@ -23,11 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.mains;
 
-import il.ac.bgu.cs.bp.bpjs.analysis.BThreadSnapshotVisitedStateStore;
-import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
-import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTraceInspections;
-import il.ac.bgu.cs.bp.bpjs.analysis.HashVisitedStateStore;
-import il.ac.bgu.cs.bp.bpjs.analysis.VerificationResult;
+import il.ac.bgu.cs.bp.bpjs.analysis.*;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.PrintDfsVerifierListener;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
@@ -47,6 +43,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.Scriptable;
 
@@ -72,7 +69,7 @@ public class BPjsCliRunner {
                     if (arg.equals("-")) {
                         println(" [READ] stdin");
                         try {
-                            evaluate(System.in, "stdin");
+                            evaluate(System.in, "stdin", Context.getCurrentContext());
                         } catch (EvaluatorException ee) {
                             logScriptExceptionAndQuit(ee, arg);
                         }
@@ -85,7 +82,7 @@ public class BPjsCliRunner {
                                 System.exit(-2);
                             }
                             try (InputStream in = Files.newInputStream(inFile)) {
-                                evaluate(in, arg);
+                                evaluate(in, arg, Context.getCurrentContext());
                             } catch (EvaluatorException ee) {
                                 logScriptExceptionAndQuit(ee, arg);
                             } catch (IOException ex) {
@@ -119,7 +116,7 @@ public class BPjsCliRunner {
                 println("Using full state storage");
                 vfr.setVisitedStateStore( new BThreadSnapshotVisitedStateStore() );
             } else {
-                vfr.setVisitedStateStore( new HashVisitedStateStore() );
+                vfr.setVisitedStateStore( new BProgramSnapshotVisitedStateStore() );
             }
             if ( switchPresent("--liveness", args) ) {
                 vfr.addInspection(ExecutionTraceInspections.HOT_SYSTEM);

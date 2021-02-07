@@ -173,7 +173,7 @@ public class MapProxy<K,V> implements java.io.Serializable {
         if (getClass() != obj.getClass()) return false;
         
         final MapProxy<?, ?> other = (MapProxy<?, ?>) obj;
-        if (!Objects.equals(this.seed, other.seed)) {
+        if (!ScriptableUtils.jsMapEquals(this.seed, other.seed)) {
             return false;
         }
         return ScriptableUtils.jsMapEquals(getModifications(), other.getModifications());

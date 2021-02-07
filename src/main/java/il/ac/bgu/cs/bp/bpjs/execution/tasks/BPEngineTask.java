@@ -1,5 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsCodeEvaluationException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
@@ -53,7 +54,7 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
     @Override
     public BThreadSyncSnapshot call() {
 
-        Context jsContext = Context.enter();
+        Context jsContext = BPjs.enterRhinoContext();
         try {            
             BProgramJsProxy.setCurrentBThread(bpss, btss);
             callImpl( jsContext );
@@ -93,9 +94,7 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
             throw generalThrowable;
             
         } finally {
-            if (Context.getCurrentContext() != null) {
-                Context.exit();
-            }
+            Context.exit();
             BProgramJsProxy.clearCurrentBThread();
         }
         
