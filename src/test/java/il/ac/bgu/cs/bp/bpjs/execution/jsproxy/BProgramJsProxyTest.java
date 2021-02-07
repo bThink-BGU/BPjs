@@ -87,7 +87,7 @@ public class BProgramJsProxyTest {
         bprog = new ResourceBProgram("RandomProxy.js");
         new BProgramRunner(bprog).run();
         BProgramJsProxy sut2 = bprog.getFromGlobalScope("bp", BProgramJsProxy.class).get();
-        assertNotEquals( sut1, sut2 );
+        assertEquals( sut1, sut2 );
         
         Map<String, BProgramJsProxy> map = new HashMap<>();
         map.put("sut1", sut1);

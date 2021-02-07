@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.mains;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
@@ -84,7 +85,7 @@ public class ContinuationGames {
         // Serialize snapshot
         byte[] serializedContinuationAndScope = null;
         try {
-            Context ctxt = Context.enter(); // need Javascript environment for this, even though we're not executing code per se.
+            Context ctxt = BPjs.enterRhinoContext(); // need Javascript environment for this, even though we're not executing code per se.
             
             // first, get bp out of the scope
             Object cnt = snapshot.getContinuation();
@@ -118,8 +119,7 @@ public class ContinuationGames {
         
         // Run the BThread a few times:
         try {
-            Context ctxt = ContextFactory.getGlobal().enterContext();
-            ctxt.setOptimizationLevel(-1); // must use interpreter mode
+            Context ctxt = BPjs.enterRhinoContext();
             final Scriptable topLevelScope = ctxt.initSafeStandardObjects();
             
             

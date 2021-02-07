@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.internal;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -241,7 +242,7 @@ public class ScriptableUtils {
     }
     
     /**
-     * A problematic-yet-working way of getting a meanningful toString 
+     * A problematic-yet-working way of getting a meaningful toString 
      * on a NativeSet.
      * @param ns
      * @return a textual description of {@code ns}.
@@ -251,10 +252,8 @@ public class ScriptableUtils {
         String code = "const arr=[]; ns.forEach(e=>arr.push(e)); arr";
         
          try {
-            Context curCtx = Context.enter();
-            curCtx.setLanguageVersion(Context.VERSION_ES6);
-            ImporterTopLevel importer = new ImporterTopLevel(curCtx);
-            Scriptable tlScope = curCtx.initStandardObjects(importer);
+            Context curCtx = BPjs.enterRhinoContext();
+            Scriptable tlScope = BPjs.makeBPjsSubScope();
             tlScope.put("ns", tlScope, ns);
             Object resultObj = curCtx.evaluateString(
                 tlScope, code, 

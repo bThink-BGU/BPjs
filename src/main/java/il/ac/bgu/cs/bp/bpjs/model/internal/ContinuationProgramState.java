@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model.internal;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -74,7 +75,7 @@ public class ContinuationProgramState {
         ScriptableObject current = nc;
         ScriptableObject currentScope = nc;
         try {
-            Context.enter();
+            BPjs.enterRhinoContext();
             while ( current != null ) {
                 for ( Object o : current.getIds() ) {
                     if ( !variables.containsKey(o) && !o.equals("bp") ) {

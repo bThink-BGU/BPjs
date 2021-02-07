@@ -1,5 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.model;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotIO;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
@@ -142,7 +143,7 @@ public class BProgramSyncSnapshot {
         Set<BThreadSyncSnapshot> sleepingThisRound = new HashSet<>(threadSnapshots.size());
         List<BEvent> nextExternalEvents = new ArrayList<>(getExternalEvents());
         try {
-            Context ctxt = Context.enter();
+            Context ctxt = BPjs.enterRhinoContext();
             handleInterrupts(anEvent, listeners, bprog, ctxt);
             nextExternalEvents.addAll(bprog.drainEnqueuedExternalEvents());
             
@@ -365,7 +366,7 @@ public class BProgramSyncSnapshot {
         
         // duplicate snapshot and register the copy with the b-program
         try {
-            Context.enter();
+            BPjs.enterRhinoContext();
             BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(bprog);
             BThreadSyncSnapshot forkedBT = io.deserializeBThread(io.serializeBThread(btss), dataStore);
             bprog.registerForkedChild(btss);

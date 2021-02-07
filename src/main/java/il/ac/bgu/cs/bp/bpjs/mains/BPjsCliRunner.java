@@ -43,6 +43,7 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.Scriptable;
 
@@ -68,7 +69,7 @@ public class BPjsCliRunner {
                     if (arg.equals("-")) {
                         println(" [READ] stdin");
                         try {
-                            evaluate(System.in, "stdin");
+                            evaluate(System.in, "stdin", Context.getCurrentContext());
                         } catch (EvaluatorException ee) {
                             logScriptExceptionAndQuit(ee, arg);
                         }
@@ -81,7 +82,7 @@ public class BPjsCliRunner {
                                 System.exit(-2);
                             }
                             try (InputStream in = Files.newInputStream(inFile)) {
-                                evaluate(in, arg);
+                                evaluate(in, arg, Context.getCurrentContext());
                             } catch (EvaluatorException ee) {
                                 logScriptExceptionAndQuit(ee, arg);
                             } catch (IOException ex) {

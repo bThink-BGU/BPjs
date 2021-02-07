@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
@@ -74,7 +75,7 @@ public class PrioritizedBSyncEventSelectionStrategy extends AbstractEventSelecti
                                             .max();
         
         try {
-            Context.enter();
+            BPjs.enterRhinoContext();
             if ( maxValueOpt.isPresent() ) {
                 int maxValue = maxValueOpt.getAsInt();
                 return statements.stream().filter( s -> getValue(s) == maxValue )

@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.bprogramio;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
@@ -34,18 +35,13 @@ import il.ac.bgu.cs.bp.bpjs.model.SafetyViolationTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Function;
-import org.mozilla.javascript.Scriptable;
-import org.mozilla.javascript.ScriptableObject;
-import org.mozilla.javascript.serialize.ScriptableInputStream;
 
 /**
  * Serialized and de-serializes {@link BProgramSyncSnapshot}s.
@@ -76,9 +72,7 @@ public class BProgramSyncSnapshotIO {
 
     public byte[] serialize(BProgramSyncSnapshot bpss) throws IOException {
         try {
-            Context.enter(); // need Javascript environment for
-            // this, even though we're not
-            // executing code per se.
+            BPjs.enterRhinoContext();
 
             try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
                 BPJSStubOutputStream outs = new BPJSStubOutputStream(bytes, bprogram.getGlobalScope())) {
@@ -106,7 +100,7 @@ public class BProgramSyncSnapshotIO {
 
     public BProgramSyncSnapshot deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
         try {
-            Context.enter();
+            BPjs.enterRhinoContext();
 
             try (BPJSStubInputStream in = new BPJSStubInputStream(new ByteArrayInputStream(bytes), 
                                                     bprogram.getGlobalScope(),
@@ -138,7 +132,7 @@ public class BProgramSyncSnapshotIO {
     public byte[] serializeBThread(BThreadSyncSnapshot btss) {
         
         try {
-            Context.enter();
+            BPjs.enterRhinoContext();
 
             try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
                 BPJSStubOutputStream outs = new BPJSStubOutputStream(bytes, bprogram.getGlobalScope())) {
@@ -158,7 +152,7 @@ public class BProgramSyncSnapshotIO {
     
     public BThreadSyncSnapshot deserializeBThread( byte[] serializedBT, Map<String,Object> bprogramDataStore  ) {
         try {
-            Context.enter();
+            BPjs.enterRhinoContext();
             
             try (BPJSStubInputStream sis = new BPJSStubInputStream( 
                                          new ByteArrayInputStream(serializedBT),

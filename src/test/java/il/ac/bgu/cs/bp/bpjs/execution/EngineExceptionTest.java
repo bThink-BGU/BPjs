@@ -7,6 +7,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import org.junit.Test;
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
 /**
@@ -39,7 +40,7 @@ public class EngineExceptionTest {
                 evaluate("var j=9\n"
                         + "#This isn't a javascript line.\n"
                         + "var o=0;",
-                        "hardcoded");
+                        "hardcoded", Context.getCurrentContext());
             }
         };
         

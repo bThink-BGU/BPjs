@@ -44,6 +44,11 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change Log for the BPjs Library.
 
+### 2021-02
+
+* :sparkles: :sparkles: :tada: :sparkles: :tada: :sparkles: :rainbow: :sparkles: :sparkles: :sparkles: BPjs now uses Rhino's native continuation equality and hash code ([#116](https://github.com/bThink-BGU/BPjs/issues/116). Also, :tada: :rainbow: :sparkles:.
+* :arrow_up: Scope and context creations across BPjs have been consolidated to utility methods in a new class called `BPjs`.
+
 ### 2021-01
 
 * :sparkles: `BProgramSyncSnapshot`s are serialized using a single stream, and with the b-program's original scope as a top-level scope (([#126](https://github.com/bThink-BGU/BPjs/issues/126)).

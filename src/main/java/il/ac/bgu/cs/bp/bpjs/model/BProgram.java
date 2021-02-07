@@ -1,5 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.model;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.EventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.SimpleEventSelectionStrategy;
@@ -19,8 +20,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContextFactory;
-import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Scriptable;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.mozilla.javascript.EcmaError;
@@ -161,7 +160,7 @@ public abstract class BProgram {
     /**
      * Adds more source code to be evaluated <em>before</em>
      * {@link #setupProgramScope(org.mozilla.javascript.Scriptable)} is called.
-     * This method allows to programatically add code, e.g. for adding standard
+     * This method allows to programmatically add code, e.g. for adding standard
      * environment, mocking non-modeled parts for model-checking.
      *
      * @throws IllegalStateException if the code is appended after the bprogram
@@ -185,9 +184,10 @@ public abstract class BProgram {
      *
      * @param inStrm Input stream for reading the script to be evaluated.
      * @param scriptName for error reporting purposes.
+     * @param curCtx The context to evaluate the script in.
      * @return Result of evaluating the code at {@code inStrm}.
      */
-    protected Object evaluate(InputStream inStrm, String scriptName) {
+    protected Object evaluate(InputStream inStrm, String scriptName, Context curCtx) {
         InputStreamReader streamReader = new InputStreamReader(inStrm, StandardCharsets.UTF_8);
         BufferedReader br = new BufferedReader(streamReader);
         StringBuilder sb = new StringBuilder();
@@ -200,7 +200,7 @@ public abstract class BProgram {
             throw new RuntimeException("error while reading javascript from stream", e);
         }
         String script = sb.toString();
-        return evaluate(script, scriptName);
+        return evaluate(script, scriptName, curCtx);
     }
 
     /**
@@ -208,13 +208,11 @@ public abstract class BProgram {
      *
      * @param script Code to evaluate
      * @param scriptName For error reporting purposes.
+     * @param curCtx The context to evaluate the script in.
      * @return Result of code evaluation.
      */
-    protected Object evaluate(String script, String scriptName) {
+    protected Object evaluate(String script, String scriptName, Context curCtx) {
         try {
-            Context curCtx = Context.getCurrentContext();
-            curCtx.setLanguageVersion(Context.VERSION_ES6);
-            curCtx.setOptimizationLevel(-1);
             return curCtx.evaluateString(programScope, script, scriptName, 1, null);
         } catch (EcmaError rerr) {
             throw new BPjsCodeEvaluationException(rerr);
@@ -291,19 +289,17 @@ public abstract class BProgram {
         }
         FailedAssertionViolation failedAssertion = null;
         try {
-            Context cx = ContextFactory.getGlobal().enterContext();
-            cx.setOptimizationLevel(-1); // must use interpreter mode
-            cx.setLanguageVersion( Context.VERSION_ES6);
-            initProgramScope(cx);
+            Context ctx = BPjs.enterRhinoContext();
+            initProgramScope();
 
             // evaluate code in order
             if (prependedCode != null) {
-                prependedCode.forEach(s -> evaluate(s, "prependedCode"));
+                prependedCode.forEach(s -> evaluate(s, "prependedCode", ctx));
                 prependedCode = null;
             }
             setupProgramScope(programScope);
             if (appendedCode != null) {
-                appendedCode.forEach(s -> evaluate(s, "appendedCode"));
+                appendedCode.forEach(s -> evaluate(s, "appendedCode", ctx));
                 appendedCode = null;
             }
 
@@ -318,17 +314,16 @@ public abstract class BProgram {
         return new BProgramSyncSnapshot(this, bthreads, getStore(), Collections.emptyList(), failedAssertion);
     }
 
-    private void initProgramScope(Context cx) {
-        // load and execute globalScopeInit.js
-        ImporterTopLevel importer = new ImporterTopLevel(cx);
-        programScope = cx.initStandardObjects(importer);
+    private void initProgramScope() {
+        
+        programScope = BPjs.makeBPjsSubScope();
+        
         jsProxy = new BProgramJsProxy(this);
         if ( preSetLogLevel != null ) {
             jsProxy.log.setLevel(preSetLogLevel.name());
         }
         programScope.put("bp", programScope, Context.javaToJS(jsProxy, programScope));
 
-//        evaluateResource("globalScopeInit.js");// <-- Currently not needed. Leaving in as we might need it soon.
         initialScopeValues.entrySet().forEach(e -> putInGlobalScope(e.getKey(), e.getValue()));
         initialScopeValues = null;
     }
@@ -415,7 +410,7 @@ public abstract class BProgram {
             initialScopeValues.put(name, obj);
         } else {
             try {
-                Context.enter();
+                BPjs.enterRhinoContext();
                 getGlobalScope().put(name, programScope, Context.javaToJS(obj, programScope));
             } finally {
                 Context.exit();

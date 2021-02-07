@@ -48,8 +48,6 @@ import java.util.concurrent.Future;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ImporterTopLevel;
-import org.mozilla.javascript.Scriptable;
 
 /**
  * Just a static place for some repeated methods useful for testing.
@@ -164,13 +162,9 @@ public abstract class TestUtils {
      */
     public static Object evaluateJS(String jsCode) {
         try {
-            Context curCtx = Context.enter();
-            curCtx.setLanguageVersion(Context.VERSION_ES6);
-            ImporterTopLevel importer = new ImporterTopLevel(curCtx);
-            Scriptable tlScope = curCtx.initStandardObjects(importer);
+            Context curCtx = BPjs.enterRhinoContext();
             Object resultObj = curCtx.evaluateString(
-                tlScope, jsCode, 
-                "", 1, null);
+                BPjs.getBPjsScope(), jsCode, "", 1, null);
             
             return resultObj;
             

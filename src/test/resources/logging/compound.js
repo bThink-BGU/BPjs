@@ -21,7 +21,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-/* global bp */
+/* global bp, java */
 importClass(java.util.HashSet);
 importClass(java.util.HashMap);
 importClass(java.util.ArrayList);
@@ -32,19 +32,19 @@ bp.log.info(1.5);
 bp.log.info(["I'm","an","array"]);
 bp.log.info({im:"an", ob:"ject", arr:[1,2,"three"]});
 
-var set = HashSet();
+var set = new HashSet();
 set.add("a");
 set.add("b");
 set.add("c");
 bp.log.info( set );
 
-var lst = ArrayList();
+var lst = new ArrayList();
 lst.add("a");
 lst.add("b");
 lst.add("c");
 bp.log.info( lst );
 
-var map = HashMap();
+var map = new HashMap();
 map.put("a","A");
 map.put("b","B");
 map.put("c","C");

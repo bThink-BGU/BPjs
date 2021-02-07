@@ -11,6 +11,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import static java.util.stream.Collectors.joining;
+import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
 /**
@@ -52,7 +53,7 @@ public class ResourceBProgram extends BProgram {
                 if (resource == null) {
                     throw new RuntimeException("Resource '" + name + "' not found.");
                 }
-                evaluate(resource, name);
+                evaluate(resource, name, Context.getCurrentContext());
             } catch (IOException ex) {
                 throw new RuntimeException("Error reading resource: '" + name + "': " + ex.getMessage(), ex);
             }
