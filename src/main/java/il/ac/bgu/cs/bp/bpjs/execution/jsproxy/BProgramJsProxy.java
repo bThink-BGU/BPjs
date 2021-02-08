@@ -380,7 +380,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
      * equality of the {@link BProgram} {@code this} is a proxy of. Rather, we 
      * just check that the other object is a proxy too.
      * 
-     * @param obj
+     * @param obj The object we compare to.
      * @return {@code true} iff the other object is a {@code BProgramJsProxy}.
      */
     @Override

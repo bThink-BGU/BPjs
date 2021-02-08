@@ -5,7 +5,6 @@ import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
-import il.ac.bgu.cs.bp.bpjs.model.internal.ContinuationProgramState;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /*
@@ -39,21 +38,6 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class MockBThreadSyncSnapshot extends BThreadSyncSnapshot {
     
     private static final AtomicInteger NEXT_ID = new AtomicInteger(0);
-    
-    public static class MockContinuationProgramState extends ContinuationProgramState {
-
-        public void setFrameIndex(int frameIndex) {
-            this.frameIndex = frameIndex;
-        }
-
-        public void setProgramCounter(int programCounter) {
-            this.programCounter = programCounter;
-        }
-        
-        public void setVariable( String name, Object value ) {
-            variables.put(name, value);
-        }
-    }
 
     public MockBThreadSyncSnapshot(String aName, SyncStatement stmt ) {
         super(aName, null, new StringBProgram(""));

@@ -2,7 +2,6 @@ package il.ac.bgu.cs.bp.bpjs.model;
 
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy;
 import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
-import il.ac.bgu.cs.bp.bpjs.model.internal.ContinuationProgramState;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.Optional;
@@ -62,8 +61,6 @@ public class BThreadSyncSnapshot implements Serializable {
      * the sync point due to conflict.
      */
     protected transient MapProxy<String, Object> bprogramStoreModifications;
-    
-    private transient ContinuationProgramState programState;
 
     /**
      * Fully detailed constructor. Mostly useful for getting objects out of
@@ -179,20 +176,12 @@ public class BThreadSyncSnapshot implements Serializable {
     public boolean canContinue(){
         return (getContinuation()!=null) || (getEntryPoint()!=null);
     }
-    
-    public ContinuationProgramState getContinuationProgramState() {
-        if ( programState == null ) {
-            programState = new ContinuationProgramState(continuation);
-        }
-        return programState;
-    }
-    
+        
     @Override
     public int hashCode() {
         final int prime = 31;
         int result = prime * Objects.hash(name, syncStatement);
         if (continuation != null) {
-//            result += getContinuationProgramState().hashCode(name);
             result += continuation.getImplementation().hashCode();
         }
         result += ScriptableUtils.jsHashCode(data);
