@@ -13,6 +13,8 @@ import org.junit.Test;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
+import java.util.Set;
+import static org.junit.Assert.assertTrue;
 
 public class PrioritizedBSyncEventSelectionStrategyTest {
 
@@ -23,7 +25,7 @@ public class PrioritizedBSyncEventSelectionStrategyTest {
 	
 	@Test
 	public void testSelectableEvents_noBlocking() throws InterruptedException {
-		PrioritizedBSyncEventSelectionStrategy sut = new PrioritizedBSyncEventSelectionStrategy();
+		PrioritizedBSyncEventSelectionStrategy sut = new PrioritizedBSyncEventSelectionStrategy(1224l);
 
 		BProgramSyncSnapshot bpss = TestUtils.makeBPSS(
             new MockBThreadSyncSnapshot(SyncStatement.make().request(Arrays.asList(EVT_4))),
@@ -92,5 +94,14 @@ public class PrioritizedBSyncEventSelectionStrategyTest {
 
 		assertEquals(Collections.singleton(external), sut.selectableEvents(bpss));
 	}
+    
+    @Test
+	public void testSCornerCases() {
+		PrioritizedBSyncEventSelectionStrategy sut = new PrioritizedBSyncEventSelectionStrategy(500);
 
+		BProgramSyncSnapshot bpss = TestUtils.makeBPSS();
+        assertTrue(sut.selectableEvents(bpss).isEmpty());
+        bpss.getExternalEvents().add(EVT_1);
+        assertEquals( Set.of(EVT_1), sut.selectableEvents(bpss) );
+	}
 }

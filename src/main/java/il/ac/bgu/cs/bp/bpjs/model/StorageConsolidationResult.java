@@ -26,6 +26,7 @@ package il.ac.bgu.cs.bp.bpjs.model;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 import static java.util.stream.Collectors.joining;
 
 /**
@@ -83,6 +84,31 @@ public abstract class StorageConsolidationResult {
         public String toString() {
             return "[Conflict " + conflicts.keySet().stream().collect( joining(", ", "{","}")) + "]";
         }
+
+        @Override
+        public int hashCode() {
+            int hash = 5;
+            hash = 13 * hash + Objects.hashCode(this.conflicts);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final Conflict other = (Conflict) obj;
+            
+            return Objects.equals(this.conflicts, other.conflicts);
+        }
+        
+        
     }
     
 }

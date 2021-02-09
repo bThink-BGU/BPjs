@@ -32,12 +32,16 @@ import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
@@ -142,6 +146,7 @@ public class BProgramStoreTest {
     @Test
     public void conflict_run() {
         AtomicBoolean called = new AtomicBoolean();
+        AtomicReference<StorageConflictViolation> scvRef = new AtomicReference<>();
         BProgram sut = new ResourceBProgram("bp_store/bpStore_conflict.js");
         BProgramRunner rnr = new BProgramRunner();
         rnr.addListener(new PrintBProgramRunnerListener());
@@ -153,12 +158,28 @@ public class BProgramStoreTest {
                 StorageConflictViolation scv = (StorageConflictViolation) theFailedAssertion;
                 StorageConsolidationResult.Conflict conflict = scv.getConflict();
                 assertEquals( Set.of("c"), conflict.conflicts.keySet() );
+                scvRef.set(scv);
             }
             
         });
         rnr.setBProgram(sut);
         rnr.run();
         assertTrue( called.get() );
+        
+        assertEquals( scvRef.get(), scvRef.get());
+        assertNotEquals( scvRef.get(), "FASFASDFSA" );
+        assertNotEquals( scvRef.get(), null );
+        StorageConflictViolation scv2 = new StorageConflictViolation(scvRef.get().getConflict(), scvRef.get().getMessage());
+        StorageConflictViolation scv3 = new StorageConflictViolation(scvRef.get().getConflict(), "LALALA"); 
+        
+        StorageConflictViolation scv4 = new StorageConflictViolation(new StorageConsolidationResult.Conflict(new HashMap<>()), "LALddddALA");
+        Set<StorageConflictViolation> sscv = new HashSet<>();
+        sscv.add(scvRef.get());
+        sscv.add(scv2);
+        sscv.add(scv3);
+        sscv.add(scv4);
+        
+        assertEquals(3, sscv.size() );
     }
     
     @Test

@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 import org.mozilla.javascript.Context;
@@ -167,6 +168,7 @@ public class JsEventSetTest {
             
             assertTrue( jsSut.contains(BEvent.named("a")) );
             assertFalse( jsSut.contains(BEvent.named("b")) );
+            assertNotEquals( jsSut, "NOT AN EVENT SET" );
             
         } finally {
             Context.exit();
