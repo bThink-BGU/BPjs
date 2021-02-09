@@ -7,7 +7,6 @@ import static org.junit.Assert.assertEquals;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Set;
 
 import org.junit.Test;
 
@@ -33,6 +32,21 @@ public class PrioritizedBSyncEventSelectionStrategyTest {
             new MockBThreadSyncSnapshot(SyncStatement.make().request(Arrays.asList(EVT_3)).data(10))
         );
 		assertEquals(new HashSet<>(Arrays.asList(EVT_2, EVT_3)), sut.selectableEvents(bpss));
+	}
+    
+    @Test
+	public void testSelectableEvents_changedPriority() throws InterruptedException {
+		PrioritizedBSyncEventSelectionStrategy sut = new PrioritizedBSyncEventSelectionStrategy();
+        sut.setDefaultPriority(11);
+        
+		BProgramSyncSnapshot bpss = TestUtils.makeBPSS(
+            new MockBThreadSyncSnapshot(SyncStatement.make().request(Arrays.asList(EVT_4))),
+            new MockBThreadSyncSnapshot(SyncStatement.make().request(Arrays.asList(EVT_1)).data(5)),
+            new MockBThreadSyncSnapshot(SyncStatement.make().request(Arrays.asList(EVT_2)).data(10)),
+            new MockBThreadSyncSnapshot(SyncStatement.make().request(Arrays.asList(EVT_3)).data(10))
+        );
+		assertEquals(new HashSet<>(Arrays.asList(EVT_4)), sut.selectableEvents(bpss));
+		assertEquals(11, sut.getDefaultPriority());
 	}
 
 	@Test

@@ -54,7 +54,6 @@ public class PrioritizedBThreadsEventSelectionStrategyTest {
             new MockBThreadSyncSnapshot("bt2", SyncStatement.make(bt("2")).request(Arrays.asList(EVT_2))),
             new MockBThreadSyncSnapshot("bt2a", SyncStatement.make(bt("2a")).request(Arrays.asList(EVT_2A)))
         );
-        
 		
 		assertEquals(new HashSet<>(Arrays.asList(EVT_2, EVT_2A)),
 				sut.selectableEvents(bpss));
@@ -129,11 +128,15 @@ public class PrioritizedBThreadsEventSelectionStrategyTest {
         assertEquals( 2, sut.getPriority("bt2a") );
         assertEquals( 3, sut.getPriority("bt3") );
         
-        assertEquals( PrioritizedBThreadsEventSelectionStrategy.DEFAULT_PRIORITY,
+        assertEquals( sut.getDefaultPriority(),
                             sut.getPriority("was-not-registered") );
         
         assertEquals( 3, sut.getHighestPriority() );
         assertEquals( 1, sut.getLowestPriority() );
+        
+        sut.setDefaultPriority(300);
+        assertEquals( sut.getDefaultPriority(),
+                            sut.getPriority("was-not-registered") );
     }
     
     private BThreadSyncSnapshot bt( String name ) {

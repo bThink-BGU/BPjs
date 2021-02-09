@@ -49,7 +49,9 @@ import org.mozilla.javascript.Context;
  * @author michael
  */
 public class PrioritizedBSyncEventSelectionStrategy extends AbstractEventSelectionStrategy {
-
+    
+    private int defaultPriority = Integer.MIN_VALUE;
+    
     public PrioritizedBSyncEventSelectionStrategy(long seed) {
         super(seed);
     }
@@ -83,7 +85,7 @@ public class PrioritizedBSyncEventSelectionStrategy extends AbstractEventSelecti
                                  .collect( toSet() );
             } else {
                 // Can't select any internal event, defer to the external, non-blocked ones.
-                return externalEvents.stream().filter( e->!blocked.contains(e) ) // No internal events requested, defer to externals.
+                return externalEvents.stream().filter( e->!blocked.contains(e) ) 
                                       .findFirst().map( e->singleton(e) ).orElse(emptySet());
             }
         } finally {
@@ -94,8 +96,15 @@ public class PrioritizedBSyncEventSelectionStrategy extends AbstractEventSelecti
     
     private int getValue( SyncStatement stmt ) {
         return (stmt.hasData() && (stmt.getData() instanceof Number))? 
-                ((Number)stmt.getData()).intValue() : Integer.MIN_VALUE;
+                ((Number)stmt.getData()).intValue() : defaultPriority;
     }
 
-    
+    public int getDefaultPriority() {
+        return defaultPriority;
+    }
+
+    public void setDefaultPriority(int defaultPriority) {
+        this.defaultPriority = defaultPriority;
+    }
+
 }

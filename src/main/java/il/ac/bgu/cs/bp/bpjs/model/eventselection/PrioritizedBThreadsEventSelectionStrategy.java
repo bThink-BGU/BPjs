@@ -33,7 +33,7 @@ import java.util.stream.Stream;
  */
 public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSelectionStrategy {
 
-    public static final int DEFAULT_PRIORITY = -1;
+    private int defaultPriority = -1;
     
     /** A mapping of b-thread names to their priorities. */
     final private Map<String, Integer> priorities = new HashMap<>();
@@ -113,15 +113,23 @@ public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSele
     }
     
     public int getPriority(String bThreadName) {
-    	return priorities.getOrDefault(bThreadName, DEFAULT_PRIORITY);
+    	return priorities.getOrDefault(bThreadName, defaultPriority);
     }
     
     public int getHighestPriority() {
-        return priorities.values().stream().mapToInt( Integer::intValue ).max().orElse(DEFAULT_PRIORITY);
+        return priorities.values().stream().mapToInt( Integer::intValue ).max().orElse(defaultPriority);
     }
     
     public int getLowestPriority() {
-        return priorities.values().stream().mapToInt( Integer::intValue ).min().orElse(DEFAULT_PRIORITY);
+        return priorities.values().stream().mapToInt( Integer::intValue ).min().orElse(defaultPriority);
+    }
+
+    public int getDefaultPriority() {
+        return defaultPriority;
+    }
+
+    public void setDefaultPriority(int defaultPriority) {
+        this.defaultPriority = defaultPriority;
     }
     
 }
