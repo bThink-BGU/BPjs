@@ -7,6 +7,10 @@ import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.ExplicitEventSet;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -164,4 +168,55 @@ public class SimpleEventSelectionStrategyTest {
         
         assertEquals( selectedBySut, selectedBySameSeed );
     }
+    
+    @Test
+    public void testWarnOnHints() throws IOException {
+        
+        PrintStream origStdout = System.out;
+        String output;
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    PrintStream testStream = new PrintStream(baos)) {
+            System.setOut(testStream);
+            BProgramSyncSnapshot bpss = TestUtils.makeBPSS(
+                new MockBThreadSyncSnapshot(SyncStatement.make(null).waitFor(eventOne).data("I will create a warning"))
+            );  sut.selectableEvents(bpss);
+            sut.selectableEvents(bpss);
+            sut.selectableEvents(bpss);
+            testStream.flush();
+            baos.flush();
+            output = baos.toString(StandardCharsets.UTF_8);
+        }
+        assertTrue( "SimpleSelectionStrategy should warn about using hints", output.contains("WARNING") );
+        output = output.replaceFirst("WARNING", "");
+        assertFalse( "SimpleSelectionStrategy should warn about using hints only once", output.contains("WARNING") );
+        
+        System.setOut(origStdout);
+    }
+    
+       @Test
+    public void testNoWarnOnNoHints() throws IOException {
+        
+        PrintStream origStdout = System.out;
+        String output;
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    PrintStream testStream = new PrintStream(baos) ) {
+            System.setOut(testStream);
+
+            BProgramSyncSnapshot bpss = TestUtils.makeBPSS(
+                new MockBThreadSyncSnapshot(SyncStatement.make(null).waitFor(eventOne))
+            );
+
+            sut.selectableEvents(bpss);
+            sut.selectableEvents(bpss);
+            sut.selectableEvents(bpss);
+
+            testStream.flush();
+            baos.flush();
+            output = baos.toString(StandardCharsets.UTF_8);
+        }
+        assertFalse( "SimpleSelectionStrategy should not warn when there are no hints", output.contains("WARNING") );
+        
+        System.setOut(origStdout);
+    }
+    
 }

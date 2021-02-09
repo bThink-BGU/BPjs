@@ -47,7 +47,7 @@ public class SyncStatement implements java.io.Serializable {
     private final boolean hot;
     
     /**
-     * Optional data a BThread can pass to the event selector. This may serve as
+     * Optional data a b-thread can pass to the event selector. This may serve as
      * a "danger level", or any other hint for a specific event selection policy.
      */
     private final Object data;

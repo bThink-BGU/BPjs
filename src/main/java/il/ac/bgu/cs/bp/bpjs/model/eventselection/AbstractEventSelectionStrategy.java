@@ -98,4 +98,21 @@ public abstract class AbstractEventSelectionStrategy implements EventSelectionSt
         }
     }
     
+    private boolean warningIssued = false;
+    
+    /**
+     * Log a warning when b-threads send synchronization statement data. This 
+     * is useful for strategies that ignore these data, as users might be sending
+     * them and not understand why they are ignored.
+     * 
+     * @param bpss the state the b-program is at.
+     */
+    protected void warnOnHints( BProgramSyncSnapshot bpss ){
+        if ( warningIssued ) return; // warn only once
+        if ( bpss.getStatements().stream().anyMatch( s->s.getData()!=null ) ) {
+            System.out.println("[WARNING] Sync statements contain data. Current strategy ("+getClass().getCanonicalName()+") ignores this field.");
+            warningIssued = true;
+        }
+    }
+    
 }

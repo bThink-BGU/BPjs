@@ -38,6 +38,7 @@ public class SimpleEventSelectionStrategy extends AbstractEventSelectionStrategy
     
     @Override
     public Set<BEvent> selectableEvents(BProgramSyncSnapshot bpss) {
+        warnOnHints(bpss);
         Set<SyncStatement> statements = bpss.getStatements();
         List<BEvent> externalEvents = bpss.getExternalEvents();
         if ( statements.isEmpty() ) {
