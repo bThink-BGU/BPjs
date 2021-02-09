@@ -49,6 +49,8 @@ a link to this page somewhere in the documentation/system about section.
 * :sparkles: :sparkles: :tada: :sparkles: :tada: :sparkles: :rainbow: :sparkles: :sparkles: :sparkles: BPjs now uses Rhino's native continuation equality and hash code ([#116](https://github.com/bThink-BGU/BPjs/issues/116). Also, :tada: :rainbow: :sparkles:.
 * :arrow_up: Scope and context creations across BPjs have been consolidated to utility methods in a new class called `BPjs`.
 * :arrow_up: Event selection strategies that ignore the synchronization statement data field, issue a warning when b-threads put data there ([#151](https://github.com/bThink-BGU/BPjs/issues/151)).
+* :arrow_up: Updated docs.
+* :arrow_up: `BProgram` uses an override-able protected method to access its global scope, in case you want to intercept these calls.
 * :bug: Fixed an issue that caused `toString` for JavaScript objects to crash at certain cases ([#145](https://github.com/bThink-BGU/BPjs/issues/145)).
 
 

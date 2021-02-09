@@ -72,6 +72,7 @@ The "orders" b-thread generates one hundred random orders. We now need to detect
   :language: javascript
   :start-after: grind more coffee
 
+.. danger:: At the moment, JavaScript arrow functions are only partially supported for event sets; They work great when running, but might break verification. Until this gets fixed in Rhino, we recommend using old-school functions for event sets (and everywhere else when writing BPjs code).
 
 After defining the event set for coffee orders, the "coffee supply" b-thread loops forever, waiting for coffee order events (line 7). After ten orders, when it's time to grind more coffee, it blocks coffee orders from happening, and requests a coffee grinding event (the ``bp.sync`` at lines 10-11). Until the coffee grinding event is selected, no coffee order can be selected.
 

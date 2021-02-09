@@ -213,7 +213,7 @@ public abstract class BProgram {
      */
     protected Object evaluate(String script, String scriptName, Context curCtx) {
         try {
-            return curCtx.evaluateString(programScope, script, scriptName, 1, null);
+            return curCtx.evaluateString(getGlobalScope(), script, scriptName, 1, null);
         } catch (EcmaError rerr) {
             throw new BPjsCodeEvaluationException(rerr);
 
@@ -255,7 +255,7 @@ public abstract class BProgram {
     void registerForkedChild( BThreadSyncSnapshot btss ) {
         // make the top-level scope be *this* program's programScope
         Scriptable pus = ScriptableUtils.getPenultiamteParent(btss.getScope());
-        pus.setParentScope(programScope);
+        pus.setParentScope(getGlobalScope());
         
         addBThreadCallback.ifPresent(cb -> cb.bthreadAdded(this, btss));
     }
@@ -411,7 +411,7 @@ public abstract class BProgram {
         } else {
             try {
                 BPjs.enterRhinoContext();
-                getGlobalScope().put(name, programScope, Context.javaToJS(obj, programScope));
+                getGlobalScope().put(name, getGlobalScope(), Context.javaToJS(obj, getGlobalScope()));
             } finally {
                 Context.exit();
             }
@@ -428,7 +428,7 @@ public abstract class BProgram {
      * to the passed class.
      */
     public <T> Optional<T> getFromGlobalScope(String name, Class<T> clazz) {
-        if (getGlobalScope().has(name, programScope)) {
+        if (getGlobalScope().has(name, getGlobalScope())) {
             return Optional.of((T) Context.jsToJava(getGlobalScope().get(name, getGlobalScope()), clazz));
         } else {
             return Optional.empty();
