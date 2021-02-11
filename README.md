@@ -53,7 +53,7 @@ a link to this page somewhere in the documentation/system about section.
 * :arrow_up: Updated docs.
 * :arrow_up: `BProgram` uses an override-able protected method to access its global scope, in case you want to intercept these calls.
 * :bug: Fixed an issue that caused `toString` for JavaScript objects to crash at certain cases ([#145](https://github.com/bThink-BGU/BPjs/issues/145)).
-* :bug: Storage consolidation confilcts have proper `equals` and `hashCode`.
+* :bug: Storage consolidation conflicts have proper `equals` and `hashCode`.
 
 ### 2021-01
 
