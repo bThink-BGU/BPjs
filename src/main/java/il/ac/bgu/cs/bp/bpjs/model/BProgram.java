@@ -94,6 +94,8 @@ public abstract class BProgram {
     
     private BpLog.LogLevel preSetLogLevel = null;
     
+    private PrintStream preSetPrintStream = null;
+
     /**
      * Objects that client code wishes to put in scope before the scope is
      * initialized are collected here.
@@ -322,6 +324,9 @@ public abstract class BProgram {
         if ( preSetLogLevel != null ) {
             jsProxy.log.setLevel(preSetLogLevel.name());
         }
+        if ( preSetPrintStream != null ) {
+            jsProxy.log.setLoggerPrintStream(preSetPrintStream);
+        }
         programScope.put("bp", programScope, Context.javaToJS(jsProxy, programScope));
 
         initialScopeValues.entrySet().forEach(e -> putInGlobalScope(e.getKey(), e.getValue()));
@@ -506,7 +511,14 @@ public abstract class BProgram {
             preSetLogLevel = aLevel;
         }
     }
-    
+    public void setLoggerOutputStreamer(PrintStream printStream){
+        if ( jsProxy != null ) {
+            jsProxy.log.setLoggerPrintStream(printStream);
+        } else {
+            preSetPrintStream = printStream;
+        }
+    }
+
     public BpLog.LogLevel getLogLevel() {
         return (jsProxy != null ) ? BpLog.LogLevel.valueOf(jsProxy.log.getLevel()) : null;
     }

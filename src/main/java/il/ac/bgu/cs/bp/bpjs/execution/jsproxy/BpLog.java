@@ -36,11 +36,19 @@ import java.util.Set;
  * @author michael
  */
 public class BpLog implements java.io.Serializable {
-    
+    private PrintStream out;
     public enum LogLevel {
         Off, Warn, Info, Fine
     }
     LogLevel level = LogLevel.Info;
+
+    public BpLog( PrintStream aStream ){
+        out = aStream;
+    }
+
+    public BpLog() {
+        this( System.out );
+    }
 
     public void warn(Object msg, Object ...args) {
         log(LogLevel.Warn, msg, args);
@@ -79,6 +87,10 @@ public class BpLog implements java.io.Serializable {
         if ( arg == null ) return arg;
         if ( PASS_THROUGH.contains(arg.getClass()) ) return arg;
         return ScriptableUtils.stringify(arg);
+    }
+
+    public void setLoggerPrintStream(PrintStream printStream){
+        out = printStream;
     }
     
 }
