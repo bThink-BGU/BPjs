@@ -104,6 +104,7 @@ public class LoggingTest {
                 "  bp.log.warn(\"msg\");\n" +
                 "});");
             bprog.setLogLevel(BpLog.LogLevel.Fine);
+            bprog.setLoggerOutputStreamer(myOut);
             new BProgramRunner(bprog).run();
             myOut.flush();
         }
