@@ -26,6 +26,7 @@ package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 
+import java.io.PrintStream;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Set;
