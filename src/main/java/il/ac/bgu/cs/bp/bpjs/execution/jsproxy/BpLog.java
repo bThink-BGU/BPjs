@@ -26,6 +26,7 @@ package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 
+import java.io.PrintStream;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Set;
@@ -36,11 +37,19 @@ import java.util.Set;
  * @author michael
  */
 public class BpLog implements java.io.Serializable {
-    
+    private PrintStream out;
     public enum LogLevel {
         Off, Warn, Info, Fine
     }
     LogLevel level = LogLevel.Info;
+
+    public BpLog( PrintStream aStream ){
+        out = aStream;
+    }
+
+    public BpLog() {
+        this( System.out );
+    }
 
     public void warn(Object msg, Object ...args) {
         log(LogLevel.Warn, msg, args);
@@ -79,6 +88,10 @@ public class BpLog implements java.io.Serializable {
         if ( arg == null ) return arg;
         if ( PASS_THROUGH.contains(arg.getClass()) ) return arg;
         return ScriptableUtils.stringify(arg);
+    }
+
+    public void setLoggerPrintStream(PrintStream printStream){
+        out = printStream;
     }
     
 }
