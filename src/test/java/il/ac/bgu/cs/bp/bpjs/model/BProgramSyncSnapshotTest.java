@@ -27,6 +27,7 @@ import static java.util.Collections.emptyList;
 import static java.util.Collections.emptySet;
 import static org.junit.Assert.*;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import static il.ac.bgu.cs.bp.bpjs.model.StorageModificationStrategy.PASSTHROUGH;
@@ -75,7 +76,7 @@ public class BProgramSyncSnapshotTest {
                 "        bp.ASSERT(false,\"Failed Assert\");\n" +
                 "});");
         BProgramSyncSnapshot setup = bprog.setup();
-        ExecutorService execSvcA = ExecutorServiceMaker.makeWithName("BProgramSnapshotTriggerTest");
+        ExecutorService execSvcA = BPjs.getExecutorServiceMaker().makeWithName("BProgramSnapshotTriggerTest");
         BProgramSyncSnapshot stepa = setup.start(execSvcA, PASSTHROUGH);
         Set<BEvent> possibleEvents_a = bprog.getEventSelectionStrategy().selectableEvents(stepa);
         EventSelectionResult event_a = bprog.getEventSelectionStrategy().select(stepa, possibleEvents_a).get();
@@ -92,7 +93,7 @@ public class BProgramSyncSnapshotTest {
                 "        bp.hot(true).sync({request:bp.Event(\"B\")});\n" +
                 "});");
         BProgramSyncSnapshot setup = bprog.setup();
-        ExecutorService execSvcA = ExecutorServiceMaker.makeWithName("BProgramSnapshotTriggerTest");
+        ExecutorService execSvcA = BPjs.getExecutorServiceMaker().makeWithName("BProgramSnapshotTriggerTest");
         BProgramSyncSnapshot bpss = setup.start(execSvcA, PASSTHROUGH);
         assertFalse(bpss.isHot());
         Set<BEvent> possibleEvents_a = bprog.getEventSelectionStrategy().selectableEvents(bpss);
@@ -126,8 +127,8 @@ public class BProgramSyncSnapshotTest {
         
         
         // Run first step
-        ExecutorService execSvcA = ExecutorServiceMaker.makeWithName("BProgramSnapshotEqualityTest");
-        ExecutorService execSvcB = ExecutorServiceMaker.makeWithName("BProgramSnapshotEqualityTest");
+        ExecutorService execSvcA = BPjs.getExecutorServiceMaker().makeWithName("BProgramSnapshotEqualityTest");
+        ExecutorService execSvcB = BPjs.getExecutorServiceMaker().makeWithName("BProgramSnapshotEqualityTest");
         BProgramSyncSnapshot step1A = setupA.start(execSvcA, PASSTHROUGH);
         BProgramSyncSnapshot step1B = setupB.start(execSvcB, PASSTHROUGH);
         assertEquals(step1A, step1B);
@@ -183,8 +184,8 @@ public class BProgramSyncSnapshotTest {
         BProgramSyncSnapshot setup2 = bprog2.setup();
 
         // Run first step
-        ExecutorService execSvcA = ExecutorServiceMaker.makeWithName("BProgramSnapshotEqualityTest");
-        ExecutorService execSvcB = ExecutorServiceMaker.makeWithName("BProgramSnapshotEqualityTest");
+        ExecutorService execSvcA = BPjs.getExecutorServiceMaker().makeWithName("BProgramSnapshotEqualityTest");
+        ExecutorService execSvcB = BPjs.getExecutorServiceMaker().makeWithName("BProgramSnapshotEqualityTest");
         BProgramSyncSnapshot postStart1 = setup1.start(execSvcA, PASSTHROUGH);
         BProgramSyncSnapshot postStart2 = setup2.start(execSvcB, PASSTHROUGH);
         assertNotEquals("The source code of the two bthreads is different, thus they should not eb equal.", postStart1, postStart2);

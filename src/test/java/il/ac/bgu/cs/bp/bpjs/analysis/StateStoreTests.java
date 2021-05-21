@@ -1,5 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotCloner;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import il.ac.bgu.cs.bp.bpjs.model.*;
@@ -16,7 +17,7 @@ public class StateStoreTests {
     @Test
     public void ForgetfulStore() throws Exception {
         BProgram program = new ResourceBProgram("SnapshotTests/ABCDTrace.js");
-        ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvc");
+        ExecutorService execSvc = BPjs.getExecutorServiceMaker().makeWithName("StoreSvc");
         BProgramSyncSnapshot bpss = program.setup().start(execSvc, program.getStorageModificationStrategy());
         DfsBProgramVerifier sut = new DfsBProgramVerifier(program);
         VisitedStateStore forgetful = new ForgetfulVisitedStateStore();
@@ -44,7 +45,7 @@ public class StateStoreTests {
 
     private void TestAAABTraceStore(VisitedStateStore storeToUse) throws Exception {
         BProgram program = new ResourceBProgram("SnapshotTests/ABCDTrace.js");
-        ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvc");
+        ExecutorService execSvc = BPjs.getExecutorServiceMaker().makeWithName("StoreSvc");
         BProgramSyncSnapshot bpss = program.setup().start(execSvc, program.getStorageModificationStrategy());
         DfsBProgramVerifier sut = new DfsBProgramVerifier(program);
         DfsTraversalNode initial = DfsTraversalNode.getInitialNode(program, bpss);
@@ -83,7 +84,7 @@ public class StateStoreTests {
                 "        bp.sync({request:bp.Event(\"D\")});\n" +
                 "    }\n" +
                 "});");
-        ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvcDiiffJSVar");
+        ExecutorService execSvc = BPjs.getExecutorServiceMaker().makeWithName("StoreSvcDiiffJSVar");
         BProgramSyncSnapshot bpss = program.setup().start(execSvc, program.getStorageModificationStrategy());
 
         DfsBProgramVerifier sut = new DfsBProgramVerifier(program);
@@ -135,7 +136,7 @@ public class StateStoreTests {
                 "        bp.sync({request:bp.Event(\"D\")});\n" +
                 "    }\n" +
                 "});");
-        ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvcEqualJSVar");
+        ExecutorService execSvc = BPjs.getExecutorServiceMaker().makeWithName("StoreSvcEqualJSVar");
         BProgramSyncSnapshot bpss = program.setup().start(execSvc, program.getStorageModificationStrategy());
         DfsBProgramVerifier sut = new DfsBProgramVerifier(program);
         List<DfsTraversalNode> snapshots = new ArrayList<>();
@@ -189,7 +190,7 @@ public class StateStoreTests {
      */
     private void testEqualRuns(VisitedStateStore storeToUse) throws Exception {
         BProgram bprog = new ResourceBProgram("SnapshotTests/ABCDTrace.js");
-        ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvcEqualJSVar");
+        ExecutorService execSvc = BPjs.getExecutorServiceMaker().makeWithName("StoreSvcEqualJSVar");
         BProgramSyncSnapshot bpss1 = bprog.setup().start(execSvc, bprog.getStorageModificationStrategy());
         BProgramSyncSnapshot bpss2 = BProgramSyncSnapshotCloner.clone(bpss1);
 
@@ -234,7 +235,7 @@ public class StateStoreTests {
                 "           a = java.lang.Integer.reverse(a);\n" +
                 "        }\n" +
                 "});");
-        ExecutorService execSvc = ExecutorServiceMaker.makeWithName("StoreSvcEqualJSVar");
+        ExecutorService execSvc = BPjs.getExecutorServiceMaker().makeWithName("StoreSvcEqualJSVar");
         BProgramSyncSnapshot bpss = bprog.setup().start(execSvc, bprog.getStorageModificationStrategy());
         DfsBProgramVerifier sut = new DfsBProgramVerifier(bprog);
 

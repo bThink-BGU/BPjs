@@ -73,7 +73,7 @@ public class ContinuationGames {
         
         // Run the top-level code (b-threads are registered but not yet run)
         BProgramSyncSnapshot cur = bprog.setup();
-        ExecutorService execSvc = ExecutorServiceMaker.makeWithName("TEST");
+        ExecutorService execSvc = BPjs.getExecutorServiceMaker().makeWithName("TEST");
         
         // Run to first bp.sync
         cur = cur.start(execSvc, StorageModificationStrategy.PASSTHROUGH);

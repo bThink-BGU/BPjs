@@ -1,5 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.analysis.bprogramio;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotIO;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
@@ -64,7 +65,7 @@ public class BProgramSyncSnapshotClonerTest {
     public void testSerialization() throws Exception {
         BProgram bprog = new ResourceBProgram("SnapshotTests/BProgramSyncSnapshotClonerTest.js");
         BProgramSyncSnapshot cur = bprog.setup();
-        ExecutorService exSvc = ExecutorServiceMaker.makeWithName("test");
+        ExecutorService exSvc = BPjs.getExecutorServiceMaker().makeWithName("test");
         cur = cur.start(exSvc, PASSTHROUGH);
         cur.triggerEvent( 
                 cur.getStatements().stream().flatMap(s->s.getRequest().stream()).findFirst().get(),
@@ -80,7 +81,7 @@ public class BProgramSyncSnapshotClonerTest {
     public void testSerializatioWithExternals() throws Exception {
         BProgram bprog = new ResourceBProgram("SnapshotTests/BProgramSyncSnapshotClonerTest.js");
         BProgramSyncSnapshot cur = bprog.setup();
-        ExecutorService exSvc = ExecutorServiceMaker.makeWithName("test");
+        ExecutorService exSvc = BPjs.getExecutorServiceMaker().makeWithName("test");
         bprog.enqueueExternalEvent(new BEvent("External1"));
         bprog.enqueueExternalEvent(new BEvent("External2"));
         cur = cur.start(exSvc, PASSTHROUGH);
