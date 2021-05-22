@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
@@ -73,7 +74,7 @@ public class BProgramRunner implements Runnable {
     public void run() {
         try {
             // setup bprogram and runtime parts.
-            execSvc = ExecutorServiceMaker.makeWithName("BProgramRunner-" + instanceNum );
+            execSvc = BPjs.getExecutorServiceMaker().makeWithName("BProgramRunner-" + instanceNum );
             failedAssertion = null;
             listeners.forEach(l -> l.starting(bprog));
             BProgramSyncSnapshot cur = bprog.setup();

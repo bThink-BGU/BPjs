@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs;
 
+import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Scriptable;
@@ -39,7 +40,9 @@ public class BPjs {
      * Top-level scope for all BPjs code.
      */
     private static ScriptableObject BPJS_SCOPE;
-    
+
+    private static ExecutorServiceMaker executorServiceMaker = new ExecutorServiceMaker();
+
     static {
         makeBPjsScope();
     }
@@ -97,5 +100,13 @@ public class BPjs {
         } finally {
             Context.exit();
         }
+    }
+
+    public static ExecutorServiceMaker getExecutorServiceMaker() {
+        return executorServiceMaker;
+    }
+
+    public static void setExecutorServiceMaker(ExecutorServiceMaker executorServiceMaker) {
+        BPjs.executorServiceMaker = executorServiceMaker;
     }
 }
