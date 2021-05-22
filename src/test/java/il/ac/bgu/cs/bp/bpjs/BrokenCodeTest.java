@@ -29,7 +29,13 @@ import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
+import static java.util.stream.Collectors.joining;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
@@ -71,11 +77,15 @@ public class BrokenCodeTest {
     
     
     @Test(expected=BPjsCodeEvaluationException.class)
-    public void brokenSyntaxRunTest() {
-        BProgram bp = new ResourceBProgram("broken/syntaxError.js");
-        BProgramRunner rnr = new BProgramRunner();
-        rnr.setBProgram(bp);
-        rnr.run();
+    public void brokenSyntaxRunTest() throws IOException {
+        try (InputStream resource = Thread.currentThread().getContextClassLoader().getResourceAsStream("broken/syntaxError.js")) {
+            String raw = new String(resource.readAllBytes(), StandardCharsets.UTF_8);
+            String post = Arrays.asList( raw.split("\n") ).stream().filter(s->!s.contains("REMOVE")).collect(joining("\n"));
+            BProgram bp = new StringBProgram(post);
+            BProgramRunner rnr = new BProgramRunner();
+            rnr.setBProgram(bp);
+            rnr.run();
+        }
     }
     
     

@@ -23,5 +23,6 @@
  */
 
 /* global bp */
-
+/* REMOVE 
 bp register bthread ("its not even") /JAVA-SKREEPT/
+REMOVE */

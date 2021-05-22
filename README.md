@@ -50,6 +50,7 @@ a link to this page somewhere in the documentation/system about section.
 * :sparkles: `bp.log.XXX` can be redirected to print streams other than `System.out`. ([#159](https://github.com/bThink-BGU/BPjs/pull/159)).
 * :arrow_up: Documentation updates.
 * :arrow_up: Improved performance of BTSS equality ([#164](https://github.com/bThink-BGU/BPjs/issues/164)).
+* :arrow_up: Removed broken JS code in tests ([#153](https://github.com/bThink-BGU/BPjs/issues/153)).
 
 
 ### 2021-02
