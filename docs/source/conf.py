@@ -141,6 +141,10 @@ html_theme_options = {
     "relbarlinkcolor": u'#aa0'
 }
 
+html_css_files = [ 
+    'css/custom.css',
+]
+
 # Add any paths that contain custom themes here, relative to this directory.
 #html_theme_path = []
 
@@ -308,6 +312,3 @@ texinfo_documents = [
 
 # If true, do not generate a @detailmenu in the "Top" node's menu.
 #texinfo_no_detailmenu = False
-
-def setup(app):
-    app.add_stylesheet('css/custom.css')

@@ -18,4 +18,7 @@ Out of its proverbial box, BPjs enables "classic" behavioral programming: runnin
 Sub-classing Events
 -------------------
 
-The built-in ``BEvent`` class can hold data in its name, and in a ``data`` field. However, sometimes the need arises for a more structured data storage, or one that's easier to create and read from the Java layer. To this end, it is possible to sub-class ``BEvent``. The only restriction about these sbu-classes is that they have to implement ``java.io.Serializable`` -- otherwise, verification would not work.
+The built-in ``BEvent`` class can hold data in its name, and in a ``data`` field. However, sometimes the need arises for a more structured data storage, or one that's easier to create and read from the Java layer. To this end, it is possible to sub-class ``BEvent``.
+
+.. warning::
+    Event sub-classes MUST implement state-based ``equals()`` and ``hashCode()``, and implement ``java.io.Serializable``. Otherwise, event unification and program verification would not work.

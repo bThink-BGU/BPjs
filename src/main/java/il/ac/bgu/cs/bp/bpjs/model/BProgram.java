@@ -505,6 +505,10 @@ public abstract class BProgram {
         return anEventSelectionStrategy;
     }
     
+    /**
+     * Set the log level - logging called below the set level are ignored.
+     * @param aLevel 
+     */
     public void setLogLevel( BpLog.LogLevel aLevel ) {
         if ( jsProxy != null ) {
             jsProxy.log.setLevel(aLevel.name());
@@ -512,6 +516,12 @@ public abstract class BProgram {
             preSetLogLevel = aLevel;
         }
     }
+    
+    /**
+     * Set the print stream used for logging.
+     * 
+     * @param printStream 
+     */
     public void setLoggerOutputStreamer(PrintStream printStream){
         if ( jsProxy != null ) {
             jsProxy.log.setLoggerPrintStream(printStream);

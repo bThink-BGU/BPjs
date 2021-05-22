@@ -101,6 +101,21 @@ There is no difference between external and internal events -- both are instance
 All event selection strategies currently included with BPjs ignore external events when there are internal ones available for selection. This choice makes the system easier to reason about, as it gets to complete its reaction to one external event before it starts reacting to a new one. But this does not *have* to be the case.
 
 
+Redirecting BPjs' Log
+~~~~~~~~~~~~~~~~~~~~~
+
+By default, BPjs' log (used by b-programs through, e.g., ``bp.log.info("hi!")`` ) is written to standard out. It is possible to redirect this log into other streams, by calling::
+
+  BProgram#setLoggerOutputStreamer(PrintStream newOut)
+
+
+Changing BPjs' Executor Services
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+BPjs uses Java's executor services for b-program execution and verification. Normally, BPjs uses a fixed thread pool, with one thread per CPU. Client code can change this, by passing a customized ``ExecutionServiceMaker`` instance to ``BPjs#setExecutorServiceMaker``.
+
+This type of customization is useful when, for example, an application wants to use BPjs in a single-threaded manner, or when an application needs to preserve CPUs for other tasks.
+
 .. _import directives: https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino/Scripting_Java
 .. _BProgram: http://javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/model/BProgram.html
 .. _ResourceBProgram: http://javadoc.io/page/com.github.bthink-bgu/BPjs/latest/il/ac/bgu/cs/bp/bpjs/model/ResourceBProgram.html
