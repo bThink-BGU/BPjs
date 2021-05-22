@@ -32,6 +32,8 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
@@ -43,15 +45,15 @@ public class LoggingTest {
     
     @Test
     public void testLogLevels() throws InterruptedException, UnsupportedEncodingException, IOException {
-        PrintStream originalOut = System.out;
+        
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         try (PrintStream myOut = new PrintStream(baos)) {
-            System.setOut(myOut);
-            new BProgramRunner( new ResourceBProgram("logging/simple.js")).run();
+            final ResourceBProgram bprog = new ResourceBProgram("logging/simple.js");
+            bprog.setLoggerOutputStreamer(myOut);
+            new BProgramRunner( bprog).run();
             myOut.flush();
         }
         String result = baos.toString(StandardCharsets.UTF_8.name());
-        System.setOut(originalOut);
         
         System.out.println("result:");
         System.out.println(result);
@@ -166,6 +168,27 @@ public class LoggingTest {
         assertTrue(result.contains("|"));
         assertTrue(result.contains("{"));
         assertTrue(result.contains("}"));
+    }
+    
+    @Test
+    public void testFormattedObjectLogging() throws IOException {
+        String result;
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                      PrintStream myOut = new PrintStream(baos))
+        {
+            final ResourceBProgram bprog = new ResourceBProgram("logging/withFormat.js");
+            bprog.setLoggerOutputStreamer(myOut);
+            new BProgramRunner(bprog).run();
+
+            myOut.flush();
+            result = baos.toString(StandardCharsets.UTF_8);   
+            
+        }
+        
+        System.out.println(result);
+        final String[] lines = result.split("\n", -1);
+        long linesWithJsArray = Arrays.asList(lines).stream().filter(s->s.contains("JS_Array")).count();
+        assertEquals(2, linesWithJsArray);
     }
     
 }

@@ -37,6 +37,9 @@ The "event generator" creates four events, one for each logging level. The "even
 
 .. caution :: Later versions might integrate BPjs with a full-blown logging system, such as `logback`_ or `log4j2`_. Programs relying on the exact logging format may need to change once the logging is updated. If you need to write a program that relies on accurate interpretation a b-program life cycle and selected events, consider implementing a `BProgramRunnerListener`_.
 
+.. note::
+  Logging does not have to go to ``System.out``. Client code can set its destination ``PrintStream`` by calling ``BProgram#setLoggerOutputStreamer``.
+
 Message Formatting
 ------------------
 
@@ -53,6 +56,30 @@ The BPjs logger formats messages using Java's `MessageFormat`_. Under the hood, 
   [BP][Info] Here is are some stuff: {JS_Set "thing 1", "thing 2", "thing 42"}
   [BP][Info] I have a 1,000,000 reasons to block this event.
   [BP][Info] 3.142 3.14 3.1416
+
+
+Caution - Array Ambiguity
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+A curious API edge-base ocurres when using message formatting, and passing a single variable for printing, AND that single variable is an array. The system confuses that array for the variable argument number, and only the first item of the array is printed. So the following code:
+
+.. code::
+
+  bp.registerBThread("t1",function(){
+    bp.log.info("array:{0}", ["x","y","z"]);
+  });
+
+Prints this::
+
+[BP][Info] array:x 
+
+To work around this, either include a dummy variable, or wrap the array in another array::
+
+  bp.log.info("array:{0}", [["x","y","z"]]);
+  bp.log.info("array:{0}", ["x","y","z"], "dummy val");
+
+
+
 
 .. _logback: https://logback.qos.ch
 .. _log4j2: http://logging.apache.org/log4j/2.x/index.html
