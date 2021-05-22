@@ -91,9 +91,13 @@ public class BrokenCodeTest {
     
     @Test(expected=BPjsCodeEvaluationException.class)
     public void brokenSyntaxDfsTest() throws Exception {
-        BProgram bp = new ResourceBProgram("broken/syntaxError.js");
-        DfsBProgramVerifier vfr = new DfsBProgramVerifier();
-        vfr.verify(bp);
+        try (InputStream resource = Thread.currentThread().getContextClassLoader().getResourceAsStream("broken/syntaxError.js")) {
+            String raw = new String(resource.readAllBytes(), StandardCharsets.UTF_8);
+            String post = Arrays.asList( raw.split("\n") ).stream().filter(s->!s.contains("REMOVE")).collect(joining("\n"));
+            BProgram bp = new StringBProgram(post);
+            DfsBProgramVerifier vfr = new DfsBProgramVerifier();
+            vfr.verify(bp);
+        }
     }
     
     @Test()
