@@ -73,7 +73,8 @@ public class BpLog implements java.io.Serializable {
         return level.name();
     }
     
-    private static final Set<Class> PASS_THROUGH = Set.of(Integer.class, Long.class, Short.class, Double.class, Float.class);
+    private static final Set<Class> PASS_THROUGH = Set.of(Integer.class, Long.class, 
+        Short.class, Double.class, Float.class, String.class);
     
     private Object formatArg(Object arg) {
         if ( arg == null ) return arg;

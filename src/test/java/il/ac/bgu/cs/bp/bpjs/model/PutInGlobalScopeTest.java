@@ -32,7 +32,7 @@ import org.junit.Test;
  * Test that we can put Objects in the global context.
  * @author michael
  */
-public class PutInContextTest {
+public class PutInGlobalScopeTest {
     
     @Test
     public void testPutInContext_preRun() throws InterruptedException {

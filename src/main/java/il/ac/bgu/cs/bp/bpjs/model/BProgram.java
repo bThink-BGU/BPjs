@@ -169,7 +169,7 @@ public abstract class BProgram {
      */
     public void prependSource(String source) {
         if (started) {
-            throw new IllegalStateException("Cannot append code after the program had started.");
+            throw new IllegalStateException("Cannot prepend code after the program had started.");
         } else {
             if (prependedCode == null) {
                 prependedCode = new ArrayList<>();

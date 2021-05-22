@@ -30,7 +30,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * A factory class for making executor services. Threads in those executor
- * can have semantic names.
+ * services can have semantic names.
  * 
  * @author michael
  */
