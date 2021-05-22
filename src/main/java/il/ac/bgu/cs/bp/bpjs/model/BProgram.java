@@ -507,7 +507,7 @@ public abstract class BProgram {
     
     /**
      * Set the log level - logging called below the set level are ignored.
-     * @param aLevel 
+     * @param aLevel The new logging level
      */
     public void setLogLevel( BpLog.LogLevel aLevel ) {
         if ( jsProxy != null ) {
@@ -520,7 +520,7 @@ public abstract class BProgram {
     /**
      * Set the print stream used for logging.
      * 
-     * @param printStream 
+     * @param printStream the new logging destination stream
      */
     public void setLoggerOutputStreamer(PrintStream printStream){
         if ( jsProxy != null ) {
