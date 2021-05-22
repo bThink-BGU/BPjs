@@ -44,6 +44,14 @@ a link to this page somewhere in the documentation/system about section.
 
 ## Change Log for the BPjs Library.
 
+### 2021-05
+
+* :sparkles: Client code can change the execution services BPjs uses ([#165](https://github.com/bThink-BGU/BPjs/pull/165)).
+* :sparkles: `bp.log.XXX` can be redirected to print streams other than `System.out`. ([#159](https://github.com/bThink-BGU/BPjs/pull/159)).
+* :arrow_up: Documentation updates.
+* :arrow_up: Improved performance of BTSS equality ([#164](https://github.com/bThink-BGU/BPjs/issues/164)).
+
+
 ### 2021-02
 
 * :sparkles: :sparkles: :tada: :sparkles: :tada: :sparkles: :rainbow: :sparkles: :sparkles: :sparkles: BPjs now uses Rhino's native continuation equality and hash code ([#116](https://github.com/bThink-BGU/BPjs/issues/116). Also, :tada: :rainbow: :sparkles:.

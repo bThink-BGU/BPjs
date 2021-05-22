@@ -397,6 +397,12 @@ public class BProgramSyncSnapshot {
         if (getClass() != obj.getClass())
             return false;
         BProgramSyncSnapshot other = (BProgramSyncSnapshot) obj;
+        
+        // optimization: non-equality by hash code - if we have one.
+        if ( hashCodeCache != Integer.MIN_VALUE && other.hashCodeCache != Integer.MIN_VALUE ) {
+            if ( hashCodeCache != other.hashCodeCache ) return false;
+        }
+        
         if (isStateValid() != other.isStateValid()) {
             return false;
         }
@@ -409,10 +415,6 @@ public class BProgramSyncSnapshot {
         if ( ! ScriptableUtils.jsMapEquals(getDataStore(), other.getDataStore()) ) return false;
         if ( ! getExternalEvents().equals(other.getExternalEvents()) ) return false;
         
-        // optimization: non-equality by hash code - if we have one.
-        if ( hashCodeCache != Integer.MIN_VALUE && other.hashCodeCache != Integer.MIN_VALUE ) {
-            if ( hashCodeCache != other.hashCodeCache ) return false;
-        }
         return Objects.equals(threadSnapshots, other.threadSnapshots);
     }
 }
