@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotCloner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
@@ -53,7 +54,7 @@ public class BThreadSyncSnapshotTest {
         BProgram bprog = new ResourceBProgram("SnapshotTests/ABCDTrace.js");
         BProgramSyncSnapshot setup = bprog.setup();
 
-        ExecutorService execSvc = ExecutorServiceMaker.makeWithName("BProgramSnapshotEqualityTest");
+        ExecutorService execSvc = BPjs.getExecutorServiceMaker().makeWithName("BProgramSnapshotEqualityTest");
         List<BProgramSyncSnapshot> snapshots = new ArrayList<>();
         BProgramSyncSnapshot step = setup.start(execSvc, PASSTHROUGH);
         snapshots.add(BProgramSyncSnapshotCloner.clone(step));
@@ -87,7 +88,7 @@ public class BThreadSyncSnapshotTest {
                 "        }\n" +
                 "});");
         BProgramSyncSnapshot postSetup = bprog.setup();
-        ExecutorService execSvcA = ExecutorServiceMaker.makeWithName("BProgramSnapshotTriggerTest");
+        ExecutorService execSvcA = BPjs.getExecutorServiceMaker().makeWithName("BProgramSnapshotTriggerTest");
         BProgramSyncSnapshot postSync1 = postSetup.start(execSvcA, PASSTHROUGH);
         Set<BEvent> possibleEvents = bprog.getEventSelectionStrategy().selectableEvents(postSync1);
         EventSelectionResult esr = bprog.getEventSelectionStrategy().select(postSync1, possibleEvents).get();

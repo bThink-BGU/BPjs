@@ -1,5 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import static org.junit.Assert.*;
 
@@ -93,7 +94,7 @@ public class NodeEqualsTest {
     
     @Before
     public void setup() {
-        exSvc = ExecutorServiceMaker.makeWithName("Test");
+        exSvc = BPjs.getExecutorServiceMaker().makeWithName("Test");
     }
     
     @After
