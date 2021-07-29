@@ -188,7 +188,7 @@ public class BProgramSyncSnapshotTest {
         ExecutorService execSvcB = BPjs.getExecutorServiceMaker().makeWithName("BProgramSnapshotEqualityTest");
         BProgramSyncSnapshot postStart1 = setup1.start(execSvcA, PASSTHROUGH);
         BProgramSyncSnapshot postStart2 = setup2.start(execSvcB, PASSTHROUGH);
-        assertNotEquals("The source code of the two bthreads is different, thus they should not eb equal.", postStart1, postStart2);
+        assertNotEquals("The source code of the two bthreads is different, thus they should not be equal.", postStart1, postStart2);
         assertNotEquals(setup1, postStart1);
         assertNotEquals(setup2, postStart2);
         
