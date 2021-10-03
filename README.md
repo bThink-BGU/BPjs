@@ -13,6 +13,14 @@ This repository contains a javascript-based [BP](http://www.b-prog.org) library.
 a link to this page somewhere in the documentation/system about section.
 * BPjs uses the Mozilla Rhino JavaScript engine. Project page and source code can be found [here](https://developer.mozilla.org/en-US/docs/Mozilla/Projects/Rhino).
 
+#### Academic Citation
+
+If you use BPjs in an academic work, please consider citing it as:
+
+> Bar-Sinai M., Weiss G. (2021) Verification of Liveness and Safety Properties of Behavioral Programs Using BPjs. In: Margaria T., Steffen B. (eds) Leveraging Applications of Formal Methods, Verification and Validation: Tools and Trends. ISoLA 2020. Lecture Notes in Computer Science, vol 12479. Springer, Cham. https://doi.org/10.1007/978-3-030-83723-5_14
+
+[bibtex](docs/source/Examples_code/bpjs.bib)
+
 ---
 
 ## Getting BPjs
@@ -43,6 +51,9 @@ a link to this page somewhere in the documentation/system about section.
 * [API Javadocs](http://www.javadoc.io/doc/com.github.bthink-bgu/BPjs/)
 
 ## Change Log for the BPjs Library.
+
+### 2021-10
+* :sparkles: Added [contribution guidelines](CONTRIBUTING.md) ([#139](https://github.com/bThink-BGU/BPjs/pull/139)).
 
 ### 2021-05
 

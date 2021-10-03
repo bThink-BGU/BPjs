@@ -23,6 +23,7 @@ What's Here
 * **Use BPjs as a library in a software system:** If you're using `maven`_, just add BPjs `as a dependency`_. Otherwise, you can `download a .jar file`_.
 * **Verify BPjs Programs/Models** see :doc:`Verification <verification/index>`.
 * **Learn more about how to use, embed, and extend BPjs:** Read below.
+* **How to Cite** If you use BPjs in an academic work, please consider citing it as mentioned :doc:`here<citing>`.
 
 
 
@@ -50,7 +51,7 @@ Topics:
    glossary
    examples
    tips
-
+   citing
 
 
 Indices and tables
