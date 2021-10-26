@@ -5,7 +5,7 @@
 
     <groupId>com.github.bthink-bgu</groupId>
     <artifactId>BPjs</artifactId>
-    <version>0.12.1-modified-quals</version>
+    <version>0.12.1-modified-0.2</version>
     <packaging>jar</packaging>
 
     <name>BPjs</name>
