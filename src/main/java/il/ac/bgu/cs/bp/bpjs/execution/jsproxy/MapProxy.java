@@ -128,6 +128,10 @@ public class MapProxy<K,V> implements java.io.Serializable {
         }
     }
 
+    public Collection<V> values() {
+        return filter((k, v) -> true).values();
+    }
+
     public Set<K> keys() {
         Set<K> retVal = new HashSet<>(seed.keySet());
         modifications.forEach((k,v)->{
