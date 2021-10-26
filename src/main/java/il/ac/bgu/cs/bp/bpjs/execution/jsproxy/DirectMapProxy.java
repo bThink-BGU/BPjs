@@ -77,6 +77,10 @@ public class DirectMapProxy<K,V> extends MapProxy<K,V> {
         return seed.values();
     }
 
+    public Set<Map.Entry<K, V>> entrySet() {
+        return seed.entrySet();
+    }
+
     @Override
     public void remove(K key) {
         seed.remove(key);

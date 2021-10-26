@@ -143,6 +143,10 @@ public class MapProxy<K,V> implements java.io.Serializable {
         });
         return retVal;
     }
+
+    public Set<Map.Entry<K, V>> entrySet() {
+        return filter((k, v) -> true).entrySet();
+    }
     
     // size
     public int size() { 
