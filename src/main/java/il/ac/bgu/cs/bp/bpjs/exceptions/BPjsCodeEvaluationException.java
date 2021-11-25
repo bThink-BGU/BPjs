@@ -19,7 +19,7 @@ public class BPjsCodeEvaluationException extends BPjsException {
     private final RhinoException cause;
 
     public BPjsCodeEvaluationException(EcmaError cause) {
-        super(cause.details() + " (at " + cause.lineNumber() + ":" + cause.columnNumber() + ")", cause);
+        super(cause.details() + " (at " + cause.sourceName() + "#" + cause.lineNumber() + ":" + cause.columnNumber() + ")", cause);
         this.cause = cause;
     }
     
@@ -29,12 +29,12 @@ public class BPjsCodeEvaluationException extends BPjsException {
     }
 
     public BPjsCodeEvaluationException(EvaluatorException cause) {
-        super(cause.details() + " (at " + cause.lineNumber() + ":" + cause.columnNumber() + ")", cause);
+        super(cause.details() + " (at " + cause.sourceName() + "#" + cause.lineNumber() + ":" + cause.columnNumber() + ")", cause);
         this.cause = cause;
     }
 
     public BPjsCodeEvaluationException(JavaScriptException cause) {
-        super("JavaScript exception: " + cause.details() + " (at " + cause.lineNumber() + ":" + cause.columnNumber() + ")", cause);
+        super("JavaScript exception: " + cause.details() + " (at " + cause.sourceName() + "#" + cause.lineNumber() + ":" + cause.columnNumber() + ")", cause);
         this.cause = cause;
     }
 
