@@ -31,7 +31,7 @@ public class BEvent implements Comparable<BEvent>, EventSet, java.io.Serializabl
      * Extra data for the event. Public access, so that the JavaScript code
      * feels natural.
      */
-    public final Object maybeData;
+    public Object maybeData;
 
     public static BEvent named(String aName) {
         return new BEvent(aName);
@@ -66,7 +66,7 @@ public class BEvent implements Comparable<BEvent>, EventSet, java.io.Serializabl
     /**
      * @return The data field of the event.
      */
-    public Optional<Object> getDataField() {
+    private Optional<Object> getDataField() {
         return Optional.ofNullable(maybeData);
     }
     
@@ -76,12 +76,16 @@ public class BEvent implements Comparable<BEvent>, EventSet, java.io.Serializabl
      * using {@link #getDataField()}, for a more Java-friendly API.
      * 
      * @return the event's data, or {@code null}.
-     * @see #getDataField() 
+     * @see #getDataField()
      */
     public Object getData() {
         return maybeData;
     }
-    
+
+    public void setData(Object maybeData) {
+        this.maybeData = maybeData;
+    }
+
     /**
      * Take the data field and give it some sensible string representation.
      * @param data
@@ -93,24 +97,21 @@ public class BEvent implements Comparable<BEvent>, EventSet, java.io.Serializabl
     
     @Override
     public boolean equals(Object obj) {
-        // Circuit breakers
+        // Simple global cases
         if (obj == this) return true;
         if (obj == null) return false;
         if (!(obj instanceof BEvent)) return false;
         
         BEvent other = (BEvent) obj;
-        // simple cases
-        if (!name.equals(other.name)) {
-            return false;
-        }
         
-        if ( maybeData == other.getData() ) return true; // same (possibly null) data on both.
-        if ( (maybeData==null) ^ (other.getDataField().isEmpty()) ) {
-            // one has data, the other does not.
-            return false;
-        }
+        /// Simple BEvent cases
+        if (!name.equals(other.name))  return false;
+        // same (possibly null) data on both.
+        if ( maybeData == other.getData() ) return true;
+        // one has data, the other does not.
+        if ( (maybeData==null) ^ (other.getDataField().isEmpty()) ) return false;
         
-        // OK, delve into data semantics
+        // Not so simple data equality casses. Let's hope they have state-based equals() implemented :^)
         Object theirData = other.getDataField().get();
         return ScriptableUtils.jsEquals(maybeData, theirData);
 

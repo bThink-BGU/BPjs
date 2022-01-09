@@ -52,6 +52,9 @@ If you use BPjs in an academic work, please consider citing it as:
 
 ## Change Log for the BPjs Library.
 
+### 2022-01
+* :arrow_up: Improvements to the `BEvent` class, to make it better support client Java code.
+
 ### 2021-10
 * :sparkles: Added [contribution guidelines](CONTRIBUTING.md) ([#139](https://github.com/bThink-BGU/BPjs/pull/139)).
 * :sparkles: Reference to the (finally) published paper describing the updated BPjs model semantics, w.r.t liveness ([#99](https://github.com/bThink-BGU/BPjs/pull/99)).
