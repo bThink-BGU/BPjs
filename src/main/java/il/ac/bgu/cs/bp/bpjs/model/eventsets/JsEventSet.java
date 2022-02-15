@@ -1,6 +1,3 @@
-/*
- *  Author: Michael Bar-Sinai
- */
 package il.ac.bgu.cs.bp.bpjs.model.eventsets;
 
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
@@ -12,7 +9,7 @@ import org.mozilla.javascript.Function;
 import org.mozilla.javascript.NativeFunction;
 
 /**
- * An event set whose predicate is a Javascript function.
+ * An event set whose predicate is a JavaScript function.
  *
  * @author michael
  */
@@ -39,7 +36,7 @@ public class JsEventSet implements EventSet, java.io.Serializable {
                     new Object[]{Context.javaToJS(event, predicate.getParentScope())});
 
             Boolean res = (Boolean) Context.jsToJava(result, Boolean.class);
-            if (res == null) {
+            if ( res == null ) {
                 throw new BPjsRuntimeException("EventSet " + name + ": JS Predicate returned null, not a boolean value. " + predicate.toString());
             }
             return res;
@@ -70,7 +67,9 @@ public class JsEventSet implements EventSet, java.io.Serializable {
         
         if ( other instanceof JsEventSet ) {
             JsEventSet otherES = (JsEventSet) other;
-            if ( encodedSource != null ) {
+            if ( !name.equals(otherES.name) ) {
+                return false;
+            } else if ( encodedSource != null ) {
                 return encodedSource.equals(otherES.encodedSource);
             } else {
                 return predicate.equals(((JsEventSet) other).predicate);

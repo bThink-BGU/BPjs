@@ -52,6 +52,10 @@ If you use BPjs in an academic work, please consider citing it as:
 
 ## Change Log for the BPjs Library.
 
+### 2022-02
+* :arrow_up: Improvements to the `MapProxy` classes, allowing client code pre-process changes.
+* :arrow_up: `JsEventSet` now honors the event set name during equality checks.
+
 ### 2022-01
 * :arrow_up: Improvements to the `BEvent` class, to make it better support client Java code.
 

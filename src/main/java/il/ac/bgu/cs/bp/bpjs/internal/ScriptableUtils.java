@@ -159,7 +159,7 @@ public class ScriptableUtils {
     
     public static String stringify( Object o, boolean quoteStrings) {
         if ( o == null ) return "<null>";
-        if ( o instanceof String ) return quoteStrings ? "\""+o + "\"" : (String)o;
+        if ( o instanceof String ) return quoteStrings ? "\"" + o + "\"" : (String)o;
         if ( o instanceof ConsString ) return quoteStrings ? "\"" + ((ConsString)o).toString() + "\"" : ((ConsString)o).toString();
         if ( o instanceof NativeArray) {
             NativeArray arr = (NativeArray) o;
@@ -177,7 +177,7 @@ public class ScriptableUtils {
             Object[] objArr = (Object[]) o;
             return IntStream.range(0, objArr.length).mapToObj(idx -> stringify(objArr[idx], true)).collect(joining(" | ","[J_Array ", "]"));
         }
-        if ( o instanceof Map) {
+        if ( o instanceof Map ) {
             Map<?,?> mp = (Map<?,?>) o;
             return mp.entrySet().stream().map( e -> e.getKey()+"->" + stringify(e.getValue(), true)).collect(joining(",","{J_Map ", "}"));
         }

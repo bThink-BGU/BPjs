@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -65,6 +66,16 @@ public class DirectMapProxy<K,V> extends MapProxy<K,V> {
         return seed.entrySet().stream()
             .filter(entry -> func.apply(entry.getKey(), entry.getValue()))
             .collect(Collectors.toMap(Map.Entry::getKey, Map.Entry::getValue));
+    }
+
+    @Override
+    public Collection<V> values() {
+        return seed.values();
+    }
+
+    @Override
+    public Set<Map.Entry<K, V>> entrySet() {
+        return seed.entrySet();
     }
 
     @Override
