@@ -37,10 +37,10 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import static java.util.stream.Collectors.toList;
+import static org.junit.Assert.*;
+
 import java.util.stream.IntStream;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+
 import org.junit.Test;
 
 /**
@@ -115,14 +115,38 @@ public class BpProxyFunctionalityTest {
         BProgramRunner rnr = new BProgramRunner();
         rnr.addListener(new PrintBProgramRunnerListener());
         var evtListener = rnr.addListener(new InMemoryEventLoggingListener());
-        
+
         rnr.setBProgram(sut);
         rnr.run();
         assertTrue( isEmbeddedSublist(List.of("a","b","c","d"), evtListener.eventNames()));
         assertTrue( isEmbeddedSublist(List.of("1","2","3","4"), evtListener.eventNames()));
     
     }
-    
+
+    @Test
+    public void NullEventSetTest()
+    {
+        BProgram sut = new ResourceBProgram("nullEventSetTest.js");
+
+        BProgramRunner rnr = new BProgramRunner();
+        rnr.addListener(new PrintBProgramRunnerListener());
+        var evtListener = rnr.addListener(new InMemoryEventLoggingListener());
+
+        rnr.setBProgram(sut);
+        try {
+            rnr.run();
+            fail("Program should have thrown an exception about null event set");
+        }
+        catch(RuntimeException e)
+        {
+            System.out.println(e.getMessage());
+            assertTrue(e.getMessage().contains("first"));
+        }
+
+
+
+    }
+
     @Test
     public void analysis_analyze() throws Exception {
         BProgram sut = new ResourceBProgram("execution/bthreadData_analysis.js");
