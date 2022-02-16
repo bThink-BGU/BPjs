@@ -53,9 +53,11 @@ If you use BPjs in an academic work, please consider citing it as:
 ## Change Log for the BPjs Library.
 
 
-### 2022-02 (Including 1st BP Day Hackathon)
-* :part_alternation_mark: `BEvent::getDataField` data accessors wrap the lower-level `getData()` ([#161](https://github.com/bThink-BGU/BPjs/issues/161)).
+### 2022-02 (Including the 1st BP Day Hackathon)
+* :arrow_up: Improvements to handling `null`s in event set arrays ([#178](https://github.com/bThink-BGU/BPjs/issues/178)).
+* :arrow_up: Improvements to handling Rhino context in BPjs class ([#176](https://github.com/bThink-BGU/BPjs/issues/176)).
 * :arrow_up: Improvements to the `MapProxy` classes, allowing client code pre-process changes.
+* :part_alternation_mark: `BEvent::getDataField` data accessors wrap the lower-level `getData()` ([#161](https://github.com/bThink-BGU/BPjs/issues/161)).
 * :arrow_up: `JsEventSet` now honors the event set name during equality checks.
 
 ### 2022-01
