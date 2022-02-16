@@ -64,10 +64,11 @@ public class BEvent implements Comparable<BEvent>, EventSet, java.io.Serializabl
     }
 
     /**
-     * @return The data field of the event.
+     * @return An Optional of the data field of the event.
+     * @see #getData() 
      */
-    private Optional<Object> getDataField() {
-        return Optional.ofNullable(maybeData);
+    public Optional<Object> getDataField() {
+        return Optional.ofNullable(getData());
     }
     
     /**
