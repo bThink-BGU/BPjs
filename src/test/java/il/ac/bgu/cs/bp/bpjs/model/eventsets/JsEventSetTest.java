@@ -23,41 +23,18 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model.eventsets;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import static org.junit.Assert.*;
-import org.mozilla.javascript.Function;
 
 /**
  *
  * @author michael
  */
 public class JsEventSetTest {
-    
-    public JsEventSetTest() {
-    }
-    
-    @BeforeClass
-    public static void setUpClass() {
-    }
-    
-    @AfterClass
-    public static void tearDownClass() {
-    }
-    
-    @Before
-    public void setUp() {
-    }
-    
-    @After
-    public void tearDown() {
-    }
 
     /**
      * Test of contains method, of class JsEventSet.
@@ -69,9 +46,12 @@ public class JsEventSetTest {
         JsEventSet esA = bprog.getFromGlobalScope("esA", JsEventSet.class).get();
         JsEventSet esB = bprog.getFromGlobalScope("esB", JsEventSet.class).get();
         
-        assertTrue( esA.contains(BEvent.named("AAA")));
-        assertTrue( esB.contains(BEvent.named("BBB")));
-        assertFalse( esB.contains(BEvent.named("ABB")));
+        BPjs.withContext((c)->{
+            assertTrue( esA.contains(BEvent.named("AAA")));
+            assertTrue( esB.contains(BEvent.named("BBB")));
+            assertFalse( esB.contains(BEvent.named("ABB")));
+        });
+        
     }
 
     
@@ -83,7 +63,9 @@ public class JsEventSetTest {
         BProgram bprog = new ResourceBProgram("model/eventsets/jsEventSet.js");
         bprog.setup();
         JsEventSet esA = bprog.getFromGlobalScope("esA", JsEventSet.class).get();
-        assertEquals("esA", esA.getName() );
+        BPjs.withContext((c)->{
+            assertEquals("esA", esA.getName() );
+        });
     }
 
     /**
@@ -95,9 +77,11 @@ public class JsEventSetTest {
         bprog.setup();
         JsEventSet esA = bprog.getFromGlobalScope("esA", JsEventSet.class).get();
         
-        String toString = esA.toString();
-        assertTrue( toString.contains(esA.getName()) );
-        assertTrue( toString.contains("JsEventSet") );
+        BPjs.withContext((c)->{
+            String toString = esA.toString();
+            assertTrue( toString.contains(esA.getName()) );
+            assertTrue( toString.contains("JsEventSet") );
+        });
     }
 
     /**
@@ -111,9 +95,11 @@ public class JsEventSetTest {
         JsEventSet esAtag = bprog.getFromGlobalScope("esA_T", JsEventSet.class).get();
         JsEventSet esB = bprog.getFromGlobalScope("esB", JsEventSet.class).get();
         
-        assertEquals(esA, esA);
-        assertNotEquals(esA, esAtag);
-        assertNotEquals(esA, esB);
+        BPjs.withContext((c)->{
+            assertEquals(esA, esA);
+            assertNotEquals(esA, esAtag);
+            assertNotEquals(esA, esB);
+        });
         
     }    
 }

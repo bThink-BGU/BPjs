@@ -24,6 +24,7 @@
 package il.ac.bgu.cs.bp.bpjs;
 
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
+import java.util.function.Consumer;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Scriptable;
@@ -77,6 +78,19 @@ public class BPjs {
     }
     
     /**
+     * Convenience method for running code that requires Rhino context. Ensures
+     * that the context if closed after the block executes.
+     * @param block 
+     */
+    public static void withContext( Consumer<Context> block ) {
+        try {
+           block.accept(enterRhinoContext());
+        } finally {
+            Context.exit();
+        }
+    }
+    
+    /**
      * Creates a new scope for running BPjs code. This scope's parent scope
      * is the JVM-global BPjs scope.
      * 
@@ -84,11 +98,15 @@ public class BPjs {
      * @see #getBPjsScope() 
      */
     public static Scriptable makeBPjsSubScope() {
-        Context cx = enterRhinoContext();
-        Scriptable retVal = cx.newObject(BPjs.getBPjsScope());
-        retVal.setPrototype(BPjs.getBPjsScope());
-        retVal.setParentScope(null);
-        return retVal;
+        try {
+            Context cx = enterRhinoContext();
+            Scriptable retVal = cx.newObject(BPjs.getBPjsScope());
+            retVal.setPrototype(BPjs.getBPjsScope());
+            retVal.setParentScope(null);
+            return retVal;
+        } finally {
+            Context.exit();
+        }
     }
     
     private static void makeBPjsScope() {

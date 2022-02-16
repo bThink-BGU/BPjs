@@ -130,3 +130,27 @@ Will yield a series of events ``event-0`` to ``event-9``, whereas:
     }
 
 Will yield a series of 10 events named ``event-0``.
+
+Working in Java with Objects from JavaScript
+--------------------------------------------
+
+When invoking methods on objects that come from Rhino, it is often required that these methods
+are invoked in a context. This context can be obtained by calling ``BPjs.enterRhinoContext()``.
+However, this method requires the client code to ensure that the context is closed properly.
+
+An alternative would be to use the consumer pattern, with ``BPjs.withContext()``:
+
+.. code:: java
+
+    BProgram bprog = createBProgram(); // create b-program
+    bprog.setup(); // run initial part
+    JsEventSet es = bprog.getFromGlobalScope("esA", JsEventSet.class).get();
+    
+    // es now holds a JsEventSet, which includes a Rhino function,
+    // and so, must be run within a context. 
+
+    BPjs.withContext((c)->{
+        assertTrue( es.contains(BEvent.named("AAA")));
+    });
+
+    
