@@ -80,7 +80,7 @@ public class BPjs {
     /**
      * Convenience method for running code that requires Rhino context. Ensures
      * that the context if closed after the block executes.
-     * @param block 
+     * @param block The block of code to be executed with the context.
      */
     public static void withContext( Consumer<Context> block ) {
         try {
@@ -120,10 +120,18 @@ public class BPjs {
         }
     }
 
+    /**
+     * Returns the maker of executor service used by BPjs to advance b-threads.
+     * @return the current executor service maker.
+     */
     public static ExecutorServiceMaker getExecutorServiceMaker() {
         return executorServiceMaker;
     }
 
+    /**
+     * Set the executor service maker BPjs uses to advance b-threads.
+     * @param executorServiceMaker the new executor service maker to be used.
+     */
     public static void setExecutorServiceMaker(ExecutorServiceMaker executorServiceMaker) {
         BPjs.executorServiceMaker = executorServiceMaker;
     }
