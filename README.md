@@ -56,12 +56,13 @@ If you use BPjs in an academic work, please consider citing it as:
 ### 2022-02 (Including the 1st BP Day Hackathon)
 * :part_alternation_mark: Calling `bp.sync` from global scope during runtime does not cause an ugly exception anymore ([#174](https://github.com/bThink-BGU/BPjs/issues/174)). The error is reported to the listeners.
     * Also when making the illegal call from an interrupt handler.
-* :arrow_up: Improved JavaScript code error detection during analysis - 
+* :arrow_up: Improved JavaScript code error detection during analysis
 * :arrow_up: Improvements to handling `null`s in event set arrays ([#178](https://github.com/bThink-BGU/BPjs/issues/178)).
 * :arrow_up: Improvements to handling Rhino context in BPjs class ([#176](https://github.com/bThink-BGU/BPjs/issues/176)).
 * :arrow_up: Improvements to the `MapProxy` classes, allowing client code pre-process changes.
-* :part_alternation_mark: `BEvent::getDataField` data accessors wrap the lower-level `getData()` ([#161](https://github.com/bThink-BGU/BPjs/issues/161)).
 * :arrow_up: `JsEventSet` now honors the event set name during equality checks.
+* :part_alternation_mark: `BEvent::getDataField` data accessors wrap the lower-level `getData()` ([#161](https://github.com/bThink-BGU/BPjs/issues/161)).
+* :part_alternation_mark: API improvments on `DfcBProgramVerifier` ([#173](https://github.com/bThink-BGU/BPjs/issues/173)).
 * :put_litter_in_its_place: Consolidated tests for `BProgramJsProxy`.
 
 ### 2022-01
