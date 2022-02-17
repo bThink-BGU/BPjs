@@ -226,12 +226,7 @@ public abstract class BProgram {
             } catch (BPjsException be ) {
                 throw be;
             } catch ( IllegalStateException ise ) {
-                String msg = ise.getMessage();
-                if ( msg.contains("Cannot capture continuation") && msg.contains("executeScriptWithContinuations or callFunctionWithContinuations") ){
-                    throw new BPjsCodeEvaluationException("bp.sync called outside of a b-thread");
-                } else {
-                    throw ise;
-                }
+                throw ise;
             } catch ( Throwable generalException ) {
                 throw new BPjsRuntimeException("(Wrapped) Exception evaluating BProgram code: " + generalException.getMessage(), generalException);
             }

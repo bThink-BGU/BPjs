@@ -68,7 +68,11 @@ public class BProgramRunner implements Runnable {
             bprog.setAddBThreadCallback( (bp,bt)->listeners.forEach(l->l.bthreadAdded(bp, bt)));
         }
     }
-    
+    /**
+     * Kicks off the execution of the {@link BProgram}. This method does not 
+     * {@code return} or {@code throw} anything, as it is part or the {@link Runnable}
+     * interface. Errors and results are reported to the listeners.
+     */
     @Override
     public void run() {
         try {

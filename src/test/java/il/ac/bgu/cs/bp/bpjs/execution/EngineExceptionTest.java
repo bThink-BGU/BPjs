@@ -2,7 +2,9 @@ package il.ac.bgu.cs.bp.bpjs.execution;
 
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsCodeEvaluationException;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
+import java.util.concurrent.atomic.AtomicBoolean;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -22,14 +24,17 @@ public class EngineExceptionTest {
             "var i=0;\n var j=42;\n var k=5; bp.sync({request:bp.Event(\"A\")});"
         );
         
-        try { 
-            new BProgramRunner(sut).run();
-            fail("System should have thrown an error due to bp.sync called outside of a BThread.");
-        } catch (BPjsCodeEvaluationException exp) {
-            assertTrue( exp.getMessage().contains("bp.sync"));
-            System.out.println("Error message details: ");
-            System.out.println(exp.getDetails());
-        }
+        final AtomicBoolean errorCalled = new AtomicBoolean(false);
+        final BProgramRunner bProgramRunner = new BProgramRunner(sut);
+        bProgramRunner.addListener( new BProgramRunnerListenerAdapter(){
+            @Override
+            public void error(BProgram bp, Exception ex) {
+                errorCalled.set(true);
+            }
+            
+        });
+        bProgramRunner.run();
+        assertTrue("The runner listener should have had its 'error' method called ", errorCalled.get() );
     }
     
     @Test

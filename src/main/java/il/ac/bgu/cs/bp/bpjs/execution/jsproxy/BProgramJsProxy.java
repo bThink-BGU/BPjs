@@ -234,6 +234,11 @@ public class BProgramJsProxy extends SyncStatementBuilder
      */
     @Override
     void synchronizationPoint(NativeObject jsRWB, Boolean hot, Object data) {
+        
+        if ( CURRENT_BTHREAD.get() == null ) {
+            throw new BPjsRuntimeException("Calling bp.sync outside of a b-thread is forbidden");
+        }
+        
         Map<String, Object> jRWB = (Map) Context.jsToJava(jsRWB, Map.class);
 
         SyncStatement stmt = SyncStatement.make();
@@ -252,7 +257,9 @@ public class BProgramJsProxy extends SyncStatementBuilder
                     stmt = stmt.request((BEvent) req);
                 }
             } catch (ClassCastException cce) {
-                throw new BPjsRuntimeException("A non-event object requested in a sync statement. Offending object:'" + ScriptableUtils.stringify(req) + "'");
+                throw new BPjsRuntimeException("A non-event object requested in a sync statement. "
+                    + "Offending object:'" + ScriptableUtils.stringify(req) + "' in BThread " + 
+                    CURRENT_BTHREAD.get().snapshot.getName());
             }
         }
 

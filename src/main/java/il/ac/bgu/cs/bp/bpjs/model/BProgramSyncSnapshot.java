@@ -248,8 +248,13 @@ public class BProgramSyncSnapshot {
                             final Scriptable scope = bt.getScope();
                             try {
                                 ctxt.callFunctionWithContinuations(func, scope, new Object[]{anEvent});
-                            } catch ( ContinuationPending ise ) {
-                                throw new BPjsRuntimeException("Cannot call bp.sync or fork from a break-upon handler. Please consider pushing an external event.");
+                            } catch ( BPjsRuntimeException e) {
+                                listeners.forEach( l -> l.error(bprog, e));
+                            } catch ( WrappedException wpe ) {
+                                if ( wpe.getWrappedException() instanceof BPjsRuntimeException ) {
+                                    BPjsRuntimeException e = (BPjsRuntimeException) wpe.getWrappedException();
+                                    listeners.forEach( l -> l.error(bprog, e));
+                                }
                             }
                         });
             });

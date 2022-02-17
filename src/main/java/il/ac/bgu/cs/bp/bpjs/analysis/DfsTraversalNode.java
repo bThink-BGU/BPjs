@@ -6,6 +6,7 @@ import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import java.util.*;
 
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
+import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
@@ -89,8 +90,26 @@ public class DfsTraversalNode {
      * 
      */
     public DfsTraversalNode getNextNode(BEvent e, ExecutorService exSvc) throws BPjsRuntimeException {
+        final Exception[] caughtException = new Exception[1];
+        final BProgramRunnerListener l = new BProgramRunnerListenerAdapter(){
+            @Override
+            public void error(BProgram bp, Exception ex) {
+                caughtException[0] = ex;
+            }
+            
+        };
         try {
-            return new DfsTraversalNode(bp, BProgramSyncSnapshotCloner.clone(systemState).triggerEvent(e, exSvc, Collections.emptyList(), bp.getStorageModificationStrategy()), e);
+            DfsTraversalNode next = new DfsTraversalNode(bp, 
+                BProgramSyncSnapshotCloner.clone(systemState).triggerEvent(e, exSvc, Collections.singletonList(l),bp.getStorageModificationStrategy()), e);
+            if ( caughtException[0] != null ) {
+                if ( caughtException[0] instanceof BPjsRuntimeException ){
+                    throw (BPjsRuntimeException)(caughtException[0]);
+                } else {
+                  throw new BPjsRuntimeException("Exception while reaching for a new node", caughtException[0]);  
+                }
+            }
+            return next;
+            
         } catch ( InterruptedException ie ) {
             throw new BPjsRuntimeException("Thread interrupted during event invocaiton", ie);
         }
