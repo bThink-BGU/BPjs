@@ -153,13 +153,30 @@ public class MapProxy<K,V> implements java.io.Serializable {
         return keys().size();
     }
     
-    // get modifications
+    /**
+     * Returns the modifications registered since last reset.
+     * Note that in case of multiple chagnes to the same key, only the 
+     * last change is returned.
+     * @return the modifications registered since last reset.
+     */
     public Map<K, Modification<V>> getModifications() {
         return modifications;
     }
     
+    /**
+     * Sets the underlying map. Does not reset changes!
+     * @param aNewSeed 
+     */
     public void setSeed( Map<K, V> aNewSeed ) {
         seed = aNewSeed;
+    }
+
+    /**
+     * Returns the underlying map.
+     * @return the underlying map.
+     */
+    public Map<K, V> getSeed() {
+        return seed;
     }
     
     // clear modifications?

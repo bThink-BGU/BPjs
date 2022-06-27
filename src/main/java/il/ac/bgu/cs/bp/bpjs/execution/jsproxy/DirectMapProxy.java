@@ -88,5 +88,4 @@ public class DirectMapProxy<K,V> extends MapProxy<K,V> {
         seed.put(key, value);
     }
     
-    
 }
