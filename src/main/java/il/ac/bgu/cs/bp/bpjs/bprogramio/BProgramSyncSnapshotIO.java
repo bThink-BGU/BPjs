@@ -151,13 +151,17 @@ public class BProgramSyncSnapshotIO {
     }
 
     private void writeBThreadSnapshot(BThreadSyncSnapshot bss, BPJSStubOutputStream outs) throws IOException {
-        outs.writeObject(bss.getName());
-        outs.writeObject(bss.getEntryPoint());
-        outs.writeObject(bss.getInterrupt().orElse(null));
-        outs.writeObject(bss.getSyncStatement());
-        outs.writeObject(bss.getData());
-        outs.writeObject(bss.getStorageModifications());
-        outs.writeObject(bss.getContinuation());
+        try {
+            outs.writeObject(bss.getName());
+            outs.writeObject(bss.getEntryPoint());
+            outs.writeObject(bss.getInterrupt().orElse(null));
+            outs.writeObject(bss.getSyncStatement());
+            outs.writeObject(bss.getData());
+            outs.writeObject(bss.getStorageModifications());
+            outs.writeObject(bss.getContinuation());
+        } catch ( IOException iox ) {
+            throw new IOException("While serializing b-thread '" + bss.getName() + "': " + iox.getMessage(), iox.getCause());
+        }
     }
 
     private BThreadSyncSnapshot readBThreadSnapshot(BPJSStubInputStream sis, Map<String,Object> bprogramDataStore) throws IOException, ClassNotFoundException {
