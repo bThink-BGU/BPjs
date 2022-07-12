@@ -148,7 +148,10 @@ public class MapProxy<K,V> implements java.io.Serializable {
         return filter((k, v) -> true).entrySet();
     }
     
-    // size
+    /**
+     * Size of the map AFTER the modifications would be applied.
+     * @return 
+     */
     public int size() { 
         return keys().size();
     }

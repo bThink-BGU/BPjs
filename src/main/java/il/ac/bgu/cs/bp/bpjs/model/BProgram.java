@@ -286,8 +286,7 @@ public abstract class BProgram {
             eventSelectionStrategy = new SimpleEventSelectionStrategy();
         }
         FailedAssertionViolation failedAssertion = null;
-        try {
-            Context ctx = BPjs.enterRhinoContext();
+        try (Context ctx = BPjs.enterRhinoContext()) {
             initProgramScope();
 
             // evaluate code in order
@@ -303,9 +302,6 @@ public abstract class BProgram {
 
         } catch (FailedAssertionException fae) {
             failedAssertion = new FailedAssertionViolation(fae.getMessage(), "---init_code");
-
-        } finally {
-            Context.exit();
         }
 
         started = true;
@@ -410,11 +406,8 @@ public abstract class BProgram {
         if (getGlobalScope() == null) {
             initialScopeValues.put(name, obj);
         } else {
-            try {
-                BPjs.enterRhinoContext();
+            try (Context cx = BPjs.enterRhinoContext() ) {
                 getGlobalScope().put(name, getGlobalScope(), Context.javaToJS(obj, getGlobalScope()));
-            } finally {
-                Context.exit();
             }
         }
     }

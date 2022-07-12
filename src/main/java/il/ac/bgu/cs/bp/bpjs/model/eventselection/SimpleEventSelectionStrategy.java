@@ -58,8 +58,7 @@ public class SimpleEventSelectionStrategy extends AbstractEventSelectionStrategy
                 .collect( toSet() );
         
         // Let's see what internal events are requested and not blocked (if any).
-        try {
-            BPjs.enterRhinoContext();
+        try (Context cx = BPjs.enterRhinoContext() ) {
             Set<BEvent> requestedAndNotBlocked = requested.stream()
                     .filter( req -> !blocked.contains(req) )
                     .collect( toSet() );
@@ -68,8 +67,6 @@ public class SimpleEventSelectionStrategy extends AbstractEventSelectionStrategy
                     externalEvents.stream().filter( e->!blocked.contains(e) ) // No internal events requested, defer to externals.
                                   .findFirst().map( e->singleton(e) ).orElse(emptySet())
                     : requestedAndNotBlocked;
-        } finally {
-            Context.exit();
         }
     }
 

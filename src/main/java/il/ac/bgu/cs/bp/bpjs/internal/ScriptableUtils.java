@@ -251,8 +251,7 @@ public class ScriptableUtils {
         
         String code = "const arr=[]; ns.forEach(e=>arr.push(e)); arr";
         
-         try {
-            Context curCtx = BPjs.enterRhinoContext();
+         try (Context curCtx = BPjs.enterRhinoContext()) {
             Scriptable tlScope = BPjs.makeBPjsSubScope();
             tlScope.put("ns", tlScope, ns);
             Object resultObj = curCtx.evaluateString(
@@ -261,9 +260,6 @@ public class ScriptableUtils {
             
             NativeArray arr = (NativeArray) resultObj;
             return arr.getIndexIds().stream().map( id -> stringify(arr.get(id), true) ).collect(joining(", "));
-            
-        } finally {
-            Context.exit();
         }
         
     }

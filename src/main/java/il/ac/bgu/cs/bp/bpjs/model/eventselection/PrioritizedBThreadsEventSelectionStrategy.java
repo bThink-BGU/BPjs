@@ -68,9 +68,7 @@ public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSele
                 .collect( Collectors.toSet() );
         
         // Let's see what internal events are requested and not blocked (if any).
-        try {
-            BPjs.enterRhinoContext();
-            
+        try (Context cx = BPjs.enterRhinoContext() ) {
             Set<Pair<BEvent,Integer>> requestedAndNotBlockedWithPriorities = requested.stream()
                     .filter( req -> !blocked.contains(req.getLeft()) )
                     .collect( toSet() );
@@ -91,8 +89,6 @@ public class PrioritizedBThreadsEventSelectionStrategy extends AbstractEventSele
             return requestedAndNotBlocked.isEmpty() ?
                     getNonBlocked(externalEvents, blocked) // No internal events requested, defer to externals.
                     : requestedAndNotBlocked;
-        } finally {
-            Context.exit();
         }
     }
     

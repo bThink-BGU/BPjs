@@ -63,8 +63,7 @@ public class DeadlockViolation extends Violation {
             });
         });
         
-        BPjs.enterRhinoContext();
-        try {
+        try (Context cx = BPjs.enterRhinoContext()) {
             // collect who blocked what
             blockedBy = requestedBy.keySet().stream().map( evt -> Pair.of(
                     evt, 
@@ -75,8 +74,6 @@ public class DeadlockViolation extends Violation {
                 mergedSet.addAll(s2);
                 return mergedSet;
             }) );
-        } finally {
-            Context.exit();
         }
         
         description = requestedBy.keySet().stream()

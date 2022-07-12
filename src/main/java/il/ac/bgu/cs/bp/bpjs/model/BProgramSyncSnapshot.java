@@ -142,8 +142,7 @@ public class BProgramSyncSnapshot {
         Set<BThreadSyncSnapshot> resumingThisRound = new HashSet<>(threadSnapshots.size());
         Set<BThreadSyncSnapshot> sleepingThisRound = new HashSet<>(threadSnapshots.size());
         List<BEvent> nextExternalEvents = new ArrayList<>(getExternalEvents());
-        try {
-            Context ctxt = BPjs.enterRhinoContext();
+        try (Context ctxt = BPjs.enterRhinoContext()) {
             handleInterrupts(anEvent, listeners, bprog, ctxt);
             nextExternalEvents.addAll(bprog.drainEnqueuedExternalEvents());
             
@@ -151,8 +150,6 @@ public class BProgramSyncSnapshot {
             threadSnapshots.forEach( snapshot -> {
                 (snapshot.getSyncStatement().shouldWakeFor(anEvent) ? resumingThisRound : sleepingThisRound).add(snapshot);
             });
-        } finally {
-            Context.exit();
         }
         
         BPEngineTask.Listener halter = new ViolationRecorder(bprog, violationTag);
@@ -370,16 +367,13 @@ public class BProgramSyncSnapshot {
         );
         
         // duplicate snapshot and register the copy with the b-program
-        try {
-            BPjs.enterRhinoContext();
+        try (Context cx = BPjs.enterRhinoContext()) {
             BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(bprog);
             BThreadSyncSnapshot forkedBT = io.deserializeBThread(io.serializeBThread(btss), dataStore);
             bprog.registerForkedChild(btss);
             
             // on child forks, the fork() statement returns 1.
             return Stream.of(new StartFork(1, this, forkedBT, listener));
-        } finally {
-            Context.exit();
         }
     }
     

@@ -161,15 +161,11 @@ public abstract class TestUtils {
      * @return The result of the passed code.
      */
     public static Object evaluateJS(String jsCode) {
-        try {
-            Context curCtx = BPjs.enterRhinoContext();
+        try (Context curCtx = BPjs.enterRhinoContext()) {
             Object resultObj = curCtx.evaluateString(
                 BPjs.getBPjsScope(), jsCode, "", 1, null);
             
             return resultObj;
-            
-        } finally {
-            Context.exit();
         }
     }
 

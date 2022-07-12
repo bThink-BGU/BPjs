@@ -71,9 +71,7 @@ public class BProgramSyncSnapshotIO {
     }
 
     public byte[] serialize(BProgramSyncSnapshot bpss) throws IOException {
-        try {
-            BPjs.enterRhinoContext();
-
+        try (Context cx = BPjs.enterRhinoContext()) {
             try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
                 BPJSStubOutputStream outs = new BPJSStubOutputStream(bytes, bprogram.getGlobalScope())) {
 
@@ -92,16 +90,11 @@ public class BProgramSyncSnapshotIO {
 
                 return bytes.toByteArray();
             }
-
-        } finally {
-            Context.exit();
         }
     }
 
     public BProgramSyncSnapshot deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
-        try {
-            BPjs.enterRhinoContext();
-
+        try (Context cx = BPjs.enterRhinoContext()) {
             try (BPJSStubInputStream in = new BPJSStubInputStream(new ByteArrayInputStream(bytes), 
                                                     bprogram.getGlobalScope(),
                                                     getStubProvider())
@@ -123,16 +116,12 @@ public class BProgramSyncSnapshotIO {
 
                 return new BProgramSyncSnapshot(bprogram, bthreads, dataStore, externalEvents, header.fa);
             }
-            
-        } finally {
-            Context.exit();
         }
     }
     
     public byte[] serializeBThread(BThreadSyncSnapshot btss) {
         
-        try {
-            BPjs.enterRhinoContext();
+        try (Context cx = BPjs.enterRhinoContext()) {
 
             try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
                 BPJSStubOutputStream outs = new BPJSStubOutputStream(bytes, bprogram.getGlobalScope())) {
@@ -144,16 +133,11 @@ public class BProgramSyncSnapshotIO {
                 // all read/writes are in-memory.
                 throw new RuntimeException("IO exception serializing a b-thread:"+ex.getMessage(), ex);
             }
-
-        } finally {
-            Context.exit();
         }   
     }
     
     public BThreadSyncSnapshot deserializeBThread( byte[] serializedBT, Map<String,Object> bprogramDataStore  ) {
-        try {
-            BPjs.enterRhinoContext();
-            
+        try (Context cx = BPjs.enterRhinoContext()) {
             try (BPJSStubInputStream sis = new BPJSStubInputStream( 
                                          new ByteArrayInputStream(serializedBT),
                                          bprogram.getGlobalScope(),
@@ -163,8 +147,6 @@ public class BProgramSyncSnapshotIO {
             } catch (ClassNotFoundException|IOException ex) {
                 throw new RuntimeException("Error reading a serialized b-thread: " + ex.getMessage(), ex );
             }
-        } finally {
-            Context.exit();
         }
     }
 

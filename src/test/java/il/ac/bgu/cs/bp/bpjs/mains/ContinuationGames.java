@@ -84,9 +84,7 @@ public class ContinuationGames {
         
         // Serialize snapshot
         byte[] serializedContinuationAndScope = null;
-        try {
-            Context ctxt = BPjs.enterRhinoContext(); // need Javascript environment for this, even though we're not executing code per se.
-            
+        try (Context ctxt = BPjs.enterRhinoContext()) {
             // first, get bp out of the scope
             Object cnt = snapshot.getContinuation();
             final Scriptable scope = snapshot.getScope();
@@ -112,14 +110,14 @@ public class ContinuationGames {
                 serializedContinuationAndScope = bytes.toByteArray();
             }
             System.out.println("Seriazlied to " + serializedContinuationAndScope.length + " bytes.");
+            
         } finally {
             execSvc.shutdown();
-            Context.exit();
         }
         
         // Run the BThread a few times:
-        try {
-            Context ctxt = BPjs.enterRhinoContext();
+        try (Context ctxt = BPjs.enterRhinoContext()) {
+            
             final Scriptable topLevelScope = ctxt.initSafeStandardObjects();
             
             
@@ -154,8 +152,6 @@ public class ContinuationGames {
             
             System.out.println("continuationsEq = " + continuationEq( (NativeContinuation)cnts[0], (NativeContinuation)cnts[1]) );
             
-        } finally {
-            Context.exit();
         }
     }
     

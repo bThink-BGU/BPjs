@@ -90,11 +90,8 @@ public abstract class AbstractEventSelectionStrategy implements EventSelectionSt
     }
 
     protected Set<BEvent> getRequestedAndNotBlocked(SyncStatement stmt, EventSet blocked) {
-        try {
-            BPjs.enterRhinoContext();
+        try (Context curCtx = BPjs.enterRhinoContext()) {
             return stmt.getRequest().stream().filter((BEvent req) -> !blocked.contains(req)).collect(toSet());
-        } finally {
-            Context.exit();
         }
     }
     

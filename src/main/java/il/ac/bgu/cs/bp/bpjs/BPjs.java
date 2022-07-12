@@ -23,9 +23,11 @@
  */
 package il.ac.bgu.cs.bp.bpjs;
 
+import il.ac.bgu.cs.bp.bpjs.internal.BPjsRhinoContextFactory;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import java.util.function.Consumer;
 import org.mozilla.javascript.Context;
+import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.ImporterTopLevel;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
@@ -45,6 +47,7 @@ public class BPjs {
     private static ExecutorServiceMaker executorServiceMaker = new ExecutorServiceMaker();
 
     static {
+        ContextFactory.initGlobal( new BPjsRhinoContextFactory()) ;
         makeBPjsScope();
     }
     
@@ -53,18 +56,12 @@ public class BPjs {
      * example, setting the optimization level to -1, and the ES version.
      * 
      * <B>NOTE</B> Must call {@code Context.exit()} after calling this method. 
-     * Preferably, call this method in a {@code try} block, and have the related
-     * {@code Context.exit()} call in a {@code finally} block.
+     * This can either be done using a try/catch block, or by using try-with-resources.
      * 
      * @return A Rhino context for BPjs executions.
      */
     public static Context enterRhinoContext() {
-        Context cx = Context.enter();
-        cx.setOptimizationLevel(-1); // must use interpreter mode for continuations to work
-        if ( cx.getLanguageVersion() != Context.VERSION_ES6 ) {
-            cx.setLanguageVersion(Context.VERSION_ES6);
-        }
-        return cx;
+        return Context.enter();
     }
     
     /**
@@ -83,10 +80,8 @@ public class BPjs {
      * @param block The block of code to be executed with the context.
      */
     public static void withContext( Consumer<Context> block ) {
-        try {
-           block.accept(enterRhinoContext());
-        } finally {
-            Context.exit();
+        try (Context cx = BPjs.enterRhinoContext()) {
+           block.accept(cx); 
         }
     }
     
@@ -98,25 +93,19 @@ public class BPjs {
      * @see #getBPjsScope() 
      */
     public static Scriptable makeBPjsSubScope() {
-        try {
-            Context cx = enterRhinoContext();
+        try (Context cx = enterRhinoContext()) {
             Scriptable retVal = cx.newObject(BPjs.getBPjsScope());
             retVal.setPrototype(BPjs.getBPjsScope());
             retVal.setParentScope(null);
             return retVal;
-        } finally {
-            Context.exit();
         }
     }
     
     private static void makeBPjsScope() {
-        try {
-            Context cx = enterRhinoContext();
+        try (Context cx = enterRhinoContext()) {
             ImporterTopLevel importer = new ImporterTopLevel(cx);
             BPJS_SCOPE = cx.initStandardObjects(importer, true); // create and seal
             // NOTE: global extensions to BPjs scopes would go here, if we decide to create them.
-        } finally {
-            Context.exit();
         }
     }
 

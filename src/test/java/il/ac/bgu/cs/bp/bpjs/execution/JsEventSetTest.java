@@ -154,8 +154,7 @@ public class JsEventSetTest {
     
     @Test
     public void testJsSetData() throws InterruptedException, URISyntaxException {
-        try {
-            BPjs.enterRhinoContext();
+        try( var ctx = BPjs.enterRhinoContext() ) {
             BProgram bpr = new StringBProgram( "Eventset",
                       "var es=bp.EventSet('a',function(e){return e.name=='a';});\n"
             );
@@ -169,9 +168,6 @@ public class JsEventSetTest {
             assertTrue( jsSut.contains(BEvent.named("a")) );
             assertFalse( jsSut.contains(BEvent.named("b")) );
             assertNotEquals( jsSut, "NOT AN EVENT SET" );
-            
-        } finally {
-            Context.exit();
         }
         
         

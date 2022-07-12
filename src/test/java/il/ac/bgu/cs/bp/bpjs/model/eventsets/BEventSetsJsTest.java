@@ -65,10 +65,10 @@ public class BEventSetsJsTest {
         BEvent eNotName = events.get("eNotName");
         EventSet esName = eventSets.get("esName");
         
-        BPjs.enterRhinoContext();
-        assertTrue( esName.contains(eName) );
-        assertFalse( esName.contains(eNotName) );
-        Context.exit();
+        try ( Context cx = BPjs.enterRhinoContext() ) {
+            assertTrue( esName.contains(eName) );
+            assertFalse( esName.contains(eNotName) );
+        }
     }
     
     @Test
@@ -78,15 +78,15 @@ public class BEventSetsJsTest {
         BEvent eName = events.get("eName");
         EventSet esDataVizIsViz = eventSets.get("esDataObjVizIsViz");
         EventSet esDataIsViz = eventSets.get("esDataIsViz");
-        BPjs.enterRhinoContext();
-        assertTrue( esDataVizIsViz.contains(eVizObj) );
-        assertTrue( esDataIsViz.contains(eViz) );
-        
-        assertFalse( esDataIsViz.contains(eVizObj) );
-        assertFalse( esDataVizIsViz.contains(eViz) );
-        assertFalse( esDataVizIsViz.contains(eName) );
-        assertFalse( esDataIsViz.contains(eName) );
-        Context.exit();
+        try ( Context cx = BPjs.enterRhinoContext() ) {
+            assertTrue( esDataVizIsViz.contains(eVizObj) );
+            assertTrue( esDataIsViz.contains(eViz) );
+
+            assertFalse( esDataIsViz.contains(eVizObj) );
+            assertFalse( esDataVizIsViz.contains(eViz) );
+            assertFalse( esDataVizIsViz.contains(eName) );
+            assertFalse( esDataIsViz.contains(eName) );
+        }
     }
    
     
