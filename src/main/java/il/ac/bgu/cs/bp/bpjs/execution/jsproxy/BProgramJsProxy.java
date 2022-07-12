@@ -7,6 +7,7 @@ import il.ac.bgu.cs.bp.bpjs.model.*;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSet;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.JsEventSet;
+import java.util.List;
 import org.mozilla.javascript.*;
 
 import java.util.Map;
@@ -250,9 +251,13 @@ public class BProgramJsProxy extends SyncStatementBuilder
             try {
                 if (req instanceof NativeArray) {
                     NativeArray arr = (NativeArray) req;
-                    stmt = stmt.request(arr.getIndexIds().stream()
-                            .map(i -> (BEvent) arr.get(i))
-                            .collect(toList()));
+                    final List<BEvent> requestedEvents = arr.getIndexIds().stream()
+                        .map(i -> (BEvent) arr.get(i))
+                        .collect(toList());
+                    if ( requestedEvents.contains(null) ) {
+                        throw new RuntimeException("Cannot request a null event. B-thread name: "+ CURRENT_BTHREAD.get().snapshot.getName());
+                    }
+                    stmt = stmt.request(requestedEvents);
                 } else {
                     stmt = stmt.request((BEvent) req);
                 }
@@ -286,7 +291,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
             if (arr.isEmpty()) return EventSets.none;
 
             if (Stream.of(arr.getIds()).anyMatch(id -> arr.get(id) == null)) {
-                throw new RuntimeException("EventSet Array contains null sets. Exception causing b-thread: "
+                throw new RuntimeException("EventSet Array contains null sets. B-thread name: "
                         + CURRENT_BTHREAD.get().snapshot.getName());
             }
 
