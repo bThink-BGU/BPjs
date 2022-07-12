@@ -26,6 +26,7 @@ package il.ac.bgu.cs.bp.bpjs.mains;
 import il.ac.bgu.cs.bp.bpjs.analysis.*;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.PrintDfsVerifierListener;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
+import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsCodeEvaluationException;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
@@ -45,6 +46,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.EvaluatorException;
+import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 
 /**
@@ -70,8 +72,10 @@ public class BPjsCliRunner {
                         println(" [READ] stdin");
                         try {
                             evaluate(System.in, "stdin", Context.getCurrentContext());
-                        } catch (EvaluatorException ee) {
+                        } catch (RhinoException ee) {
                             logScriptExceptionAndQuit(ee, arg);
+                        } catch (BPjsCodeEvaluationException ee) {
+                           logScriptExceptionAndQuit(ee, arg);
                         }
                     } else {
                         if (!arg.startsWith("-")) {
@@ -83,8 +87,10 @@ public class BPjsCliRunner {
                             }
                             try (InputStream in = Files.newInputStream(inFile)) {
                                 evaluate(in, arg, Context.getCurrentContext());
-                            } catch (EvaluatorException ee) {
+                            } catch (RhinoException ee) {
                                 logScriptExceptionAndQuit(ee, arg);
+                            } catch (BPjsCodeEvaluationException ee) {
+                               logScriptExceptionAndQuit(ee, arg);
                             } catch (IOException ex) {
                                 println("Exception while processing " + arg + ": " + ex.getMessage());
                                 Logger.getLogger(BPjsCliRunner.class.getName()).log(Level.SEVERE, null, ex);
@@ -95,11 +101,20 @@ public class BPjsCliRunner {
                 }
             }
 
-            private void logScriptExceptionAndQuit(EvaluatorException ee, String arg) {
+            private void logScriptExceptionAndQuit(RhinoException ee, String arg) {
                 println("Error in source %s:", arg);
                 println(ee.details());
                 println("line: " + ee.lineNumber() + ":" + ee.columnNumber());
                 println("source: " + ee.lineSource());
+                System.exit(-3);
+            }
+            private void logScriptExceptionAndQuit(BPjsCodeEvaluationException ee, String arg) {
+                println("Error in source %s:", arg);
+                if ( ee.getCause() instanceof RhinoException ) {
+                    logScriptExceptionAndQuit((RhinoException)ee.getCause(), arg);
+                } else {
+                    println(ee.getMessage()); 
+                }
                 System.exit(-3);
             }
         };

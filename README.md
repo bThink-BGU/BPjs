@@ -61,7 +61,7 @@ If you use BPjs in an academic work, please consider citing it as:
     * Also, this is a basis for custom serializations in general.
 * :arrow_up: Improved warrping of Java objects as they come to JavaScript: Java strings are now treated as native JS strings, so using the `===` operator works as expected. ([#104](https://github.com/bThink-BGU/BPjs/issues/104)).
 * :bug: Verification stops on ECMAScript errors ([#49](https://github.com/bThink-BGU/BPjs/issues/49)).
-
+* :bug: Improved error reporting when trying to sync outside of a b-thread ([#174](https://github.com/bThink-BGU/BPjs/issues/174)).
 
 
 ### 2022-02 (Including the 1st BP Day Hackathon)

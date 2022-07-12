@@ -1,10 +1,11 @@
 package il.ac.bgu.cs.bp.bpjs.execution.listeners;
 
+import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.model.FailedAssertionViolation;
 import java.io.PrintStream;
+import org.mozilla.javascript.RhinoException;
 
 /**
  * Listens to a BProgram, sends the events to an output stream.
@@ -71,6 +72,27 @@ public class PrintBProgramRunnerListener implements BProgramRunnerListener {
     @Override
     public void bthreadDone(BProgram bp, BThreadSyncSnapshot theBThread) {
         out.println("  -:" + bp.getName() + " Done " + theBThread.getName());
+    }
+
+    @Override
+    public void error(BProgram bp, Exception ex) {
+        out.println("/!\\ Error during run: " + ex.getMessage() );
+        if ( ex instanceof BPjsRuntimeException ) {
+            BPjsRuntimeException bre = (BPjsRuntimeException) ex;
+            var cz = bre.getCause();
+            if ( cz instanceof RhinoException ) {
+                var rh = (RhinoException)cz;
+                out.println( "  " + rh.details() + " at: " + rh.sourceName() + ":" + rh.lineNumber());
+                StringBuilder sb = new StringBuilder();
+                for ( var emt : rh.getScriptStack() ) {
+                    emt.renderMozillaStyle(sb);
+                }
+                out.println( sb.toString() );
+            }
+            
+        } else {
+            ex.printStackTrace(out);
+        }
     }
     
 }
