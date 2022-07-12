@@ -61,7 +61,7 @@ The BPjs logger formats messages using Java's `MessageFormat`_. Under the hood, 
 Caution - Array Ambiguity
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-A curious API edge-base ocurres when using message formatting, and passing a single variable for printing, AND that single variable is an array. The system confuses that array for the variable argument number, and only the first item of the array is printed. So the following code:
+A curious API edge-case occurs when using message formatting, and passing a single variable for printing, AND said single variable is an array. The system auto-spreads the array, and only the first item of the array is printed. So the following code:
 
 .. code::
 
