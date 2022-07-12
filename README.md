@@ -60,6 +60,7 @@ If you use BPjs in an academic work, please consider citing it as:
 * :sparkles: Custom serialization for the non-serializable `java.util.Optional` and JavaScript's `Set()`. ([#189](https://github.com/bThink-BGU/BPjs/issues/189))
     * Also, this is a basis for custom serializations in general.
 * :arrow_up: Improved warrping of Java objects as they come to JavaScript: Java strings are now treated as native JS strings, so using the `===` operator works as expected. ([#104](https://github.com/bThink-BGU/BPjs/issues/104)).
+* :bug: Verification stops on ECMAScript errors ([#49](https://github.com/bThink-BGU/BPjs/issues/49)).
 
 
 

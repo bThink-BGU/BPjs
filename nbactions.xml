@@ -10,9 +10,12 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath il.ac.bgu.cs.bp.bpjs.mains.RunFile -v NamedArgsHotNCold.js</exec.args>
+                <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.workingdir>/Users/michael/Documents/PhD/Thesis/code/bThink-BGU/BPjs/src/test/resources</exec.workingdir>
+                <exec.mainClass>il.ac.bgu.cs.bp.bpjs.mains.BPjsCliRunner</exec.mainClass>
+                <exec.vmArgs></exec.vmArgs>
+                <exec.appArgs>--verify /Users/michael/sandbox/broken.js</exec.appArgs>
             </properties>
         </action>
         <action>
@@ -25,10 +28,13 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -classpath %classpath il.ac.bgu.cs.bp.bpjs.mains.RunFile -v NamedArgsHotNCold.js</exec.args>
+                <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
                 <jpda.listen>true</jpda.listen>
                 <exec.workingdir>/Users/michael/Documents/PhD/Thesis/code/bThink-BGU/BPjs/src/test/resources</exec.workingdir>
+                <exec.mainClass>il.ac.bgu.cs.bp.bpjs.mains.BPjsCliRunner</exec.mainClass>
+                <exec.vmArgs>-agentlib:jdwp=transport=dt_socket,server=n,address=${jpda.address}</exec.vmArgs>
+                <exec.appArgs>--verify /Users/michael/sandbox/broken.js</exec.appArgs>
             </properties>
         </action>
         <action>
@@ -41,9 +47,12 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-classpath %classpath il.ac.bgu.cs.bp.bpjs.mains.RunFile -v NamedArgsHotNCold.js</exec.args>
+                <exec.args>${exec.vmArgs} -classpath %classpath ${exec.mainClass} ${exec.appArgs}</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.workingdir>/Users/michael/Documents/PhD/Thesis/code/bThink-BGU/BPjs/src/test/resources</exec.workingdir>
+                <exec.mainClass>il.ac.bgu.cs.bp.bpjs.mains.BPjsCliRunner</exec.mainClass>
+                <exec.vmArgs></exec.vmArgs>
+                <exec.appArgs>--verify /Users/michael/sandbox/broken.js</exec.appArgs>
             </properties>
         </action>
     </actions>

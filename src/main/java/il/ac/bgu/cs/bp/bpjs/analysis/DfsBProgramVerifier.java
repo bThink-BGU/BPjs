@@ -168,16 +168,22 @@ public class DfsBProgramVerifier {
         }
         
         ExecutorService execSvc = BPjs.getExecutorServiceMaker().makeWithName("DfsBProgramRunner-" + INSTANCE_COUNTER.incrementAndGet());
+        
         long start = System.currentTimeMillis();
         listener.started(this);
-        Violation vio = dfsUsingStack(new DfsTraversalNode(currentBProgram, 
-            currentBProgram.setup().start(execSvc, currentBProgram.getStorageModificationStrategy()), null), 
-            execSvc
-        );
-        long end = System.currentTimeMillis();
-        execSvc.shutdown();
-        listener.done(this);
-        return new VerificationResult(vio, end - start, visited.getVisitedStateCount(), visitedEdgeCount);
+        try {
+            Violation vio = dfsUsingStack(new DfsTraversalNode(currentBProgram, 
+                currentBProgram.setup().start(execSvc, currentBProgram.getStorageModificationStrategy()), null), 
+                execSvc
+            );            
+            
+            long end = System.currentTimeMillis();
+            return new VerificationResult(vio, end - start, visited.getVisitedStateCount(), visitedEdgeCount);
+
+        } finally {            
+            listener.done(this);
+            execSvc.shutdown();
+        }
     }
 
     protected Violation dfsUsingStack(DfsTraversalNode aStartNode, ExecutorService execSvc) throws Exception {

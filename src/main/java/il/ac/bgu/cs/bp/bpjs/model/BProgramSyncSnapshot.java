@@ -29,7 +29,6 @@ import java.util.concurrent.Future;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
-import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.EcmaError;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.WrappedException;

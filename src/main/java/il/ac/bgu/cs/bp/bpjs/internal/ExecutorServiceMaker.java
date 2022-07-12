@@ -42,6 +42,7 @@ public class ExecutorServiceMaker {
         ThreadFactory tf = (Runnable r) -> {
             Thread retVal = dtf.newThread(r);
             retVal.setName(threadNameTemplate + "#" + threadCoutner.incrementAndGet() );
+            retVal.setDaemon(true);
             return retVal;
         };
         return Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), tf);
