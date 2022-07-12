@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.bprogramio;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import org.mozilla.javascript.Scriptable;
@@ -30,11 +31,17 @@ import org.mozilla.javascript.serialize.ScriptableOutputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+import org.mozilla.javascript.Context;
+import org.mozilla.javascript.NativeSet;
 
 /**
- * Output stream for {@link BThreadSyncSnapshot} objects. Creates stubs for objects that can link back to the java
- * context, such as the {@code XJsProxy} classes.
- * 
+ * Output stream for {@link BThreadSyncSnapshot} objects. Creates stubs for
+ * objects that can link back to the java context, such as the {@code XJsProxy}
+ * classes.
+ *
  * @author michael
  */
 public class BPJSStubOutputStream extends ScriptableOutputStream {
@@ -46,12 +53,47 @@ public class BPJSStubOutputStream extends ScriptableOutputStream {
 
     @Override
     protected Object replaceObject(Object obj) throws IOException {
-        if ( obj == null ) return null;
-        if ( obj instanceof BProgramJsProxy ) {
+        if (obj == null) {
+            return null;
+        }
+        if (obj instanceof BProgramJsProxy) {
             return StreamObjectStub.BP_PROXY;
+
+        } else if (obj instanceof Optional) {
+            return OptionalStub.getFor((Optional) obj);
+
+        } else if (obj instanceof NativeSet) {
+            NativeSet ns = (NativeSet) obj;
+            return stubify(ns);
+
         } else {
             return super.replaceObject(obj);
         }
     }
-    
+
+    /**
+     * NativeSet does not have good Java accessors, so we use a JavaScript code
+     * to extract its members.
+     *
+     * @param ns a NativeSet
+     * @return a NativeSetStub with the values of ns.
+     */
+    private NativeSetStub stubify(NativeSet ns) {
+
+        String code = "ns.forEach(e=>javaSet.add(e))";
+
+        System.out.println("Stybifying Native set");
+        
+        try ( Context cx = BPjs.enterRhinoContext()) {
+            Scriptable tlScope = BPjs.makeBPjsSubScope();
+            Set<Object> javaSet = new HashSet<>();
+            tlScope.put("ns", tlScope, ns);
+            tlScope.put("javaSet", tlScope, javaSet);
+            cx.evaluateString(tlScope, code, "", 1, null);
+
+            return new NativeSetStub(javaSet);
+        }
+
+    }
+
 }

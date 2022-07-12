@@ -23,6 +23,8 @@
  */
 package il.ac.bgu.cs.bp.bpjs.bprogramio;
 
+import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
+import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -93,5 +95,14 @@ public class StreamObjectStubTest {
         
         assertEquals( sutA, outA );
         assertNotSame( sutA, outA );
+    }
+    
+    @Test
+    public void testCustomSerializations() throws Exception {
+        final ResourceBProgram bprog = new ResourceBProgram("custom-serializations.js");
+        DfsBProgramVerifier vfr = new DfsBProgramVerifier(bprog);
+        
+        // We just check that there are no serialization / de-serialization errors.
+        vfr.verify(bprog);
     }
 }

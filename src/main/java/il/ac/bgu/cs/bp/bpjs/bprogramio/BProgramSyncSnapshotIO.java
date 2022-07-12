@@ -120,9 +120,7 @@ public class BProgramSyncSnapshotIO {
     }
     
     public byte[] serializeBThread(BThreadSyncSnapshot btss) {
-        
         try (Context cx = BPjs.enterRhinoContext()) {
-
             try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
                 BPJSStubOutputStream outs = new BPJSStubOutputStream(bytes, bprogram.getGlobalScope())) {
                 writeBThreadSnapshot(btss, outs);

@@ -57,6 +57,8 @@ If you use BPjs in an academic work, please consider citing it as:
     * :part_alternation_mark: Refactored internals fo better fit the new Rhino version. We now have a proper context factory, as well as try-with-resources on all context invocations.
 * :part_alternation_mark: `BProgramRunnerListener` defautls to ignores errors during BProgram execution, instead of printing the details to `stderr`. This behavior remains in `BProgramRunnerListenerAdapter`, where it makes more sense. At any event, client code can override these methods. ([#191](https://github.com/bThink-BGU/BPjs/issues/191)).
 * :arrow_up: Printing problematic b-thread's name during serialization errors ([#169](https://github.com/bThink-BGU/BPjs/issues/169)).
+* :sparkles: Custom serialization for the non-serializable `java.util.Optional` and JavaScript's `Set()`. ([#189](https://github.com/bThink-BGU/BPjs/issues/189))
+    * Also, this is a basis for custom serializations in general.
 
 
 
