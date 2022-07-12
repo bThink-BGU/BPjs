@@ -85,9 +85,6 @@ public interface BProgramRunnerListener {
      * @param ex the exception that was thrown because of the offense.
      */
     default void error( BProgram bp, Exception ex ) {
-        System.err.println("JavaScript Error during program execution: " + ex.getMessage() );
-        System.err.println("Trace: ");
-        ex.printStackTrace(System.err);
     }
     
     /**

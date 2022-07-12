@@ -68,7 +68,9 @@ public abstract class BProgramRunnerListenerAdapter implements BProgramRunnerLis
 
     @Override
     public void error(BProgram bp, Exception ex) {
-        BProgramRunnerListener.super.error(bp, ex); 
+        System.err.println("JavaScript Error during program execution: " + ex.getMessage() );
+        System.err.println("Trace: ");
+        ex.printStackTrace(System.err);
     }
 
 }
