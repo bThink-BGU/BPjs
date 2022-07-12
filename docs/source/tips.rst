@@ -131,6 +131,27 @@ Will yield a series of events ``event-0`` to ``event-9``, whereas:
 
 Will yield a series of 10 events named ``event-0``.
 
+Working with Java Strings
+-------------------------
+
+Java strings are a bit different from JavaScript strings -- they are *equal*, but not *strictly equal*. For example, say that ``j`` is a ``java.lang.String``, and ``n`` is a JavaScript string, we get ``j==n`` but not ``j===n``. 
+
+BPjs uses wrapping to iron out these inequalities, which can turn ugly when strings do a round-trip from JavaScript to Java and back. The only case in which BPjs programmers need to worry about this is in when directly instantiating Java strings in JS code (see example below).
+
+.. code:: javascript
+
+    var jString = java.lang.String("hello"); // Java String
+    var jsString = "hello";                  // JavaScript String
+    var list = java.util.ArrayList();
+    list.add(jString);
+    var rString = list.get(0);    // Java String that have done a round-trip
+
+    bp.log.info( jString  == jsString );  // true
+    bp.log.info( jString === jsString );  // false
+    bp.log.info( rString  == jsString );  // true
+    bp.log.info( rString === jsString );  // true
+
+
 Working in Java with Objects from JavaScript
 --------------------------------------------
 

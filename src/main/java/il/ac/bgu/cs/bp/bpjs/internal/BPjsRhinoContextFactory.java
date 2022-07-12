@@ -25,18 +25,20 @@ package il.ac.bgu.cs.bp.bpjs.internal;
 
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
+import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.WrapFactory;
 
 /**
  * A context factory for all BPjs' contexts.
- * 
+ *
  * @author michael
  */
 public class BPjsRhinoContextFactory extends ContextFactory {
-
+    
     @Override
     protected boolean hasFeature(Context cx, int featureIndex) {
         switch (featureIndex) {
-            
+
             case Context.FEATURE_LOCATION_INFORMATION_IN_ERROR:
                 return true;
 
@@ -47,19 +49,35 @@ public class BPjsRhinoContextFactory extends ContextFactory {
                 return true;
         }
         // defaults
-        return super.hasFeature(cx, featureIndex); 
+        return super.hasFeature(cx, featureIndex);
     }
 
     @Override
     protected Context makeContext() {
         Context cx = super.makeContext();
         cx.setOptimizationLevel(-1); // must use interpreter mode for continuations to work
-        if ( cx.getLanguageVersion() != Context.VERSION_ES6 ) {
+        if (cx.getLanguageVersion() != Context.VERSION_ES6) {
             cx.setLanguageVersion(Context.VERSION_ES6);
         }
+        cx.setWrapFactory(BPjsWrapFactory.INSTANCE);
         return cx;
     }
+}
+
+class BPjsWrapFactory extends WrapFactory {
     
+    static final BPjsWrapFactory INSTANCE = new BPjsWrapFactory();
     
-    
+    @Override
+    public Object wrap(Context cx, Scriptable scope, Object obj, Class<?> staticType) {
+        if (obj instanceof String || obj instanceof Number || obj instanceof Boolean) {
+            return obj;
+
+        } else if (obj instanceof Character) {
+            char[] a = {((Character) obj)};
+            return new String(a);
+
+        }
+        return super.wrap(cx, scope, obj, staticType);
+    }
 }

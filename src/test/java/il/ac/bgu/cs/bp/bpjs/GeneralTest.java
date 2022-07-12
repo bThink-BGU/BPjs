@@ -173,4 +173,12 @@ public class GeneralTest {
             result.get()
         );
     }
+    
+    @Test
+    public void testStringEquality() throws Exception {
+        ResourceBProgram bprog = new ResourceBProgram("stringEquality.js");
+        BProgramRunner rnr = new BProgramRunner(bprog);
+        rnr.run();
+        assertTrue( bprog.getFromGlobalScope("retrievedEqualsNative", Boolean.class).get() );
+    }
 }
