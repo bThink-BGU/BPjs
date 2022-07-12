@@ -54,7 +54,7 @@ If you use BPjs in an academic work, please consider citing it as:
 
 ### 2022-07
 * :arrow_up: :sparkles: Moved to Rhino 1.7.14. This means many new features, including template strings and better Java interoperability. See full list [on Mozilla's site](https://github.com/mozilla/rhino/releases/tag/Rhino1_7_14_Release). ([#186](https://github.com/bThink-BGU/BPjs/issues/186)).
-** :part_alternation_mark: Refactored internals fo better fit the new Rhino version. We now have a proper context factory, as well as try-with-resources on all context invocations.
+    * :part_alternation_mark: Refactored internals fo better fit the new Rhino version. We now have a proper context factory, as well as try-with-resources on all context invocations.
 
 
 ### 2022-02 (Including the 1st BP Day Hackathon)
