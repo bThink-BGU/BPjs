@@ -30,7 +30,6 @@ import java.io.PrintStream;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Set;
-import org.mozilla.javascript.NativeArray;
 
 /**
  * Simple logging mechanism for {@link BProgram}s.
@@ -38,11 +37,15 @@ import org.mozilla.javascript.NativeArray;
  * @author michael
  */
 public class BpLog implements java.io.Serializable {
-    private PrintStream out;
+    
     public enum LogLevel {
         Off, Warn, Info, Fine
     }
-    LogLevel level = LogLevel.Info;
+    
+    public static final LogLevel DEFAULT_LOG_LEVEL = LogLevel.Info;
+    
+    LogLevel level = DEFAULT_LOG_LEVEL;
+    private PrintStream out;
 
     public BpLog( PrintStream aStream ){
         out = aStream;

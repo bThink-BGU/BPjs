@@ -52,15 +52,15 @@ import static java.util.stream.Collectors.toSet;
 public class ExecutionTraceInspections {
         
     /**
-     * Detects a deadlock in a b-program: where there are requested events, but
-     * non of them is selectable.
+     * Detects a deadlock in a b-program: where there are requested events,
+     * and none of them is selectable.
      */
     public static final ExecutionTraceInspection DEADLOCKS = ExecutionTraceInspection.named(
         "Deadlocks",
         trace -> {
             if ( trace.isCyclic() ) return Optional.empty(); 
             BProgramSyncSnapshot curState = trace.getLastState();
-            if (hasRequestedEvents(curState) &&
+            if (hasRequestedEvents(curState) && 
                 trace.getBProgram().getEventSelectionStrategy().selectableEvents(curState).isEmpty()) {
                 return Optional.of(new DeadlockViolation(trace));
             } else return Optional.empty();

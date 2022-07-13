@@ -45,6 +45,8 @@ public class BPjs {
     private static ScriptableObject BPJS_SCOPE;
 
     private static ExecutorServiceMaker executorServiceMaker = new ExecutorServiceMaker();
+    
+    private static boolean logDuringVerification = false;
 
     static {
         ContextFactory.initGlobal( new BPjsRhinoContextFactory()) ;
@@ -123,6 +125,23 @@ public class BPjs {
      */
     public static void setExecutorServiceMaker(ExecutorServiceMaker executorServiceMaker) {
         BPjs.executorServiceMaker = executorServiceMaker;
+    }
+
+    /**
+     * When set to {@code false}, calls to {@code bp.log} during verifications will
+     * be ignored. Defaults to {@code false}.
+     * @return Should the system honor logging calls during verifications.
+     */
+    public static boolean isLogDuringVerification() {
+        return logDuringVerification;
+    }
+
+    /**
+     * Sets whether calls to the logger should be respected during verification.
+     * @param logDuringVerification 
+     */
+    public static void setLogDuringVerification(boolean logDuringVerification) {
+        BPjs.logDuringVerification = logDuringVerification;
     }
     
     

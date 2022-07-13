@@ -519,7 +519,9 @@ public abstract class BProgram {
     }
 
     public BpLog.LogLevel getLogLevel() {
-        return (jsProxy != null ) ? BpLog.LogLevel.valueOf(jsProxy.log.getLevel()) : null;
+        return (jsProxy != null ) 
+            ? BpLog.LogLevel.valueOf(jsProxy.log.getLevel()) 
+            : BpLog.DEFAULT_LOG_LEVEL;
     }
 
     public StorageModificationStrategy getStorageModificationStrategy() {

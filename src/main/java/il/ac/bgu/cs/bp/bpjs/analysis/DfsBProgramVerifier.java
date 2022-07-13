@@ -27,6 +27,7 @@ import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.JsErrorViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BpLog;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -169,6 +170,10 @@ public class DfsBProgramVerifier {
         
         ExecutorService execSvc = BPjs.getExecutorServiceMaker().makeWithName("DfsBProgramRunner-" + INSTANCE_COUNTER.incrementAndGet());
         
+        BpLog.LogLevel prevLevel = currentBProgram.getLogLevel();
+        if ( ! BPjs.isLogDuringVerification() ) {
+            currentBProgram.setLogLevel(BpLog.LogLevel.Off);
+        }
         long start = System.currentTimeMillis();
         listener.started(this);
         try {
@@ -183,6 +188,9 @@ public class DfsBProgramVerifier {
         } finally {            
             listener.done(this);
             execSvc.shutdown();
+            if ( ! BPjs.isLogDuringVerification() ) {
+                currentBProgram.setLogLevel(prevLevel);
+            }
         }
     }
 
