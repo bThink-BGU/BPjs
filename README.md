@@ -64,6 +64,7 @@ If you use BPjs in an academic work, please consider citing it as:
 * :bug: Improved error reporting when trying to sync outside of a b-thread ([#174](https://github.com/bThink-BGU/BPjs/issues/174)).
 * :arrow_up: Informative error message when requesting a list of events and one of the events is `null` ([#184](https://github.com/bThink-BGU/BPjs/issues/184)).
 * :arrow_up: Loggins is turned off by default during verification. Call `BPjs.setLogDuringVerification(true)` to enable them again ([#160](https://github.com/bThink-BGU/BPjs/issues/160)).
+* :sparkles: Added local JACOCO code coverage reports.
 
 ### 2022-02 (Including the 1st BP Day Hackathon)
 * :part_alternation_mark: Calling `bp.sync` from global scope during runtime does not cause an ugly exception anymore ([#174](https://github.com/bThink-BGU/BPjs/issues/174)). The error is reported to the listeners.
