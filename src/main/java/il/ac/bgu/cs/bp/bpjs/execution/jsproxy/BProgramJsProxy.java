@@ -234,7 +234,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
      * @param data  Optional extra data the synchronizing b-thread may want to add.
      */
     @Override
-    void synchronizationPoint(NativeObject jsRWB, Boolean hot, Object data) {
+    protected void synchronizationPoint(NativeObject jsRWB, Boolean hot, Object data) {
         
         if ( CURRENT_BTHREAD.get() == null ) {
             throw new BPjsRuntimeException("Calling bp.sync outside of a b-thread is forbidden");
@@ -279,7 +279,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
         captureBThreadState(stmt);
     }
 
-    private EventSet convertToEventSet(Object jsObject) {
+    protected EventSet convertToEventSet(Object jsObject) {
         if (jsObject == null) return EventSets.none;
 
         // This covers event sets AND events.

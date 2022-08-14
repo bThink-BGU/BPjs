@@ -41,6 +41,10 @@ public class DirectMapProxy<K,V> extends MapProxy<K,V> {
         super(aSeed);
     }
 
+    public DirectMapProxy(MapProxy<K, V> aSeed) {
+        super(aSeed.seed);
+    }
+
     @Override
     public int size() {
         return seed.size();
