@@ -144,5 +144,12 @@ public class BPjs {
         BPjs.logDuringVerification = logDuringVerification;
     }
     
+    public static void getPomVersion(){
+        Package mainPackage = Main.class.getPackage();
+        String version = mainPackage.getImplementationVersion();
+        String groupId = mainPackage.getName();
+        String artifactId = mainPackage.getImplementationTitle();
+    }
+    
     
 }
