@@ -90,23 +90,20 @@ function addLineBThreads(xline, oline) {
     bp.sync({ request: [StaticEvents.OWin] }, 100)
   })
 
+  // Player O line strategy:
 
-  // Player O strategy to add a the third O to win
   bp.registerBThread('AddThirdO', function () {
     bp.sync({ waitFor: oline })
     bp.sync({ waitFor: oline })
-    bp.sync({ request: oline }, 50)
+    bp.sync({ request: oline }, 80)
   })
 
   bp.registerBThread('PreventThirdX', function () {
     bp.sync({ waitFor: xline })
     bp.sync({ waitFor: xline })
-    bp.sync({ request: oline }, 40)
+    bp.sync({ request: oline }, 70)
   })
-
 }
-
-// Player O strategy:
 
 var lines = [[{ x: 0, y: 0 }, { x: 0, y: 1 }, { x: 0, y: 2 }],
   [{ x: 1, y: 0 }, { x: 1, y: 1 }, { x: 1, y: 2 }],
@@ -122,19 +119,20 @@ lines.forEach(function (l) {
   addLineBThreads(l.map(c => X(c.x, c.y)), l.map(c => O(c.x, c.y)))
 })
 
+// Player O strategy:
+function addWinForkBThread(X,O) {
+  bp.registerBThread('WinFork', function () {
+    bp.sync({ waitFor: X })
+    bp.sync({ waitFor: X })
+    bp.sync({ request: O }, 60)
+  })
+}
+
 function addBlockForkBThread(X,O) {
   bp.registerBThread('PreventFork', function () {
     bp.sync({ waitFor: X })
     bp.sync({ waitFor: X })
-    bp.sync({ request: O }, 30)
-  })
-}
-
-function addWinForkBThread(X,O) {
-  bp.registerBThread('PreventFork', function () {
-    bp.sync({ waitFor: X })
-    bp.sync({ waitFor: X })
-    bp.sync({ request: O }, 34)
+    bp.sync({ request: O }, 50)
   })
 }
 
@@ -156,21 +154,20 @@ forks.forEach(function (f) {
 
 // Preference to put O on the center
 bp.registerBThread('Center', function () {
-  bp.sync({ request: [O(1, 1)] }, 35)
+  bp.sync({ request: [O(1, 1)] }, 40)
 })
 
 // Preference to put O on the corners
 bp.registerBThread('Corners', function () {
   while (true) {
-    bp.sync({ request: [O(0, 0), O(0, 2), O(2, 0), O(2, 2)] }, 20)
-
+    bp.sync({ request: [O(0, 0), O(0, 2), O(2, 0), O(2, 2)] }, 30)
   }
 })
 
 // Preference to put O on the sides
 bp.registerBThread('Sides', function () {
   while (true) {
-    bp.sync({ request: [O(0, 1), O(1, 0), O(1, 2), O(2, 1)] }, 10)
+    bp.sync({ request: [O(0, 1), O(1, 0), O(1, 2), O(2, 1)] }, 20)
   }
 })
 
