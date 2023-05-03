@@ -30,10 +30,12 @@ import java.util.function.BiFunction;
 import java.util.stream.Collectors;
 
 /**
- * A type of {@link MapProxy} that directly modifies its map. Used for accessing
- * the b-program data store during its initial execution phase (pre b-thread).
+ * A type of {@link MapProxy} that directly modifies its map.Used for accessing
+ the b-program data store during its initial execution phase (pre b-thread).
  * 
  * @author michael
+ * @param <K>
+ * @param <V>
  */
 public class DirectMapProxy<K,V> extends MapProxy<K,V> {
     

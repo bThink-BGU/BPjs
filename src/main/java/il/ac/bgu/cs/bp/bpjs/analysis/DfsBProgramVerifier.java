@@ -220,9 +220,6 @@ public class DfsBProgramVerifier {
                     DfsTraversalNode nextNode = getUnvisitedNextNode(curNode, execSvc);
                     if (nextNode == null) {
                         // fold stack, retry next iteration;
-                        if (isDebugMode()) {
-                            System.out.println("-pop!-");
-                        }
                         DfsTraversalNode p = pop();
                         if ( p.getEventIterator().hasNext() ) {
                             throw new IllegalStateException("Still having some events to traverse: " + p.getEventIterator().next() );
@@ -230,9 +227,6 @@ public class DfsBProgramVerifier {
                         
                     } else {
                         // go deeper 
-                        if (isDebugMode()) {
-                            System.out.println("-visiting: " + nextNode);
-                        }
                         push(nextNode);
                         v = inspectCurrentTrace();
                         if ( v != null ) return v;
@@ -364,6 +358,9 @@ public class DfsBProgramVerifier {
     private void push(DfsTraversalNode n) {
         visited.store(n.getSystemState());
         currentPath.add(n);
+        if (isDebugMode()) {
+            System.out.println("-visiting: " + n);
+        }
         if ( trace.getStateCount() == 0 ) {
             trace.push( n.getSystemState() );
         } else {
@@ -374,6 +371,9 @@ public class DfsBProgramVerifier {
     private DfsTraversalNode pop() {
         DfsTraversalNode popped = currentPath.remove(currentPath.size() - 1);
         trace.pop();
+        if (isDebugMode()) {
+            System.out.println("-pop!-");
+        }
         return popped;
     }
 
