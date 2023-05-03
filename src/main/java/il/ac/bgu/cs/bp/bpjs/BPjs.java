@@ -146,10 +146,7 @@ public class BPjs {
     
     public static String getPomVersion(){
         Package mainPackage = BPjs.class.getPackage();
-        String version = mainPackage.getImplementationVersion();
-        String groupId = mainPackage.getName();
-        String artifactId = mainPackage.getImplementationTitle();
-
-        return version;   
+        return mainPackage.getImplementationVersion();
+    }
     
 }
