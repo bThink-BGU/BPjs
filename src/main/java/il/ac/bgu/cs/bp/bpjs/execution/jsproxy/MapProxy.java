@@ -74,7 +74,7 @@ public class MapProxy<K,V> implements java.io.Serializable {
     /**
      * The map we are proxying.
      */
-    Map<K,V> seed;
+    protected Map<K,V> seed;
 
     private final Map<K,Modification<V>> modifications;
     
