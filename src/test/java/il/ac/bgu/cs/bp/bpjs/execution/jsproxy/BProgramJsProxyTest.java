@@ -263,8 +263,8 @@ public class BProgramJsProxyTest {
     }
 
     @Test
-    public void OutOfBThreadExecTest() {
-        BProgram sut = new ResourceBProgram("execution/jsproxy/bthreadFromGlobalScope.js");
+    public void syncOutOfBThreadExecTest() {
+        BProgram sut = new ResourceBProgram("execution/jsproxy/syncFromGlobalScope.js");
         
         final AtomicReference<String> errorMessage = new AtomicReference<>();
         BProgramRunner rnr = new BProgramRunner();
@@ -286,8 +286,8 @@ public class BProgramJsProxyTest {
     }
     
     @Test
-    public void OutOfBThreadAnalyzeTest() {
-        BProgram sut = new ResourceBProgram("execution/jsproxy/bthreadFromGlobalScope.js");
+    public void syncOutOfBThreadAnalyzeTest() {
+        BProgram sut = new ResourceBProgram("execution/jsproxy/syncFromGlobalScope.js");
         var vfr = new DfsBProgramVerifier(sut);
         
         try {
@@ -300,6 +300,45 @@ public class BProgramJsProxyTest {
         }
     }
 
+
+
+    @Test
+    public void threadOutOfBThreadExecTest() {
+        BProgram sut = new ResourceBProgram("execution/jsproxy/bthreadFromGlobalScope.js");
+
+        final AtomicReference<String> errorMessage = new AtomicReference<>();
+        BProgramRunner rnr = new BProgramRunner();
+        rnr.addListener( new BProgramRunnerListenerAdapter(){
+            @Override
+            public void error(BProgram bp, Exception ex) {
+                errorMessage.set(ex.getMessage());
+            }
+        });
+        rnr.setBProgram(sut);
+
+        rnr.run();
+        var errMsg = errorMessage.get();
+        assertNotNull("Runtime listener should have captured the error message", errMsg);
+        assertTrue(errMsg.toLowerCase().contains("bp.thread"));
+        assertTrue(errMsg.toLowerCase().contains("forbidden"));
+        assertTrue(errMsg.toLowerCase().contains("outside of a b-thread"));
+
+    }
+
+    @Test
+    public void threadOutOfBThreadAnalyzeTest() {
+        BProgram sut = new ResourceBProgram("execution/jsproxy/bthreadFromGlobalScope.js");
+        var vfr = new DfsBProgramVerifier(sut);
+
+        try {
+            vfr.verify(sut);
+            fail("Verification should have failed with error message about thread out of b-thread");
+        } catch (Exception ex) {
+            assertTrue(ex.getMessage().toLowerCase().contains("bp.thread"));
+            assertTrue(ex.getMessage().toLowerCase().contains("forbidden"));
+            assertTrue(ex.getMessage().toLowerCase().contains("outside of a b-thread"));
+        }
+    }
 
     private void runBThreadDataTest(String dispatch, List<String> expectedNames ) {
         BProgram sut = new ResourceBProgram("execution/bthreadData_dataObj.js");
