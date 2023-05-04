@@ -1,5 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 
+import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsOutsideOfBThreadException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsSyncOutsideBThreadException;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.FailedAssertionException;
@@ -355,6 +356,9 @@ public class BProgramJsProxy extends SyncStatementBuilder
 
 
     public BThreadDataProxy getThread() {
+        if ( CURRENT_BTHREAD.get() == null || CURRENT_BTHREAD.get().snapshot == null) {
+            throw new BPjsOutsideOfBThreadException("Calling bp.thread outside of a b-thread is forbidden");
+        }
         return new BThreadDataProxy(CURRENT_BTHREAD.get().snapshot);
     }
 
