@@ -2,6 +2,7 @@ package il.ac.bgu.cs.bp.bpjs.model;
 
 import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BpLog;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.EventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.SimpleEventSelectionStrategy;
 
@@ -12,7 +13,6 @@ import java.util.concurrent.*;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsCodeEvaluationException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
-import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BpLog;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.FailedAssertionException;
 import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
 import java.io.BufferedReader;
@@ -52,6 +52,7 @@ public abstract class BProgram {
      * Counter for giving anonymous instances some semantic name.
      */
     private static final AtomicInteger INSTANCE_COUNTER = new AtomicInteger();
+    private BpLog preSetLogger = null;
 
     /**
      * A callback interface invoked when a b-thread is added to {@code this}.
@@ -309,10 +310,12 @@ public abstract class BProgram {
     }
 
     private void initProgramScope() {
-        
+
         programScope = BPjs.makeBPjsSubScope();
-        
-        jsProxy = new BProgramJsProxy(this);
+
+        jsProxy = preSetLogger==null?
+                  new BProgramJsProxy(this)
+                  :new BProgramJsProxy(this, preSetLogger);
         if ( preSetLogLevel != null ) {
             jsProxy.log.setLevel(preSetLogLevel.name());
         }
@@ -504,7 +507,15 @@ public abstract class BProgram {
             preSetLogLevel = aLevel;
         }
     }
-    
+
+    /**
+     * Set the log implementation - logging called below the set level are logged using @BpLog implementation.
+     * @param logger The new logger implementation to use.
+     */
+    public void setLogger(BpLog logger){
+        preSetLogger = logger;
+    }
+
     /**
      * Set the print stream used for logging.
      * 
@@ -520,7 +531,7 @@ public abstract class BProgram {
 
     public BpLog.LogLevel getLogLevel() {
         return (jsProxy != null ) 
-            ? BpLog.LogLevel.valueOf(jsProxy.log.getLevel()) 
+            ? BpLog.LogLevel.valueOf(jsProxy.log.getLevel())
             : BpLog.DEFAULT_LOG_LEVEL;
     }
 

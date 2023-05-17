@@ -27,10 +27,11 @@ import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.JsErrorViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
-import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BpLog;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BpLog;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
