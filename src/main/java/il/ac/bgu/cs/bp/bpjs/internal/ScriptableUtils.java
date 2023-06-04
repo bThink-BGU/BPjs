@@ -163,15 +163,15 @@ public class ScriptableUtils {
         if ( o instanceof ConsString ) return quoteStrings ? "\"" + ((ConsString)o).toString() + "\"" : ((ConsString)o).toString();
         if ( o instanceof NativeArray) {
             NativeArray arr = (NativeArray) o;
-            return arr.getIndexIds().stream().map( id -> id + ":" + stringify(arr.get(id), true) ).collect(joining(" | ", "[JS_Array ", "]"));
+            return arr.getIndexIds().stream().map( id -> id + ":" + stringify(arr.get(id), true) ).collect(joining(" | ", "[", "]"));
         }
         if ( o instanceof NativeSet ) {
             NativeSet ns = (NativeSet) o;
-            return "{JS_Set " + toString(ns) + "}";
+            return "Set[" + toString(ns) + "]";
         }
         if ( o instanceof ScriptableObject ) {
             ScriptableObject sob = (ScriptableObject) o;
-            return Arrays.stream(sob.getIds()).map( id -> id + ":" + stringify(sob.get(id), true) ).collect( joining(", ", "{JS_Obj ", "}"));
+            return Arrays.stream(sob.getIds()).map( id -> id + ":" + stringify(sob.get(id), true) ).collect( joining(", ", "{", "}"));
         }
         if ( o instanceof Object[] ) {
             Object[] objArr = (Object[]) o;

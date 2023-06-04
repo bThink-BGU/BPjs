@@ -32,7 +32,7 @@ If you use BPjs in an academic work, please consider citing it as:
     <dependency>
         <groupId>com.github.bthink-bgu</groupId>
         <artifactId>BPjs</artifactId>
-        <version>0.12.2</version>
+        <version>0.12.3</version>
     </dependency>
     ...
 </dependencies>
@@ -52,10 +52,14 @@ If you use BPjs in an academic work, please consider citing it as:
 
 ## Change Log for the BPjs Library.
 
+### 2023-06
+* :arrow_up: Printouts and `toString`s of JavaScript compound values (e.g. arrays) adhere to normative JavaScript style. That is, no more `[JS_Array 1,2,3]`, just `[1,2,3]`. Java objects still retain their `J_` prefix.([#213](https://github.com/bThink-BGU/BPjs/issues/213)).
+
 ### 2023-05
 * :arrow_up: Upgraded dependencies.
 * :arrow_up: `MapProxy`'s seed is now `protected`, so client code can use it directly ([#206](https://github.com/bThink-BGU/BPjs/issues/206)).
 * :sparkles: Dedicated exceptions for calling `bp.sync` and `bp.thread` outside of a bthread. ([#195](https://github.com/bThink-BGU/BPjs/issues/195), [#203](https://github.com/bThink-BGU/BPjs/issues/203))
+* :sparkles: BPjs' version is now available at runtime, using `BPjs.getVersion()`. ([#136](https://github.com/bThink-BGU/BPjs/issues/136))
 
 
 [Earlier Changes](changelog-2022.md)
