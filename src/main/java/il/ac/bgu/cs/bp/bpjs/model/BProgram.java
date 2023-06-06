@@ -510,10 +510,15 @@ public abstract class BProgram {
 
     /**
      * Set the log implementation - logging called below the set level are logged using @BpLog implementation.
+     *
      * @param logger The new logger implementation to use.
+     * @see BpLog
      */
     public void setLogger(BpLog logger){
-        preSetLogger = logger;
+        if( jsProxy == null ) {
+            preSetLogger = logger;
+        }
+        else throw new IllegalStateException("Cannot set logger after b-program has initialized");
     }
 
     /**
@@ -532,7 +537,7 @@ public abstract class BProgram {
     public BpLog.LogLevel getLogLevel() {
         return (jsProxy != null ) 
             ? BpLog.LogLevel.valueOf(jsProxy.log.getLevel())
-            : BpLog.DEFAULT_LOG_LEVEL;
+            : (preSetLogLevel!= null)? preSetLogLevel: BpLog.DEFAULT_LOG_LEVEL;
     }
 
     public StorageModificationStrategy getStorageModificationStrategy() {

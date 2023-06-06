@@ -114,7 +114,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
 
     public BProgramJsProxy(BProgram aBProgram) {
         bProg = aBProgram;
-        this.log = new DefaultBpLog();
+        this.log = new PrintStreamBpLog();
     }
 
     public BProgramJsProxy(BProgram aBProgram, BpLog log) {

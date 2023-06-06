@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution;
 
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BpListLog;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BpLog;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
@@ -33,6 +34,9 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -61,7 +65,29 @@ public class LoggingTest {
         org.junit.Assert.assertEquals(6l, (long)result.split("\n").length);
         baos.close();
     }
-    
+
+    @Test
+    public void testNewLogImpLevels() throws InterruptedException, UnsupportedEncodingException, IOException {
+
+
+        final ResourceBProgram bprog = new ResourceBProgram("logging/simple.js");
+
+        var Log = new BpListLog();
+        bprog.setLogger(Log);
+        new BProgramRunner( bprog).run();
+
+        System.out.println("result:");
+        System.out.println("info" + Log.getInfo().toString());
+        System.out.println("warn" + Log.getWarn().toString());
+        System.out.println("fine" + Log.getFine().toString());
+        System.out.println("off" + Log.getOff().toString());
+
+        org.junit.Assert.assertEquals(4l, (long)Log.getInfo().size());
+        org.junit.Assert.assertEquals(4l, (long)Log.getWarn().size());
+        org.junit.Assert.assertEquals(4l, (long)Log.getFine().size());
+        org.junit.Assert.assertEquals(0l, (long)Log.getOff().size());
+    }
+
     @Test
     public void testFormatting() throws InterruptedException, UnsupportedEncodingException, IOException {
         PrintStream originalOut = System.out;

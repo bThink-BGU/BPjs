@@ -34,18 +34,18 @@ import java.util.Set;
 /**
  * Simple logging mechanism for {@link BProgram}s.
  *
- * @author michael
+ * @author maor
  */
-public class DefaultBpLog implements BpLog {
+public class PrintStreamBpLog implements BpLog {
 
     LogLevel level = DEFAULT_LOG_LEVEL;
     private PrintStream out;
 
-    public DefaultBpLog(PrintStream aStream ){
+    public PrintStreamBpLog(PrintStream aStream ){
         out = aStream;
     }
 
-    public DefaultBpLog() {
+    public PrintStreamBpLog() {
         this( System.out );
     }
 
