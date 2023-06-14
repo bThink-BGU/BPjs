@@ -45,17 +45,17 @@ public class ScriptableUtilsTest {
     @Test
     public void testToStringJSObject() {
         Scriptable aScope = (Scriptable)evaluateJS("var a={}; a");
-        String expResult = "{JS_Obj }";
+        String expResult = "{}";
         String result = ScriptableUtils.toString(aScope);
         assertEquals(expResult, result);
         
         aScope = (Scriptable)evaluateJS("var a={x:\"hello\"}; a");
-        expResult = "{JS_Obj x:\"hello\"}";
+        expResult = "{x:\"hello\"}";
         result = ScriptableUtils.toString(aScope);
         assertEquals(expResult, result);
         
         aScope = (Scriptable)evaluateJS("var a={x:\"hello\", y:\"world\"}; a");
-        expResult = "{JS_Obj x:\"hello\", y:\"world\"}";
+        expResult = "{x:\"hello\", y:\"world\"}";
         result = ScriptableUtils.toString(aScope);
         assertEquals(expResult, result);
     }
@@ -65,7 +65,7 @@ public class ScriptableUtilsTest {
         Object aScope = evaluateJS("var a=new Set(); a.add(\"a\"); a.add(\"b\"); a");
         
         String result = ScriptableUtils.toString((Scriptable)aScope);
-        assertTrue(result.startsWith("{JS_Set"));
+        assertTrue(result.startsWith("Set["));
         assertTrue(result.contains("\"a\""));
         assertTrue(result.contains("\"b\""));
         assertTrue(result.contains(", "));

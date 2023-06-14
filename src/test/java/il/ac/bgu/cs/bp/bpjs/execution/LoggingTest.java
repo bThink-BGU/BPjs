@@ -186,8 +186,6 @@ public class LoggingTest {
         System.out.println(result);
         
         assertTrue(result.contains("Set"));
-        assertTrue(result.contains("JS_Array"));
-        assertTrue(result.contains("JS_Obj"));
         assertTrue(result.contains("List"));
         assertTrue(result.contains("Map"));
         assertTrue(result.contains("->"));
@@ -213,7 +211,7 @@ public class LoggingTest {
         
         System.out.println(result);
         final String[] lines = result.split("\n", -1);
-        long linesWithJsArray = Arrays.asList(lines).stream().filter(s->s.contains("JS_Array")).count();
+        long linesWithJsArray = Arrays.asList(lines).stream().filter(s->s.contains("[")).count();
         assertEquals(2, linesWithJsArray);
     }
     

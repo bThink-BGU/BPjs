@@ -144,9 +144,13 @@ public class BPjs {
         BPjs.logDuringVerification = logDuringVerification;
     }
     
-    public static String getPomVersion(){
+    /**
+     * Returns BPjs' version. 
+     * @return BPjs' version, or {@code null} when no such version is available.
+     */
+    public static String getVersion(){
         Package mainPackage = BPjs.class.getPackage();
-        return mainPackage.getImplementationVersion();
+        return mainPackage != null ? mainPackage.getImplementationVersion() : null;
     }
     
 }
