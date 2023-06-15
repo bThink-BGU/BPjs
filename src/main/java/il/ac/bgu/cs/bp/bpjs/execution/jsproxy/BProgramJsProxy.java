@@ -38,6 +38,8 @@ import static java.util.stream.Collectors.toSet;
 public class BProgramJsProxy extends SyncStatementBuilder
         implements java.io.Serializable {
 
+
+
     ///////////////////////////////
     // A (Java) thread-local mechanism to allow the Java code calling the BP 
     // code to communicate with the Java code called from the BP code.
@@ -88,7 +90,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
 
     private final AtomicInteger autoAddCounter = new AtomicInteger(0);
 
-    public final BpLog log = new BpLog();
+    public final BpLog log;
 
     /**
      * Deprecated - use eventSets.all
@@ -112,6 +114,12 @@ public class BProgramJsProxy extends SyncStatementBuilder
 
     public BProgramJsProxy(BProgram aBProgram) {
         bProg = aBProgram;
+        this.log = new PrintStreamBpLog();
+    }
+
+    public BProgramJsProxy(BProgram aBProgram, BpLog log) {
+        bProg = aBProgram;
+        this.log = log;
     }
 
     /**

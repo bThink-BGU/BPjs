@@ -47,8 +47,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import static java.util.stream.Collectors.toList;
 import java.util.stream.IntStream;
 import static org.junit.Assert.assertEquals;
@@ -89,6 +88,19 @@ public class BProgramJsProxyTest {
         String logLevel1 = sut.getFromGlobalScope("logLevel1", String.class).get();
         assertEquals(BpLog.LogLevel.Off.name(), logLevel1);
         
+        String logLevel2 = sut.getFromGlobalScope("logLevel2", String.class).get();
+        assertEquals(BpLog.LogLevel.Warn.name(), logLevel2);
+    }
+
+    @Test
+    public void newLogImpProxyTest() throws InterruptedException {
+
+        BProgram sut = new ResourceBProgram("RandomProxy.js");
+
+        new BProgramRunner(sut).run();
+        String logLevel1 = sut.getFromGlobalScope("logLevel1", String.class).get();
+        assertEquals(BpLog.LogLevel.Off.name(), logLevel1);
+
         String logLevel2 = sut.getFromGlobalScope("logLevel2", String.class).get();
         assertEquals(BpLog.LogLevel.Warn.name(), logLevel2);
     }
