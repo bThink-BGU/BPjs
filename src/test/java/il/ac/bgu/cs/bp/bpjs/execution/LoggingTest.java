@@ -62,7 +62,7 @@ public class LoggingTest {
         System.out.println("result:");
         System.out.println(result);
         
-        org.junit.Assert.assertEquals(6l, (long)result.split("\n").length);
+        org.junit.Assert.assertEquals(10l, (long)result.split("\n").length);
         baos.close();
     }
 
@@ -82,9 +82,10 @@ public class LoggingTest {
         System.out.println("fine" + Log.getFine().toString());
         System.out.println("off" + Log.getOff().toString());
 
-        org.junit.Assert.assertEquals(4l, (long)Log.getInfo().size());
-        org.junit.Assert.assertEquals(4l, (long)Log.getWarn().size());
-        org.junit.Assert.assertEquals(4l, (long)Log.getFine().size());
+        org.junit.Assert.assertEquals(5l, (long)Log.getInfo().size());
+        org.junit.Assert.assertEquals(5l, (long)Log.getWarn().size());
+        org.junit.Assert.assertEquals(5l, (long)Log.getFine().size());
+        org.junit.Assert.assertEquals(5l, (long)Log.getError().size());
         org.junit.Assert.assertEquals(0l, (long)Log.getOff().size());
     }
 

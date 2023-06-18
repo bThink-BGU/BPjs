@@ -61,6 +61,7 @@ If you use BPjs in an academic work, please consider citing it as:
 * :sparkles: Dedicated exceptions for calling `bp.sync` and `bp.thread` outside of a bthread. ([#195](https://github.com/bThink-BGU/BPjs/issues/195), [#203](https://github.com/bThink-BGU/BPjs/issues/203))
 * :part_alternation_mark: `BpLog` is now an interface, and it's implementation can be changed by calling `BProgram.setLogger`. ([#208](https://github.com/bThink-BGU/BPjs/issues/208))
 * :sparkles: BPjs' version is now available at runtime, using `BPjs.getVersion()`. ([#136](https://github.com/bThink-BGU/BPjs/issues/136))
+* :sparkles: BPjs' logger is now is now supporting `bp.log.error`. ([#175](https://github.com/bThink-BGU/BPjs/issues/175))
 
 
 [Earlier Changes](changelog-2022.md)

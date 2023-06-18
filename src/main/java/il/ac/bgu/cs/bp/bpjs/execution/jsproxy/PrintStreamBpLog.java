@@ -66,6 +66,11 @@ public class PrintStreamBpLog implements BpLog {
     }
 
     @Override
+    public void error(Object msg, Object... args) {
+        log(LogLevel.Error, msg, args);
+    }
+
+    @Override
     public void log(LogLevel lvl, Object msg, Object[] args) {
         if (level.compareTo(lvl) >= 0) {
             out.println("[BP][" + lvl.name() + "] " +

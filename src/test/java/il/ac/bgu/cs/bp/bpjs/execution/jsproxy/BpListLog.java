@@ -11,6 +11,7 @@ public class BpListLog implements BpLog {
         private List<String> info= new LinkedList<>();
         private List<String> fine= new LinkedList<>();
         private List<String> off= new LinkedList<>();
+        private List<String> error= new LinkedList<>();
 
         @Override
         public void warn(Object msg, Object... args) {
@@ -28,6 +29,11 @@ public class BpListLog implements BpLog {
         }
 
         @Override
+        public void error(Object msg, Object... args) {
+            log(LogLevel.Error, msg, args);
+        }
+
+        @Override
         public void log(LogLevel lvl, Object msg, Object[] args) {
             switch (lvl){
                 case Warn:
@@ -39,7 +45,11 @@ public class BpListLog implements BpLog {
                 case Fine:
                     fine.add(String.format(msg.toString(), args));
                     break;
+                case Error:
+                    error.add(String.format(msg.toString(), args));
+                    break;
                 case Off:
+                default:
                     off.add(String.format(msg.toString(), args));
                     break;
             }
@@ -68,6 +78,10 @@ public class BpListLog implements BpLog {
 
         public List<String> getFine() {
             return fine;
+        }
+
+        public List<String> getError() {
+            return error;
         }
 
         public List<String> getOff() {

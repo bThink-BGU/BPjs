@@ -24,11 +24,12 @@
  */
 
 
-var levels = ["Off", "Warn", "Info", "Fine"];
+var levels = ["Off", "Warn", "Info", "Fine","Error"];
 
 for ( var i in levels ) {
     bp.log.setLevel(levels[i]);
     bp.log.fine(i);
     bp.log.info(i);
     bp.log.warn(i);
+    bp.log.error(i);
 }

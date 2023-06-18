@@ -35,6 +35,8 @@ public interface BpLog extends java.io.Serializable {
 
     void fine(Object msg, Object... args);
 
+    void error(Object msg, Object... args);
+
     void log(LogLevel lvl, Object msg, Object[] args);
 
     void setLevel(String levelName);
@@ -44,6 +46,6 @@ public interface BpLog extends java.io.Serializable {
     void setLoggerPrintStream(PrintStream printStream);
 
     public enum LogLevel {
-        Off, Warn, Info, Fine
+        Off, Warn, Info, Fine , Error
     }
 }
