@@ -46,6 +46,6 @@ public interface BpLog extends java.io.Serializable {
     void setLoggerPrintStream(PrintStream printStream);
 
     public enum LogLevel {
-        Off, Warn, Info, Fine , Error
+        Off, Error, Warn, Info, Fine
     }
 }

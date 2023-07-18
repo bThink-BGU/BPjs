@@ -77,16 +77,17 @@ public class LoggingTest {
         new BProgramRunner( bprog).run();
 
         System.out.println("result:");
-        System.out.println("info" + Log.getInfo().toString());
-        System.out.println("warn" + Log.getWarn().toString());
-        System.out.println("fine" + Log.getFine().toString());
         System.out.println("off" + Log.getOff().toString());
+        System.out.println("error" + Log.getError().toString());
+        System.out.println("warn" + Log.getWarn().toString());
+        System.out.println("info" + Log.getInfo().toString());
+        System.out.println("fine" + Log.getFine().toString());
 
-        org.junit.Assert.assertEquals(5l, (long)Log.getInfo().size());
-        org.junit.Assert.assertEquals(5l, (long)Log.getWarn().size());
-        org.junit.Assert.assertEquals(5l, (long)Log.getFine().size());
-        org.junit.Assert.assertEquals(5l, (long)Log.getError().size());
         org.junit.Assert.assertEquals(0l, (long)Log.getOff().size());
+        org.junit.Assert.assertEquals(5l, (long)Log.getError().size());
+        org.junit.Assert.assertEquals(5l, (long)Log.getWarn().size());
+        org.junit.Assert.assertEquals(5l, (long)Log.getInfo().size());
+        org.junit.Assert.assertEquals(5l, (long)Log.getFine().size());
     }
 
     @Test
