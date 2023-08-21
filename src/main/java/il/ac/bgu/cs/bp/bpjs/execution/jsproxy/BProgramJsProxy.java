@@ -1,6 +1,8 @@
 package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 
+import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsOutsideOfBThreadException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
+import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsSyncOutsideBThreadException;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.FailedAssertionException;
 import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
 import il.ac.bgu.cs.bp.bpjs.model.*;
@@ -35,6 +37,8 @@ import static java.util.stream.Collectors.toSet;
  */
 public class BProgramJsProxy extends SyncStatementBuilder
         implements java.io.Serializable {
+
+
 
     ///////////////////////////////
     // A (Java) thread-local mechanism to allow the Java code calling the BP 
@@ -86,7 +90,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
 
     private final AtomicInteger autoAddCounter = new AtomicInteger(0);
 
-    public final BpLog log = new BpLog();
+    public final BpLog log;
 
     /**
      * Deprecated - use eventSets.all
@@ -110,6 +114,12 @@ public class BProgramJsProxy extends SyncStatementBuilder
 
     public BProgramJsProxy(BProgram aBProgram) {
         bProg = aBProgram;
+        this.log = new PrintStreamBpLog();
+    }
+
+    public BProgramJsProxy(BProgram aBProgram, BpLog log) {
+        bProg = aBProgram;
+        this.log = log;
     }
 
     /**
@@ -237,7 +247,7 @@ public class BProgramJsProxy extends SyncStatementBuilder
     protected void synchronizationPoint(NativeObject jsRWB, Boolean hot, Object data) {
         
         if ( CURRENT_BTHREAD.get() == null ) {
-            throw new BPjsRuntimeException("Calling bp.sync outside of a b-thread is forbidden");
+            throw new BPjsSyncOutsideBThreadException("Calling bp.sync outside of a b-thread is forbidden");
         }
         
         Map<String, Object> jRWB = (Map) Context.jsToJava(jsRWB, Map.class);
@@ -354,6 +364,9 @@ public class BProgramJsProxy extends SyncStatementBuilder
 
 
     public BThreadDataProxy getThread() {
+        if ( CURRENT_BTHREAD.get() == null || CURRENT_BTHREAD.get().snapshot == null) {
+            throw new BPjsOutsideOfBThreadException("Calling bp.thread outside of a b-thread is forbidden");
+        }
         return new BThreadDataProxy(CURRENT_BTHREAD.get().snapshot);
     }
 

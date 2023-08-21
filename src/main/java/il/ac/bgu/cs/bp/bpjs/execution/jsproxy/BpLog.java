@@ -21,83 +21,31 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
+
 package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 
-import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
-import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-
 import java.io.PrintStream;
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Set;
 
-/**
- * Simple logging mechanism for {@link BProgram}s.
- * 
- * @author michael
- */
-public class BpLog implements java.io.Serializable {
-    
+public interface BpLog extends java.io.Serializable {
+    LogLevel DEFAULT_LOG_LEVEL = LogLevel.Info;
+
+    void warn(Object msg, Object... args);
+
+    void info(Object msg, Object... args);
+
+    void fine(Object msg, Object... args);
+
+    void error(Object msg, Object... args);
+
+    void log(LogLevel lvl, Object msg, Object[] args);
+
+    void setLevel(String levelName);
+
+    String getLevel();
+
+    void setLoggerPrintStream(PrintStream printStream);
+
     public enum LogLevel {
-        Off, Warn, Info, Fine
+        Off, Error, Warn, Info, Fine
     }
-    
-    public static final LogLevel DEFAULT_LOG_LEVEL = LogLevel.Info;
-    
-    LogLevel level = DEFAULT_LOG_LEVEL;
-    private PrintStream out;
-
-    public BpLog( PrintStream aStream ){
-        out = aStream;
-    }
-
-    public BpLog() {
-        this( System.out );
-    }
-
-    public void warn(Object msg, Object ...args) {
-        log(LogLevel.Warn, msg, args);
-    }
-
-    public void info(Object msg, Object ...args) {
-        log(LogLevel.Info, msg, args);
-    }
-    
-
-    public void fine(Object msg, Object ...args) {
-        log(LogLevel.Fine, msg, args);
-    }
-
-    public void log(LogLevel lvl, Object msg, Object[] args) {
-        if (level.compareTo(lvl) >= 0) {
-            out.println("[BP][" + lvl.name() + "] " +
-                (((args==null)||(args.length > 0)) 
-                   ? MessageFormat.format( (msg!=null ? msg.toString():"<null>"), Arrays.stream(args).map(this::formatArg).toArray())
-                   : ScriptableUtils.stringify(msg)));
-        }
-    }
-
-    public void setLevel(String levelName) {
-        synchronized (this) {
-            level = LogLevel.valueOf(levelName);
-        }
-    }
-
-    public String getLevel() {
-        return level.name();
-    }
-    
-    private static final Set<Class> PASS_THROUGH = Set.of(Integer.class, Long.class, 
-        Short.class, Double.class, Float.class, String.class);
-    
-    private Object formatArg(Object arg) {
-        if ( arg == null ) return arg;
-        if ( PASS_THROUGH.contains(arg.getClass()) ) return arg;
-        return ScriptableUtils.stringify(arg);
-    }
-
-    public void setLoggerPrintStream(PrintStream printStream){
-        out = printStream;
-    }
-    
 }

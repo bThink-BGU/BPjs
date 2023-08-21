@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution;
 
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BpListLog;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BpLog;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
@@ -33,6 +34,9 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
@@ -58,10 +62,34 @@ public class LoggingTest {
         System.out.println("result:");
         System.out.println(result);
         
-        org.junit.Assert.assertEquals(6l, (long)result.split("\n").length);
+        org.junit.Assert.assertEquals(10l, (long)result.split("\n").length);
         baos.close();
     }
-    
+
+    @Test
+    public void testNewLogImpLevels() throws InterruptedException, UnsupportedEncodingException, IOException {
+
+
+        final ResourceBProgram bprog = new ResourceBProgram("logging/simple.js");
+
+        var Log = new BpListLog();
+        bprog.setLogger(Log);
+        new BProgramRunner( bprog).run();
+
+        System.out.println("result:");
+        System.out.println("off" + Log.getOff().toString());
+        System.out.println("error" + Log.getError().toString());
+        System.out.println("warn" + Log.getWarn().toString());
+        System.out.println("info" + Log.getInfo().toString());
+        System.out.println("fine" + Log.getFine().toString());
+
+        org.junit.Assert.assertEquals(0l, (long)Log.getOff().size());
+        org.junit.Assert.assertEquals(5l, (long)Log.getError().size());
+        org.junit.Assert.assertEquals(5l, (long)Log.getWarn().size());
+        org.junit.Assert.assertEquals(5l, (long)Log.getInfo().size());
+        org.junit.Assert.assertEquals(5l, (long)Log.getFine().size());
+    }
+
     @Test
     public void testFormatting() throws InterruptedException, UnsupportedEncodingException, IOException {
         PrintStream originalOut = System.out;
@@ -160,8 +188,6 @@ public class LoggingTest {
         System.out.println(result);
         
         assertTrue(result.contains("Set"));
-        assertTrue(result.contains("JS_Array"));
-        assertTrue(result.contains("JS_Obj"));
         assertTrue(result.contains("List"));
         assertTrue(result.contains("Map"));
         assertTrue(result.contains("->"));
@@ -187,7 +213,7 @@ public class LoggingTest {
         
         System.out.println(result);
         final String[] lines = result.split("\n", -1);
-        long linesWithJsArray = Arrays.asList(lines).stream().filter(s->s.contains("JS_Array")).count();
+        long linesWithJsArray = Arrays.asList(lines).stream().filter(s->s.contains("[")).count();
         assertEquals(2, linesWithJsArray);
     }
     

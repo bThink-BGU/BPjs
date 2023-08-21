@@ -47,8 +47,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+
 import static java.util.stream.Collectors.toList;
 import java.util.stream.IntStream;
 import static org.junit.Assert.assertEquals;
@@ -89,6 +88,19 @@ public class BProgramJsProxyTest {
         String logLevel1 = sut.getFromGlobalScope("logLevel1", String.class).get();
         assertEquals(BpLog.LogLevel.Off.name(), logLevel1);
         
+        String logLevel2 = sut.getFromGlobalScope("logLevel2", String.class).get();
+        assertEquals(BpLog.LogLevel.Warn.name(), logLevel2);
+    }
+
+    @Test
+    public void newLogImpProxyTest() throws InterruptedException {
+
+        BProgram sut = new ResourceBProgram("RandomProxy.js");
+
+        new BProgramRunner(sut).run();
+        String logLevel1 = sut.getFromGlobalScope("logLevel1", String.class).get();
+        assertEquals(BpLog.LogLevel.Off.name(), logLevel1);
+
         String logLevel2 = sut.getFromGlobalScope("logLevel2", String.class).get();
         assertEquals(BpLog.LogLevel.Warn.name(), logLevel2);
     }
@@ -263,8 +275,8 @@ public class BProgramJsProxyTest {
     }
 
     @Test
-    public void OutOfBThreadExecTest() {
-        BProgram sut = new ResourceBProgram("execution/jsproxy/bthreadFromGlobalScope.js");
+    public void syncOutOfBThreadExecTest() {
+        BProgram sut = new ResourceBProgram("execution/jsproxy/syncFromGlobalScope.js");
         
         final AtomicReference<String> errorMessage = new AtomicReference<>();
         BProgramRunner rnr = new BProgramRunner();
@@ -286,8 +298,8 @@ public class BProgramJsProxyTest {
     }
     
     @Test
-    public void OutOfBThreadAnalyzeTest() {
-        BProgram sut = new ResourceBProgram("execution/jsproxy/bthreadFromGlobalScope.js");
+    public void syncOutOfBThreadAnalyzeTest() {
+        BProgram sut = new ResourceBProgram("execution/jsproxy/syncFromGlobalScope.js");
         var vfr = new DfsBProgramVerifier(sut);
         
         try {
@@ -300,6 +312,45 @@ public class BProgramJsProxyTest {
         }
     }
 
+
+
+    @Test
+    public void threadOutOfBThreadExecTest() {
+        BProgram sut = new ResourceBProgram("execution/jsproxy/bthreadFromGlobalScope.js");
+
+        final AtomicReference<String> errorMessage = new AtomicReference<>();
+        BProgramRunner rnr = new BProgramRunner();
+        rnr.addListener( new BProgramRunnerListenerAdapter(){
+            @Override
+            public void error(BProgram bp, Exception ex) {
+                errorMessage.set(ex.getMessage());
+            }
+        });
+        rnr.setBProgram(sut);
+
+        rnr.run();
+        var errMsg = errorMessage.get();
+        assertNotNull("Runtime listener should have captured the error message", errMsg);
+        assertTrue(errMsg.toLowerCase().contains("bp.thread"));
+        assertTrue(errMsg.toLowerCase().contains("forbidden"));
+        assertTrue(errMsg.toLowerCase().contains("outside of a b-thread"));
+
+    }
+
+    @Test
+    public void threadOutOfBThreadAnalyzeTest() {
+        BProgram sut = new ResourceBProgram("execution/jsproxy/bthreadFromGlobalScope.js");
+        var vfr = new DfsBProgramVerifier(sut);
+
+        try {
+            vfr.verify(sut);
+            fail("Verification should have failed with error message about thread out of b-thread");
+        } catch (Exception ex) {
+            assertTrue(ex.getMessage().toLowerCase().contains("bp.thread"));
+            assertTrue(ex.getMessage().toLowerCase().contains("forbidden"));
+            assertTrue(ex.getMessage().toLowerCase().contains("outside of a b-thread"));
+        }
+    }
 
     private void runBThreadDataTest(String dispatch, List<String> expectedNames ) {
         BProgram sut = new ResourceBProgram("execution/bthreadData_dataObj.js");
