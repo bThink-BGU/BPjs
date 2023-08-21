@@ -28,15 +28,20 @@ public class BPjsCodeEvaluationException extends BPjsException {
         this.cause = cause;
     }
 
-    public BPjsCodeEvaluationException(EvaluatorException cause) {
-        super(cause.details() + " (at " + cause.sourceName() + "#" + cause.lineNumber() + ":" + cause.columnNumber() + ")", cause);
+    public BPjsCodeEvaluationException(RhinoException cause) {
+        super( ( cause instanceof JavaScriptException ? "JavaScript exception: ":"") +cause.details() + " (at " + cause.sourceName() + "#" + cause.lineNumber() + ":" + cause.columnNumber() + ")", cause);
         this.cause = cause;
     }
 
-    public BPjsCodeEvaluationException(JavaScriptException cause) {
-        super("JavaScript exception: " + cause.details() + " (at " + cause.sourceName() + "#" + cause.lineNumber() + ":" + cause.columnNumber() + ")", cause);
-        this.cause = cause;
-    }
+//    public BPjsCodeEvaluationException(EvaluatorException cause) {
+//        super(cause.details() + " (at " + cause.sourceName() + "#" + cause.lineNumber() + ":" + cause.columnNumber() + ")", cause);
+//        this.cause = cause;
+//    }
+//
+//    public BPjsCodeEvaluationException(JavaScriptException cause) {
+//        super("JavaScript exception: " + cause.details() + " (at " + cause.sourceName() + "#" + cause.lineNumber() + ":" + cause.columnNumber() + ")", cause);
+//        this.cause = cause;
+//    }
 
     public BPjsCodeEvaluationException(String message) {
         super(message);
