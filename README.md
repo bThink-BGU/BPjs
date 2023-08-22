@@ -53,6 +53,7 @@ If you use BPjs in an academic work, please consider citing it as:
 ## Change Log for the BPjs Library.
 
 ### 2023-08
+* :part_alternation_mark: `BPjsCodeEvaluationException` is now have one general constructor for all rhino exception([#200](https://github.com/bThink-BGU/BPjs/issues/200))
 * :bug: `BProgramRunnerListenerAdapter` is now doing what adapters should do (create empty implementation for abstract classes and interfaces) and does not print on errors anymore. ([#119](https://github.com/bThink-BGU/BPjs/issues/119)).
 
 ### 2023-06
