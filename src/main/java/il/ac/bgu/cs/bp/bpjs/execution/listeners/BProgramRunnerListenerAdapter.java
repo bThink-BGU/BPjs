@@ -26,7 +26,6 @@ package il.ac.bgu.cs.bp.bpjs.execution.listeners;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
-import il.ac.bgu.cs.bp.bpjs.model.FailedAssertionViolation;
 
 /**
  * A {@link BProgramRunnerListener} with all methods defaultly implemented. Use when
@@ -67,10 +66,6 @@ public abstract class BProgramRunnerListenerAdapter implements BProgramRunnerLis
     public void halted(BProgram bp) {}
 
     @Override
-    public void error(BProgram bp, Exception ex) {
-        System.err.println("JavaScript Error during program execution: " + ex.getMessage() );
-        System.err.println("Trace: ");
-        ex.printStackTrace(System.err);
-    }
+    public void error(BProgram bp, Exception ex) {}
 
 }
