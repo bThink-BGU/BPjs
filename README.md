@@ -52,6 +52,10 @@ If you use BPjs in an academic work, please consider citing it as:
 
 ## Change Log for the BPjs Library.
 
+### 2023-09
+* :sparkles: EventSets now have an `except` method, that allows removal of events from the set. e.g. `allMotionEvents.except(moveDownEvent)`. ([#218](https://github.com/bThink-BGU/BPjs/issues/218))
+* :arrow_up: Improved error messages when composing event sets.
+
 ### 2023-08
 * :part_alternation_mark: `BPjsCodeEvaluationException` is now have one general constructor for all rhino exception([#200](https://github.com/bThink-BGU/BPjs/issues/200))
 * :bug: `BProgramRunnerListenerAdapter` is now doing what adapters should do (create empty implementation for abstract classes and interfaces) and does not print on errors anymore. ([#119](https://github.com/bThink-BGU/BPjs/issues/119)).
