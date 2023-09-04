@@ -557,7 +557,7 @@ public class DfsBProgramVerifierTest {
 
     @Test
     public void testPruneABAA() throws Exception {
-        BProgram program = new ResourceBProgram("DFSVerifierTests/AAAAorABAATrace.js");
+        BProgram program = new ResourceBProgram("DFSVerifierTests/AAAA_withBnoice.js");
         DfsBProgramVerifier sut = new DfsBProgramVerifier();
         sut.setDebugMode(true);
         VisitedStateStore stateStore = new BThreadSnapshotVisitedStateStore();
