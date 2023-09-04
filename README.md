@@ -52,6 +52,9 @@ If you use BPjs in an academic work, please consider citing it as:
 
 ## Change Log for the BPjs Library.
 
+### 2023-09
+* :arrow_up: `DfsBProgramVerifier.ProgressListener::violationFound` now returns a `ViolenceResponse` object, instead of a `bool`, and now supporting the option of pruning the trace tree when violation happened ([#204](https://github.com/bThink-BGU/BPjs/issues/204)).
+
 ### 2023-06
 * :arrow_up: Printouts and `toString`s of JavaScript compound values (e.g. arrays) adhere to normative JavaScript style. That is, no more `[JS_Array 1,2,3]`, just `[1,2,3]`. Java objects still retain their `J_` prefix.([#213](https://github.com/bThink-BGU/BPjs/issues/213)).
 
