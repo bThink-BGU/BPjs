@@ -110,4 +110,17 @@ public class EventSetsTest {
         assertEquals( 2, lgr.eventNames().stream().filter(n->n.equals("allOf-OK")).count() );
         assertEquals( 1, lgr.eventNames().stream().filter(n->n.equals("conv-OK")).count() );
     }
+    
+    @Test
+    public void testExcept(){
+        final EventSet events1to4 = EventSets.anyOf(EVT_1, EVT_2, EVT_3, EVT_4);
+        final EventSet sut = events1to4.except( EVT_2 );
+        
+        assertFalse( sut.contains(EVT_2) );
+        assertFalse( sut.contains(new BEvent("hello")) );
+        
+        assertTrue( sut.contains(EVT_1) );
+        assertTrue( sut.contains(EVT_3) );
+        assertTrue( sut.contains(EVT_4) );
+    }
 }

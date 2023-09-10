@@ -25,31 +25,37 @@ public interface EventSet extends java.io.Serializable {
     
     
     default EventSet and( final EventSet ifce ) {
-        if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
+        if ( ifce==null ) throw new IllegalArgumentException("cannot pass a null event set to and()");
 		return new AllOf(Set.of(this, ifce));
 	}
 	
 	default EventSet or( final EventSet ifce ) {
-        if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
+        if ( ifce==null ) throw new IllegalArgumentException("cannot pass a null event set to or()");
 		return new AnyOf(Set.of(this, ifce) );
 	}
 	
 	default EventSet xor( final EventSet ifce ) {
-        if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
+        if ( ifce==null ) throw new IllegalArgumentException("cannot pass a null event set to xor()");
 		return new Xor(this, ifce);
 	}
 	
 	default EventSet nor( final EventSet ifce ) {
-        if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
+        if ( ifce==null ) throw new IllegalArgumentException("cannot pass a null event set to nor()");
 		return new Not( or(ifce) );
 	}
 	
 	default EventSet nand( final EventSet ifce ) {
-        if ( ifce==null ) throw new IllegalArgumentException("eventset cannot be null");
+        if ( ifce==null ) throw new IllegalArgumentException("cannot pass a null event set to nand()");
 		return new Not( and(ifce) );
 	}
     
     default EventSet negate() {
         return new Not(this);
     }
+    
+    default EventSet except( final EventSet ifce ){
+        if ( ifce==null ) throw new IllegalArgumentException("cannot pass a null event set to except()");
+        return and(ifce.negate());
+    }
+    
 }
