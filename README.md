@@ -53,6 +53,7 @@ If you use BPjs in an academic work, please consider citing it as:
 ## Change Log for the BPjs Library.
 
 ### 2023-09
+* :arrow_up: `DfsBProgramVerifier.ProgressListener::violationFound` now returns a `ViolenceResponse` object, instead of a `bool`, and now supporting the option of pruning the trace tree when violation happened ([#204](https://github.com/bThink-BGU/BPjs/issues/204)).
 * :sparkles: EventSets now have an `except` method, that allows removal of events from the set. e.g. `allMotionEvents.except(moveDownEvent)`. ([#218](https://github.com/bThink-BGU/BPjs/issues/218))
 * :arrow_up: Improved error messages when composing event sets.
 

@@ -26,9 +26,8 @@ package il.ac.bgu.cs.bp.bpjs.analysis;
 import il.ac.bgu.cs.bp.bpjs.TestUtils;
 import static il.ac.bgu.cs.bp.bpjs.TestUtils.eventNamesString;
 
-import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import il.ac.bgu.cs.bp.bpjs.model.*;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
-import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
 
@@ -37,13 +36,12 @@ import org.junit.Test;
 import static il.ac.bgu.cs.bp.bpjs.TestUtils.traceEventNamesString;
 import static org.junit.Assert.*;
 
-import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.analysis.listeners.PrintDfsVerifierListener;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.DeadlockViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.DetectedSafetyViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.JsErrorViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
-import il.ac.bgu.cs.bp.bpjs.model.BEvent;
+
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Optional;
@@ -491,12 +489,12 @@ public class DfsBProgramVerifierTest {
             @Override public void done(DfsBProgramVerifier vfr) {}
 
             @Override
-            public boolean violationFound(Violation aViolation, DfsBProgramVerifier vfr) {
+            public DfsBProgramVerifier.ViolenceResponse violationFound(Violation aViolation, DfsBProgramVerifier vfr) {
                 errorCalled.set(aViolation instanceof JsErrorViolation );
                 JsErrorViolation jsev = (JsErrorViolation) aViolation;
                 errorMadeSense.set(jsev.decsribe().contains("isNullAndSoThisInvocationShouldCrash"));
                 System.out.println(jsev.getThrownException().getMessage());
-                return true;
+                return DfsBProgramVerifier.ViolenceResponse.CONTINUE;
             }
         });
         
@@ -555,5 +553,41 @@ public class DfsBProgramVerifierTest {
         
         assertEquals( 9, res.getScannedStatesCount() );
         assertEquals( 9, stateStore.getVisitedStateCount() );
+    }
+
+    @Test
+    public void testPruneABAA() throws Exception {
+        BProgram program = new ResourceBProgram("DFSVerifierTests/AAAA_withBnoice.js");
+        DfsBProgramVerifier sut = new DfsBProgramVerifier();
+        sut.setDebugMode(true);
+        VisitedStateStore stateStore = new BThreadSnapshotVisitedStateStore();
+        sut.setVisitedStateStore(stateStore);
+        //add violation  on event "B"
+
+        sut.setProgressListener(new PrintDfsVerifierListener() {
+
+            @Override
+            public DfsBProgramVerifier.ViolenceResponse violationFound(Violation aViolation, DfsBProgramVerifier vfr) {
+
+                System.out.println( aViolation.decsribe() +": "+ aViolation.getCounterExampleTrace().getNodes().stream().filter(e->e.getEvent().isPresent()).map(e->e.getEvent().get().name).reduce("", String::concat));
+                return DfsBProgramVerifier.ViolenceResponse.PRUNE;
+            }
+
+        });
+
+        VerificationResult res = sut.verify(program);
+
+        /*
+        sould be
+              +---- B (pruned)
+            --|       + ---- B (pruned)
+              +---- A |       + ---- B (pruned)
+                      +---- A |       + ---- B (pruned)
+                              +---- A |
+                                      +---- A (stoped)
+         */
+
+        assertEquals( 9, res.getScannedStatesCount());
+        assertEquals( 8, res.getScannedEdgesCount());
     }
 }
