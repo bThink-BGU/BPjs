@@ -1,6 +1,6 @@
 /* global bp, bp.sync, TicTacToeGameMain, Packages */
 
-importPackage(Packages.il.ac.bgu.cs.bp.bpjs.TicTacToe.events);
+importPackage(Packages.il.ac.bgu.cs.bp.bpjs.examples.analysis.TicTacToe.events);
 
 bp.log.info('Tic-Tac-Toe - Let the game begin!');
 
