@@ -100,9 +100,9 @@ public class DfsBProgramVerifier {
          * 
          * @param aViolation the violation found
          * @param vfr the verifier that found the violation
-         * @return {@code true} for the verifier to continue the search, {@code false} otherwise.
+         * @return {@code CONTINUE} for the verifier to continue the search, {@code HALT} for the verifier to halt the search and {@code PRUNE} for pruning the node ans continue the search from other node.
          */
-        boolean violationFound( Violation aViolation, DfsBProgramVerifier vfr );
+        ViolenceResponse violationFound( Violation aViolation, DfsBProgramVerifier vfr );
         
         /**
          * The verifier {@code vfr} has finished the verification process.
@@ -110,7 +110,19 @@ public class DfsBProgramVerifier {
          */
         void done(DfsBProgramVerifier vfr);
     }
-    
+
+
+    /**
+     *Effect of the return values:
+     * CONTINUE - mark current node as having a violation, go deeper into the graph.
+     * PRUNE - mark current node as having a violation, pop it (as in - go back and don't DFS into its descendants)
+     * HALT - mark current node as having a violation and stop the verification.
+     */
+    public enum ViolenceResponse {
+        CONTINUE,
+        PRUNE,
+        HALT
+    }
     private static class ViolatingPathFoundException extends Exception {
         final Violation v;
 
@@ -130,8 +142,8 @@ public class DfsBProgramVerifier {
         @Override public void done(DfsBProgramVerifier vfr) {}
 
         @Override
-        public boolean violationFound(Violation aViolation, DfsBProgramVerifier vfr) {
-            return false;
+        public ViolenceResponse violationFound(Violation aViolation, DfsBProgramVerifier vfr) {
+            return ViolenceResponse.HALT;
         }
     };
         
@@ -262,9 +274,15 @@ public class DfsBProgramVerifier {
                         .filter(o->o.isPresent()).map(Optional::get).collect(toSet());
 
                     for ( Violation v : res ) {
-                        if ( ! listener.violationFound(v, this)) {
+                        ViolenceResponse tmp =listener.violationFound(v, this);
+                        if ( tmp == ViolenceResponse.HALT ) {
                             throw new ViolatingPathFoundException(v);
                         }
+                        else if ( tmp == ViolenceResponse.PRUNE ) {
+                            trace.pop();
+                            return null;
+                        }
+
                     }
                     
                 } else if ( visited.isVisited(pns) ) {
@@ -275,13 +293,19 @@ public class DfsBProgramVerifier {
                             .filter(o->o.isPresent()).map(Optional::get).collect(toSet());
                     if ( res.size() > 0  ) {
                         for ( Violation v : res ) {
-                            if ( ! listener.violationFound(v, this) ) {
+                            ViolenceResponse tmp =listener.violationFound(v, this);
+                            if ( tmp == ViolenceResponse.HALT ) {
                                 throw new ViolatingPathFoundException(v);
                             }
+                            else if ( tmp == ViolenceResponse.PRUNE ) {
+                                trace.pop();
+                                return null;
+                            }
+
                         }
                     }
                     trace.pop();
-                    
+
                 } else {
                     // advance to this newly discovered node
                     return possibleNextNode;
@@ -290,10 +314,14 @@ public class DfsBProgramVerifier {
             } catch ( BPjsRuntimeException bprte ) {
                 trace.advance(nextEvent, null);
                 Violation jsev = new JsErrorViolation(trace, bprte);
-                if ( ! listener.violationFound(jsev, this) ) {
+                ViolenceResponse tmp =listener.violationFound(jsev, this);
+                if ( tmp == ViolenceResponse.HALT ) {
                     throw new ViolatingPathFoundException(jsev);
                 }
                 trace.pop();
+                if ( tmp == ViolenceResponse.PRUNE ) {
+                    return null;
+                }
             }
         }
         return null;
@@ -344,14 +372,19 @@ public class DfsBProgramVerifier {
                                     .collect(toSet());
         if ( res.size() > 0  ) {
             for ( Violation v : res ) {
-                if ( ! listener.violationFound(v, this) ) {
+                ViolenceResponse tmp =listener.violationFound(v, this);
+                if ( tmp == ViolenceResponse.HALT) {
                     return v;
                 }
+                else if ( tmp == ViolenceResponse.PRUNE ) {
+                    if (isDebugMode()) {
+                        System.out.println("(violation) Prune:" +v.decsribe());
+                    }
+                    pop();
+                    return null;
+                }
             }
-            if (isDebugMode()) {
-                System.out.println("-pop! (violation)-");
-            }
-            pop();
+
         }
         return null;
     }

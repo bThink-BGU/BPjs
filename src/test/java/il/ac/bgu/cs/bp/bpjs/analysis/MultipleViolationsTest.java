@@ -62,11 +62,11 @@ public class MultipleViolationsTest {
             }
 
             @Override
-            public boolean violationFound(Violation aViolation, DfsBProgramVerifier vfr) {
+            public DfsBProgramVerifier.ViolenceResponse violationFound(Violation aViolation, DfsBProgramVerifier vfr) {
                 int num = violationCount.incrementAndGet();
                 System.out.println("Violation " + num + ": " + aViolation.decsribe() );
                 violations.add(aViolation);
-                return true;
+                return DfsBProgramVerifier.ViolenceResponse.PRUNE;
             }
 
             @Override public void done(DfsBProgramVerifier vfr) {}
@@ -104,10 +104,10 @@ public class MultipleViolationsTest {
             }
 
             @Override
-            public boolean violationFound(Violation aViolation, DfsBProgramVerifier vfr) {
+            public DfsBProgramVerifier.ViolenceResponse violationFound(Violation aViolation, DfsBProgramVerifier vfr) {
                 int num = violationCount.incrementAndGet();
                 System.out.println("Violation " + num + ": " + aViolation.decsribe() );
-                return true;
+                return DfsBProgramVerifier.ViolenceResponse.CONTINUE;
             }
 
             @Override public void done(DfsBProgramVerifier vfr) {}
@@ -136,10 +136,10 @@ public class MultipleViolationsTest {
             public void maxTraceLengthHit(ExecutionTrace aTrace, DfsBProgramVerifier vfr) {}
 
             @Override
-            public boolean violationFound(Violation aViolation, DfsBProgramVerifier vfr) {
+            public DfsBProgramVerifier.ViolenceResponse violationFound(Violation aViolation, DfsBProgramVerifier vfr) {
                 int num = violationCount.incrementAndGet();
                 System.out.println("Violation " + num + ": " + aViolation.decsribe() );
-                return true;
+                return DfsBProgramVerifier.ViolenceResponse.CONTINUE;
             }
 
             @Override public void done(DfsBProgramVerifier vfr) {}
