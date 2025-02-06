@@ -47,8 +47,9 @@ import org.mozilla.javascript.NativeSet;
 public class BPJSStubOutputStream extends ScriptableOutputStream {
 
     @SuppressWarnings("OverridableMethodCallInConstructor")
-    public BPJSStubOutputStream(OutputStream out, Scriptable scope) throws IOException {
-        super(out, scope);
+    public BPJSStubOutputStream(OutputStream out) throws IOException {
+        super(out, BPjs.getBPjsScope());
+
     }
 
     @Override
@@ -82,10 +83,9 @@ public class BPJSStubOutputStream extends ScriptableOutputStream {
 
         String code = "ns.forEach(e=>javaSet.add(e))";
 
-        System.out.println("Stybifying Native set");
-        
         try ( Context cx = BPjs.enterRhinoContext()) {
             Scriptable tlScope = BPjs.makeBPjsSubScope();
+//            ScriptableObject tlScope = cx.initStandardObjects();
             Set<Object> javaSet = new HashSet<>();
             tlScope.put("ns", tlScope, ns);
             tlScope.put("javaSet", tlScope, javaSet);
@@ -93,7 +93,5 @@ public class BPJSStubOutputStream extends ScriptableOutputStream {
 
             return new NativeSetStub(javaSet);
         }
-
     }
-
 }

@@ -9,12 +9,12 @@ bp.log.info('Dinning philosophers with ' + PHILOSOPHER_COUNT + ' philosophers');
 
 function addStick(i) {
     var j = (i % PHILOSOPHER_COUNT) + 1;
-    var pickMe = [bp.Event("Pick" + i + "R"), bp.Event("Pick" + j + "L")];
-    var releaseMe = [bp.Event("Rel" + i + "R"), bp.Event("Rel" + j + "L")];
+    var pickMe    = [bp.Event("Pick" + i + "R"), bp.Event("Pick" + j + "L")];
+    var releaseMe = [bp.Event("Rel" + i + "R"),  bp.Event("Rel" + j + "L")];
     
     bp.registerBThread("Stick" + i, function () {
         while (true) {
-        	bp.sync({waitFor: pickMe, block: releaseMe});
+        	bp.sync({waitFor: pickMe,    block: releaseMe});
             bp.sync({waitFor: releaseMe, block: pickMe});
         }
     });

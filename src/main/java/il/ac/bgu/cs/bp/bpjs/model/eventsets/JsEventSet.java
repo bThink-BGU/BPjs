@@ -17,15 +17,16 @@ public class JsEventSet implements EventSet, java.io.Serializable {
 
     private final Function predicate;
     private final String name;
-    private final String encodedSource;
+    private final String rawSource;
 
     public JsEventSet(String aName, Function aPredicate) {
         name = aName;
         predicate = aPredicate;
         if ( aPredicate instanceof NativeFunction ) {
-            encodedSource = ((NativeFunction)aPredicate).getEncodedSource();
+//            rawSource = ((NativeFunction)aPredicate).getEncodedSource();
+            rawSource = ((NativeFunction)aPredicate).getRawSource(); // for Rhino 1.8.0
         } else {
-            encodedSource = null;
+            rawSource = null;
         }
     }
 
@@ -69,8 +70,8 @@ public class JsEventSet implements EventSet, java.io.Serializable {
             JsEventSet otherES = (JsEventSet) other;
             if ( !name.equals(otherES.name) ) {
                 return false;
-            } else if ( encodedSource != null ) {
-                return encodedSource.equals(otherES.encodedSource);
+            } else if ( rawSource != null ) {
+                return rawSource.equals(otherES.rawSource);
             } else {
                 return predicate.equals(((JsEventSet) other).predicate);
             }
@@ -82,6 +83,6 @@ public class JsEventSet implements EventSet, java.io.Serializable {
     
     @Override
     public int hashCode() {
-        return (encodedSource!=null) ? encodedSource.hashCode() : predicate.hashCode();
+        return (rawSource!=null) ? rawSource.hashCode() : predicate.hashCode();
     }
 }

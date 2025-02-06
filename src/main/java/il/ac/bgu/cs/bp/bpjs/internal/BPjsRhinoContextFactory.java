@@ -47,6 +47,9 @@ public class BPjsRhinoContextFactory extends ContextFactory {
 
             case Context.FEATURE_ENABLE_JAVA_MAP_ACCESS:
                 return true;
+            
+            case Context.FEATURE_THREAD_SAFE_OBJECTS:
+                return true;
         }
         // defaults
         return super.hasFeature(cx, featureIndex);
@@ -55,15 +58,20 @@ public class BPjsRhinoContextFactory extends ContextFactory {
     @Override
     protected Context makeContext() {
         Context cx = super.makeContext();
-        cx.setOptimizationLevel(-1); // must use interpreter mode for continuations to work
-        if (cx.getLanguageVersion() != Context.VERSION_ES6) {
-            cx.setLanguageVersion(Context.VERSION_ES6);
+        cx.setInterpretedMode(true); // must use interpreter mode for continuations to work
+        if (cx.getLanguageVersion() != Context.VERSION_ECMASCRIPT) {
+            cx.setLanguageVersion(Context.VERSION_ECMASCRIPT);
         }
         cx.setWrapFactory(BPjsWrapFactory.INSTANCE);
         return cx;
     }
 }
 
+/**
+ * Returns java objects for primitive types, to allow easier state-based comparison.
+ * 
+ * @author michael
+ */
 class BPjsWrapFactory extends WrapFactory {
     
     static final BPjsWrapFactory INSTANCE = new BPjsWrapFactory();

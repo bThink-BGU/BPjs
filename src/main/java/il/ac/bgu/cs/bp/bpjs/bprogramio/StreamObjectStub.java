@@ -24,7 +24,6 @@
 package il.ac.bgu.cs.bp.bpjs.bprogramio;
 
 import il.ac.bgu.cs.bp.bpjs.BPjs;
-import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -32,9 +31,8 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Scriptable;
 
 /**
- * Placeholders to put in the application stream. Used to break connections from the
- * JavaScript serialized context to the Java context.
- * 
+ * Placeholders for non-serializable objects in the  bthread serialization stream.
+ * Used for breaking connections from the JavaScript serialized context to the Java context.
  * 
  * @author michael
  */
@@ -67,8 +65,7 @@ public class StreamObjectStub implements java.io.Serializable {
     }
     
     private Object readResolve() {
-        if ( name.equals(BP_PROXY.name) ) return BP_PROXY;
-        return this;
+        return name.equals(BP_PROXY.name)  ? BP_PROXY : this;
     }    
 }
 
@@ -123,13 +120,13 @@ class NativeSetStub extends StreamObjectStub implements java.io.Serializable {
     
     private Object readResolve(){
         
-        String src = "let ns = new Set(); javaSet.forEach(e=>ns.add(e)); ns";
+        String src = "let ns = new Set(); javaSet.forEach(e=>ns.add(e));";
         
         try (Context cx = BPjs.enterRhinoContext()) {
             Scriptable tlScope = BPjs.makeBPjsSubScope();
-            Set<Object> javaSet = new HashSet<>();
-            tlScope.put("javaSet", tlScope, javaSet);
-            return cx.evaluateString( tlScope, src, "", 1, null);
+            tlScope.put("javaSet", tlScope, items);
+            cx.evaluateString( tlScope, src, "", 1, null);
+            return tlScope.get("ns", tlScope);
         }
         
     }

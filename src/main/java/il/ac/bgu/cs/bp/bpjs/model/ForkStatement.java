@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BPJSStubInputStream;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BPJSStubOutputStream;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.StreamObjectStub;
@@ -66,7 +67,8 @@ public class ForkStatement {
         byte[] serializedForm;
         
         try ( ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            BPJSStubOutputStream btos = new BPJSStubOutputStream(baos, syncOrigin.getBProgram().getGlobalScope()) ) {
+            BPJSStubOutputStream btos = new BPJSStubOutputStream(baos) 
+        ) { 
             btos.writeObject(bthreadData);
             btos.writeObject(storageModifications);
             btos.writeObject(continuation);
@@ -88,8 +90,8 @@ public class ForkStatement {
         };
         
         try ( ByteArrayInputStream bais = new ByteArrayInputStream(serializedForm);
-              BPJSStubInputStream btis = new BPJSStubInputStream(bais, syncOrigin.getBProgram().getGlobalScope(), stubPrv)
-            ) {
+              BPJSStubInputStream btis = new BPJSStubInputStream(bais, stubPrv)
+        ) {
             
             bthreadData = btis.readObject();
             storageModifications = (Map<String, Modification<Object>>) btis.readObject();

@@ -1,7 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
 import il.ac.bgu.cs.bp.bpjs.BPjs;
-import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import static org.junit.Assert.*;
 
 import il.ac.bgu.cs.bp.bpjs.model.*;
@@ -10,6 +9,7 @@ import org.junit.Test;
 import java.util.concurrent.ExecutorService;
 import org.junit.After;
 import org.junit.Before;
+import org.mozilla.javascript.EcmaError;
 
 public class NodeEqualsTest {
 
@@ -52,24 +52,34 @@ public class NodeEqualsTest {
 
     @Test
     public void test2() throws Exception {
-        final BProgram bprog = new ResourceBProgram("BPJSDiningPhil.js");
-        bprog.putInGlobalScope("PHILOSOPHER_COUNT", 5);
-        BProgramSyncSnapshot bpss = bprog.setup().start(exSvc, bprog.getStorageModificationStrategy());
+        try {
+            final BProgram bprog = new ResourceBProgram("BPJSDiningPhil.js");
+            bprog.putInGlobalScope("PHILOSOPHER_COUNT", 5);
+            BProgramSyncSnapshot bpss = bprog.setup().start(exSvc, bprog.getStorageModificationStrategy());
 
-        String events[] = {"Pick1R", "Pick2R", "Pick3R", "Pick4R", "Pick5R"};
-        DfsTraversalNode[] nodes = new DfsTraversalNode[events.length + 1];
-        nodes[0] = DfsTraversalNode.getInitialNode(bprog, bpss);
+            String events[] = {"Pick1R", "Pick2R", "Pick3R", "Pick4R", "Pick5R"};
+            DfsTraversalNode[] nodes = new DfsTraversalNode[events.length + 1];
+            nodes[0] = DfsTraversalNode.getInitialNode(bprog, bpss);
 
-        for (int i = 0; i < events.length; i++) {
-            nodes[i + 1] = nodes[i].getNextNode(new BEvent(events[i]), exSvc);
-        }
+            for (int i = 0; i < events.length; i++) {
+                nodes[i + 1] = nodes[i].getNextNode(new BEvent(events[i]), exSvc);
+            }
 
-        for (int i = 0; i < nodes.length; i++) {
-            for (int j = 0; j < nodes.length; j++) {
-                if (i != j) {
-                    assertFalse("node " + i + " should not equal node " + j, nodes[i].equals(nodes[j]));
+            for (int i = 0; i < nodes.length; i++) {
+                for (int j = 0; j < nodes.length; j++) {
+                    if (i != j) {
+                        assertFalse("node " + i + " should not equal node " + j, nodes[i].equals(nodes[j]));
+                    }
                 }
             }
+        } catch ( EcmaError e ) {
+            System.out.println("EcmaError during test");
+            System.out.println(e.details());
+            System.out.println(e.getErrorMessage());
+            System.out.println(e.getName());
+            System.out.println(e.sourceName() + ":" + e.lineNumber() + " " + e.lineSource());
+            System.out.println(e.getScriptStackTrace());
+            throw e;
         }
     }
 

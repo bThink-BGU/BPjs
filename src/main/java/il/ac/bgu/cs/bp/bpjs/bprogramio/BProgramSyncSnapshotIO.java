@@ -73,7 +73,8 @@ public class BProgramSyncSnapshotIO {
     public byte[] serialize(BProgramSyncSnapshot bpss) throws IOException {
         try (Context cx = BPjs.enterRhinoContext()) {
             try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                BPJSStubOutputStream outs = new BPJSStubOutputStream(bytes, bprogram.getGlobalScope())) {
+                BPJSStubOutputStream outs = new BPJSStubOutputStream(bytes)
+            ) {
 
                 outs.writeObject(new Header(bpss.getBThreadSnapshots().size(), bpss.getExternalEvents().size(), bpss.getViolationTag()));
 
@@ -96,7 +97,6 @@ public class BProgramSyncSnapshotIO {
     public BProgramSyncSnapshot deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
         try (Context cx = BPjs.enterRhinoContext()) {
             try (BPJSStubInputStream in = new BPJSStubInputStream(new ByteArrayInputStream(bytes), 
-                                                    bprogram.getGlobalScope(),
                                                     getStubProvider())
             ) {
                 Header header = (Header) in.readObject();
@@ -122,7 +122,8 @@ public class BProgramSyncSnapshotIO {
     public byte[] serializeBThread(BThreadSyncSnapshot btss) {
         try (Context cx = BPjs.enterRhinoContext()) {
             try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                BPJSStubOutputStream outs = new BPJSStubOutputStream(bytes, bprogram.getGlobalScope())) {
+                BPJSStubOutputStream outs = new BPJSStubOutputStream(bytes) 
+            ) {
                 writeBThreadSnapshot(btss, outs);
                 outs.flush();
                 return bytes.toByteArray();
@@ -138,7 +139,6 @@ public class BProgramSyncSnapshotIO {
         try (Context cx = BPjs.enterRhinoContext()) {
             try (BPJSStubInputStream sis = new BPJSStubInputStream( 
                                          new ByteArrayInputStream(serializedBT),
-                                         bprogram.getGlobalScope(),
                                          getStubProvider())
             ) {
                 return readBThreadSnapshot(sis, bprogramDataStore);

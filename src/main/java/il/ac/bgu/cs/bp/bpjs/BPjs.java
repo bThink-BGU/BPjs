@@ -42,7 +42,7 @@ public class BPjs {
     /**
      * Top-level scope for all BPjs code.
      */
-    private static ScriptableObject BPJS_SCOPE;
+    private static final ScriptableObject BPJS_SCOPE;
 
     private static ExecutorServiceMaker executorServiceMaker = new ExecutorServiceMaker();
     
@@ -50,7 +50,11 @@ public class BPjs {
 
     static {
         ContextFactory.initGlobal( new BPjsRhinoContextFactory()) ;
-        makeBPjsScope();
+        try (Context cx = enterRhinoContext()) {
+            ImporterTopLevel importer = new ImporterTopLevel(cx);
+            BPJS_SCOPE = cx.initStandardObjects(importer, true); // create and seal
+            // NOTE: global extensions to BPjs scopes would go here, if we decide to create them.
+        }
     }
     
     /**
@@ -103,14 +107,6 @@ public class BPjs {
         }
     }
     
-    private static void makeBPjsScope() {
-        try (Context cx = enterRhinoContext()) {
-            ImporterTopLevel importer = new ImporterTopLevel(cx);
-            BPJS_SCOPE = cx.initStandardObjects(importer, true); // create and seal
-            // NOTE: global extensions to BPjs scopes would go here, if we decide to create them.
-        }
-    }
-
     /**
      * Returns the maker of executor service used by BPjs to advance b-threads.
      * @return the current executor service maker.

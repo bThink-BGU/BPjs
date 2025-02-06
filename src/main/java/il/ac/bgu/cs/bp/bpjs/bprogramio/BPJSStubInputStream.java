@@ -23,9 +23,9 @@
  */
 package il.ac.bgu.cs.bp.bpjs.bprogramio;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import java.io.IOException;
 import java.io.InputStream;
-import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.serialize.ScriptableInputStream;
 
 /**
@@ -36,8 +36,8 @@ public class BPJSStubInputStream extends ScriptableInputStream {
 
     private final StubProvider stubProvider;
 
-    public BPJSStubInputStream(InputStream in, Scriptable scope, StubProvider aProvider) throws IOException {
-        super(in, scope);
+    public BPJSStubInputStream(InputStream in, StubProvider aProvider) throws IOException {
+        super(in, BPjs.getBPjsScope());
         stubProvider = aProvider;
     }
 

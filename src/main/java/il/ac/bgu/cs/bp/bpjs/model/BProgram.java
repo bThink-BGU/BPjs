@@ -104,7 +104,6 @@ public abstract class BProgram {
      */
     protected Map<String, Object> initialScopeValues = new HashMap<>();
     
-    
     protected Map<String, Object> initialStore = new HashMap<>();
 
     private Optional<BProgramCallback> addBThreadCallback = Optional.empty();
@@ -322,10 +321,11 @@ public abstract class BProgram {
         if ( preSetPrintStream != null ) {
             jsProxy.log.setLoggerPrintStream(preSetPrintStream);
         }
-        programScope.put("bp", programScope, Context.javaToJS(jsProxy, programScope));
 
         initialScopeValues.entrySet().forEach(e -> putInGlobalScope(e.getKey(), e.getValue()));
         initialScopeValues = null;
+
+        programScope.put("bp", programScope, Context.javaToJS(jsProxy, programScope));
     }
    
 
@@ -425,6 +425,9 @@ public abstract class BProgram {
      * to the passed class.
      */
     public <T> Optional<T> getFromGlobalScope(String name, Class<T> clazz) {
+        if ( getGlobalScope() == null ) {
+            return Optional.ofNullable((T)initialScopeValues.get(name));
+        }
         if (getGlobalScope().has(name, getGlobalScope())) {
             return Optional.of((T) Context.jsToJava(getGlobalScope().get(name, getGlobalScope()), clazz));
         } else {
