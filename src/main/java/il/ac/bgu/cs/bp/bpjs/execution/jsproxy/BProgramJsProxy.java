@@ -38,8 +38,6 @@ import static java.util.stream.Collectors.toSet;
 public class BProgramJsProxy extends SyncStatementBuilder
         implements java.io.Serializable {
 
-
-
     ///////////////////////////////
     // A (Java) thread-local mechanism to allow the Java code calling the BP 
     // code to communicate with the Java code called from the BP code.
@@ -286,8 +284,8 @@ public class BProgramJsProxy extends SyncStatementBuilder
             }
         }
 
-        EventSet waitForSet = convertToEventSet(jRWB.get("waitFor"));
-        EventSet blockSet = convertToEventSet(jRWB.get("block"));
+        EventSet waitForSet   = convertToEventSet(jRWB.get("waitFor"));
+        EventSet blockSet     = convertToEventSet(jRWB.get("block"));
         EventSet interruptSet = convertToEventSet(jRWB.get("interrupt"));
         stmt = stmt.waitFor(waitForSet)
                 .block(blockSet)
