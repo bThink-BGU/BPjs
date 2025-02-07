@@ -36,7 +36,10 @@ import java.util.HashSet;
  * @author michael
  */
 public class EventSetsJsProxy {
-   
+    
+    /** Required for serialization efficiency */
+    public final static EventSetsJsProxy INSTANCE = new EventSetsJsProxy();
+    
     public final EventSet all = EventSets.all;
     
     public final EventSet none = EventSets.none;

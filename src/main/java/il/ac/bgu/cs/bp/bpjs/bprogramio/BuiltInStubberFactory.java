@@ -25,6 +25,7 @@ package il.ac.bgu.cs.bp.bpjs.bprogramio;
 
 import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.EventSetsJsProxy;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import java.util.HashSet;
 import java.util.Optional;
@@ -49,7 +50,8 @@ public class BuiltInStubberFactory implements SerializationStubberFactory {
 class BuiltInStubber implements SerializationStubber {
 
     public static final StreamObjectStub BP_PROXY = new StreamObjectStub("built-in", "BP-PROXY");
-    public static final StreamObjectStub EMPTY_OPTIONAL = new StreamObjectStub("built-in", "EMPTY_OPTIONAL");
+    public static final StreamObjectStub ES_PROXY = new StreamObjectStub("built-in", "ES-PROXY");
+    
     
     private final BProgramJsProxy bprogProxy;
     
@@ -64,12 +66,13 @@ class BuiltInStubber implements SerializationStubber {
 
     @Override
     public Set<Class> getClasses() {
-        return Set.of( BProgramJsProxy.class, Optional.class, NativeSet.class );
+        return Set.of( BProgramJsProxy.class, EventSetsJsProxy.class, Optional.class, NativeSet.class );
     }
 
     @Override
     public StreamObjectStub stubFor(Object in) {
         if ( in instanceof BProgramJsProxy ) return BP_PROXY;
+        if ( in instanceof EventSetsJsProxy ) return ES_PROXY;
         if ( in instanceof Optional ) {
             Optional opt = (Optional) in;
             return (StreamObjectStub)opt.map( v -> new OptionalStub(v) ).orElse(OptionalStub.EMPTY);
@@ -83,6 +86,7 @@ class BuiltInStubber implements SerializationStubber {
     @Override
     public Object objectFor(StreamObjectStub aStub) {
         if ( aStub.equals(BP_PROXY) ) return bprogProxy;
+        if ( aStub.equals(ES_PROXY) ) return EventSetsJsProxy.INSTANCE;
         if ( aStub.equals(OptionalStub.EMPTY) ) return Optional.empty();
         if ( aStub instanceof OptionalStub ) {
             return Optional.ofNullable(aStub.getData());
