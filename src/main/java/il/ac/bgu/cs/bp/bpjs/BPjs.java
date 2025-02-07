@@ -29,8 +29,10 @@ import java.util.function.Consumer;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.ImporterTopLevel;
+import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.ScriptableObject;
+import org.mozilla.javascript.StackStyle;
 
 /**
  * Central place for application-level, static BPjs resources.
@@ -55,6 +57,7 @@ public class BPjs {
             BPJS_SCOPE = cx.initStandardObjects(importer, true); // create and seal
             // NOTE: global extensions to BPjs scopes would go here, if we decide to create them.
         }
+        RhinoException.setStackStyle(StackStyle.V8);
     }
     
     /**

@@ -38,7 +38,6 @@ public class BPjsRhinoContextFactory extends ContextFactory {
     @Override
     protected boolean hasFeature(Context cx, int featureIndex) {
         switch (featureIndex) {
-
             case Context.FEATURE_LOCATION_INFORMATION_IN_ERROR:
                 return true;
 
@@ -50,9 +49,10 @@ public class BPjsRhinoContextFactory extends ContextFactory {
             
             case Context.FEATURE_THREAD_SAFE_OBJECTS:
                 return true;
+            
+            default:
+                return super.hasFeature(cx, featureIndex);
         }
-        // defaults
-        return super.hasFeature(cx, featureIndex);
     }
 
     @Override
