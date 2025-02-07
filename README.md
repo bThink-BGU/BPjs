@@ -56,6 +56,7 @@ If you use BPjs in an academic work, please consider citing it as:
 * :arrow_up: Upgraded to Rhino 1.8.0 with updated JavaScript version. See the many updates [here](https://github.com/mozilla/rhino/releases/tag/Rhino1_8_0_Release).
 * :sparkles: Integers are printed as integers, not floats (e.g `5`, not `5.0`).
 * :bug: Fixed a crash when accessing a b-program's global scope before the program starts to run.
+* :arrow_up: Added method `BProgramRunner::getListeners` (closes [#190](https://github.com/bThink-BGU/BPjs/issues/190)).
 
 ### 2023-09
 * :sparkles: EventSets now have an `except` method, that allows removal of events from the set. e.g. `allMotionEvents.except(moveDownEvent)`. ([#218](https://github.com/bThink-BGU/BPjs/issues/218))

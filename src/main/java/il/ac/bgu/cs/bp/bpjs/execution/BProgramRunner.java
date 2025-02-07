@@ -37,6 +37,7 @@ import java.util.Optional;
 import java.util.Set;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListener;
 import il.ac.bgu.cs.bp.bpjs.model.SafetyViolationTag;
+import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -212,5 +213,12 @@ public class BProgramRunner implements Runnable {
     public void removeListener(BProgramRunnerListener aListener) {
         listeners.remove(aListener);
     }
-
+    
+    /**
+     * Returns an unmodifiable list of the current runner listeners.
+     * @return unmodifiable list of the listerns.
+     */
+    public List<BProgramRunnerListener> getListeners() {
+        return Collections.unmodifiableList(listeners);
+    }
 }
