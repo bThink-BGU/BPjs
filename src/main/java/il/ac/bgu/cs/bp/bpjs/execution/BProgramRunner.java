@@ -41,6 +41,7 @@ import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.mozilla.javascript.Context;
 
 /**
  * Runs a {@link BProgram} to completion. Uses an {@link EventSelectionStrategy}
@@ -97,56 +98,59 @@ public class BProgramRunner implements Runnable {
             }
 
             // while snapshot not empty, select an event and get the next snapshot.
-            while ( (!cur.noBThreadsLeft()) && go.get() ) {
-                                
-                // see which events are selectable
-                Set<BEvent> possibleEvents = bprog.getEventSelectionStrategy().selectableEvents(cur);
-                if ( possibleEvents.isEmpty() ) {
-                    // Superstep done: No events available for selection.
-                    
-                    if ( bprog.isWaitForExternalEvents() ) {
-                        listeners.forEach( l->l.superstepDone(bprog) );
-                        BEvent next = bprog.takeExternalEvent(); // and now we wait for external event
-                        if ( next == null ) {
-                            go.set(false); // program no longer waits for external events
+            try ( Context cx = BPjs.enterRhinoContext() ) {
+                while ( (!cur.noBThreadsLeft()) && go.get() ) {
+
+                    // see which events are selectable
+                    Set<BEvent> possibleEvents = bprog.getEventSelectionStrategy().selectableEvents(cur);
+                    if ( possibleEvents.isEmpty() ) {
+                        // Superstep done: No events available for selection.
+
+                        if ( bprog.isWaitForExternalEvents() ) {
+                            listeners.forEach( l->l.superstepDone(bprog) );
+                            BEvent next = bprog.takeExternalEvent(); // and now we wait for external event
+                            if ( next == null ) {
+                                go.set(false); // program no longer waits for external events
+                            } else {
+                                cur.getExternalEvents().add(next);
+                            }
+
                         } else {
-                            cur.getExternalEvents().add(next);
+                            // Ending the program - no selectable event.
+                            listeners.forEach(l->l.superstepDone(bprog));
+                            go.set(false); 
                         }
 
                     } else {
-                        // Ending the program - no selectable event.
-                        listeners.forEach(l->l.superstepDone(bprog));
-                        go.set(false); 
-                    }
+                        // we can select some events - select one and advance.
+                        Optional<EventSelectionResult> res = bprog.getEventSelectionStrategy().select(cur, possibleEvents);
 
-                } else {
-                    // we can select some events - select one and advance.
-                    Optional<EventSelectionResult> res = bprog.getEventSelectionStrategy().select(cur, possibleEvents);
+                        if ( res.isPresent() ) {
+                            EventSelectionResult esr = res.get();
 
-                    if ( res.isPresent() ) {
-                        EventSelectionResult esr = res.get();
+                            if ( ! esr.getIndicesToRemove().isEmpty() ) {
+                                // the event selection affected the external event queue.
+                                List<BEvent> updatedExternals = new ArrayList<>(cur.getExternalEvents());
+                                esr.getIndicesToRemove().stream().sorted(reverseOrder())
+                                    .forEach( idxObj -> updatedExternals.remove(idxObj.intValue()) );
+                                cur = cur.copyWith(updatedExternals);
+                            }
 
-                        if ( ! esr.getIndicesToRemove().isEmpty() ) {
-                            // the event selection affected the external event queue.
-                            List<BEvent> updatedExternals = new ArrayList<>(cur.getExternalEvents());
-                            esr.getIndicesToRemove().stream().sorted(reverseOrder())
-                                .forEach( idxObj -> updatedExternals.remove(idxObj.intValue()) );
-                            cur = cur.copyWith(updatedExternals);
+                            cur = cur.triggerEvent(esr.getEvent(), execSvc, listeners, bprog.getStorageModificationStrategy());
+                            if ( ! cur.isStateValid() ) {
+                                failedAssertion = cur.getViolationTag();
+                                listeners.forEach( l->l.assertionFailed(bprog, failedAssertion));
+                                go.set(false);
+                            }
+
+                        } else {
+                            // edge case: we can select events, but we didn't. Might be a bug in the EventSelectionStrategy.
+                            go.set(false); 
                         }
-
-                        cur = cur.triggerEvent(esr.getEvent(), execSvc, listeners, bprog.getStorageModificationStrategy());
-                        if ( ! cur.isStateValid() ) {
-                            failedAssertion = cur.getViolationTag();
-                            listeners.forEach( l->l.assertionFailed(bprog, failedAssertion));
-                            go.set(false);
-                        }
-
-                    } else {
-                        // edge case: we can select events, but we didn't. Might be a bug in the EventSelectionStrategy.
-                        go.set(false); 
                     }
                 }
             }
+            
             if ( halted ) {
                 listeners.forEach(l->l.halted(bprog)); 
             } else {

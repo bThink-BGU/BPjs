@@ -42,6 +42,7 @@ import java.util.Set;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.atomic.AtomicInteger;
 import static java.util.stream.Collectors.toSet;
+import org.mozilla.javascript.Context;
 
 /**
  * Takes a {@link BProgram}, and verifies that it does not run into false
@@ -177,7 +178,7 @@ public class DfsBProgramVerifier {
         }
         long start = System.currentTimeMillis();
         listener.started(this);
-        try {
+        try (Context cx = BPjs.enterRhinoContext() ) {
             Violation vio = dfsUsingStack(new DfsTraversalNode(currentBProgram, 
                 currentBProgram.setup().start(execSvc, currentBProgram.getStorageModificationStrategy()), null), 
                 execSvc
@@ -262,7 +263,7 @@ public class DfsBProgramVerifier {
                         .filter(o->o.isPresent()).map(Optional::get).collect(toSet());
 
                     for ( Violation v : res ) {
-                        if ( ! listener.violationFound(v, this)) {
+                        if ( ! listener.violationFound(v, this) ) {
                             throw new ViolatingPathFoundException(v);
                         }
                     }
@@ -273,7 +274,7 @@ public class DfsBProgramVerifier {
                     trace.advance(nextEvent, pns);
                     Set<Violation> res = inspections.stream().map(i->i.inspectTrace(trace))
                             .filter(o->o.isPresent()).map(Optional::get).collect(toSet());
-                    if ( res.size() > 0  ) {
+                    if ( !res.isEmpty()  ) {
                         for ( Violation v : res ) {
                             if ( ! listener.violationFound(v, this) ) {
                                 throw new ViolatingPathFoundException(v);

@@ -36,13 +36,13 @@ public class DfsTraversalNode {
     }
 
     private final BProgramSyncSnapshot systemState;
-    private final BProgram bp;
+    private final BProgram bprog;
     private final Set<BEvent> selectableEvents;
     private final BEvent lastEvent;
     private final Iterator<BEvent> iterator;
 
     protected DfsTraversalNode(BProgram bp, BProgramSyncSnapshot systemState, BEvent e) {
-        this.bp = bp;
+        this.bprog = bp;
         this.systemState = systemState;
         this.lastEvent = e;
 
@@ -99,8 +99,8 @@ public class DfsTraversalNode {
             
         };
         try {
-            DfsTraversalNode next = new DfsTraversalNode(bp, 
-                BProgramSyncSnapshotCloner.clone(systemState).triggerEvent(e, exSvc, Collections.singletonList(l),bp.getStorageModificationStrategy()), e);
+            DfsTraversalNode next = new DfsTraversalNode(bprog, 
+                BProgramSyncSnapshotCloner.clone(systemState).triggerEvent(e, exSvc, Collections.singletonList(l),bprog.getStorageModificationStrategy()), e);
             if ( caughtException[0] != null ) {
                 if ( caughtException[0] instanceof BPjsRuntimeException ){
                     throw (BPjsRuntimeException)(caughtException[0]);
