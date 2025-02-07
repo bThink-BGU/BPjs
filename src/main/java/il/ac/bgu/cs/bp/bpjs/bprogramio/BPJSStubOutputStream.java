@@ -24,18 +24,14 @@
 package il.ac.bgu.cs.bp.bpjs.bprogramio;
 
 import il.ac.bgu.cs.bp.bpjs.BPjs;
-import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
-import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.serialize.ScriptableOutputStream;
 
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.HashSet;
-import java.util.Optional;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.NativeSet;
 
 /**
  * Output stream for {@link BThreadSyncSnapshot} objects. Creates stubs for
@@ -46,10 +42,24 @@ import org.mozilla.javascript.NativeSet;
  */
 public class BPJSStubOutputStream extends ScriptableOutputStream {
 
-    @SuppressWarnings("OverridableMethodCallInConstructor")
-    public BPJSStubOutputStream(OutputStream out) throws IOException {
+    private Map<Class, SerializationStubber> stubbers = new HashMap<>();
+    
+    /**
+     * Constructor
+     * @param out downstream
+     * @param someStubbers stubbers to apply
+     * @throws IOException 
+     */
+    public BPJSStubOutputStream(OutputStream out, Set<SerializationStubber> someStubbers) throws IOException {
         super(out, BPjs.getBPjsScope());
-
+        for ( var stb : someStubbers ) {
+            for ( var clz : stb.getClasses() ) {
+                if ( stubbers.containsKey(clz) ) {
+                    System.err.println("Warning: stubber " + stb.getId() + " overrides stubber for class " + clz.getCanonicalName() + ", previously set by " + stubbers.get(clz).getId() );
+                }
+                stubbers.put(clz, stb);
+            }
+        }
     }
 
     @Override
@@ -57,41 +67,8 @@ public class BPJSStubOutputStream extends ScriptableOutputStream {
         if (obj == null) {
             return null;
         }
-        if (obj instanceof BProgramJsProxy) {
-            return StreamObjectStub.BP_PROXY;
-
-        } else if (obj instanceof Optional) {
-            return OptionalStub.getFor((Optional) obj);
-
-        } else if (obj instanceof NativeSet) {
-            NativeSet ns = (NativeSet) obj;
-            return stubify(ns);
-
-        } else {
-            return super.replaceObject(obj);
-        }
+        SerializationStubber srs = stubbers.get(obj.getClass());
+        return srs == null ? super.replaceObject(obj) : srs.stubFor(obj);
     }
-
-    /**
-     * NativeSet does not have good Java accessors, so we use a JavaScript code
-     * to extract its members.
-     *
-     * @param ns a NativeSet
-     * @return a NativeSetStub with the values of ns.
-     */
-    private NativeSetStub stubify(NativeSet ns) {
-
-        String code = "ns.forEach(e=>javaSet.add(e))";
-
-        try ( Context cx = BPjs.enterRhinoContext()) {
-            Scriptable tlScope = BPjs.makeBPjsSubScope();
-//            ScriptableObject tlScope = cx.initStandardObjects();
-            Set<Object> javaSet = new HashSet<>();
-            tlScope.put("ns", tlScope, ns);
-            tlScope.put("javaSet", tlScope, javaSet);
-            cx.evaluateString(tlScope, code, "", 1, null);
-
-            return new NativeSetStub(javaSet);
-        }
-    }
+    
 }

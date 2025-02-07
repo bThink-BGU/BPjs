@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 michael.
+ * Copyright 2025 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,39 +23,40 @@
  */
 package il.ac.bgu.cs.bp.bpjs.bprogramio;
 
-import il.ac.bgu.cs.bp.bpjs.BPjs;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.HashMap;
 import java.util.Set;
-import org.mozilla.javascript.serialize.ScriptableInputStream;
 
 /**
- * Reads and de-serializes object input streams with {@link StreamObjectStub}s.
+ * An object that allows serialization of non-serializable objects. This is done
+ * by providing serializable stub for the serialization stream, and then converting
+ * stubs to data and vice versa.
  * 
  * @author michael
  */
-public class BPJSStubInputStream extends ScriptableInputStream {
-
-    private final HashMap<String, SerializationStubber> stubbers = new HashMap<>();
-
-    public BPJSStubInputStream(InputStream in, Set<SerializationStubber> someStubbers) throws IOException {
-        super(in, BPjs.getBPjsScope());
-        for ( var stb : someStubbers ) {
-            stubbers.put(stb.getId(), stb);
-        }
-    }
-
-    @Override
-    protected Object resolveObject(Object obj) throws IOException {
-        return ( obj instanceof StreamObjectStub )
-            ? stubbers.get(((StreamObjectStub)obj).getStubberId()).objectFor((StreamObjectStub) obj)
-            : super.resolveObject(obj);
-    }
-
-    @Override
-    protected Object readObjectOverride() throws IOException, ClassNotFoundException {
-        return super.readObjectOverride();
-    }
+public interface SerializationStubber {
+   
+    /**
+     * Gets the id of the stubber, needed to de-stub the stubs.
+     * @return id of this stubber.
+     */
+    String getId();
+   
+    /**
+     * 
+     * @return Set of classes this stubber can stub.
+     */
+    Set<Class> getClasses();
     
+    /**
+     * Generate a stub for the given object.
+     * @param in a (probably non-serializable) object to be replaced by a stub.
+     * @return a serializable stub for the object.
+     */
+    StreamObjectStub stubFor( Object in );
+    
+    /**
+     * Parse a stub into an original object.
+     * @param aStub The stub to parse.
+     * @return An object.
+     */
+    Object objectFor( StreamObjectStub aStub );
 }

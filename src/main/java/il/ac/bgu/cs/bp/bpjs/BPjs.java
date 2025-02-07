@@ -23,8 +23,12 @@
  */
 package il.ac.bgu.cs.bp.bpjs;
 
+import il.ac.bgu.cs.bp.bpjs.bprogramio.BuiltInStubberFactory;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.SerializationStubberFactory;
 import il.ac.bgu.cs.bp.bpjs.internal.BPjsRhinoContextFactory;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContextFactory;
@@ -49,6 +53,8 @@ public class BPjs {
     private static ExecutorServiceMaker executorServiceMaker = new ExecutorServiceMaker();
     
     private static boolean logDuringVerification = false;
+    
+    private static final Set<SerializationStubberFactory> STUBBER_FACTORIES = new HashSet<>();
 
     static {
         ContextFactory.initGlobal( new BPjsRhinoContextFactory()) ;
@@ -58,6 +64,7 @@ public class BPjs {
             // NOTE: global extensions to BPjs scopes would go here, if we decide to create them.
         }
         RhinoException.setStackStyle(StackStyle.V8);
+        registerStubberFactory(new BuiltInStubberFactory() );
     }
     
     /**
@@ -141,6 +148,33 @@ public class BPjs {
      */
     public static void setLogDuringVerification(boolean logDuringVerification) {
         BPjs.logDuringVerification = logDuringVerification;
+    }
+    
+    /**
+     * Adds a new stubber factory to the currently registered factories.
+     * @param <T> The actual type of the factory, to allow fluent coding.
+     * @param aFactory The factory to add
+     * @return the added factory.
+     */
+    public static <T extends SerializationStubberFactory> T registerStubberFactory( T aFactory ) {
+        STUBBER_FACTORIES.add(aFactory);
+        return aFactory;
+    }
+    
+    /**
+     * Removes a stubber factory.
+     * @param aFactory 
+     */
+    public static void unregisterStubberFactory( SerializationStubberFactory aFactory ) {
+        STUBBER_FACTORIES.remove(aFactory);
+    }
+    
+    /**
+     * Returns currently registered stubber factories.
+     * @return currently registered stubber factories.
+     */
+    public static Set<SerializationStubberFactory> getRegisteredStubberFactories() {
+        return STUBBER_FACTORIES;
     }
     
     /**

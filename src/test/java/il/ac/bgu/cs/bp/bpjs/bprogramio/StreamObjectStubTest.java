@@ -23,14 +23,17 @@
  */
 package il.ac.bgu.cs.bp.bpjs.bprogramio;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
+import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import org.junit.Test;
 import static org.junit.Assert.*;
@@ -45,64 +48,123 @@ public class StreamObjectStubTest {
      */
     @Test
     public void testBasics() {
-        StreamObjectStub instance = new StreamObjectStub("Test");
+        StreamObjectStub instance = new StreamObjectStub("testStub", "SOMEDATA");
         String result = instance.toString();
-        assertTrue( result.contains("Test") );
-        Set<StreamObjectStub> stubSet = new HashSet<>();
-        stubSet.add( new StreamObjectStub("A") );
-        stubSet.add( new StreamObjectStub("B") );
-        stubSet.add( new StreamObjectStub("C") );
-        stubSet.add( new StreamObjectStub("B") );
-        assertEquals( 3, stubSet.size() );
+        assertTrue( result.contains("testStub") );
+        assertEquals( instance, new StreamObjectStub("testStub", "SOMEDATA") );
+        assertNotEquals(instance, new StreamObjectStub("testStub", "XX SOMEDATAX"));
+        assertNotEquals(instance, new StreamObjectStub("XX testStub", "SOMEDATA"));
+        
+        var set = new HashSet<>();
+        set.add( new StreamObjectStub("testStub", "SOMEDATA") );
+        set.add( new StreamObjectStub("testStub", "SOME xx DATA") );
+        set.add( new StreamObjectStub("test xx Stub", "SOMEDATA") );
+        set.add( new StreamObjectStub("testStub", "SOMEDATA") );
+        
+        assertEquals( 3, set.size() );
     }
 
-    /**
-     * Test of equals method, of class StreamObjectStub.
-     */
+    
     @Test
-    public void testEquals() {
-        Object sut = new StreamObjectStub("sut");
-        assertFalse( sut.equals(null) );
-        assertFalse( sut.equals("String") );
-        assertFalse( sut.equals(new StreamObjectStub("not-sut")) );
-        assertTrue( sut.equals(new StreamObjectStub("sut")) );
-        assertTrue( sut.equals(sut) );
+    public void testCustomSerialization() throws IOException, ClassNotFoundException {
+        
+        // Create stubber factory.
+        SerializationStubberFactory testFact = (BProgram aBProgram) -> new SerializationStubber(){
+            @Override
+            public String getId() {
+                return "test-stubber";
+            }
+            
+            @Override
+            public Set<Class> getClasses() {
+                return Set.of(NonSerializable.class);
+            }
+            
+            @Override
+            public StreamObjectStub stubFor(Object in) {
+                return new StreamObjectStub(getId(), ((NonSerializable)in).getData());
+            }
+            
+            @Override
+            public Object objectFor(StreamObjectStub aStub) {
+                return new NonSerializable((String) aStub.getData());
+            }
+        };
+        
+        // register factory
+        BPjs.registerStubberFactory(testFact);
+        
+        // now, test
+        List<NonSerializable> testDataIn = List.of(new NonSerializable("a"), new NonSerializable("ab"), new NonSerializable("abc"));
+        List<NonSerializable> testDataOut;
+        
+        byte[] serializedForm;
+        BProgramSyncSnapshotIO dupper = new BProgramSyncSnapshotIO(new StringBProgram("let x = 80;"));
+        
+        try ( ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            BPJSStubOutputStream btos = dupper.newOutputStream(baos)
+        ) { 
+            btos.writeObject(testDataIn);
+            btos.flush();
+            baos.flush();
+            serializedForm = baos.toByteArray();
+        }
+        
+        try ( ByteArrayInputStream bais = new ByteArrayInputStream(serializedForm);
+              BPJSStubInputStream btis = dupper.newInputStream(bais)
+        ) {
+            testDataOut = (List<NonSerializable>) btis.readObject();
+        }
+        
+        // clean up global status
+        BPjs.unregisterStubberFactory(testFact);
+        
+        // validate results.
+        assertEquals(testDataIn, testDataOut);
     }
     
     @Test
-    public void testSerialization() throws IOException, ClassNotFoundException {
-        
-        StreamObjectStub sutA = new StreamObjectStub("A");
-        StreamObjectStub sutB = new StreamObjectStub("B");
-        StreamObjectStub sutC = new StreamObjectStub("C");
-        
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(StreamObjectStub.BP_PROXY);
-        oos.writeObject( sutA );
-        oos.writeObject( sutB );
-        oos.writeObject( sutC );
-        
-        oos.flush();
-        oos.close();
-        baos.close();
-        
-        ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-        ObjectInputStream ois = new ObjectInputStream(bais);
-        
-        assertSame( StreamObjectStub.BP_PROXY, ois.readObject() );
-        Object outA = ois.readObject();
-        
-        assertEquals( sutA, outA );
-        assertNotSame( sutA, outA );
-    }
-    
-    @Test
-    public void testCustomSerializations() throws Exception {
-        final ResourceBProgram bprog = new ResourceBProgram("custom-serializations.js");
+    public void testBuiltInSerializations() throws Exception {
+        final ResourceBProgram bprog = new ResourceBProgram("built-in-serializations.js");
         DfsBProgramVerifier vfr = new DfsBProgramVerifier(bprog);
         
         // We just check that there are no serialization / de-serialization errors.
         vfr.verify(bprog);
     }
+}
+
+class NonSerializable {
+    private final String data;
+
+    public NonSerializable(String data) {
+        this.data = data;
+    }
+
+    public String getData() {
+        return data;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 47 * hash + Objects.hashCode(this.data);
+        return hash;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        if (getClass() != obj.getClass()) {
+            return false;
+        }
+        final NonSerializable other = (NonSerializable) obj;
+        return Objects.equals(this.data, other.data);
+    }
+    
+    
 }

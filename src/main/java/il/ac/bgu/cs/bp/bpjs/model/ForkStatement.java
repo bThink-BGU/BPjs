@@ -23,11 +23,9 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model;
 
-import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BPJSStubInputStream;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BPJSStubOutputStream;
-import il.ac.bgu.cs.bp.bpjs.bprogramio.StreamObjectStub;
-import il.ac.bgu.cs.bp.bpjs.bprogramio.StubProvider;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotIO;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy.Modification;
@@ -65,9 +63,10 @@ public class ForkStatement {
      */
     public void cloneBThreadData(BProgramSyncSnapshot syncOrigin){
         byte[] serializedForm;
+        BProgramSyncSnapshotIO dupper = new BProgramSyncSnapshotIO(syncOrigin.getBProgram());
         
         try ( ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            BPJSStubOutputStream btos = new BPJSStubOutputStream(baos) 
+            BPJSStubOutputStream btos = dupper.newOutputStream(baos)
         ) { 
             btos.writeObject(bthreadData);
             btos.writeObject(storageModifications);
@@ -80,17 +79,8 @@ public class ForkStatement {
             throw new RuntimeException("Error while serializing continuation during fork:" + ex.getMessage(), ex);
         }
         
-        final BProgramJsProxy bpProxy = new BProgramJsProxy(syncOrigin.getBProgram());
-
-        StubProvider stubPrv = (StreamObjectStub stub) -> {
-            if (stub == StreamObjectStub.BP_PROXY) {
-                return bpProxy;
-            }
-            throw new IllegalArgumentException("Unknown stub " + stub);
-        };
-        
         try ( ByteArrayInputStream bais = new ByteArrayInputStream(serializedForm);
-              BPJSStubInputStream btis = new BPJSStubInputStream(bais, stubPrv)
+              BPJSStubInputStream btis = dupper.newInputStream(bais)
         ) {
             
             bthreadData = btis.readObject();

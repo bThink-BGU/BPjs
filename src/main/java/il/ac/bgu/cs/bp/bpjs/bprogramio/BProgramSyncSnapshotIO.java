@@ -28,13 +28,14 @@ import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.SyncStatement;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
-import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.SafetyViolationTag;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -64,16 +65,19 @@ public class BProgramSyncSnapshotIO {
     }
 
     private final BProgram bprogram;
-    private StubProvider stubProvider = null;
+    private final Set<SerializationStubber> stubbers = new HashSet<>();
 
     public BProgramSyncSnapshotIO(BProgram bprogram) {
         this.bprogram = bprogram;
+        for ( var f : BPjs.getRegisteredStubberFactories() ) {
+            stubbers.add( f.build(bprogram) );
+        }
     }
 
     public byte[] serialize(BProgramSyncSnapshot bpss) throws IOException {
         try (Context cx = BPjs.enterRhinoContext()) {
             try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                BPJSStubOutputStream outs = new BPJSStubOutputStream(bytes)
+                BPJSStubOutputStream outs = newOutputStream(bytes)
             ) {
 
                 outs.writeObject(new Header(bpss.getBThreadSnapshots().size(), bpss.getExternalEvents().size(), bpss.getViolationTag()));
@@ -96,8 +100,7 @@ public class BProgramSyncSnapshotIO {
 
     public BProgramSyncSnapshot deserialize(byte[] bytes) throws IOException, ClassNotFoundException {
         try (Context cx = BPjs.enterRhinoContext()) {
-            try (BPJSStubInputStream in = new BPJSStubInputStream(new ByteArrayInputStream(bytes), 
-                                                    getStubProvider())
+            try (BPJSStubInputStream in = newInputStream(new ByteArrayInputStream(bytes))
             ) {
                 Header header = (Header) in.readObject();
                 
@@ -122,7 +125,7 @@ public class BProgramSyncSnapshotIO {
     public byte[] serializeBThread(BThreadSyncSnapshot btss) {
         try (Context cx = BPjs.enterRhinoContext()) {
             try (ByteArrayOutputStream bytes = new ByteArrayOutputStream();
-                BPJSStubOutputStream outs = new BPJSStubOutputStream(bytes) 
+                BPJSStubOutputStream outs = newOutputStream(bytes) 
             ) {
                 writeBThreadSnapshot(btss, outs);
                 outs.flush();
@@ -137,17 +140,34 @@ public class BProgramSyncSnapshotIO {
     
     public BThreadSyncSnapshot deserializeBThread( byte[] serializedBT, Map<String,Object> bprogramDataStore  ) {
         try (Context cx = BPjs.enterRhinoContext()) {
-            try (BPJSStubInputStream sis = new BPJSStubInputStream( 
-                                         new ByteArrayInputStream(serializedBT),
-                                         getStubProvider())
-            ) {
+            try (BPJSStubInputStream sis = newInputStream(new ByteArrayInputStream(serializedBT))) {
                 return readBThreadSnapshot(sis, bprogramDataStore);
             } catch (ClassNotFoundException|IOException ex) {
                 throw new RuntimeException("Error reading a serialized b-thread: " + ex.getMessage(), ex );
             }
         }
     }
-
+    
+    /**
+     * Create a properly stubbed output stream.
+     * @param downstream The stream to write into.
+     * @return A stubbed stream, based on BPjs's registered stub factories.
+     * @throws IOException 
+     */
+    public BPJSStubOutputStream newOutputStream(OutputStream downstream) throws IOException {
+        return new BPJSStubOutputStream(downstream, stubbers);
+    }
+    
+    /**
+     * Create a properly stubbed input stream
+     * @param upstream the stream to read from
+     * @return an input stream that de-stubs stream stubs.
+     * @throws IOException 
+     */
+    public BPJSStubInputStream newInputStream(InputStream upstream) throws IOException {
+        return new BPJSStubInputStream(upstream, stubbers);
+    }
+    
     private void writeBThreadSnapshot(BThreadSyncSnapshot bss, BPJSStubOutputStream outs) throws IOException {
         try {
             outs.writeObject(bss.getName());
@@ -175,19 +195,6 @@ public class BProgramSyncSnapshotIO {
         final BThreadSyncSnapshot bThreadSyncSnapshot = new BThreadSyncSnapshot(name, entryPoint, interruptHandler, cont, stmt, data, proxy);
 
         return bThreadSyncSnapshot;
-    }
-    
-    private StubProvider getStubProvider() {
-        final BProgramJsProxy bpProxy = new BProgramJsProxy(bprogram);
-        if ( stubProvider == null ) {
-            stubProvider = (StreamObjectStub stub) -> {
-                if (stub == StreamObjectStub.BP_PROXY) {
-                    return bpProxy;
-                }
-                throw new IllegalArgumentException("Unknown stub " + stub);
-            };
-        }
-        return stubProvider;
     }
     
 }

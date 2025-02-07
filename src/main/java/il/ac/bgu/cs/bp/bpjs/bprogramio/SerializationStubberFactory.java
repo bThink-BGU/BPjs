@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2017 michael.
+ * Copyright 2025 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -23,12 +23,20 @@
  */
 package il.ac.bgu.cs.bp.bpjs.bprogramio;
 
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+
 /**
- *
+ * Creates serialization stubbers, providing them with required bprogram
+ * context.
+ * 
  * @author michael
  */
-public interface StubProvider {
-    
-    Object get(StreamObjectStub stub);
-    
+public interface SerializationStubberFactory {
+   
+    /**
+     * Creates a serialization stubber for the passed {@link BProgram}.
+     * @param aBProgram
+     * @return A stubber for the passed bprogram.
+     */
+    SerializationStubber build( BProgram aBProgram );
 }

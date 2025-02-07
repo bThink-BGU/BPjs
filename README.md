@@ -56,6 +56,9 @@ If you use BPjs in an academic work, please consider citing it as:
 * :arrow_up: Upgraded to Rhino 1.8.0 with updated JavaScript version. See the many updates [here](https://github.com/mozilla/rhino/releases/tag/Rhino1_8_0_Release).
 * :arrow_up: ``DfsBProgramVerifier.ProgressListener` now supports default methods for easier implementation.
 * :sparkles: Integers are printed as integers, not floats (e.g `5`, not `5.0`).
+* :sparkles: Custom serialization is here. Client code can implement serialization logic and register it using `BPjs.registerStubberFactory()`.
+    * See examples at `StreamObjectStubTest` and `BuiltInStubberFactory` classes.
+    * Followed by [#107](https://github.com/bThink-BGU/BPjs/issues/107) and [#170](https://github.com/bThink-BGU/BPjs/issues/170).
 * :sparkles: Event selection strategies always run within a JS context, so any JS logic just works, no manual context wrapping required ([#229](https://github.com/bThink-BGU/BPjs/issues/229)).
 * :bug: When performing verification, exceptions during b-program setups are not swalloed anymore ([#228](https://github.com/bThink-BGU/BPjs/issues/228)).
 * :bug: Fixed a crash when accessing a b-program's global scope before the program starts to run.
