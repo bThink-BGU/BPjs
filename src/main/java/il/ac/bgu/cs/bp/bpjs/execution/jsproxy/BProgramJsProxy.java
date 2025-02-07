@@ -216,8 +216,16 @@ public class BProgramJsProxy extends SyncStatementBuilder
 
 
     public void setInterruptHandler(Object aPossibleHandler) {
-        CURRENT_BTHREAD.get().snapshot.setInterruptHandler(
-                (aPossibleHandler instanceof Function) ? (Function) aPossibleHandler : null);
+        final BThreadData currenntBThread = CURRENT_BTHREAD.get();
+        if ( aPossibleHandler == null ) {
+            currenntBThread.snapshot.setInterruptHandler(null);
+        } else {
+            if ( aPossibleHandler instanceof Function ) {
+                currenntBThread.snapshot.setInterruptHandler((Function) aPossibleHandler);
+            } else {
+                throw new BPjsRuntimeException("bthread " + currenntBThread.snapshot.getName() + ": interrupt handler must be a function. Got " + aPossibleHandler.toString() + " instead.");
+            }
+        }
     }
 
     ////////////////////////
