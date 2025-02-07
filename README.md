@@ -54,8 +54,10 @@ If you use BPjs in an academic work, please consider citing it as:
 
 ### 2025-02
 * :arrow_up: Upgraded to Rhino 1.8.0 with updated JavaScript version. See the many updates [here](https://github.com/mozilla/rhino/releases/tag/Rhino1_8_0_Release).
+* :arrow_up: ``DfsBProgramVerifier.ProgressListener` now supports default methods for easier implementation.
 * :sparkles: Integers are printed as integers, not floats (e.g `5`, not `5.0`).
 * :sparkles: Event selection strategies always run within a JS context, so any JS logic just works, no manual context wrapping required ([#229](https://github.com/bThink-BGU/BPjs/issues/229)).
+* :bug: When performing verification, exceptions during b-program setups are not swalloed anymore ([#228](https://github.com/bThink-BGU/BPjs/issues/228)).
 * :bug: Fixed a crash when accessing a b-program's global scope before the program starts to run.
 * :arrow_up: Added method `BProgramRunner::getListeners` ([#190](https://github.com/bThink-BGU/BPjs/issues/190)).
 * :arrow_up: Setting a non-function interrupt handler (which you should never do anyway) now throws an exception with informative message, rather than being siletly ignored. ([#114](https://github.com/bThink-BGU/BPjs/issues/114)).

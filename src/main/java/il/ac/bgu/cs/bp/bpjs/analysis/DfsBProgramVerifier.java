@@ -27,6 +27,7 @@ import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.JsErrorViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
+import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsSyncOutsideBThreadException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +74,7 @@ public class DfsBProgramVerifier {
          * Verifier {@code vfr} started a verification process.
          * @param vfr the verifier
          */
-        void started(DfsBProgramVerifier vfr);
+        default void started(DfsBProgramVerifier vfr){};
 
         /**
          * A periodical call to update progress.
@@ -82,7 +83,7 @@ public class DfsBProgramVerifier {
          * @param vfr the verifier
          * @see DfsBProgramVerifier#setIterationCountGap(long) 
          */
-        void iterationCount(long count, long statesHit, DfsBProgramVerifier vfr);
+        default void iterationCount(long count, long statesHit, DfsBProgramVerifier vfr){};
         
         /**
          * Verifier {@code vfr} hit the max trace length, and now pops its
@@ -91,7 +92,7 @@ public class DfsBProgramVerifier {
          * @param vfr The verifier.
          * @see DfsBProgramVerifier#setMaxTraceLength(long) 
          */
-        void maxTraceLengthHit(ExecutionTrace aTrace, DfsBProgramVerifier vfr);
+        default void maxTraceLengthHit(ExecutionTrace aTrace, DfsBProgramVerifier vfr){};
         
         /**
          * Verifier {@code vfr} reports a found violation. It is up to the listener
@@ -109,7 +110,7 @@ public class DfsBProgramVerifier {
          * The verifier {@code vfr} has finished the verification process.
          * @param vfr the verifier that found the violation
          */
-        void done(DfsBProgramVerifier vfr);
+        default void done(DfsBProgramVerifier vfr) {};
     }
     
     private static class ViolatingPathFoundException extends Exception {
@@ -186,7 +187,13 @@ public class DfsBProgramVerifier {
             
             long end = System.currentTimeMillis();
             return new VerificationResult(vio, end - start, visited.getVisitedStateCount(), visitedEdgeCount);
-
+            
+        } catch ( BPjsRuntimeException bre ) {
+            // Edge case where JS error is thrown at setup time, before any events are selected.
+            final JsErrorViolation jsErrorViolation = new JsErrorViolation(new ArrayExecutionTrace(currentBProgram), bre);
+            listener.violationFound(jsErrorViolation, this);
+            return new VerificationResult(jsErrorViolation, System.currentTimeMillis() - start, visited.getVisitedStateCount(), visitedEdgeCount);
+            
         } finally {            
             listener.done(this);
             execSvc.shutdown();

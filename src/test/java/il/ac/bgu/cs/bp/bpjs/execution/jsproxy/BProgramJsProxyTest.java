@@ -35,6 +35,7 @@ import org.junit.Test;
 import static il.ac.bgu.cs.bp.bpjs.TestUtils.traceEventNamesString;
 import il.ac.bgu.cs.bp.bpjs.analysis.ExecutionTraceInspection;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.DeadlockViolation;
+import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.BProgramRunnerListenerAdapter;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.InMemoryEventLoggingListener;
 import il.ac.bgu.cs.bp.bpjs.execution.listeners.PrintBProgramRunnerListener;
@@ -298,18 +299,26 @@ public class BProgramJsProxyTest {
     }
     
     @Test
-    public void syncOutOfBThreadAnalyzeTest() {
+    public void syncOutOfBThreadAnalyzeTest() throws Exception {
         BProgram sut = new ResourceBProgram("execution/jsproxy/syncFromGlobalScope.js");
         var vfr = new DfsBProgramVerifier(sut);
+        final AtomicReference<String> errorMessage = new AtomicReference<>();
+        var l = (DfsBProgramVerifier.ProgressListener) (Violation aViolation, DfsBProgramVerifier vfr1) -> {
+            errorMessage.set(aViolation.decsribe().toLowerCase());
+            return false;
+        };
+        vfr.setProgressListener(l);
+        var res = vfr.verify(sut);
+        assertTrue(errorMessage.get().contains("bp.sync"));
+        assertTrue(errorMessage.get().contains("forbidden"));
+        assertTrue(errorMessage.get().contains("outside of a b-thread"));           
         
-        try {
-            vfr.verify(sut);
-            fail("Verification should have failed with error message about syncc out of b-thread");
-        } catch (Exception ex) {
-            assertTrue(ex.getMessage().toLowerCase().contains("bp.sync"));
-            assertTrue(ex.getMessage().toLowerCase().contains("forbidden"));
-            assertTrue(ex.getMessage().toLowerCase().contains("outside of a b-thread"));           
-        }
+        assertTrue( res.isViolationFound() );
+      
+        String errorMessageFromViolation = res.getViolation().get().decsribe().toLowerCase();      
+        assertTrue(errorMessageFromViolation.contains("bp.sync"));
+        assertTrue(errorMessageFromViolation.contains("forbidden"));
+        assertTrue(errorMessageFromViolation.contains("outside of a b-thread"));           
     }
 
 
@@ -338,18 +347,28 @@ public class BProgramJsProxyTest {
     }
 
     @Test
-    public void threadOutOfBThreadAnalyzeTest() {
+    public void threadOutOfBThreadAnalyzeTest() throws Exception {
         BProgram sut = new ResourceBProgram("execution/jsproxy/bthreadFromGlobalScope.js");
-        var vfr = new DfsBProgramVerifier(sut);
-
-        try {
-            vfr.verify(sut);
-            fail("Verification should have failed with error message about thread out of b-thread");
-        } catch (Exception ex) {
-            assertTrue(ex.getMessage().toLowerCase().contains("bp.thread"));
-            assertTrue(ex.getMessage().toLowerCase().contains("forbidden"));
-            assertTrue(ex.getMessage().toLowerCase().contains("outside of a b-thread"));
-        }
+         var vfr = new DfsBProgramVerifier(sut);
+        final AtomicReference<String> errorMessage = new AtomicReference<>();
+        var l = (DfsBProgramVerifier.ProgressListener) (Violation aViolation, DfsBProgramVerifier vfr1) -> {
+            errorMessage.set(aViolation.decsribe().toLowerCase());
+            return false;
+        };
+        vfr.setProgressListener(l);
+        var res = vfr.verify(sut);
+        
+        assertTrue(errorMessage.get().contains("bp.thread"));
+        assertTrue(errorMessage.get().contains("forbidden"));
+        assertTrue(errorMessage.get().contains("outside of a b-thread"));           
+        
+        assertTrue( res.isViolationFound() );
+      
+        String errorMessageFromViolation = res.getViolation().get().decsribe().toLowerCase();      
+        assertTrue(errorMessageFromViolation.contains("bp.thread"));
+        assertTrue(errorMessageFromViolation.contains("forbidden"));
+        assertTrue(errorMessageFromViolation.contains("outside of a b-thread"));   
+        
     }
 
     private void runBThreadDataTest(String dispatch, List<String> expectedNames ) {
