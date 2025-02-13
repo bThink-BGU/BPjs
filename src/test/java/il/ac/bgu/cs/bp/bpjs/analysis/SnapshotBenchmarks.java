@@ -1,6 +1,6 @@
 package il.ac.bgu.cs.bp.bpjs.analysis;
 
-import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotIO;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramIO;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
@@ -59,7 +59,7 @@ public class SnapshotBenchmarks {
 
         static int[] getStateSizes(BProgram program, int num_steps) throws Exception {
             LOGGER.info("Measuring state size");
-            final BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(program);
+            final BProgramIO io = new BProgramIO(program);
             final ArrayList<Integer> snapshotSizes = new ArrayList<>();
             final BProgramRunner rnr = new BProgramRunner( program );
             

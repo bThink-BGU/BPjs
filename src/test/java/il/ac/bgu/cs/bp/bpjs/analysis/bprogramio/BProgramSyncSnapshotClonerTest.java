@@ -1,7 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.analysis.bprogramio;
 
 import il.ac.bgu.cs.bp.bpjs.BPjs;
-import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotIO;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramIO;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
@@ -71,7 +71,7 @@ public class BProgramSyncSnapshotClonerTest {
                 cur.getStatements().stream().flatMap(s->s.getRequest().stream()).findFirst().get(),
                 exSvc,
                 emptySet(), PASSTHROUGH);
-        BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(bprog);
+        BProgramIO io = new BProgramIO(bprog);
         byte[] out = io.serialize(cur);
         io.deserialize(out);
         exSvc.shutdown();
@@ -89,7 +89,7 @@ public class BProgramSyncSnapshotClonerTest {
                 cur.getStatements().stream().flatMap(s->s.getRequest().stream()).findFirst().get(),
                 exSvc,
                 emptySet(), PASSTHROUGH);
-        BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(bprog);
+        BProgramIO io = new BProgramIO(bprog);
         byte[] out = io.serialize(cur);
         BProgramSyncSnapshot deserialized = io.deserialize(out);
         

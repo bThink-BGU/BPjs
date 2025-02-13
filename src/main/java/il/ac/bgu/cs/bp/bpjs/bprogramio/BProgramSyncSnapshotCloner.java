@@ -34,7 +34,7 @@ import java.io.IOException;
 public class BProgramSyncSnapshotCloner {
 
 	public static BProgramSyncSnapshot clone(BProgramSyncSnapshot src) {
-		BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(src.getBProgram());
+		BProgramIO io = new BProgramIO(src.getBProgram());
 		try {
 			BProgramSyncSnapshot result = io.deserialize(io.serialize(src));
 			return result;

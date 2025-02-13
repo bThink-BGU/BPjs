@@ -99,7 +99,7 @@ public class StreamObjectStubTest {
         List<NonSerializable> testDataOut;
         
         byte[] serializedForm;
-        BProgramSyncSnapshotIO dupper = new BProgramSyncSnapshotIO(new StringBProgram("let x = 80;"));
+        BProgramIO dupper = new BProgramIO(new StringBProgram("let x = 80;"));
         
         try ( ByteArrayOutputStream baos = new ByteArrayOutputStream();
             BPJSStubOutputStream btos = dupper.newOutputStream(baos)

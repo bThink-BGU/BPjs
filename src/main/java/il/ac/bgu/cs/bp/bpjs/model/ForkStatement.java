@@ -25,7 +25,7 @@ package il.ac.bgu.cs.bp.bpjs.model;
 
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BPJSStubInputStream;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BPJSStubOutputStream;
-import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotIO;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramIO;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy.Modification;
@@ -63,7 +63,7 @@ public class ForkStatement {
      */
     public void cloneBThreadData(BProgramSyncSnapshot syncOrigin){
         byte[] serializedForm;
-        BProgramSyncSnapshotIO dupper = new BProgramSyncSnapshotIO(syncOrigin.getBProgram());
+        BProgramIO dupper = new BProgramIO(syncOrigin.getBProgram());
         
         try ( ByteArrayOutputStream baos = new ByteArrayOutputStream();
             BPJSStubOutputStream btos = dupper.newOutputStream(baos)

@@ -23,10 +23,17 @@
  */
 package il.ac.bgu.cs.bp.bpjs;
 
+import il.ac.bgu.cs.bp.bpjs.bprogramio.BPJSStubInputStream;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.BPJSStubOutputStream;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BuiltInStubberFactory;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.SerializationStubber;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.SerializationStubberFactory;
 import il.ac.bgu.cs.bp.bpjs.internal.BPjsRhinoContextFactory;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
+import il.ac.bgu.cs.bp.bpjs.model.BProgram;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -186,4 +193,35 @@ public class BPjs {
         return mainPackage != null ? mainPackage.getImplementationVersion() : null;
     }
     
+    /**
+     * Create an output stream for b-program constructs, initialized with proper 
+     * stubbers from the registered stubber factories.
+     * 
+     * @param bprog The b-program under which stubbing happens.
+     * @param downstream The output stream to write to.
+     * @return An output stream with stubbing capabilities.
+     * @throws IOException in case something goes wrong in super.
+     */
+    public static BPJSStubOutputStream createOutputStream( BProgram bprog, OutputStream downstream ) throws IOException {
+        var stubbers = new HashSet<SerializationStubber>();
+        for ( var f : BPjs.getRegisteredStubberFactories() ) {
+            stubbers.add( f.build(bprog) );
+        }
+        return new BPJSStubOutputStream(downstream, stubbers);
+    }
+    
+    /**
+     * Create an input stream for serialized BProgram constructs.
+     * @param bprog The BProgram under which serialization happens.
+     * @param upstream the input stream to read from.
+     * @return An inputstream that replaces stubs as needed.
+     * @throws IOException see super.
+     */
+    public static BPJSStubInputStream createInputStream( BProgram bprog, InputStream upstream ) throws IOException {
+        var stubbers = new HashSet<SerializationStubber>();
+        for ( var f : BPjs.getRegisteredStubberFactories() ) {
+            stubbers.add( f.build(bprog) );
+        }
+        return new BPJSStubInputStream(upstream, stubbers);
+    }
 }

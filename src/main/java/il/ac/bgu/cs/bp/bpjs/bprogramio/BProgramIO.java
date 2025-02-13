@@ -45,11 +45,12 @@ import org.mozilla.javascript.Context;
 import org.mozilla.javascript.Function;
 
 /**
- * Serialized and de-serializes {@link BProgramSyncSnapshot}s.
+ * Serializes and de-serializes objects that contain {@link BProgram}-related
+ * objects.
  *
  * @author michael
  */
-public class BProgramSyncSnapshotIO {
+public class BProgramIO {
 
     private static class Header implements java.io.Serializable {
 
@@ -67,7 +68,7 @@ public class BProgramSyncSnapshotIO {
     private final BProgram bprogram;
     private final Set<SerializationStubber> stubbers = new HashSet<>();
 
-    public BProgramSyncSnapshotIO(BProgram bprogram) {
+    public BProgramIO(BProgram bprogram) {
         this.bprogram = bprogram;
         for ( var f : BPjs.getRegisteredStubberFactories() ) {
             stubbers.add( f.build(bprogram) );

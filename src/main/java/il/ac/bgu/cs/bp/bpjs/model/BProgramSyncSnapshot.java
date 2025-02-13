@@ -1,7 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.model;
 
 import il.ac.bgu.cs.bp.bpjs.BPjs;
-import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotIO;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramIO;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.ResumeBThread;
@@ -367,7 +367,7 @@ public class BProgramSyncSnapshot {
         
         // duplicate snapshot and register the copy with the b-program
         try (Context cx = BPjs.enterRhinoContext()) {
-            BProgramSyncSnapshotIO io = new BProgramSyncSnapshotIO(bprog);
+            BProgramIO io = new BProgramIO(bprog);
             BThreadSyncSnapshot forkedBT = io.deserializeBThread(io.serializeBThread(btss), dataStore);
             bprog.registerForkedChild(btss);
             

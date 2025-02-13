@@ -34,9 +34,10 @@ import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 public interface SerializationStubberFactory {
    
     /**
-     * Creates a serialization stubber for the passed {@link BProgram}.
-     * @param aBProgram
-     * @return A stubber for the passed bprogram.
+     * Creates a serialization stubber for the passed {@link BProgram}. Note that the
+     * passed b-program MAY BE NULL.
+     * @param aBProgram the b-program under which the serialization happens. May be {@code null}.
+     * @return A stubber for the passed b-program.
      */
     SerializationStubber build( BProgram aBProgram );
 }

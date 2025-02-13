@@ -23,12 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.bprogramio;
 
-import il.ac.bgu.cs.bp.bpjs.BPjs;
 import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
-import org.mozilla.javascript.Context;
-import org.mozilla.javascript.Scriptable;
 
 /**
  * Placeholders for non-serializable objects in the  bthread serialization stream.

@@ -71,7 +71,7 @@ class BuiltInStubber implements SerializationStubber {
 
     @Override
     public StreamObjectStub stubFor(Object in) {
-        if ( in instanceof BProgramJsProxy ) return BP_PROXY;
+        if ( in instanceof BProgramJsProxy  ) return BP_PROXY;
         if ( in instanceof EventSetsJsProxy ) return ES_PROXY;
         if ( in instanceof Optional ) {
             Optional opt = (Optional) in;
