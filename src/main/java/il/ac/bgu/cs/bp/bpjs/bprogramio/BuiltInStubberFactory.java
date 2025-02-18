@@ -28,6 +28,7 @@ import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.EventSetsJsProxy;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import org.mozilla.javascript.Context;
@@ -80,7 +81,7 @@ class BuiltInStubber implements SerializationStubber {
         if ( in instanceof NativeSet ) {
             return NativeSetStub.forSet((NativeSet) in);
         }
-        throw new IllegalArgumentException("BuiltInStubber cannot handle " + in.toString());
+        throw new IllegalArgumentException("BuiltInStubber cannot handle " + Objects.toString(in));
     }
 
     @Override
