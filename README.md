@@ -64,7 +64,7 @@ If you use BPjs in an academic work, please consider citing it as:
 * :bug: Fixed a crash when accessing a b-program's global scope before the program starts to run.
 * :arrow_up: Added method `BProgramRunner::getListeners` ([#190](https://github.com/bThink-BGU/BPjs/issues/190)).
 * :arrow_up: Setting a non-function interrupt handler (which you should never do anyway) now throws an exception with informative message, rather than being siletly ignored. ([#114](https://github.com/bThink-BGU/BPjs/issues/114)).
-* :part_altertion_mark: Stack traces now use standard V8 formatting ([#198](https://github.com/bThink-BGU/BPjs/issues/198)).
+* :part_alternation_mark: Stack traces now use standard V8 formatting ([#198](https://github.com/bThink-BGU/BPjs/issues/198)).
 
 ### 2023-09
 * :sparkles: EventSets now have an `except` method, that allows removal of events from the set. e.g. `allMotionEvents.except(moveDownEvent)`. ([#218](https://github.com/bThink-BGU/BPjs/issues/218))
