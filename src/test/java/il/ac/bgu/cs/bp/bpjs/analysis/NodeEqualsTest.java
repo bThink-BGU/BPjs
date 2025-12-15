@@ -104,11 +104,11 @@ public class NodeEqualsTest {
     
     @Before
     public void setup() {
-        exSvc = BPjs.getExecutorServiceMaker().makeWithName("Test");
+        exSvc = BPjs.getExecutorServiceMaker().borrow();
     }
     
     @After
     public void teardown() {
-        exSvc.shutdown();
+        BPjs.getExecutorServiceMaker().returnService(exSvc);
     }
 }

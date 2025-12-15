@@ -55,6 +55,7 @@ If you use BPjs in an academic work, please consider citing it as:
 ### 2025-12
 * :arrow_up: Upgraded to Rhino 1.8.1.
 * :arrow_up: Upgraded build and test dependencies.
+* :bug: Fixed and issued which prevented executor sevices from being re-used. Users who use custom executor services in managed environments now need to use the new methods on `ExecutorService`: `borrow()`/`borrowWithName()` and `returnService()`. Most users will not be affected by this change.[#236](https://github.com/bThink-BGU/BPjs/issues/236)
 
 ### 2025-02
 * :arrow_up: Upgraded to Rhino 1.8.0 with updated JavaScript version. See the many updates [here](https://github.com/mozilla/rhino/releases/tag/Rhino1_8_0_Release).

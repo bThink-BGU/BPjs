@@ -54,7 +54,7 @@ public class BThreadSyncSnapshotTest {
         BProgram bprog = new ResourceBProgram("SnapshotTests/ABCDTrace.js");
         BProgramSyncSnapshot setup = bprog.setup();
 
-        ExecutorService execSvc = BPjs.getExecutorServiceMaker().makeWithName("BProgramSnapshotEqualityTest");
+        ExecutorService execSvc = BPjs.getExecutorServiceMaker().borrowWithName("BProgramSnapshotEqualityTest");
         List<BProgramSyncSnapshot> snapshots = new ArrayList<>();
         BProgramSyncSnapshot step = setup.start(execSvc, PASSTHROUGH);
         snapshots.add(BProgramSyncSnapshotCloner.clone(step));
@@ -75,7 +75,7 @@ public class BThreadSyncSnapshotTest {
         //  They should differ in loop index.
         assertNotEquals(snapshots.get(1).getBThreadSnapshots(), snapshots.get(0).getBThreadSnapshots());
         
-        execSvc.shutdown();
+        BPjs.getExecutorServiceMaker().returnService(execSvc);
     }
 
     @Test
@@ -88,13 +88,13 @@ public class BThreadSyncSnapshotTest {
                 "        }\n" +
                 "});");
         BProgramSyncSnapshot postSetup = bprog.setup();
-        ExecutorService execSvcA = BPjs.getExecutorServiceMaker().makeWithName("BProgramSnapshotTriggerTest");
-        BProgramSyncSnapshot postSync1 = postSetup.start(execSvcA, PASSTHROUGH);
+        ExecutorService execSvc = BPjs.getExecutorServiceMaker().borrowWithName("BProgramSnapshotTriggerTest");
+        BProgramSyncSnapshot postSync1 = postSetup.start(execSvc, PASSTHROUGH);
         Set<BEvent> possibleEvents = bprog.getEventSelectionStrategy().selectableEvents(postSync1);
         EventSelectionResult esr = bprog.getEventSelectionStrategy().select(postSync1, possibleEvents).get();
-        BProgramSyncSnapshot postSync2 = BProgramSyncSnapshotCloner.clone(postSync1).triggerEvent(esr.getEvent(), execSvcA, listeners, PASSTHROUGH);
+        BProgramSyncSnapshot postSync2 = BProgramSyncSnapshotCloner.clone(postSync1).triggerEvent(esr.getEvent(), execSvc, listeners, PASSTHROUGH);
         assertNotEquals(postSync1.getBThreadSnapshots(), postSync2.getBThreadSnapshots());
-        execSvcA.shutdown();
+        BPjs.getExecutorServiceMaker().returnService(execSvc);
     }
 
 }

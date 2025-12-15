@@ -23,17 +23,10 @@
  */
 package il.ac.bgu.cs.bp.bpjs;
 
-import il.ac.bgu.cs.bp.bpjs.bprogramio.BPJSStubInputStream;
-import il.ac.bgu.cs.bp.bpjs.bprogramio.BPJSStubOutputStream;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BuiltInStubberFactory;
-import il.ac.bgu.cs.bp.bpjs.bprogramio.SerializationStubber;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.SerializationStubberFactory;
 import il.ac.bgu.cs.bp.bpjs.internal.BPjsRhinoContextFactory;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
-import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -64,14 +57,14 @@ public class BPjs {
     private static final Set<SerializationStubberFactory> STUBBER_FACTORIES = new HashSet<>();
 
     static {
-        ContextFactory.initGlobal( new BPjsRhinoContextFactory()) ;
-        try (Context cx = enterRhinoContext()) {
+        ContextFactory.initGlobal(new BPjsRhinoContextFactory());
+        try ( Context cx = enterRhinoContext() ) {
             ImporterTopLevel importer = new ImporterTopLevel(cx);
             BPJS_SCOPE = cx.initStandardObjects(importer, true); // create and seal
             // NOTE: global extensions to BPjs scopes would go here, if we decide to create them.
         }
         RhinoException.setStackStyle(StackStyle.V8);
-        registerStubberFactory(new BuiltInStubberFactory() );
+        registerStubberFactory(new BuiltInStubberFactory());
     }
     
     /**

@@ -28,7 +28,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.ContextFactory;
 import org.mozilla.javascript.Scriptable;
 import org.mozilla.javascript.serialize.ScriptableInputStream;
 import org.mozilla.javascript.serialize.ScriptableOutputStream;
@@ -38,7 +37,6 @@ import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
-import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.StorageModificationStrategy;
 import java.util.HashMap;
@@ -73,7 +71,7 @@ public class ContinuationGames {
         
         // Run the top-level code (b-threads are registered but not yet run)
         BProgramSyncSnapshot cur = bprog.setup();
-        ExecutorService execSvc = BPjs.getExecutorServiceMaker().makeWithName("TEST");
+        ExecutorService execSvc = BPjs.getExecutorServiceMaker().borrowWithName("TEST");
         
         // Run to first bp.sync
         cur = cur.start(execSvc, StorageModificationStrategy.PASSTHROUGH);
@@ -112,7 +110,7 @@ public class ContinuationGames {
             System.out.println("Seriazlied to " + serializedContinuationAndScope.length + " bytes.");
             
         } finally {
-            execSvc.shutdown();
+            BPjs.getExecutorServiceMaker().returnService(execSvc);
         }
         
         // Run the BThread a few times:

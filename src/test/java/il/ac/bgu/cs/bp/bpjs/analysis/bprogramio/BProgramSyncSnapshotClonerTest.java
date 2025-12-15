@@ -65,7 +65,7 @@ public class BProgramSyncSnapshotClonerTest {
     public void testSerialization() throws Exception {
         BProgram bprog = new ResourceBProgram("SnapshotTests/BProgramSyncSnapshotClonerTest.js");
         BProgramSyncSnapshot cur = bprog.setup();
-        ExecutorService exSvc = BPjs.getExecutorServiceMaker().makeWithName("test");
+        ExecutorService exSvc = BPjs.getExecutorServiceMaker().borrowWithName("test");
         cur = cur.start(exSvc, PASSTHROUGH);
         cur.triggerEvent( 
                 cur.getStatements().stream().flatMap(s->s.getRequest().stream()).findFirst().get(),
@@ -74,14 +74,14 @@ public class BProgramSyncSnapshotClonerTest {
         BProgramIO io = new BProgramIO(bprog);
         byte[] out = io.serialize(cur);
         io.deserialize(out);
-        exSvc.shutdown();
+        BPjs.getExecutorServiceMaker().returnService(exSvc);
     }
     
     @Test
     public void testSerializatioWithExternals() throws Exception {
         BProgram bprog = new ResourceBProgram("SnapshotTests/BProgramSyncSnapshotClonerTest.js");
         BProgramSyncSnapshot cur = bprog.setup();
-        ExecutorService exSvc = BPjs.getExecutorServiceMaker().makeWithName("test");
+        ExecutorService exSvc = BPjs.getExecutorServiceMaker().borrowWithName("test");
         bprog.enqueueExternalEvent(new BEvent("External1"));
         bprog.enqueueExternalEvent(new BEvent("External2"));
         cur = cur.start(exSvc, PASSTHROUGH);
@@ -94,7 +94,7 @@ public class BProgramSyncSnapshotClonerTest {
         BProgramSyncSnapshot deserialized = io.deserialize(out);
         
         assertEquals( Arrays.asList(new BEvent("External1"), new BEvent("External2")), deserialized.getExternalEvents());
-        exSvc.shutdown();
+        BPjs.getExecutorServiceMaker().returnService(exSvc);
     }
     
     @Test

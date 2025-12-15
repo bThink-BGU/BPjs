@@ -171,7 +171,7 @@ public class DfsBProgramVerifier {
             inspections.addAll( ExecutionTraceInspections.DEFAULT_SET );
         }
         
-        ExecutorService execSvc = BPjs.getExecutorServiceMaker().makeWithName("DfsBProgramRunner-" + INSTANCE_COUNTER.incrementAndGet());
+        ExecutorService execSvc = BPjs.getExecutorServiceMaker().borrowWithName("DfsBProgramRunner-" + INSTANCE_COUNTER.incrementAndGet());
         
         BpLog.LogLevel prevLevel = currentBProgram.getLogLevel();
         if ( ! BPjs.isLogDuringVerification() ) {
@@ -196,7 +196,7 @@ public class DfsBProgramVerifier {
             
         } finally {            
             listener.done(this);
-            execSvc.shutdown();
+            BPjs.getExecutorServiceMaker().returnService(execSvc);
             if ( ! BPjs.isLogDuringVerification() ) {
                 currentBProgram.setLogLevel(prevLevel);
             }
