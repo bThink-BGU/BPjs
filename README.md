@@ -32,7 +32,7 @@ If you use BPjs in an academic work, please consider citing it as:
     <dependency>
         <groupId>com.github.bthink-bgu</groupId>
         <artifactId>BPjs</artifactId>
-        <version>0.13.0</version>
+        <version>0.14.0</version>
     </dependency>
     ...
 </dependencies>
@@ -51,6 +51,10 @@ If you use BPjs in an academic work, please consider citing it as:
 * [API Javadocs](http://www.javadoc.io/doc/com.github.bthink-bgu/BPjs/)
 
 ## Change Log for the BPjs Library.
+
+### 2025-12
+* :arrow_up: Upgraded to Rhino 1.8.1.
+* :arrow_up: Upgraded build and test dependencies.
 
 ### 2025-02
 * :arrow_up: Upgraded to Rhino 1.8.0 with updated JavaScript version. See the many updates [here](https://github.com/mozilla/rhino/releases/tag/Rhino1_8_0_Release).

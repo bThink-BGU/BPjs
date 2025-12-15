@@ -65,7 +65,7 @@ public class GeneralTest {
     @org.junit.Test
     public void multipleBPjsInstances() throws InterruptedException {
         int rangeStart = 1000;
-//      rangeStart = 100; // un-comment for a stress test
+//      rangeStart = 500; // un-comment for a stress test
         int rangeEnd   = 1010;
         int threadPoolSize = 4;
         

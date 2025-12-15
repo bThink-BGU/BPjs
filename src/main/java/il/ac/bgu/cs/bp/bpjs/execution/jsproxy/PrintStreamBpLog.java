@@ -83,7 +83,11 @@ public class PrintStreamBpLog implements BpLog {
     @Override
     public void setLevel(String levelName) {
         synchronized (this) {
-            level = LogLevel.valueOf(levelName);
+            try {
+                level = LogLevel.valueOf(levelName);
+            } catch (IllegalArgumentException iae) {
+                error("Unknown log level: '{0}'", levelName);
+            }
         }
     }
 
@@ -92,10 +96,14 @@ public class PrintStreamBpLog implements BpLog {
         return level.name();
     }
 
-    private static final Set<Class> PASS_THROUGH = Set.of(Integer.class, Long.class,
+    public LogLevel getTypedLevel() {
+        return level;
+    }
+    
+    public static final Set<Class> PASS_THROUGH = Set.of(Integer.class, Long.class,
         Short.class, Double.class, Float.class, String.class);
 
-    private Object formatArg(Object arg) {
+    protected Object formatArg(Object arg) {
         if ( arg == null ) return arg;
         if ( PASS_THROUGH.contains(arg.getClass()) ) return arg;
         return ScriptableUtils.stringify(arg);

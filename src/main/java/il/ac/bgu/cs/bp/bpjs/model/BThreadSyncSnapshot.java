@@ -71,7 +71,7 @@ public class BThreadSyncSnapshot implements Serializable {
      * @param interruptHandler  function to handle interrupts (or {@code null}, mostly)
      * @param continuation      captured b-thread continuation
      * @param bSyncStatement    current statement of the b-thread
-     * @param someData          data for the b-thread (mqy be null).
+     * @param someData          data for the b-thread (may be null).
      * @param modifications     modifications to the b-program store
      */
     public BThreadSyncSnapshot(String name, Function entryPoint, Function interruptHandler,

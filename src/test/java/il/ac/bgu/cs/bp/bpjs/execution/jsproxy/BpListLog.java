@@ -7,11 +7,11 @@ import java.util.List;
 public class BpListLog implements BpLog {
         private String level = "info";
 
-        private List<String> warn= new LinkedList<>();
-        private List<String> info= new LinkedList<>();
-        private List<String> fine= new LinkedList<>();
-        private List<String> off= new LinkedList<>();
-        private List<String> error= new LinkedList<>();
+        private final List<String> warn= new LinkedList<>();
+        private final List<String> info= new LinkedList<>();
+        private final List<String> fine= new LinkedList<>();
+        private final List<String> off= new LinkedList<>();
+        private final List<String> error= new LinkedList<>();
 
         @Override
         public void warn(Object msg, Object... args) {
