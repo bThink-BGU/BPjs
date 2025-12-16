@@ -24,7 +24,7 @@
  */
 
 
-var levels = ["Off" , "Error", "Warn", "Info", "Fine"]
+var levels = ["Off", "Error", "Warn", "Info", "Fine"]
 
 for ( var i in levels ) {
     bp.log.setLevel(levels[i]);

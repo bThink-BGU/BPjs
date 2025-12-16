@@ -107,7 +107,7 @@ public abstract class AbstractEventSelectionStrategy implements EventSelectionSt
     protected void warnOnHints( BProgramSyncSnapshot bpss ){
         if ( warningIssued ) return; // warn only once
         if ( bpss.getStatements().stream().anyMatch( s->s.getData()!=null ) ) {
-            System.out.println("[WARNING] Sync statements contain data. Current strategy ("+getClass().getCanonicalName()+") ignores this field.");
+            BPjs.log().warn("Sync statements contain data. Current strategy ("+getClass().getCanonicalName()+") ignores this field.");
             warningIssued = true;
         }
     }

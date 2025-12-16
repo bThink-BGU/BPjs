@@ -2,8 +2,10 @@ package il.ac.bgu.cs.bp.bpjs.model;
 
 import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramIO;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.log.BpLog;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
+import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.MapProxy;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.ResumeBThread;
 import il.ac.bgu.cs.bp.bpjs.execution.tasks.StartBThread;
 
@@ -221,6 +223,10 @@ public class BProgramSyncSnapshot {
         if ( mpcRes instanceof Success ) {
             Success success = (Success)mpcRes;
             success = sms.incomingModifications(success, this, nextRound);
+            if ( bprog.getLogLevel().compareTo(BpLog.LogLevel.Fine) >= 0 && !success.updates.isEmpty() ) {
+                bprog.getLogger().fine("Store changes:");
+                success.updates.forEach( (String k,MapProxy.Modification<Object> m) -> bprog.getLogger().fine("{0}:\t {1}", k, m));
+            }
             Map<String, Object> updatedStore = success.apply(dataStore);
             nextRound.forEach( ts -> ts.clearStorageModifications() ); // changes were applied, so can be reset.
             return new BProgramSyncSnapshot(bprog, nextRound, updatedStore, nextExternalEvents, violationTag.get());

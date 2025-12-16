@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 import org.mozilla.javascript.EcmaError;
-import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.JavaScriptException;
 import org.mozilla.javascript.RhinoException;
 
@@ -29,7 +28,12 @@ public class BPjsCodeEvaluationException extends BPjsException {
     }
 
     public BPjsCodeEvaluationException(RhinoException cause) {
-        super( ( cause instanceof JavaScriptException ? "JavaScript exception: ":"") +cause.details() + " (at " + cause.sourceName() + "#" + cause.lineNumber() + ":" + cause.columnNumber() + ")", cause);
+        super( 
+            ( cause != null && cause instanceof JavaScriptException ) 
+                ? ("JavaScript exception: " + cause.details() + " (at " + cause.sourceName() + "#" + cause.lineNumber() + ":" + cause.columnNumber() + ")")
+                : "",
+            cause
+        );
         this.cause = cause;
     }
 

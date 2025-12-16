@@ -21,28 +21,30 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
+package il.ac.bgu.cs.bp.bpjs.bprogramio.log;
 
-import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
-import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 
 import java.io.PrintStream;
-import java.text.MessageFormat;
-import java.util.Arrays;
-import java.util.Set;
+import java.io.PrintWriter;
 
 /**
- * Simple logging mechanism for {@link BProgram}s.
+ * Logs BPjs messages to a {@link PrintStream} or a {@link PrintWriter}.
  *
  * @author maor
  */
 public class PrintStreamBpLog implements BpLog {
 
     LogLevel level = DEFAULT_LOG_LEVEL;
-    private PrintStream out;
-
+    private PrintWriter out;
+    
+    private boolean autoFlush = true;
+    
+    public PrintStreamBpLog(PrintWriter aWriter ){
+        out = aWriter;
+    }
+    
     public PrintStreamBpLog(PrintStream aStream ){
-        out = aStream;
+        this(new PrintWriter(aStream));
     }
 
     public PrintStreamBpLog() {
@@ -73,17 +75,23 @@ public class PrintStreamBpLog implements BpLog {
     @Override
     public void log(LogLevel lvl, Object msg, Object[] args) {
         if (level.compareTo(lvl) >= 0) {
-            out.println("[BP][" + lvl.name() + "] " +
-                (((args==null)||(args.length > 0))
-                   ? MessageFormat.format( (msg!=null ? msg.toString():"<null>"), Arrays.stream(args).map(this::formatArg).toArray())
-                   : ScriptableUtils.stringify(msg)));
+            synchronized (this) {
+                out.println(formatMessage(lvl, msg, args));
+                if ( autoFlush ) {
+                    flush();
+                }
+            }
         }
     }
 
     @Override
     public void setLevel(String levelName) {
         synchronized (this) {
-            level = LogLevel.valueOf(levelName);
+            try {
+                level = LogLevel.valueOf(levelName.trim());
+            } catch (IllegalArgumentException iae) {
+                error("Unknown log level: '{0}'", levelName);
+            }
         }
     }
 
@@ -92,18 +100,26 @@ public class PrintStreamBpLog implements BpLog {
         return level.name();
     }
 
-    private static final Set<Class> PASS_THROUGH = Set.of(Integer.class, Long.class,
-        Short.class, Double.class, Float.class, String.class);
-
-    private Object formatArg(Object arg) {
-        if ( arg == null ) return arg;
-        if ( PASS_THROUGH.contains(arg.getClass()) ) return arg;
-        return ScriptableUtils.stringify(arg);
+    public LogLevel getTypedLevel() {
+        return level;
     }
+    
 
     @Override
     public void setLoggerPrintStream(PrintStream printStream){
-        out = printStream;
+        out = new PrintWriter(printStream);
     }
 
+    public boolean isAutoFlush() {
+        return autoFlush;
+    }
+
+    public void setAutoFlush(boolean autoFlush) {
+        this.autoFlush = autoFlush;
+    }
+    
+    public void flush() {
+        out.flush();
+    }
+    
 }

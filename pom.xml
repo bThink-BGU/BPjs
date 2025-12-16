@@ -64,7 +64,7 @@
         <dependency>
             <groupId>org.mozilla</groupId>
             <artifactId>rhino</artifactId>
-            <version>1.8.0</version>
+            <version>1.8.1</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
@@ -113,7 +113,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.11.2</version>
+                <version>3.12.0</version>
                 <configuration>
                     <source>11</source>
                 </configuration>
@@ -186,7 +186,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-shade-plugin</artifactId>
-                        <version>3.3.0</version>
+                        <version>3.6.1</version>
                         <executions>
                             <execution>
                                 <phase>package</phase>
@@ -239,7 +239,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-javadoc-plugin</artifactId>
-                        <version>3.11.2</version>
+                        <version>3.12.0</version>
                         <configuration>
                             <source>8</source>
                         </configuration>
@@ -255,7 +255,7 @@
                     <plugin>
                         <groupId>org.apache.maven.plugins</groupId>
                         <artifactId>maven-gpg-plugin</artifactId>
-                        <version>3.2.7</version>
+                        <version>3.2.8</version>
                         <executions>
                             <execution>
                                 <id>sign-artifacts</id>

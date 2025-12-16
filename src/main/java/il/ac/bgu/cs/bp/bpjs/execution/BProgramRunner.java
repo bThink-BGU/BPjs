@@ -79,7 +79,7 @@ public class BProgramRunner implements Runnable {
     public void run() {
         try {
             // setup bprogram and runtime parts.
-            execSvc = BPjs.getExecutorServiceMaker().makeWithName("BProgramRunner-" + instanceNum );
+            execSvc = BPjs.getExecutorServiceMaker().borrowWithName("BProgramRunner-" + instanceNum );
             failedAssertion = null;
             listeners.forEach(l -> l.starting(bprog));
             BProgramSyncSnapshot cur = bprog.setup();
@@ -159,10 +159,10 @@ public class BProgramRunner implements Runnable {
         } catch ( BPjsRuntimeException bre ) {
             listeners.forEach( l -> l.error(bprog, bre));
         } catch (InterruptedException itr) {
-            System.err.println("BProgramRunner interrupted: " + itr.getMessage() );
+            BPjs.log().warn("BProgramRunner interrupted: " + itr.getMessage() );
             
         } finally {
-            execSvc.shutdown();
+            BPjs.getExecutorServiceMaker().returnService(execSvc);        
         }
     }
     

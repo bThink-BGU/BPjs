@@ -131,8 +131,8 @@ public class ScriptableUtils {
         if ( a==null ^ b==null ) return false;
         if ( a.size() != b.size() ) return false;
         
-        Iterator itA = a.iterator();
-        Iterator itB = b.iterator();
+        Iterator<?> itA = a.iterator();
+        Iterator<?> itB = b.iterator();
         
         while ( itA.hasNext() ) {
             if ( ! jsEquals(itA.next(), itB.next()) ) return false;

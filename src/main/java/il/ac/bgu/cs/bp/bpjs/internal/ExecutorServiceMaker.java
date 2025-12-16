@@ -36,7 +36,26 @@ import java.util.concurrent.atomic.AtomicInteger;
  */
 public class ExecutorServiceMaker {
     
+    /**
+     * Borrows an executor service from the maker.
+     * @param threadNameTemplate Template for naming the Java threads of the executor
+     * @return an executor service for running b-threads.
+     * @deprecated Use ExecutorServiceMaker#burrowWithName(String)
+     */
+    @Deprecated()
     public ExecutorService makeWithName( String threadNameTemplate ) {
+        return borrowWithName(threadNameTemplate);
+    }
+    
+    /**
+     * Borrows an executor service from the maker. The service may be new or re-used.
+     * Note that once done with the service, it should be returned to the maker
+     * using {@code returnService}.
+     * @param threadNameTemplate Template for naming the Java threads of the executor
+     * @return an executor service for running b-threads.
+     * @see ExecutorServiceMaker#returnService(java.util.concurrent.ExecutorService) 
+     */
+    public ExecutorService borrowWithName( String threadNameTemplate ) {
         final ThreadFactory dtf = Executors.defaultThreadFactory();
         final AtomicInteger threadCoutner = new AtomicInteger(0);
         ThreadFactory tf = (Runnable r) -> {
@@ -46,6 +65,22 @@ public class ExecutorServiceMaker {
             return retVal;
         };
         return Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors(), tf);
+    }
+    
+    public ExecutorService borrow() {
+        return borrowWithName("BPjs-executor-thread_");
+    }
+    
+    /**
+     * Returns the service to the maker. The maker may or may not shut the service done.
+     * Once the service is returned, it cannot be used again. In case another executor service
+     * is needed, another service has to be borrowed using one of the {@code borrow} methods.
+     * @param doneService the service to be returned.
+     * @see ExecutorServiceMaker#borrow() 
+     * @see ExecutorServiceMaker#borrowWithName(java.lang.String)  
+     */
+    public void returnService( ExecutorService doneService ){
+        doneService.shutdown();
     }
 
 }

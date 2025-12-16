@@ -2,7 +2,7 @@ package il.ac.bgu.cs.bp.bpjs.model;
 
 import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BProgramJsProxy;
-import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BpLog;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.log.BpLog;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.EventSelectionStrategy;
 import il.ac.bgu.cs.bp.bpjs.model.eventselection.SimpleEventSelectionStrategy;
 
@@ -73,7 +73,7 @@ public abstract class BProgram {
     private boolean waitForExternalEvents;
 
     /**
-     * Events are enqueued here by external threads
+     * The b-program's environment sends events to {@code this} b-program using this queue.
      */
     private final BlockingQueue<BEvent> recentlyEnqueuedExternalEvents = new LinkedBlockingQueue<>();
 
@@ -145,7 +145,7 @@ public abstract class BProgram {
      * This method allows to programatically add code, e.g. for adding standard
      * environment, mocking non-modeled parts for model-checking.
      *
-     * @throws IllegalStateException if the code is appended after the bprogram
+     * @throws IllegalStateException if the code is appended after the b-program
      * started.
      * @param source JavaScript source to be added at the end of the current source.
      */
@@ -314,7 +314,7 @@ public abstract class BProgram {
 
         jsProxy = preSetLogger==null?
                   new BProgramJsProxy(this)
-                  :new BProgramJsProxy(this, preSetLogger);
+                  : new BProgramJsProxy(this, preSetLogger);
         if ( preSetLogLevel != null ) {
             jsProxy.log.setLevel(preSetLogLevel.name());
         }
@@ -542,7 +542,15 @@ public abstract class BProgram {
             ? BpLog.LogLevel.valueOf(jsProxy.log.getLevel())
             : (preSetLogLevel!= null)? preSetLogLevel: BpLog.DEFAULT_LOG_LEVEL;
     }
-
+    
+    /**
+     * Access {@code this} b-program's logger. May be {@code null} if the b-program was not started yet.
+     * @return the b-program logger (or {@code null}).
+     */
+    public BpLog getLogger() {
+        return jsProxy != null ? jsProxy.log : null;
+    }
+    
     public StorageModificationStrategy getStorageModificationStrategy() {
         return storageModificationStrategy;
     }

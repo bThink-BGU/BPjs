@@ -23,8 +23,8 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution;
 
-import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BpListLog;
-import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BpLog;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.log.BpListLog;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.log.BpLog;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
@@ -34,8 +34,6 @@ import java.io.PrintStream;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -54,7 +52,7 @@ public class LoggingTest {
         try (PrintStream myOut = new PrintStream(baos)) {
             final ResourceBProgram bprog = new ResourceBProgram("logging/simple.js");
             bprog.setLoggerOutputStreamer(myOut);
-            new BProgramRunner( bprog).run();
+            new BProgramRunner(bprog).run();
             myOut.flush();
         }
         String result = baos.toString(StandardCharsets.UTF_8.name());

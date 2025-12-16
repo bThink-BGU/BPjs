@@ -14,23 +14,21 @@ The "event generator" creates four events, one for each logging level. The "even
 
 .. code:: 
 
-  #  [READ] /.../logging.js
-  [JS][Info] registering b-threads - start
-    -:BPjs Added event generator
-    -:BPjs Added event logging
-  [JS][Info] registering b-threads - done
-  #  [ OK ] logging.js
   ---:BPjs Started
    --:BPjs Event [BEvent name:event 0]
-  [JS][Warn] event 0
-  [JS][Info] event 0
-  [JS][Fine] event 0
+  [BP][Error] event 0
+  [BP][Warn] event 0
+  [BP][Info] event 0
+  [BP][Fine] event 0
    --:BPjs Event [BEvent name:event 1]
-  [JS][Warn] event 1
-  [JS][Info] event 1
+  [BP][Error] event 1
+  [BP][Warn] event 1
+  [BP][Info] event 1
    --:BPjs Event [BEvent name:event 2]
-  [JS][Warn] event 2
+  [BP][Error] event 2
+  [BP][Warn] event 2
    --:BPjs Event [BEvent name:event 3]
+    -:BPjs Done event generator
   ---:BPjs No Event Selected
   ---:BPjs Ended
 

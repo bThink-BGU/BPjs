@@ -23,6 +23,7 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 
+import il.ac.bgu.cs.bp.bpjs.bprogramio.log.BpLog;
 import static il.ac.bgu.cs.bp.bpjs.TestUtils.isEmbeddedSublist;
 import il.ac.bgu.cs.bp.bpjs.analysis.BThreadSnapshotVisitedStateStore;
 import il.ac.bgu.cs.bp.bpjs.analysis.DfsBProgramVerifier;

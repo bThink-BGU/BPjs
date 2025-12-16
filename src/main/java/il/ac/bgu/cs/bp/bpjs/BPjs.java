@@ -23,17 +23,12 @@
  */
 package il.ac.bgu.cs.bp.bpjs;
 
-import il.ac.bgu.cs.bp.bpjs.bprogramio.BPJSStubInputStream;
-import il.ac.bgu.cs.bp.bpjs.bprogramio.BPJSStubOutputStream;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BuiltInStubberFactory;
-import il.ac.bgu.cs.bp.bpjs.bprogramio.SerializationStubber;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.SerializationStubberFactory;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.log.BpLog;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.log.PrintStreamBpLog;
 import il.ac.bgu.cs.bp.bpjs.internal.BPjsRhinoContextFactory;
 import il.ac.bgu.cs.bp.bpjs.internal.ExecutorServiceMaker;
-import il.ac.bgu.cs.bp.bpjs.model.BProgram;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -62,16 +57,18 @@ public class BPjs {
     private static boolean logDuringVerification = false;
     
     private static final Set<SerializationStubberFactory> STUBBER_FACTORIES = new HashSet<>();
-
+    
+    private static BpLog MAIN_LOGGER;
+    
     static {
-        ContextFactory.initGlobal( new BPjsRhinoContextFactory()) ;
-        try (Context cx = enterRhinoContext()) {
+        ContextFactory.initGlobal(new BPjsRhinoContextFactory());
+        try ( Context cx = enterRhinoContext() ) {
             ImporterTopLevel importer = new ImporterTopLevel(cx);
             BPJS_SCOPE = cx.initStandardObjects(importer, true); // create and seal
             // NOTE: global extensions to BPjs scopes would go here, if we decide to create them.
         }
         RhinoException.setStackStyle(StackStyle.V8);
-        registerStubberFactory(new BuiltInStubberFactory() );
+        registerStubberFactory(new BuiltInStubberFactory());
     }
     
     /**
@@ -191,6 +188,24 @@ public class BPjs {
     public static String getVersion(){
         Package mainPackage = BPjs.class.getPackage();
         return mainPackage != null ? mainPackage.getImplementationVersion() : null;
+    }
+    
+    public static BpLog log() { 
+        if ( MAIN_LOGGER==null ) {
+            MAIN_LOGGER = new PrintStreamBpLog();
+        }
+        return MAIN_LOGGER;
+    }
+
+    /**
+     * Sets the global logger for BPjs.
+     * @param <L> The exact type of the logger, fo fluent API calls.
+     * @param aBpLogger The new logger to use
+     * @return The new logger that is being used (for fluent API etc).
+     */
+    public static <L extends BpLog> L setLogger(L aBpLogger) {
+        BPjs.MAIN_LOGGER = aBpLogger;
+        return aBpLogger;
     }
     
 }

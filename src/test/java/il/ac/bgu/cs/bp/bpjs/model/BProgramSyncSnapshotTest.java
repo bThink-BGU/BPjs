@@ -76,14 +76,14 @@ public class BProgramSyncSnapshotTest {
                 "        bp.ASSERT(false,\"Failed Assert\");\n" +
                 "});");
         BProgramSyncSnapshot setup = bprog.setup();
-        ExecutorService execSvcA = BPjs.getExecutorServiceMaker().makeWithName("BProgramSnapshotTriggerTest");
+        ExecutorService execSvcA = BPjs.getExecutorServiceMaker().borrow();
         BProgramSyncSnapshot stepa = setup.start(execSvcA, PASSTHROUGH);
         Set<BEvent> possibleEvents_a = bprog.getEventSelectionStrategy().selectableEvents(stepa);
         EventSelectionResult event_a = bprog.getEventSelectionStrategy().select(stepa, possibleEvents_a).get();
         stepa.triggerEvent(event_a.getEvent(), execSvcA, listeners, PASSTHROUGH);
         exception.expect(IllegalStateException.class);
         stepa.triggerEvent(event_a.getEvent(), execSvcA, listeners, PASSTHROUGH);
-        execSvcA.shutdown();
+        BPjs.getExecutorServiceMaker().returnService(execSvcA);
     }
    
     @Test
@@ -93,14 +93,14 @@ public class BProgramSyncSnapshotTest {
                 "        bp.hot(true).sync({request:bp.Event(\"B\")});\n" +
                 "});");
         BProgramSyncSnapshot setup = bprog.setup();
-        ExecutorService execSvcA = BPjs.getExecutorServiceMaker().makeWithName("BProgramSnapshotTriggerTest");
+        ExecutorService execSvcA = BPjs.getExecutorServiceMaker().borrowWithName("BProgramSnapshotTriggerTest");
         BProgramSyncSnapshot bpss = setup.start(execSvcA, PASSTHROUGH);
         assertFalse(bpss.isHot());
         Set<BEvent> possibleEvents_a = bprog.getEventSelectionStrategy().selectableEvents(bpss);
         EventSelectionResult event_a = bprog.getEventSelectionStrategy().select(bpss, possibleEvents_a).get();
         bpss = bpss.triggerEvent(event_a.getEvent(), execSvcA, listeners, PASSTHROUGH);
         assertTrue(bpss.isHot());
-        execSvcA.shutdown();
+        BPjs.getExecutorServiceMaker().returnService(execSvcA);
     }
 
     /*
@@ -127,8 +127,8 @@ public class BProgramSyncSnapshotTest {
         
         
         // Run first step
-        ExecutorService execSvcA = BPjs.getExecutorServiceMaker().makeWithName("BProgramSnapshotEqualityTest");
-        ExecutorService execSvcB = BPjs.getExecutorServiceMaker().makeWithName("BProgramSnapshotEqualityTest");
+        ExecutorService execSvcA = BPjs.getExecutorServiceMaker().borrowWithName("BProgramSnapshotEqualityTest");
+        ExecutorService execSvcB = BPjs.getExecutorServiceMaker().borrowWithName("BProgramSnapshotEqualityTest");
         BProgramSyncSnapshot step1A = setupA.start(execSvcA, PASSTHROUGH);
         BProgramSyncSnapshot step1B = setupB.start(execSvcB, PASSTHROUGH);
         assertEquals(step1A, step1B);
@@ -159,8 +159,8 @@ public class BProgramSyncSnapshotTest {
         assertNotEquals(step3A, step2A);
         assertNotEquals(step3B, step2A);
         assertTrue(step3A.noBThreadsLeft());
-        execSvcA.shutdown();
-        execSvcB.shutdown();
+        BPjs.getExecutorServiceMaker().returnService(execSvcA);
+        BPjs.getExecutorServiceMaker().returnService(execSvcB);
     }
 
 
@@ -184,8 +184,8 @@ public class BProgramSyncSnapshotTest {
         BProgramSyncSnapshot setup2 = bprog2.setup();
 
         // Run first step
-        ExecutorService execSvcA = BPjs.getExecutorServiceMaker().makeWithName("BProgramSnapshotEqualityTest");
-        ExecutorService execSvcB = BPjs.getExecutorServiceMaker().makeWithName("BProgramSnapshotEqualityTest");
+        ExecutorService execSvcA = BPjs.getExecutorServiceMaker().borrowWithName("BProgramSnapshotEqualityTest");
+        ExecutorService execSvcB = BPjs.getExecutorServiceMaker().borrowWithName("BProgramSnapshotEqualityTest");
         BProgramSyncSnapshot postStart1 = setup1.start(execSvcA, PASSTHROUGH);
         BProgramSyncSnapshot postStart2 = setup2.start(execSvcB, PASSTHROUGH);
         assertNotEquals("The source code of the two bthreads is different, thus they should not eb equal.", postStart1, postStart2);
@@ -200,7 +200,7 @@ public class BProgramSyncSnapshotTest {
         assertEquals( event1_1, event1_2 );
 
 
-        execSvcA.shutdown();
-        execSvcB.shutdown();
+        BPjs.getExecutorServiceMaker().returnService(execSvcA);
+        BPjs.getExecutorServiceMaker().returnService(execSvcB);
     }
 }
