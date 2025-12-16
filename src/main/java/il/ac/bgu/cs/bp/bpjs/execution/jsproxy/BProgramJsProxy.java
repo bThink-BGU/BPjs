@@ -1,5 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
 
+import il.ac.bgu.cs.bp.bpjs.bprogramio.log.BpLog;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.log.PrintStreamBpLog;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsOutsideOfBThreadException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsSyncOutsideBThreadException;

@@ -159,7 +159,7 @@ public class BProgramRunner implements Runnable {
         } catch ( BPjsRuntimeException bre ) {
             listeners.forEach( l -> l.error(bprog, bre));
         } catch (InterruptedException itr) {
-            System.err.println("BProgramRunner interrupted: " + itr.getMessage() );
+            BPjs.log().warn("BProgramRunner interrupted: " + itr.getMessage() );
             
         } finally {
             BPjs.getExecutorServiceMaker().returnService(execSvc);        

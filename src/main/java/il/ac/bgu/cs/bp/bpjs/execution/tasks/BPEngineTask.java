@@ -1,6 +1,7 @@
 package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
 import il.ac.bgu.cs.bp.bpjs.BPjs;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.log.BpLog;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsCodeEvaluationException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsException;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
@@ -15,6 +16,7 @@ import il.ac.bgu.cs.bp.bpjs.model.BThreadSyncSnapshot;
 import il.ac.bgu.cs.bp.bpjs.model.FailedAssertionViolation;
 import il.ac.bgu.cs.bp.bpjs.model.ForkStatement;
 import il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets;
+import java.util.Arrays;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.ContinuationPending;
 import org.mozilla.javascript.EcmaError;
@@ -73,10 +75,7 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
         } catch ( WrappedException wfae ) {
             return handleWrappedException(wfae);
             
-        } catch ( EvaluatorException eve ) {
-            throw new BPjsCodeEvaluationException(eve);
-            
-        } catch ( JavaScriptException eve ) {
+        } catch ( EvaluatorException | JavaScriptException eve ) {
             throw new BPjsCodeEvaluationException(eve);
             
         } catch ( EcmaError jsError ) {
@@ -87,9 +86,22 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
             }
             
         } catch ( Throwable generalThrowable ) {
-            System.err.println("BPjs Error: Unhandled exception in BPEngineTask.");
-            System.err.println("            This is a bug in BPjs. Please report. Sorry.");
-            generalThrowable.printStackTrace( System.err );
+            final BpLog log = BPjs.log();
+            log.error("BPjs Error: Unhandled exception in BPEngineTask.");
+            log.error("            This is a bug in BPjs. Please report. Sorry.");
+            log.error(generalThrowable.getMessage());
+            Throwable curThrowable = generalThrowable;
+            while ( curThrowable != null ) {
+                if ( curThrowable.getStackTrace() != null ) {
+                    Arrays.asList(curThrowable.getStackTrace()).forEach( frame -> {
+                       log.error( String.format(" at %s (%s:%d)", frame.getClassName(), frame.getFileName(), frame.getLineNumber()));
+                    });
+                }
+                curThrowable = curThrowable.getCause();
+                if ( curThrowable != null ) {
+                    log.error("Caused by:");
+                }
+            }
             
             throw generalThrowable;
             
@@ -121,7 +133,7 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
             if ( hasRequest && hasBlock ) {
                 boolean hasCollision = syncStatement.getRequest().stream().allMatch(syncStatement.getBlock()::contains);
                 if ( hasCollision ) {
-                    System.err.println("Warning: B-thread '"+btss.getName()+"' is blocking an event it is also requesting, this may lead to a deadlock.");
+                    BPjs.log().warn("B-thread '"+btss.getName()+"' is blocking an event it is also requesting, this may lead to a deadlock.");
                 }
             }
             

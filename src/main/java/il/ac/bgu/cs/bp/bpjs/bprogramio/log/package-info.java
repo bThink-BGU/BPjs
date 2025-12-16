@@ -1,7 +1,7 @@
 /*
  * The MIT License
  *
- * Copyright 2018 michael.
+ * Copyright 2025 michael.
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -21,31 +21,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-
-package il.ac.bgu.cs.bp.bpjs.execution.jsproxy;
-
-import java.io.PrintStream;
-
-public interface BpLog extends java.io.Serializable {
-    LogLevel DEFAULT_LOG_LEVEL = LogLevel.Info;
-
-    void warn(Object msg, Object... args);
-
-    void info(Object msg, Object... args);
-
-    void fine(Object msg, Object... args);
-
-    void error(Object msg, Object... args);
-
-    void log(LogLevel lvl, Object msg, Object[] args);
-
-    void setLevel(String levelName);
-
-    String getLevel();
-
-    void setLoggerPrintStream(PrintStream printStream);
-
-    public enum LogLevel {
-        Off, Error, Warn, Info, Fine
-    }
-}
+/**
+ * BPjs uses an internal logging interface that can be connected
+ * to multiple logging output. Relevant classes live here.
+ */
+package il.ac.bgu.cs.bp.bpjs.bprogramio.log;

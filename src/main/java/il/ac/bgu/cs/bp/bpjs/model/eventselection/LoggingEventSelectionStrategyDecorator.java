@@ -23,6 +23,8 @@
  */
 package il.ac.bgu.cs.bp.bpjs.model.eventselection;
 
+import il.ac.bgu.cs.bp.bpjs.bprogramio.log.BpLog;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.log.PrintStreamBpLog;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
 import java.io.PrintStream;
@@ -40,11 +42,11 @@ import java.util.Set;
  */
 public class LoggingEventSelectionStrategyDecorator<ESS extends EventSelectionStrategy> extends AbstractEventSelectionStrategyDecorator<ESS> {
     
-    private final PrintWriter out;
+    private final BpLog out;
     
     public LoggingEventSelectionStrategyDecorator(ESS decorated, PrintWriter anOut) {
         super(decorated);
-        out = anOut;
+        out = new PrintStreamBpLog(anOut);
     }
     
     public LoggingEventSelectionStrategyDecorator(ESS decorated) {
@@ -55,25 +57,24 @@ public class LoggingEventSelectionStrategyDecorator<ESS extends EventSelectionSt
     public Set<BEvent> selectableEvents(BProgramSyncSnapshot bpss) {
         final Set<BEvent> selectableEvents = getDecorated().selectableEvents(bpss);
 
-        out.println("== Choosing Selectable Events ==");
-        out.println("BThread Sync Statements:");
+        out.info("== Choosing Selectable Events ==");
+        out.info("BThread Sync Statements:");
         bpss.getStatements().forEach( stmt -> {
-            out.println("+ " + stmt.getBthread().getName() + ":" + (stmt.isHot()?" HOT":""));
-            out.println("    Request: " + stmt.getRequest());
-            out.println("    WaitFor: " + stmt.getWaitFor());
-            out.println("    Block: "   + stmt.getBlock());
-            out.println("    Interrupt: " + stmt.getInterrupt());
+            out.info("+ " + stmt.getBthread().getName() + ":" + (stmt.isHot()?" HOT":""));
+            out.info("    Request: " + stmt.getRequest());
+            out.info("    WaitFor: " + stmt.getWaitFor());
+            out.info("    Block: "   + stmt.getBlock());
+            out.info("    Interrupt: " + stmt.getInterrupt());
         });
-        out.println("+ ExternalEvents: " + bpss.getExternalEvents());
+        out.info("+ ExternalEvents: " + bpss.getExternalEvents());
         
-        out.println("-- Selectable Events -----------");
+        out.info("-- Selectable Events -----------");
         if ( selectableEvents.isEmpty() ){
-            out.println(" - none -");
+            out.info(" - none -");
         } else {
-            selectableEvents.stream().forEach( e -> out.println(" + " + e));
+            selectableEvents.stream().forEach( e -> out.info(" + " + e));
         }
-        out.println("================================");
-        out.flush();
+        out.info("================================");
 
         return selectableEvents;
     }
@@ -81,10 +82,9 @@ public class LoggingEventSelectionStrategyDecorator<ESS extends EventSelectionSt
     @Override
     public Optional<EventSelectionResult> select(BProgramSyncSnapshot bpss, Set<BEvent> selectableEvents) {
         Optional<EventSelectionResult> selectedEvent = getDecorated().select(bpss, selectableEvents);
-        out.println("== Actual Event Selection ======");
-        out.println( selectedEvent.toString() );
-        out.println("================================");
-        out.flush();
+        out.info("== Actual Event Selection ======");
+        out.info( selectedEvent.toString() );
+        out.info("================================");
         return selectedEvent;
     }
     

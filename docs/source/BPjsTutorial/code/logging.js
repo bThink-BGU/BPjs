@@ -12,11 +12,12 @@ bp.registerBThread( "event logging", function() {
   while (true) {
     var evt = bp.sync({waitFor:bp.all});
     bp.log.setLevel(LOG_LEVELS[idx]);
+    bp.log.error( evt.name );
     bp.log.warn( evt.name );
     bp.log.info( evt.name );
     bp.log.fine( evt.name );
     idx++;
   }
-})
+});
 
 bp.log.info("registering b-threads - done");

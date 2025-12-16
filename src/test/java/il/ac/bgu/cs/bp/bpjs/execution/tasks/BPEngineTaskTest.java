@@ -23,15 +23,12 @@
  */
 package il.ac.bgu.cs.bp.bpjs.execution.tasks;
 
+import il.ac.bgu.cs.bp.bpjs.BPjs;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.log.BpListLog;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import static java.util.stream.Collectors.joining;
 import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
@@ -40,34 +37,19 @@ import org.junit.Test;
  * @author michael
  */
 public class BPEngineTaskTest {
-    
-    
+
     @Test
     public void testSelfBlockWarning() {
+
+        final BpListLog curLogger = BPjs.setLogger(new BpListLog());
+
         BProgram bpr = new ResourceBProgram("bpsync-blockrequest.js");
         BProgramRunner rnr = new BProgramRunner(bpr);
-        
-        var prevErr = System.err;
-        
-        ByteArrayOutputStream out = new ByteArrayOutputStream();
-        PrintStream prtOut = new PrintStream(out);
-        
-        try {
-            System.setErr(prtOut);
 
-            rnr.run();
-            prtOut.flush();
-            out.flush();
-            String outRes = out.toString(StandardCharsets.UTF_8);
-            assertTrue( outRes.contains("helloer") ); // name of the self-blocking b-thread
-            assertTrue( outRes.contains("Warning") ); // There's a warning there too.
-        
-        } catch (IOException ex) {
-            Logger.getLogger(BPEngineTaskTest.class.getName()).log(Level.SEVERE, null, ex);
-            
-        } finally {
-            System.setErr(prevErr);
-        }
-        
+        rnr.run();
+        String outRes = curLogger.getAll().stream().collect(joining("\n"));
+        assertTrue(outRes.contains("helloer")); // name of the self-blocking b-thread
+        assertTrue(outRes.contains("Warn")); // There's a warning there too.
+
     }
 }

@@ -42,7 +42,7 @@ import java.util.Set;
  */
 public class BPJSStubOutputStream extends ScriptableOutputStream {
 
-    private Map<Class, SerializationStubber> stubbers = new HashMap<>();
+    private final Map<Class, SerializationStubber> stubbers = new HashMap<>();
     
     /**
      * Constructor
@@ -55,7 +55,7 @@ public class BPJSStubOutputStream extends ScriptableOutputStream {
         for ( var stb : someStubbers ) {
             for ( var clz : stb.getClasses() ) {
                 if ( stubbers.containsKey(clz) ) {
-                    System.err.println("Warning: stubber " + stb.getId() + " overrides stubber for class " + clz.getCanonicalName() + ", previously set by " + stubbers.get(clz).getId() );
+                    BPjs.log().warn("Stubber " + stb.getId() + " overrides stubber for class " + clz.getCanonicalName() + ", previously set by " + stubbers.get(clz).getId() );
                 }
                 stubbers.put(clz, stb);
             }

@@ -53,9 +53,18 @@ If you use BPjs in an academic work, please consider citing it as:
 ## Change Log for the BPjs Library.
 
 ### 2025-12
+
+> [!IMPORTANT]
+> This update breaks backward compatibility in some minor ways around logging and custom executor services, as some methods were 
+> added and some classes were moved. See below for details. Updates should be pretty straightforward. Contact us if there's any
+> issue, we'll be happy to help.
+
 * :arrow_up: Upgraded to Rhino 1.8.1.
 * :arrow_up: Upgraded build and test dependencies.
 * :bug: Fixed and issued which prevented executor sevices from being re-used. Users who use custom executor services in managed environments now need to use the new methods on `ExecutorService`: `borrow()`/`borrowWithName()` and `returnService()`. Most users will not be affected by this change.[#236](https://github.com/bThink-BGU/BPjs/issues/236)
+* :tada: BPLog moved to own package. BPjs now has a central static logger, and no prints should go to `Systen.(out|err)` if you don't want them to. This is still the default behavior, but now messages go through the logging system first, so they can be directed to other logging destinations as well. [#231](https://github.com/bThink-BGU/BPjs/issues/231)
+* :arrow_up: `BpLog` is now easier to subclass, as core functionality moved to the interface using `default` methods.
+* :sparkles: Added a new logging level: `Error`. Exposed via `bp.log.error("ouch!")`.
 
 ### 2025-02
 * :arrow_up: Upgraded to Rhino 1.8.0 with updated JavaScript version. See the many updates [here](https://github.com/mozilla/rhino/releases/tag/Rhino1_8_0_Release).

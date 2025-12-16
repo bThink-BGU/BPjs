@@ -27,12 +27,11 @@ import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.JsErrorViolation;
 import il.ac.bgu.cs.bp.bpjs.analysis.violations.Violation;
 import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsRuntimeException;
-import il.ac.bgu.cs.bp.bpjs.exceptions.BPjsSyncOutsideBThreadException;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import il.ac.bgu.cs.bp.bpjs.execution.jsproxy.BpLog;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.log.BpLog;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.BEvent;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
@@ -340,9 +339,9 @@ public class DfsBProgramVerifier {
     }
 
     void printStatus(long iteration, List<DfsTraversalNode> path) {
-        System.out.println("Iteration " + iteration);
-        System.out.println("  visited: " + visited.getVisitedStateCount());
-        path.forEach(n -> System.out.println("  " + n.getLastEvent()));
+        BPjs.log().fine("Iteration " + iteration);
+        BPjs.log().fine("  visited: " + visited.getVisitedStateCount());
+        path.forEach(n -> BPjs.log().fine("  " + n.getLastEvent()));
     }
     
     private Violation inspectCurrentTrace() {
@@ -350,14 +349,14 @@ public class DfsBProgramVerifier {
                                     .map(v->v.inspectTrace(trace))
                                     .filter(o->o.isPresent()).map(Optional::get)
                                     .collect(toSet());
-        if ( res.size() > 0  ) {
+        if ( !res.isEmpty()  ) {
             for ( Violation v : res ) {
                 if ( ! listener.violationFound(v, this) ) {
                     return v;
                 }
             }
             if (isDebugMode()) {
-                System.out.println("-pop! (violation)-");
+                BPjs.log().fine("-pop! (violation)-");
             }
             pop();
         }
@@ -368,7 +367,7 @@ public class DfsBProgramVerifier {
         visited.store(n.getSystemState());
         currentPath.add(n);
         if (isDebugMode()) {
-            System.out.println("-visiting: " + n);
+            BPjs.log().fine("-visiting: " + n);
         }
         if ( trace.getStateCount() == 0 ) {
             trace.push( n.getSystemState() );
@@ -381,7 +380,7 @@ public class DfsBProgramVerifier {
         DfsTraversalNode popped = currentPath.remove(currentPath.size() - 1);
         trace.pop();
         if (isDebugMode()) {
-            System.out.println("-pop!-");
+            BPjs.log().fine("-pop!-");
         }
         return popped;
     }

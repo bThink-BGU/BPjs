@@ -45,7 +45,6 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.mozilla.javascript.Context;
-import org.mozilla.javascript.EvaluatorException;
 import org.mozilla.javascript.RhinoException;
 import org.mozilla.javascript.Scriptable;
 
@@ -211,12 +210,12 @@ public class BPjsCliRunner {
     }
     
     private static String keyForValue( String aKey, String args[] ) {
-       for ( int idx=0; idx<args.length; idx++ ) {
-           if ( args[idx].startsWith(aKey+"=") ) {
-               String[] comps = args[idx].split("=", 2);
-               return comps.length == 2 ? comps[1] : null;
-           }
-       }
+        for (String arg : args) {
+            if (arg.startsWith(aKey+"=")) {
+                String[] comps = arg.split("=", 2);
+                return comps.length == 2 ? comps[1] : null;
+            }
+        }
        return null;
     }
     
