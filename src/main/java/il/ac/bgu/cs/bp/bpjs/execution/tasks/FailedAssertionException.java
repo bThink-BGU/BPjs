@@ -29,9 +29,11 @@ package il.ac.bgu.cs.bp.bpjs.execution.tasks;
  * @author michael
  */
 public class FailedAssertionException extends RuntimeException {
-
+    
+    
     public FailedAssertionException(String message) {
         super(message);
     }
+
     
 }

@@ -171,6 +171,8 @@ public abstract class BPEngineTask implements Callable<BThreadSyncSnapshot>{
         if ( wfae.getCause() instanceof FailedAssertionException ) {
             FailedAssertionException fae = (FailedAssertionException) wfae.getCause();
             FailedAssertionViolation fa = new FailedAssertionViolation( fae.getMessage(), btss.getName() );
+            fa.setScriptStack(wfae.getScriptStack());
+            
             listener.assertionFailed( fa );
             return null;
             

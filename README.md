@@ -66,6 +66,7 @@ If you use BPjs in an academic work, please consider citing it as:
 * :arrow_up: `BpLog` is now easier to subclass, as core functionality moved to the interface using `default` methods.
 * :sparkles: Added a new logging level: `Error`. Exposed via `bp.log.error("ouch!")`.
 * :arrow_up: When logger is in `Fine` level, sotrage modifications are printed to the b-program's logger. [#230](https://github.com/bThink-BGU/BPjs/issues/230)
+* :tada: Violations now have location and stack trace. [#224](https://github.com/bThink-BGU/BPjs/issues/224)
 
 ### 2025-02
 * :arrow_up: Upgraded to Rhino 1.8.0 with updated JavaScript version. See the many updates [here](https://github.com/mozilla/rhino/releases/tag/Rhino1_8_0_Release).

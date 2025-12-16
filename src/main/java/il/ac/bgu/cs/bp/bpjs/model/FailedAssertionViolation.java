@@ -24,6 +24,8 @@
 package il.ac.bgu.cs.bp.bpjs.model;
 
 import java.util.Objects;
+import java.util.Optional;
+import org.mozilla.javascript.ScriptStackElement;
 
 /**
  * Captures a failed assertion done by a b-thread. This is normally used to capture
@@ -33,13 +35,31 @@ import java.util.Objects;
  */
 public class FailedAssertionViolation extends SafetyViolationTag implements java.io.Serializable {
     private final String bThreadName;
-
+    
+    private ScriptStackElement[] scriptStack;
+    
     public FailedAssertionViolation(String message, String bThreadName) {
         super(message);
         this.bThreadName = bThreadName;
     }
+    
+    public ScriptStackElement[] getScriptStack() {
+        return scriptStack;
+    }
 
+    public void setScriptStack(ScriptStackElement[] scriptStack) {
+        this.scriptStack = scriptStack;
+    }    
+    
+    Optional<ScriptStackElement> stackTop() {
+        return scriptStack != null ? Optional.of(scriptStack[0]): Optional.empty();
+    }
+    
+    public final Optional<String> getLocation() {
+        return stackTop().map( f -> f.functionName + " (" + f.fileName + ":" + f.lineNumber + ")" );
+    }
 
+    
     public String getBThreadName() {
         return bThreadName;
     }
