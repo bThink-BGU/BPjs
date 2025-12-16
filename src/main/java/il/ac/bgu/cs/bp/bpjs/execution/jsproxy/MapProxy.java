@@ -28,9 +28,10 @@ import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.stream.Collectors;
+import org.mozilla.javascript.Scriptable;
 
 /**
- * A Proxy to a map.Stores changes to the proxied map, but does not change it.
+ * A Proxy to a map. Stores changes to the proxied map, but does not change it.
  * @author michael
  * @param <K> Type of the keys in the map.
  * @param <V> Type of values in the map.
@@ -38,7 +39,13 @@ import java.util.stream.Collectors;
 public class MapProxy<K,V> implements java.io.Serializable {
 
     public static abstract class Modification<VV> implements java.io.Serializable {
-        public static final Modification DELETE = new Modification(){};
+        public static final Modification DELETE = new Modification(){
+            @Override
+            public String toString() {
+                return "{-DELETE-}";
+            }
+            
+        };
     }
     
     public static class PutValue<VV> extends Modification<VV> implements java.io.Serializable {
@@ -67,7 +74,12 @@ public class MapProxy<K,V> implements java.io.Serializable {
             final PutValue other = (PutValue) obj;
             
             return ScriptableUtils.jsEquals(this.value, other.value);
-        }        
+        }
+        
+        @Override
+        public String toString() {
+            return "Put " + ScriptableUtils.stringify(getValue());
+        }
     }
    
     

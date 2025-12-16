@@ -542,7 +542,15 @@ public abstract class BProgram {
             ? BpLog.LogLevel.valueOf(jsProxy.log.getLevel())
             : (preSetLogLevel!= null)? preSetLogLevel: BpLog.DEFAULT_LOG_LEVEL;
     }
-
+    
+    /**
+     * Access {@code this} b-program's logger. May be {@code null} if the b-program was not started yet.
+     * @return the b-program logger (or {@code null}).
+     */
+    public BpLog getLogger() {
+        return jsProxy != null ? jsProxy.log : null;
+    }
+    
     public StorageModificationStrategy getStorageModificationStrategy() {
         return storageModificationStrategy;
     }

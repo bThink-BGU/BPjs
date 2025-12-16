@@ -65,6 +65,7 @@ If you use BPjs in an academic work, please consider citing it as:
 * :tada: BPLog moved to own package. BPjs now has a central static logger, and no prints should go to `Systen.(out|err)` if you don't want them to. This is still the default behavior, but now messages go through the logging system first, so they can be directed to other logging destinations as well. [#231](https://github.com/bThink-BGU/BPjs/issues/231)
 * :arrow_up: `BpLog` is now easier to subclass, as core functionality moved to the interface using `default` methods.
 * :sparkles: Added a new logging level: `Error`. Exposed via `bp.log.error("ouch!")`.
+* :arrow_up: When logger is in `Fine` level, sotrage modifications are printed to the b-program's logger. [#230](https://github.com/bThink-BGU/BPjs/issues/230)
 
 ### 2025-02
 * :arrow_up: Upgraded to Rhino 1.8.0 with updated JavaScript version. See the many updates [here](https://github.com/mozilla/rhino/releases/tag/Rhino1_8_0_Release).

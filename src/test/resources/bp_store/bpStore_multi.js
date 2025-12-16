@@ -26,6 +26,8 @@
 const START = bp.Event("START");
 const DONE  = bp.Event("Done");
 
+bp.log.setLevel("Fine");
+
 bp.registerBThread("starter", function(){
     bp.store.put("v", {x:0, y:0});
     bp.sync({request:START});
