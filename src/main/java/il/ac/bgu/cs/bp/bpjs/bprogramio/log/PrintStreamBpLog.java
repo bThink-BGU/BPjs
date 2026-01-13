@@ -35,16 +35,16 @@ import java.io.PrintWriter;
 public class PrintStreamBpLog implements BpLog {
 
     LogLevel level = DEFAULT_LOG_LEVEL;
-    private PrintWriter out;
+    private PrintWriter out = new PrintWriter(System.out);
     
     private boolean autoFlush = true;
     
     public PrintStreamBpLog(PrintWriter aWriter ){
-        out = aWriter;
+        this.out = (aWriter != null) ? aWriter : new PrintWriter(System.out);
     }
     
     public PrintStreamBpLog(PrintStream aStream ){
-        this(new PrintWriter(aStream));
+        this(aStream != null ? new PrintWriter(aStream) : null);
     }
 
     public PrintStreamBpLog() {
@@ -107,7 +107,9 @@ public class PrintStreamBpLog implements BpLog {
 
     @Override
     public void setLoggerPrintStream(PrintStream printStream){
-        out = new PrintWriter(printStream);
+        this.out = (printStream != null)
+                ? new PrintWriter(printStream)
+                : new PrintWriter(System.out);
     }
 
     public boolean isAutoFlush() {
@@ -119,7 +121,7 @@ public class PrintStreamBpLog implements BpLog {
     }
     
     public void flush() {
-        out.flush();
+        if(out != null) out.flush();
     }
     
 }
