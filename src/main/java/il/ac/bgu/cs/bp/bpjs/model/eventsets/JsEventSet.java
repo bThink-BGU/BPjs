@@ -22,12 +22,9 @@ public class JsEventSet implements EventSet, java.io.Serializable {
     public JsEventSet(String aName, Function aPredicate) {
         name = aName;
         predicate = aPredicate;
-        if ( aPredicate instanceof NativeFunction ) {
-//            rawSource = ((NativeFunction)aPredicate).getEncodedSource();
-            rawSource = ((NativeFunction)aPredicate).getRawSource(); // for Rhino 1.8.0
-        } else {
-            rawSource = null;
-        }
+        // Capture a source form that stays comparable across Rhino versions and
+        // recreated function objects.
+        rawSource = extractStableSource(aPredicate);
     }
 
     @Override
@@ -56,6 +53,31 @@ public class JsEventSet implements EventSet, java.io.Serializable {
         return name;
     }
 
+    private static String extractStableSource(Function predicate) {
+        if (predicate instanceof NativeFunction) {
+            // Raw source is the most stable representation when Rhino exposes it directly.
+            String source = ((NativeFunction) predicate).getRawSource();
+            if (source != null && !source.isEmpty()) {
+                return source;
+            }
+        }
+
+        Context ctx = Context.getCurrentContext();
+        if (ctx != null) {
+            try {
+                // Decompile when raw source is unavailable, such as for newer function forms.
+                String source = ctx.decompileFunction(predicate, 0);
+                if (source != null && !source.isBlank()) {
+                    return source;
+                }
+            } catch (RuntimeException ignored) {
+                // Fall back to the function's string representation if decompilation is unavailable.
+            }
+        }
+
+        return predicate.toString();
+    }
+
     @Override
     public String toString() {
         return "[JsEventSet: " + getName() +"]";
@@ -70,10 +92,13 @@ public class JsEventSet implements EventSet, java.io.Serializable {
             JsEventSet otherES = (JsEventSet) other;
             if ( !name.equals(otherES.name) ) {
                 return false;
-            } else if ( rawSource != null ) {
+            } else if ( rawSource != null && otherES.rawSource != null ) {
+                // Prefer source-based equality so equivalent predicates still match
+                // after being recreated during snapshotting or restoration.
                 return rawSource.equals(otherES.rawSource);
             } else {
-                return predicate.equals(((JsEventSet) other).predicate);
+                if (predicate.equals(((JsEventSet) other).predicate)) return true;
+                return predicate.toString().equals(((JsEventSet) other).predicate.toString());
             }
                 
         } else {
@@ -83,6 +108,8 @@ public class JsEventSet implements EventSet, java.io.Serializable {
     
     @Override
     public int hashCode() {
-        return (rawSource!=null) ? rawSource.hashCode() : predicate.hashCode();
+        // Keep the hash aligned with equals by using the same stable identity:
+        // the event-set name plus the extracted predicate source.
+        return java.util.Objects.hash(name, rawSource);
     }
 }

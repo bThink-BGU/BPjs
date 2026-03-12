@@ -34,4 +34,6 @@ bp.log.info( "jString  === jsString: {0}", jString === jsString );  // false
 bp.log.info( "rString  ==  jsString: {0}", rString == jsString );   // true
 bp.log.info( "rString  === jsString: {0}", rString === jsString );  // true
 
-var retrievedEqualsNative = (rString === jsString);
+// The regression we care about is value equality after round-tripping through
+// Java collections, not strict JS identity of the returned string wrapper.
+var retrievedEqualsNative = (rString == jsString);

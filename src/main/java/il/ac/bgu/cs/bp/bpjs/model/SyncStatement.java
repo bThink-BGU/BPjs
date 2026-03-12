@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.Set;
 import static il.ac.bgu.cs.bp.bpjs.model.eventsets.EventSets.none;
 import il.ac.bgu.cs.bp.bpjs.internal.OrderedSet;
+import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
 import java.util.SortedSet;
 
 /**
@@ -167,8 +168,10 @@ public class SyncStatement implements java.io.Serializable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getRequest(), getWaitFor(), getBlock(),
-                            getInterrupt(), getData(), isHot());
+        // Combine the regular structural fields with the JS-aware data hash using
+        // the usual multiplier, so the hash stays aligned with jsEquals(data, ...).
+        return 31 * Objects.hash(getRequest(), getWaitFor(), getBlock(),
+                            getInterrupt(), isHot()) + ScriptableUtils.jsHashCode(getData());
     }
 
     @Override
@@ -196,7 +199,7 @@ public class SyncStatement implements java.io.Serializable {
         if (!Objects.equals(this.getInterrupt(), other.getInterrupt())) {
             return false;
         }
-        return Objects.equals(getData(), other.getData());
+        return ScriptableUtils.jsEquals(getData(), other.getData());
     }
 
 }

@@ -2,6 +2,7 @@ package il.ac.bgu.cs.bp.bpjs.analysis.bprogramio;
 
 import il.ac.bgu.cs.bp.bpjs.BPjs;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramIO;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.BProgramSyncSnapshotCloner;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.execution.BProgramRunner;
 import il.ac.bgu.cs.bp.bpjs.model.BProgramSyncSnapshot;
@@ -17,6 +18,7 @@ import java.util.Arrays;
 import static java.util.Collections.emptySet;
 import java.util.concurrent.ExecutorService;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import org.junit.Test;
 
 /*
@@ -104,6 +106,33 @@ public class BProgramSyncSnapshotClonerTest {
         final VerificationResult res = vfr.verify(bprog);
         res.getViolation().ifPresent( vio->System.out.println("res = " + vio.getCounterExampleTrace()) );
         
+    }
+
+    @Test
+    public void clonedFruitRatioSnapshotsStayComparableAcrossCycle() throws Exception {
+        // Regression test for the verifier's clone-and-advance path: when the
+        // fruit-ratio program returns to the same hot state, cloned snapshots
+        // must still compare equal and keep matching hash codes.
+        BProgram bprog = new ResourceBProgram("DFSVerifierTests/fruitRatio.js");
+        ExecutorService exSvc = BPjs.getExecutorServiceMaker().borrowWithName("fruit-ratio-clone-test");
+
+        try {
+            BProgramSyncSnapshot s0 = bprog.setup().start(exSvc, PASSTHROUGH);
+            BProgramSyncSnapshot s1 = advanceCloned(bprog, s0, exSvc);
+            BProgramSyncSnapshot s2 = advanceCloned(bprog, s1, exSvc);
+            BProgramSyncSnapshot s3 = advanceCloned(bprog, s2, exSvc);
+
+            assertTrue("Expected the verifier clone path to preserve the repeating hot state", s1.equals(s3));
+            assertEquals(s1.hashCode(), s3.hashCode());
+        } finally {
+            BPjs.getExecutorServiceMaker().returnService(exSvc);
+        }
+    }
+
+    private BProgramSyncSnapshot advanceCloned(BProgram bprog, BProgramSyncSnapshot src, ExecutorService exSvc) throws Exception {
+        BProgramSyncSnapshot clone = BProgramSyncSnapshotCloner.clone(src);
+        BEvent nextEvent = bprog.getEventSelectionStrategy().selectableEvents(clone).iterator().next();
+        return clone.triggerEvent(nextEvent, exSvc, emptySet(), PASSTHROUGH);
     }
     
 }

@@ -4,7 +4,9 @@
 // Refills 
 ////
 var ADD_FRUIT = bp.EventSet("sADD_FRUIT", function(e){
- return e.name.equals("ADD_FRUIT");
+    // Use JS string comparison here because newer Rhino versions may expose
+    // event names as native JS strings rather than Java String objects.
+    return e.name == "ADD_FRUIT";
 });
 
 /**
