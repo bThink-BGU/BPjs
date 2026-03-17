@@ -54,7 +54,7 @@ If you use BPjs in an academic work, please consider citing it as:
 
 ### 2026-03
 
-* :arrow_up: Moved to Rhino 1.9.1. Now supporting modern JS structures, such as arrow functions for bthreads ([#240](https://github.com/bThink-BGU/BPjs/issues/240)).
+* :arrow_up: Upgraded to Rhino 1.9.1. Now supporting modern JS structures, such as arrow functions for bthreads ([#240](https://github.com/bThink-BGU/BPjs/issues/240)).
 
 [Earlier Changes](changelog-2025.md)
 
