@@ -32,7 +32,7 @@ If you use BPjs in an academic work, please consider citing it as:
     <dependency>
         <groupId>com.github.bthink-bgu</groupId>
         <artifactId>BPjs</artifactId>
-        <version>0.14.0</version>
+        <version>0.15.0</version>
     </dependency>
     ...
 </dependencies>
