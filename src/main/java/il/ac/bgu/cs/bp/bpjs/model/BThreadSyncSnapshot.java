@@ -182,7 +182,11 @@ public class BThreadSyncSnapshot implements Serializable {
         final int prime = 31;
         int result = prime * Objects.hash(name, syncStatement);
         if (continuation != null) {
-            result += continuation.getImplementation().hashCode();
+            // result += continuation.getImplementation().hashCode(); 
+            // The above was removed because in Rhino 1.9.1, the implementation 
+            // (Interpreter$CallFrame) has an unstable hashCode() - it can 
+            // change for equal implementations.
+            result += 42; 
         }
         result += ScriptableUtils.jsHashCode(data);
         return result;
@@ -190,33 +194,37 @@ public class BThreadSyncSnapshot implements Serializable {
 
     @Override
     public boolean equals(Object obj) {
-
-        // Quick circuit-breakers
         if (this == obj) return true;
         if (obj == null) return false;
         if (!(obj instanceof BThreadSyncSnapshot)) return false;
         
         BThreadSyncSnapshot other = (BThreadSyncSnapshot) obj;
         
-        if (!Objects.equals(getName(), other.getName())) {
-            return false;
-        }
-        if ( ! Objects.equals(syncStatement,other.getSyncStatement()) ) {
-            return false;
-        }
-        
+        if (!Objects.equals(getName(), other.getName())) return false;
+        if ( ! Objects.equals(syncStatement,other.getSyncStatement()) ) return false;
         if ( (!ScriptableUtils.jsEquals(data,other.getData())) ||
-              (!Objects.equals(bprogramStoreModifications,other.bprogramStoreModifications)) ) {
-            return false;
-        }
+              (!Objects.equals(bprogramStoreModifications,other.bprogramStoreModifications)) ) return false;
         
         if (continuation == null) {
-            // This b-thread hasn't run yet. Check eqality on its source.
             return (other.continuation == null) && entryPoint.equals(other.entryPoint);
         } else {
-            // Check equality on the PC+stack+heap
-//            return getContinuationProgramState().equals(other.getContinuationProgramState());
-            return NativeContinuation.equalImplementations(continuation,other.getContinuation());
+            if (other.getContinuation() == null) return false;
+            if (org.mozilla.javascript.NativeContinuation.equalImplementations(continuation,other.getContinuation())) return true;
+            // Fall back to serialized continuation bytes when Rhino's implementation
+            // equality misses semantically equivalent states.
+            try {
+                java.io.ByteArrayOutputStream baos1 = new java.io.ByteArrayOutputStream();
+                try (java.io.ObjectOutputStream oos1 = new java.io.ObjectOutputStream(baos1)) {
+                    oos1.writeObject(continuation);
+                }
+                java.io.ByteArrayOutputStream baos2 = new java.io.ByteArrayOutputStream();
+                try (java.io.ObjectOutputStream oos2 = new java.io.ObjectOutputStream(baos2)) {
+                    oos2.writeObject(other.getContinuation());
+                }
+                return java.util.Arrays.equals(baos1.toByteArray(), baos2.toByteArray());
+            } catch (java.io.IOException e) {
+                return false;
+            }
         }
     }
 

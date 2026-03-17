@@ -68,7 +68,13 @@ public class ScriptableUtils {
         if (o1 == o2) return true;
         if (o1 == null ^ o2 == null) return false;
         
-        // Can we do a by-part comparison?
+        // Rhino may surface equal numeric values through different Java number
+        // wrappers, so compare them by numeric value rather than by type.
+        if ( o1 instanceof Number && o2 instanceof Number ) {
+            return ((Number)o1).doubleValue() == ((Number)o2).doubleValue();
+        }
+        
+        // For structured values, compare their contents recursively.
         if (o1 instanceof ScriptableObject && o2 instanceof ScriptableObject) {
             return jsScriptableObjectEqual((ScriptableObject) o1, (ScriptableObject) o2);
         }
@@ -94,7 +100,7 @@ public class ScriptableUtils {
             o2 = o2.toString();
         }
         
-        // default comparison (hopefully they have meaningful equals())
+        // Default comparison (hopefully they have meaningful equals())
         return o1.equals(o2);
     }
 
@@ -207,22 +213,33 @@ public class ScriptableUtils {
             return 1;
         }
         
+        if ( jsObj instanceof Number ) {
+            double d = ((Number)jsObj).doubleValue();
+            return Double.hashCode(d);
+        }
+        
         // Concatenated strings in Rhino have a different type. We need to manually
         // resolve to String semantics, which is what the following lines do.
         if (jsObj instanceof ConsString) return jsObj.toString().hashCode();
+        
+        if (jsObj instanceof ScriptableObject) {
+            return jsScriptableObjectHashCode((ScriptableObject) jsObj);
+        }
+        
         if ( jsObj instanceof Map ) return jsMapHashCode( (Map)jsObj );
         if ( jsObj instanceof Collection ) return jsColHashCode( (Collection)jsObj );
         
-        return (jsObj instanceof ScriptableObject)
-                ? jsScriptableObjectHashCode((ScriptableObject) jsObj)
-                : jsObj.hashCode();
+        return jsObj.hashCode();
     }
 
     public static int jsScriptableObjectHashCode(ScriptableObject jsObj) {
         Set<Object> ids = new HashSet<>(Arrays.asList(jsObj.getIds()));
         final int[] acc = new int[1];
-        ids.stream().mapToInt( id -> Objects.hash(id, jsObj.get(id)) )
-            .forEach( h -> acc[0]^=h );
+        ids.stream().forEach(id -> {
+            Object val = jsObj.get(id);
+            int h = Objects.hash(id, jsHashCode(val));
+            acc[0] ^= h;
+        });
         
         return acc[0];
     }

@@ -136,17 +136,14 @@ public class ArrayExecutionTrace implements ExecutionTrace {
     }
     
     public int indexOf( BProgramSyncSnapshot bpss ) {
-        // check bloom
-        int hash = Objects.hashCode(bpss);
-        for ( int i=0; i<BLOOM_KEYS.length; i++ ){
-            if ( bloomFilter[ Math.abs(hash*BLOOM_KEYS[i])%bloomFilter.length ] == 0 ) {
-                return -1;
-            }
-        }
+        // The bloom pre-check was removed because snapshot equality may now rely on
+        // continuation serialization fallbacks, while the hash code stays coarser.
+        // Keeping the bloom check could therefore reject equal states too early.
         
         // if OK, check for real
         for ( int i=0; i<stack.size(); i++ ) {
-            if ( stack.get(i).getState().equals(bpss) ) {
+            boolean eq = stack.get(i).getState().equals(bpss);
+            if ( eq ) {
                 return i;
             }
         }
