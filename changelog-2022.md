@@ -1,6 +1,6 @@
 # Changelog for 2022
 
-### 2022-07
+## 2022-07
 * :arrow_up: :sparkles: Moved to Rhino 1.7.14. This means many new features, including template strings and better Java interoperability. See full list [on Mozilla's site](https://github.com/mozilla/rhino/releases/tag/Rhino1_7_14_Release). ([#186](https://github.com/bThink-BGU/BPjs/issues/186)).
     * :part_alternation_mark: Refactored internals fo better fit the new Rhino version. We now have a proper context factory, as well as try-with-resources on all context invocations.
 * :part_alternation_mark: `BProgramRunnerListener` defautls to ignore errors during BProgram execution, instead of printing the details to `stderr`. This behavior remains in `BProgramRunnerListenerAdapter`, where it makes more sense. Of course, client code can override these methods. ([#191](https://github.com/bThink-BGU/BPjs/issues/191)).
@@ -14,7 +14,7 @@
 * :arrow_up: Logging is turned off by default during verification. Call `BPjs.setLogDuringVerification(true)` to enable them again ([#160](https://github.com/bThink-BGU/BPjs/issues/160)).
 * :sparkles: Added local [JACOCO](https://www.jacoco.org) code coverage reports.
 
-### 2022-02 (Including the 1st BP Day Hackathon)
+## 2022-02 (Including the 1st BP Day Hackathon)
 * :part_alternation_mark: Calling `bp.sync` from global scope during runtime does not cause an ugly exception anymore ([#174](https://github.com/bThink-BGU/BPjs/issues/174)). The error is reported to the listeners.
     * Also when making the illegal call from an interrupt handler.
 * :arrow_up: Improved JavaScript code error detection during analysis

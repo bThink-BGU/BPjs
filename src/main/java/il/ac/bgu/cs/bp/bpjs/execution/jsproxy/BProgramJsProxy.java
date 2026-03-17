@@ -228,9 +228,15 @@ public class BProgramJsProxy extends SyncStatementBuilder
         }
     }
 
-    ////////////////////////
     // sync ("bp.sync") related code
-
+    
+    /**
+     * Convenience method for a cold sync.
+     * 
+     * @param jsRWB JS object describing a sync statement
+     * @param data Data for sync point.
+     * @see BProgramJsProxy#synchronizationPoint(org.mozilla.javascript.NativeObject, java.lang.Boolean, java.lang.Object) 
+     */
     @Override
     public void sync(NativeObject jsRWB, Object data) {
         synchronizationPoint(jsRWB, null, data);

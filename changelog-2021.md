@@ -1,13 +1,13 @@
 # Changelog for 2021
 
-### 2022-01
+## 2022-01
 * :arrow_up: Improvements to the `BEvent` class, to make it better support client Java code.
 
-### 2021-10
+## 2021-10
 * :sparkles: Added [contribution guidelines](CONTRIBUTING.md) ([#139](https://github.com/bThink-BGU/BPjs/pull/139)).
 * :sparkles: Reference to the (finally) published paper describing the updated BPjs model semantics, w.r.t liveness ([#99](https://github.com/bThink-BGU/BPjs/pull/99)).
 
-### 2021-05
+## 2021-05
 
 * :sparkles: Client code can change the execution services BPjs uses ([#165](https://github.com/bThink-BGU/BPjs/pull/165)).
 * :sparkles: `bp.log.XXX` can be redirected to print streams other than `System.out`. ([#159](https://github.com/bThink-BGU/BPjs/pull/159)).
@@ -16,7 +16,7 @@
 * :arrow_up: Removed broken JS code in tests ([#153](https://github.com/bThink-BGU/BPjs/issues/153)).
 
 
-### 2021-02
+## 2021-02
 
 * :sparkles: :sparkles: :tada: :sparkles: :tada: :sparkles: :rainbow: :sparkles: :sparkles: :sparkles: BPjs now uses Rhino's native continuation equality and hash code ([#116](https://github.com/bThink-BGU/BPjs/issues/116). Also, :tada: :rainbow: :sparkles:.
 * :arrow_up: Scope and context creations across BPjs have been consolidated to utility methods in a new class called `BPjs`.
@@ -27,7 +27,7 @@
 * :bug: Fixed an issue that caused `toString` for JavaScript objects to crash at certain cases ([#145](https://github.com/bThink-BGU/BPjs/issues/145)).
 * :bug: Storage consolidation conflicts have proper `equals` and `hashCode`.
 
-### 2021-01
+## 2021-01
 
 * :sparkles: `BProgramSyncSnapshot`s are serialized using a single stream, and with the b-program's original scope as a top-level scope (([#126](https://github.com/bThink-BGU/BPjs/issues/126)).
 * :sparkles: BThread snapshots do not retain their entry point function after their first sync point. This results in lower memory footprint, and a more efficient de/serialization. These result in improved analysis performance and efficiency.
