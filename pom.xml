@@ -32,7 +32,7 @@
     <developers>
         <developer>
             <name>Michael Bar-Sinai</name>
-            <email>m@mbarsinai.com</email>
+            <email>mich.barsinai@gmail.com</email>
             <organization>Ben-Gurion University of the Negev</organization>
             <organizationUrl>http://cs.bgu.ac.il</organizationUrl>
         </developer>
@@ -50,12 +50,10 @@
     <distributionManagement>
         <snapshotRepository>
             <id>ossrh</id>
-            <!--<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>-->
             <url>https://oss.sonatype.org/content/repositories/snapshots</url>
         </snapshotRepository>
         <repository>
             <id>ossrh</id>
-            <!--<url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>-->
             <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
         </repository>
     </distributionManagement>
