@@ -288,6 +288,7 @@ public abstract class BProgram {
         FailedAssertionViolation failedAssertion = null;
         try (Context ctx = BPjs.enterRhinoContext()) {
             initProgramScope();
+            evaluate(BPjs.class.getResourceAsStream("/globalScopeInit.js"), "globalScopeInit.js", ctx);
 
             // evaluate code in order
             if (prependedCode != null) {
