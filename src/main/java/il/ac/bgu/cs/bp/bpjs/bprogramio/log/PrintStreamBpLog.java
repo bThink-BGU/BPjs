@@ -32,9 +32,8 @@ import java.io.PrintWriter;
  *
  * @author maor
  */
-public class PrintStreamBpLog implements BpLog {
+public class PrintStreamBpLog extends AbstractBpLog {
 
-    LogLevel level = DEFAULT_LOG_LEVEL;
     private PrintWriter out = new PrintWriter(System.out);
     
     private boolean autoFlush = true;
@@ -50,60 +49,16 @@ public class PrintStreamBpLog implements BpLog {
     public PrintStreamBpLog() {
         this( System.out );
     }
-
-    @Override
-    public void warn(Object msg, Object... args) {
-        log(LogLevel.Warn, msg, args);
-    }
-
-    @Override
-    public void info(Object msg, Object... args) {
-        log(LogLevel.Info, msg, args);
-    }
-
-
-    @Override
-    public void fine(Object msg, Object... args) {
-        log(LogLevel.Fine, msg, args);
-    }
-
-    @Override
-    public void error(Object msg, Object... args) {
-        log(LogLevel.Error, msg, args);
-    }
-
-    @Override
-    public void log(LogLevel lvl, Object msg, Object[] args) {
-        if (level.compareTo(lvl) >= 0) {
-            synchronized (this) {
-                out.println(formatMessage(lvl, msg, args));
-                if ( autoFlush ) {
-                    flush();
-                }
-            }
-        }
-    }
-
-    @Override
-    public void setLevel(String levelName) {
-        synchronized (this) {
-            try {
-                level = LogLevel.valueOf(levelName.trim());
-            } catch (IllegalArgumentException iae) {
-                error("Unknown log level: '{0}'", levelName);
-            }
-        }
-    }
-
-    @Override
-    public String getLevel() {
-        return level.name();
-    }
-
-    public LogLevel getTypedLevel() {
-        return level;
-    }
     
+    @Override
+    protected void doLog(LogLevel lvl, Object msg, Object[] args) {
+        synchronized (this) {
+            out.println(formatMessage(lvl, msg, args));
+            if ( autoFlush ) {
+                flush();
+            }
+        }
+    }
 
     @Override
     public void setLoggerPrintStream(PrintStream printStream){

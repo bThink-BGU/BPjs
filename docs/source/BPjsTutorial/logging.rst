@@ -56,28 +56,6 @@ The BPjs logger formats messages using Java's `MessageFormat`_. Under the hood, 
   [BP][Info] 3.142 3.14 3.1416
 
 
-Caution - Array Ambiguity
-~~~~~~~~~~~~~~~~~~~~~~~~~
-
-A curious API edge-case occurs when using message formatting, and passing a single variable for printing, AND said single variable is an array. The system auto-spreads the array, and only the first item of the array is printed. So the following code:
-
-.. code::
-
-  bp.registerBThread("t1",function(){
-    bp.log.info("array:{0}", ["x","y","z"]);
-  });
-
-Prints this::
-
-[BP][Info] array:x 
-
-To work around this, either include a dummy variable, or wrap the array in another array::
-
-  bp.log.info("array:{0}", [["x","y","z"]]);
-  bp.log.info("array:{0}", ["x","y","z"], "dummy val");
-
-
-
 
 .. _logback: https://logback.qos.ch
 .. _log4j2: http://logging.apache.org/log4j/2.x/index.html

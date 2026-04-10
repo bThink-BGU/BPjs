@@ -1,4 +1,4 @@
-package il.ac.bgu.cs.bp.bpjs.bprogramio;
+package il.ac.bgu.cs.bp.bpjs.bprogramio.log;
 
 import java.io.PrintStream;
 import java.io.PrintWriter;

@@ -25,6 +25,7 @@ package il.ac.bgu.cs.bp.bpjs.execution;
 
 import il.ac.bgu.cs.bp.bpjs.bprogramio.log.BpListLog;
 import il.ac.bgu.cs.bp.bpjs.bprogramio.log.BpLog;
+import il.ac.bgu.cs.bp.bpjs.bprogramio.log.PrintStreamBpLog;
 import il.ac.bgu.cs.bp.bpjs.model.BProgram;
 import il.ac.bgu.cs.bp.bpjs.model.ResourceBProgram;
 import il.ac.bgu.cs.bp.bpjs.model.StringBProgram;
@@ -72,7 +73,7 @@ public class LoggingTest {
 
         var Log = new BpListLog();
         bprog.setLogger(Log);
-        new BProgramRunner( bprog).run();
+        new BProgramRunner(bprog).run();
 
         System.out.println("result:");
         System.out.println("off" + Log.getOff().toString());
@@ -82,10 +83,10 @@ public class LoggingTest {
         System.out.println("fine" + Log.getFine().toString());
 
         org.junit.Assert.assertEquals(0l, (long)Log.getOff().size());
-        org.junit.Assert.assertEquals(5l, (long)Log.getError().size());
-        org.junit.Assert.assertEquals(5l, (long)Log.getWarn().size());
-        org.junit.Assert.assertEquals(5l, (long)Log.getInfo().size());
-        org.junit.Assert.assertEquals(5l, (long)Log.getFine().size());
+        org.junit.Assert.assertEquals(4l, (long)Log.getError().size());
+        org.junit.Assert.assertEquals(3l, (long)Log.getWarn().size());
+        org.junit.Assert.assertEquals(2l, (long)Log.getInfo().size());
+        org.junit.Assert.assertEquals(1l, (long)Log.getFine().size());
     }
 
     @Test
@@ -167,24 +168,22 @@ public class LoggingTest {
     
     @Test
     public void testCompoundObjectLogging() throws IOException {
-        PrintStream originalOut = System.out;
         String result;
         
         try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
             try (PrintStream myOut = new PrintStream(baos)) {
-                System.setOut(myOut);
-                
-                new BProgramRunner(new ResourceBProgram("logging/compound.js")).run();
+                final BProgramRunner runner = new BProgramRunner(new ResourceBProgram("logging/compound.js"));
+                BpLog logger = new PrintStreamBpLog(myOut);
+                runner.getBProgram().setLogger(logger);
+                runner.run();
                 myOut.flush();
-                
-            } finally {
-                System.setOut(originalOut);
             }
             result = baos.toString(StandardCharsets.UTF_8);    
         }
         
         System.out.println(result);
         
+        assertTrue(result.contains("3.142  3.14 42  3.1415900"));
         assertTrue(result.contains("Set"));
         assertTrue(result.contains("List"));
         assertTrue(result.contains("Map"));

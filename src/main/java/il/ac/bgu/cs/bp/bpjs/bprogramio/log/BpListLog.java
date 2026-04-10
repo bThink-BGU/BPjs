@@ -10,9 +10,7 @@ import java.util.List;
  *
  * @author michael
  */
-public class BpListLog implements BpLog {
-
-    private String level = "info";
+public class BpListLog extends AbstractBpLog {
 
     private final List<String> all   = new LinkedList<>();
     private final List<String> warn  = new LinkedList<>();
@@ -20,29 +18,11 @@ public class BpListLog implements BpLog {
     private final List<String> fine  = new LinkedList<>();
     private final List<String> off   = new LinkedList<>();
     private final List<String> error = new LinkedList<>();
+    
+    private PrintStream outStrm = null;
 
     @Override
-    public void warn(Object msg, Object... args) {
-        log(LogLevel.Warn, msg, args);
-    }
-
-    @Override
-    public void info(Object msg, Object... args) {
-        log(LogLevel.Info, msg, args);
-    }
-
-    @Override
-    public void fine(Object msg, Object... args) {
-        log(LogLevel.Fine, msg, args);
-    }
-
-    @Override
-    public void error(Object msg, Object... args) {
-        log(LogLevel.Error, msg, args);
-    }
-
-    @Override
-    public void log(LogLevel lvl, Object msg, Object[] args) {
+    public void doLog(LogLevel lvl, Object msg, Object[] args) {
         String message = formatMessage(lvl, msg, args);
         all.add(message);
         switch (lvl) {
@@ -63,20 +43,14 @@ public class BpListLog implements BpLog {
                 off.add(message);
                 break;
         }
+        if ( outStrm != null ) {
+            outStrm.println(message);
+        }
     }
-
+    
     @Override
-    public void setLevel(String levelName) {
-        level = levelName;
-    }
-
-    @Override
-    public String getLevel() {
-        return level;
-    }
-
-    @Override
-    public void setLoggerPrintStream(PrintStream printStream) {
+    public void setLoggerPrintStream(PrintStream aPrintStream) {
+        outStrm = aPrintStream;
     }
 
     public List<String> getWarn() {

@@ -90,7 +90,38 @@ public class BProgramJsProxy extends SyncStatementBuilder
 
     private final AtomicInteger autoAddCounter = new AtomicInteger(0);
 
-    public final BpLog log;
+    private BpLog javaLog;
+    private Object jsLogOverride;
+
+    /**
+     * Returns the log object visible to JavaScript ({@code bp.log}). When JavaScript
+     * assigns a new value to {@code bp.log}, this returns that override. Java callers
+     * should use {@link #getJavaLog()} instead.
+     */
+    public Object getLog() {
+        return (jsLogOverride != null) ? jsLogOverride : javaLog;
+    }
+
+    /**
+     * Called by Rhino when JavaScript assigns to {@code bp.log}.
+     * Accepts either a {@link BpLog} (replaces the Java logger) or a JS wrapper object.
+     */
+    public void setLog(Object o) {
+        if (o instanceof BpLog) {
+            javaLog = (BpLog) o;
+            jsLogOverride = null;
+        } else {
+            jsLogOverride = o;
+        }
+    }
+
+    /**
+     * Returns the underlying Java {@link BpLog}. Use this from Java code rather
+     * than {@link #getLog()}, which may return a JavaScript wrapper object.
+     */
+    public BpLog getJavaLog() {
+        return javaLog;
+    }
 
     /**
      * Deprecated - use eventSets.all
@@ -114,12 +145,12 @@ public class BProgramJsProxy extends SyncStatementBuilder
 
     public BProgramJsProxy(BProgram aBProgram) {
         bProg = aBProgram;
-        this.log = new PrintStreamBpLog();
+        this.javaLog = new PrintStreamBpLog();
     }
 
     public BProgramJsProxy(BProgram aBProgram, BpLog log) {
         bProg = aBProgram;
-        this.log = log;
+        this.javaLog = log;
     }
 
     /**
