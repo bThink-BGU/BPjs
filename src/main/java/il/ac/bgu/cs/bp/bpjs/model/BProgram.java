@@ -317,10 +317,10 @@ public abstract class BProgram {
                   new BProgramJsProxy(this)
                   : new BProgramJsProxy(this, preSetLogger);
         if ( preSetLogLevel != null ) {
-            jsProxy.log.setLevel(preSetLogLevel.name());
+            jsProxy.getJavaLog().setLevel(preSetLogLevel.name());
         }
         if ( preSetPrintStream != null ) {
-            jsProxy.log.setLoggerPrintStream(preSetPrintStream);
+            jsProxy.getJavaLog().setLoggerPrintStream(preSetPrintStream);
         }
 
         initialScopeValues.entrySet().forEach(e -> putInGlobalScope(e.getKey(), e.getValue()));
@@ -506,7 +506,7 @@ public abstract class BProgram {
      */
     public void setLogLevel( BpLog.LogLevel aLevel ) {
         if ( jsProxy != null ) {
-            jsProxy.log.setLevel(aLevel.name());
+            jsProxy.getJavaLog().setLevel(aLevel.name());
         } else {
             preSetLogLevel = aLevel;
         }
@@ -532,15 +532,15 @@ public abstract class BProgram {
      */
     public void setLoggerOutputStreamer(PrintStream printStream){
         if ( jsProxy != null ) {
-            jsProxy.log.setLoggerPrintStream(printStream);
+            jsProxy.getJavaLog().setLoggerPrintStream(printStream);
         } else {
             preSetPrintStream = printStream;
         }
     }
 
     public BpLog.LogLevel getLogLevel() {
-        return (jsProxy != null ) 
-            ? BpLog.LogLevel.valueOf(jsProxy.log.getLevel())
+        return (jsProxy != null )
+            ? BpLog.LogLevel.valueOf(jsProxy.getJavaLog().getLevel())
             : (preSetLogLevel!= null)? preSetLogLevel: BpLog.DEFAULT_LOG_LEVEL;
     }
     
@@ -549,7 +549,7 @@ public abstract class BProgram {
      * @return the b-program logger (or {@code null}).
      */
     public BpLog getLogger() {
-        return jsProxy != null ? jsProxy.log : null;
+        return jsProxy != null ? jsProxy.getJavaLog() : null;
     }
     
     public StorageModificationStrategy getStorageModificationStrategy() {

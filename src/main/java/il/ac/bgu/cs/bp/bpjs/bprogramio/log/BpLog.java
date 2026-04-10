@@ -27,7 +27,10 @@ package il.ac.bgu.cs.bp.bpjs.bprogramio.log;
 import il.ac.bgu.cs.bp.bpjs.internal.ScriptableUtils;
 import java.io.PrintStream;
 import java.text.MessageFormat;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.Set;
 
 /**
@@ -51,19 +54,35 @@ public interface BpLog extends java.io.Serializable {
     void setLevel(String levelName);
 
     String getLevel();
-
+    
+    boolean isLevelEnabled(String levelName);
+    
     void setLoggerPrintStream(PrintStream printStream);
 
     public enum LogLevel {
-        Off, Error, Warn, Info, Fine
+        Off, Error, Warn, Info, Fine;
+        
+        public static LogLevel lenientValueOf(String levelName) {
+            if ( levelName == null ) return LogLevel.Info;
+            if ( levelName.equals("") ) return LogLevel.Info;
+            
+            String lcLevelName = levelName.trim().toLowerCase();
+            for( LogLevel l : LogLevel.values() ){
+                if (l.toString().toLowerCase().equals(lcLevelName) ) {
+                    return l;
+                }
+            }
+            
+            throw new IllegalArgumentException("Unknown log level: '" + levelName + "'");
+        }
     }
     
     /**
      * A set of classes that can use their own {@code toString()} method. Classes 
      * not in this set are formatted using custom formatting code.
      */
-    public static final Set<Class> PASS_THROUGH = Set.of(Integer.class, Long.class,
-        Short.class, Double.class, Float.class, String.class);
+    public static final Set<Class<?>> PASS_THROUGH = Set.of(Integer.class, Long.class,
+        Short.class, Double.class, Float.class, String.class, Date.class, LocalDate.class, LocalDateTime.class);
     
     /**
      * Default formatting of a log message. This method should not deal with 
@@ -76,19 +95,30 @@ public interface BpLog extends java.io.Serializable {
      * @see MessageFormat
      */
     default String formatMessage(LogLevel lvl, Object msg, Object[] args) {
-        return "[BP][" + lvl.name() + "] " +
-            (((args==null)||(args.length > 0))
-            ? MessageFormat.format( (msg!=null ? msg.toString():"<null>"), Arrays.stream(args).map(this::formatArg).toArray())
-            : ScriptableUtils.stringify(msg));
+        String prefix = "[BP][" + lvl.name() + "] ";
+        if ( msg == null ) return prefix + "<null>";
+        if ( args.length == 0 ) { 
+            return prefix + formatArg(msg);
+        }
+        try {
+            Object[] formattedArgs = Arrays.stream(args).map(this::formatArg).toArray();
+            return prefix + MessageFormat.format( formatArg(msg).toString(), formattedArgs );
+        } catch (Exception e) {
+            error( "Message formatting exception: " + e.getMessage() );
+            return prefix + msg;
+        }   
     }
     
     /**
-     * Formats a single logging message argument.
+     * Formats a single logging message argument. NOTE: for pass-through classes, 
+     * the formatted argument needs to maintain its class, so that the MessageFormat
+     * instructions can kick in.
+     * 
      * @param arg an object to format
      * @return a {@code toString()}-able view of {@code arg}.
      */
     default Object formatArg(Object arg) {
-        if ( arg == null ) return arg;
+        if ( arg == null ) return null;
         if ( PASS_THROUGH.contains(arg.getClass()) ) return arg;
         return ScriptableUtils.stringify(arg);
     }

@@ -52,6 +52,14 @@ If you use BPjs in an academic work, please consider citing it as:
 
 ## Change Log for the BPjs Library.
 
+### 2026-04
+
+* :tada: Loggers correctly distinguish between printing and array and printing a message with array of argument ([#241](https://github.com/bThink-BGU/BPjs/issues/241) (thanks @Codergoterrors)
+* :sparkles: Added methods for checking loggin level from JS: `bp.log.isLevelEnabled(levelName)`
+* :sparkles: Refactored the logging mechanism tom make new loggers easier.
+* :arrow_up: `bp.log.setLevel` is more lenient about level names (e.g. users can use `Info` and `info` which would both yield `LogLevel.Info`.
+* :sparkles: Added CLAUDE.md.
+
 ### 2026-03
 
 * :arrow_up: Upgraded to Rhino 1.9.1. Now supporting modern JS structures, such as arrow functions for bthreads ([#240](https://github.com/bThink-BGU/BPjs/issues/240)).

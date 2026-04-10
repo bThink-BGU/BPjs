@@ -30,7 +30,17 @@ bp.log.info("Simple String");
 bp.log.info(1);
 bp.log.info(1.5);
 bp.log.info(["I'm","an","array"]);
+bp.log.info("{0}", ["I'm","an","array"]);
+bp.log.info("{0} {0}", ["I'm","an","array"]);
+bp.log.info(["Single emt arr"]);
+bp.log.info("Single emt");
+bp.log.info("array:{0}", ["x","y","z"]);
+bp.log.info(["just some args {0} {1}","arg1","arg2"]);
+bp.log.info("just some args {0} {1}","arg1","arg2");
 bp.log.info({im:"an", ob:"ject", arr:[1,2,"three"]});
+bp.log.info("Here is obj: {0} {1} {2}", {im:"an", ob:"ject", arr:[1,2,"three"]}, 2, 3);
+
+bp.log.info("{0} {0, number, #.##} {1} {0, number, 0.0000000}", 3.14159, 42);
 
 var set = new HashSet();
 set.add("a");
