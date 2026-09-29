@@ -38,7 +38,7 @@ public class HotSystemViolation extends LivenessViolation {
     }
 
     @Override
-    public String decsribe() {
+    public String describe() {
         return "Hot System violation: returning to index " + getCycleToIndex() 
                 + " in the trace because of event " + getCycleToEvent();
     }

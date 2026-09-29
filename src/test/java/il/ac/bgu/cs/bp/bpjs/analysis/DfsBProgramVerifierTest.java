@@ -494,7 +494,7 @@ public class DfsBProgramVerifierTest {
             public boolean violationFound(Violation aViolation, DfsBProgramVerifier vfr) {
                 errorCalled.set(aViolation instanceof JsErrorViolation );
                 JsErrorViolation jsev = (JsErrorViolation) aViolation;
-                errorMadeSense.set(jsev.decsribe().contains("isNullAndSoThisInvocationShouldCrash"));
+                errorMadeSense.set(jsev.describe().contains("isNullAndSoThisInvocationShouldCrash"));
                 System.out.println(jsev.getThrownException().getMessage());
                 return true;
             }

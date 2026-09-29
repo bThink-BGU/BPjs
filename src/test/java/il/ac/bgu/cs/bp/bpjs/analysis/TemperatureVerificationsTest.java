@@ -60,7 +60,7 @@ public class TemperatureVerificationsTest {
         
         HotTerminationViolation htv = (HotTerminationViolation) res.getViolation().get();
         assertEquals( htv.getBThreadNames(), Collections.singleton("hotter") );
-        System.out.println(htv.decsribe());
+        System.out.println(htv.describe());
     }
     
     
@@ -76,7 +76,7 @@ public class TemperatureVerificationsTest {
         assertTrue(res.isViolationFound());
         assertTrue(res.getViolation().get() instanceof HotSystemViolation);
         HotSystemViolation hcv = (HotSystemViolation) res.getViolation().get();
-        System.out.println(hcv.decsribe());
+        System.out.println(hcv.describe());
         System.out.println("Trace:");
         System.out.println(TestUtils.traceEventNamesString(hcv.getCounterExampleTrace(), "\n"));
         System.out.println("Cycle-to Index:" + hcv.getCycleToIndex());
@@ -115,7 +115,7 @@ public class TemperatureVerificationsTest {
         assertTrue(res.isViolationFound());
         assertTrue(res.getViolation().get() instanceof HotBThreadViolation);
         HotBThreadViolation htv = (HotBThreadViolation) res.getViolation().get();
-        System.out.println(htv.decsribe());
+        System.out.println(htv.describe());
         System.out.println("Trace:");
         System.out.println(TestUtils.traceEventNamesString(htv.getCounterExampleTrace(), "\n"));
         System.out.println("Cycle-to Index:" + htv.getCycleToIndex());
@@ -182,7 +182,7 @@ public class TemperatureVerificationsTest {
         assertTrue( res.isViolationFound() );
         assertTrue( res.getViolation().get() instanceof HotRunViolation );
         
-        System.out.println(hrv.decsribe());
+        System.out.println(hrv.describe());
         System.out.println("Trace:");
         System.out.println(TestUtils.traceEventNamesString(hrv.getCounterExampleTrace(), "\n"));
         System.out.println("Cycle-to Index:" + hrv.getCycleToIndex());

@@ -95,7 +95,7 @@ public class DeadlockViolation extends Violation {
     }
     
     @Override
-    public String decsribe() {
+    public String describe() {
         return "Deadlock: " + description;
     }
     

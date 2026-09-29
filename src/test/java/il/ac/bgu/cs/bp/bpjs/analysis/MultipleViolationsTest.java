@@ -64,7 +64,7 @@ public class MultipleViolationsTest {
             @Override
             public boolean violationFound(Violation aViolation, DfsBProgramVerifier vfr) {
                 int num = violationCount.incrementAndGet();
-                System.out.println("Violation " + num + ": " + aViolation.decsribe() );
+                System.out.println("Violation " + num + ": " + aViolation.describe() );
                 violations.add(aViolation);
                 return true;
             }
@@ -106,7 +106,7 @@ public class MultipleViolationsTest {
             @Override
             public boolean violationFound(Violation aViolation, DfsBProgramVerifier vfr) {
                 int num = violationCount.incrementAndGet();
-                System.out.println("Violation " + num + ": " + aViolation.decsribe() );
+                System.out.println("Violation " + num + ": " + aViolation.describe() );
                 return true;
             }
 
@@ -138,7 +138,7 @@ public class MultipleViolationsTest {
             @Override
             public boolean violationFound(Violation aViolation, DfsBProgramVerifier vfr) {
                 int num = violationCount.incrementAndGet();
-                System.out.println("Violation " + num + ": " + aViolation.decsribe() );
+                System.out.println("Violation " + num + ": " + aViolation.describe() );
                 return true;
             }
 

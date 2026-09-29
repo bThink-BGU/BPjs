@@ -40,7 +40,7 @@ public class JsErrorViolation extends Violation {
     }
 
     @Override
-    public String decsribe() {
+    public String describe() {
         return "Runtime JavaScript Error: " + exception.getMessage();
     }
 

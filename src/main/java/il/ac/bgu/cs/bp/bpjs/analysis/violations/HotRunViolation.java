@@ -44,7 +44,7 @@ public class HotRunViolation extends LivenessViolation {
     }
 
     @Override
-    public String decsribe() {
+    public String describe() {
         return String.format("Hot run of b-threads {%s}: returning to index %d in the trace because of event %s", 
             bThreadNames.stream().sorted().collect(joining(", ")),
             getCycleToIndex(),

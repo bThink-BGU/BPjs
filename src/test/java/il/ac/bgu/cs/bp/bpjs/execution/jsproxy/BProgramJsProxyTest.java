@@ -305,7 +305,7 @@ public class BProgramJsProxyTest {
         var vfr = new DfsBProgramVerifier(sut);
         final AtomicReference<String> errorMessage = new AtomicReference<>();
         var l = (DfsBProgramVerifier.ProgressListener) (Violation aViolation, DfsBProgramVerifier vfr1) -> {
-            errorMessage.set(aViolation.decsribe().toLowerCase());
+            errorMessage.set(aViolation.describe().toLowerCase());
             return false;
         };
         vfr.setProgressListener(l);
@@ -316,7 +316,7 @@ public class BProgramJsProxyTest {
         
         assertTrue( res.isViolationFound() );
       
-        String errorMessageFromViolation = res.getViolation().get().decsribe().toLowerCase();      
+        String errorMessageFromViolation = res.getViolation().get().describe().toLowerCase();      
         assertTrue(errorMessageFromViolation.contains("bp.sync"));
         assertTrue(errorMessageFromViolation.contains("forbidden"));
         assertTrue(errorMessageFromViolation.contains("outside of a b-thread"));           
@@ -353,7 +353,7 @@ public class BProgramJsProxyTest {
          var vfr = new DfsBProgramVerifier(sut);
         final AtomicReference<String> errorMessage = new AtomicReference<>();
         var l = (DfsBProgramVerifier.ProgressListener) (Violation aViolation, DfsBProgramVerifier vfr1) -> {
-            errorMessage.set(aViolation.decsribe().toLowerCase());
+            errorMessage.set(aViolation.describe().toLowerCase());
             return false;
         };
         vfr.setProgressListener(l);
@@ -365,7 +365,7 @@ public class BProgramJsProxyTest {
         
         assertTrue( res.isViolationFound() );
       
-        String errorMessageFromViolation = res.getViolation().get().decsribe().toLowerCase();      
+        String errorMessageFromViolation = res.getViolation().get().describe().toLowerCase();      
         assertTrue(errorMessageFromViolation.contains("bp.thread"));
         assertTrue(errorMessageFromViolation.contains("forbidden"));
         assertTrue(errorMessageFromViolation.contains("outside of a b-thread"));   

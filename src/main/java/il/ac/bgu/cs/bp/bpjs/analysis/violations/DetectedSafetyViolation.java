@@ -41,7 +41,7 @@ public class DetectedSafetyViolation extends Violation {
     }
 
     @Override
-    public String decsribe() {
+    public String describe() {
         return "Safety Violation: " +
                 detected.getMessage();
     }

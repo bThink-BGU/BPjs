@@ -79,7 +79,7 @@ public class RegExpSerializationTest {
             "    bp.sync({request:bp.Event('done')});",
             "});"
         ));
-        assertFalse(res.isViolationFound() ? res.getViolation().get().decsribe() : "", res.isViolationFound());
+        assertFalse(res.isViolationFound() ? res.getViolation().get().describe() : "", res.isViolationFound());
     }
 
     @Test

@@ -67,7 +67,7 @@ public class PrintDfsVerifierListener implements DfsBProgramVerifier.ProgressLis
 
     @Override
     public boolean violationFound(Violation aViolation, DfsBProgramVerifier vfr) {
-        out.println("/v/ Violation found: " + aViolation.decsribe() );
+        out.println("/v/ Violation found: " + aViolation.describe() );
         return false;
     }
     

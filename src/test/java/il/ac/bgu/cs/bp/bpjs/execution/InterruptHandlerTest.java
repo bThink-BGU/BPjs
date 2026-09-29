@@ -68,7 +68,7 @@ public class InterruptHandlerTest {
             assertTrue( res.isViolationFound() );
             System.out.println(
                 "found violation: " + 
-                res.getViolation().get().decsribe()
+                res.getViolation().get().describe()
             );
             
         } catch (Exception e) {

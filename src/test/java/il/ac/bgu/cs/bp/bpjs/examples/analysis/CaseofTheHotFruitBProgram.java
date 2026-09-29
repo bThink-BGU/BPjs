@@ -66,7 +66,7 @@ public class CaseofTheHotFruitBProgram {
         System.out.println("Violation found: " + res.isViolationFound());
         System.out.println("Visited state count: " + res.getScannedStatesCount());
         res.getViolation().ifPresent(v -> {
-            System.out.println(v.decsribe());
+            System.out.println(v.describe());
             System.out.println("Trace:");
             HotSystemViolation hcv = (HotSystemViolation) v;
             System.out.println(hcv.getCounterExampleTrace().getNodes().stream()

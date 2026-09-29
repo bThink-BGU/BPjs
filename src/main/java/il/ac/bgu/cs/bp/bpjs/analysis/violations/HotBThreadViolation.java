@@ -46,7 +46,7 @@ public class HotBThreadViolation extends LivenessViolation {
     }
     
     @Override
-    public String decsribe() {
+    public String describe() {
         return "Hot run violation: b-threads {"
             + (bthreadNames.stream().collect(joining(" ,"))) 
             + "} can each get to an infinite hot loop. Cycle returns to index " + getCounterExampleTrace().getCycleToIndex()

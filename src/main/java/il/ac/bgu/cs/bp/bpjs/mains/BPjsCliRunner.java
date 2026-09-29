@@ -163,7 +163,7 @@ public class BPjsCliRunner {
                 if ( res.getViolation().isPresent() ) {
                     Violation vio = res.getViolation().get();
                     println("Found Violation:");
-                    println(vio.decsribe());
+                    println(vio.describe());
                     
                     println("Counter example trace:");
                     vio.getCounterExampleTrace().getNodes().stream()

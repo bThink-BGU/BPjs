@@ -45,7 +45,7 @@ public abstract class Violation {
      * visitor/down-casting, and without hogging {@code toString()}.
      * @return a 
      */
-    public abstract String decsribe();
+    public abstract String describe();
 
     public ExecutionTrace getCounterExampleTrace() {
         return counterExampleTrace;

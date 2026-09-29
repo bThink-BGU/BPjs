@@ -68,7 +68,7 @@ public class VerificationResultOptionsTest {
 
         assertTrue(res.isViolationFound());
         assertTrue(res.getViolation().get() instanceof DeadlockViolation);
-        assertTrue(res.getViolation().get().decsribe().contains("Deadlock"));
+        assertTrue(res.getViolation().get().describe().contains("Deadlock"));
     }
 
     @Test
@@ -89,7 +89,7 @@ public class VerificationResultOptionsTest {
         assertEquals(expectedAssert, ((DetectedSafetyViolation)res.getViolation().get()).getDetectedViolation());
         
         Violation violation = res.getViolation().get();
-        assertTrue(violation.decsribe().contains("B happened"));
+        assertTrue(violation.describe().contains("B happened"));
         assertTrue(violation.toString().contains("FailedAssertion"));
         assertTrue(violation.toString().contains("B happened"));
     }

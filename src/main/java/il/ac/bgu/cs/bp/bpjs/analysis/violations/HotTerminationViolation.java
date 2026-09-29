@@ -43,7 +43,7 @@ public class HotTerminationViolation extends Violation {
     }
 
     @Override
-    public String decsribe() {
+    public String describe() {
         return "Hot Termination - The following b-threads were hot when the b-program ended: " +
                 hotlyTerminated.stream().sorted().collect(joining(", "));
     }
