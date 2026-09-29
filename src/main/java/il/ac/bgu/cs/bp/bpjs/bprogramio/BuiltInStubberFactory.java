@@ -34,6 +34,7 @@ import java.util.Set;
 import org.mozilla.javascript.Context;
 import org.mozilla.javascript.NativeSet;
 import org.mozilla.javascript.Scriptable;
+import org.mozilla.javascript.ScriptRuntime;
 
 /**
  * Stub provider for standard classes.
@@ -54,6 +55,20 @@ class BuiltInStubber implements SerializationStubber {
     public static final StreamObjectStub ES_PROXY = new StreamObjectStub("built-in", "ES-PROXY");
     
     
+    /**
+     * Rhino's compiled regular expression class. It is package-private, so we
+     * can't reference it directly.
+     */
+    static final Class<?> RECOMPILED_CLASS;
+    
+    static {
+        try {
+            RECOMPILED_CLASS = Class.forName("org.mozilla.javascript.regexp.RECompiled");
+        } catch (ClassNotFoundException ex) {
+            throw new ExceptionInInitializerError(ex);
+        }
+    }
+    
     private final BProgramJsProxy bprogProxy;
     
     BuiltInStubber( BProgram aBProg ) {
@@ -67,7 +82,7 @@ class BuiltInStubber implements SerializationStubber {
 
     @Override
     public Set<Class> getClasses() {
-        return Set.of( BProgramJsProxy.class, EventSetsJsProxy.class, Optional.class, NativeSet.class );
+        return Set.of( BProgramJsProxy.class, EventSetsJsProxy.class, Optional.class, NativeSet.class, RECOMPILED_CLASS );
     }
 
     @Override
@@ -80,6 +95,9 @@ class BuiltInStubber implements SerializationStubber {
         }
         if ( in instanceof NativeSet ) {
             return NativeSetStub.forSet((NativeSet) in);
+        }
+        if ( RECOMPILED_CLASS.isInstance(in) ) {
+            return RegExpStub.forCompiled(in);
         }
         throw new IllegalArgumentException("BuiltInStubber cannot handle " + Objects.toString(in));
     }
@@ -94,6 +112,9 @@ class BuiltInStubber implements SerializationStubber {
         }
         if ( aStub instanceof NativeSetStub ) {
             return ((NativeSetStub)aStub).deStub();
+        }
+        if ( aStub instanceof RegExpStub ) {
+            return ((RegExpStub)aStub).deStub();
         }
         throw new IllegalArgumentException("BuiltInStubber cannot handle " + aStub.toString());
     }
@@ -169,6 +190,57 @@ class BuiltInStubber implements SerializationStubber {
             }
             final NativeSetStub other = (NativeSetStub) obj;
             return super.equals(other);
+        }
+    }
+    
+    /**
+     * Stubs compiled regular expressions, which Rhino 1.9.1 cannot serialize
+     * (their character classes hold a non-serializable {@code NativeRegExp.ClassContents}).
+     * 
+     * We stub {@code RECompiled} rather than {@code NativeRegExp}: regex literals are
+     * compiled into {@code RECompiled} objects stored in the function's interpreter data,
+     * so they get serialized even when no {@code NativeRegExp} exists. Live
+     * {@code NativeRegExp}s serialize normally once their {@code RECompiled} is stubbed.
+     * 
+     * The stub holds the regex in its literal form ({@code /source/flags}).
+     */
+    static class RegExpStub extends StreamObjectStub implements java.io.Serializable {
+        
+        public static RegExpStub forCompiled(Object reCompiled) {
+            try (Context cx = BPjs.enterRhinoContext()) {
+                // NativeRegExp.toString() yields the literal form, "/source/flags".
+                String literal = ScriptRuntime.checkRegExpProxy(cx)
+                    .wrapRegExp(cx, BPjs.getBPjsScope(), reCompiled).toString();
+                return new RegExpStub(literal);
+            }
+        }
+        
+        public RegExpStub(String literal) {
+            super("built-in", literal);
+        }
+        
+        public Object deStub() {
+            String literal = (String) getData();
+            int flagsStart = literal.lastIndexOf('/');
+            String source = literal.substring(1, flagsStart);
+            String flags = literal.substring(flagsStart + 1);
+            try (Context cx = BPjs.enterRhinoContext()) {
+                return ScriptRuntime.checkRegExpProxy(cx).compileRegExp(cx, source, flags);
+            }
+        }
+        
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            return super.equals(obj);
         }
     }
     
